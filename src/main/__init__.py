@@ -16,13 +16,9 @@
 # limitations under the License.
 #
 
-
 from . import _init_global_config
-
-from core.driver.lite_driver import LiteUnitTest
 from core.command.console import Console
 
 __all__ = [
     "Console",
-    "LiteUnitTest",
 ]

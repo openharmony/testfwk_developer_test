@@ -64,3 +64,4 @@ class BuildLiteManager(object):
             return self.build_version_and_cases()
         self.log.info("windows environment, only use .bin test cases")
         return True
+

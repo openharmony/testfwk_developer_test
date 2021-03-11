@@ -22,70 +22,73 @@ from core.utils import get_file_list_by_postfix
 from core.config.config_manager import FilterConfigManager
 from xdevice import platform_logger
 
-TESTFILE_TYPE_DATA_DIC = {"DEX": [], "HAP": [], "PYT": [],
-                          "CXX": [], "BIN": []}
+LOG = platform_logger("TestcaseManager")
+
+TESTFILE_TYPE_DATA_DIC = {
+    "DEX": [],
+    "HAP": [],
+    "PYT": [],
+    "CXX": [],
+    "BIN": [],
+}
 FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
 
 
 class TestCaseManager(object):
-    case_log = platform_logger("TestCaseManager")
-
     def get_test_files(self, test_case_path, options):
-        self.case_log.info("test case path: " + test_case_path)
-        self.case_log.info("test type list: " + str(options.testtype))
-        suit_file_dictionary = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
+        LOG.info("test case path: " + test_case_path)
+        LOG.info("test type list: " + str(options.testtype))
+        suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
         if os.path.exists(test_case_path):
             if len(options.testtype) != 0:
                 test_type_list = options.testtype
-                suit_file_dictionary = self.get_test_file_data(test_case_path,
-                                                               test_type_list,
-                                                               options)
+                suit_file_dic = self.get_test_file_data(
+                    test_case_path,
+                    test_type_list,
+                    options)
         else:
-            self.case_log.error("%s is not exist." % test_case_path)
-        return suit_file_dictionary
+            LOG.error("%s is not exist." % test_case_path)
+        return suit_file_dic
 
     def get_test_file_data(self, test_case_path, test_type_list, options):
-        suit_file_dictionary = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
+        suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
         for test_type in test_type_list:
-            temp_dictionary = \
-                self.get_test_file_data_by_test_type(test_case_path,
-                                                     test_type,
-                                                     options)
-            for key, value in suit_file_dictionary.items():
-                suit_file_dictionary[key] = value + temp_dictionary[key]
-        return suit_file_dictionary
+            temp_dic = self.get_test_file_data_by_test_type(
+                test_case_path,
+                test_type,
+                options)
+            for key, value in suit_file_dic.items():
+                suit_file_dic[key] = value + temp_dic[key]
+        return suit_file_dic
 
     def get_test_file_data_by_test_type(self, test_case_path,
                                         test_type, options):
         suit_file_dictionary = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
         test_case_out_path = os.path.join(test_case_path, test_type)
         if os.path.exists(test_case_out_path):
-            self.case_log.info("The test case directory: %s" %
-                               test_case_out_path)
+            LOG.info("The test case directory: %s" % test_case_out_path)
             return self.get_all_test_file(test_case_out_path, options)
         else:
-            self.case_log.error("The test case directory does not exist. %s" %
-                                test_case_out_path)
+            LOG.error("Test case dir does not exist. %s" % test_case_out_path)
         return suit_file_dictionary
 
     def get_all_test_file(self, test_case_out_path, options):
         suite_file_dictionary = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
-        filter_list_subsystem = FilterConfigManager().get_filtering_list(
+        filter_part_list = FilterConfigManager().get_filtering_list(
             "subsystem_name", options.productform)
         filter_list_test_file = FilterConfigManager().get_filtering_list(
             "testfile_name", options.productform)
 
-        for subsystem_name in os.listdir(test_case_out_path):
-            subsystem_case_dir = os.path.join(test_case_out_path,
-                                              subsystem_name)
-            if not os.path.isdir(subsystem_case_dir):
+        for part_name in os.listdir(test_case_out_path):
+            part_case_dir = os.path.join(test_case_out_path, part_name)
+            if not os.path.isdir(part_case_dir):
                 continue
 
-            if subsystem_name in filter_list_subsystem:
+            if part_name in filter_part_list:
                 continue
 
-            suit_file_list = get_file_list_by_postfix(subsystem_case_dir)
-            for suite_file in suit_file_list:
+            suite_file_list = get_file_list_by_postfix(part_case_dir)
+            for suite_file in suite_file_list:
                 if -1 != suite_file.replace(test_case_out_path, "").find(
                         os.sep + "resource" + os.sep):
                     continue
@@ -98,11 +101,9 @@ class TestCaseManager(object):
                 if suffix_name in FILTER_SUFFIX_NAME_LIST:
                     continue
 
-                if not self._get_valid_suite_file(test_case_out_path,
-                                                  suite_file,
-                                                  options.subsystem,
-                                                  options.testmodule,
-                                                  options.testsuit):
+                if not self.get_valid_suite_file(test_case_out_path,
+                                                suite_file,
+                                                options):
                     continue
 
                 if suffix_name == ".dex":
@@ -110,7 +111,7 @@ class TestCaseManager(object):
                 elif suffix_name == ".hap":
                     suite_file_dictionary["HAP"].append(suite_file)
                 elif suffix_name == ".py":
-                    if not self._check_python_test_file(suite_file):
+                    if not self.check_python_test_file(suite_file):
                         continue
                     suite_file_dictionary["PYT"].append(suite_file)
                 elif suffix_name == "":
@@ -121,45 +122,44 @@ class TestCaseManager(object):
         return suite_file_dictionary
 
     @classmethod
-    def _get_valid_suite_file(cls,
-                              test_case_out_path,
-                              suit_file,
-                              test_subsystem,
-                              test_module,
-                              test_suit):
+    def get_valid_suite_file(cls, test_case_out_path, suite_file, options):
+        partlist = options.partname_list
+        testmodule = options.testmodule
+        testsuit = options.testsuit
+
+        if not suite_file.startswith(test_case_out_path):
+            return False
+
+        if testsuit != "":
+            short_name, _ = os.path.splitext(os.path.basename(suite_file))
+            return short_name.startswith(testsuit) or \
+                testsuit.startswith(short_name)
+
         is_valid_status = False
-        if suit_file.startswith(test_case_out_path):
-            if test_suit == "":
-                suite_file_sub_path = suit_file.replace(
-                    test_case_out_path, "").strip(os.sep)
-                if test_subsystem != "":
-                    if test_module != "":
-                        if suite_file_sub_path.startswith(test_subsystem +
-                                                          os.sep +
-                                                          test_module +
-                                                          os.sep):
-                            is_valid_status = True
-                    else:
-                        if suite_file_sub_path.startswith(
-                                test_subsystem + os.sep):
-                            is_valid_status = True
-                else:
-                    if test_module != "":
-                        dir_item_list = suite_file_sub_path.split(os.sep)
-                        if len(dir_item_list) > 2 \
-                                and test_module == dir_item_list[1]:
-                            is_valid_status = True
-                    else:
-                        is_valid_status = True
-            else:
-                short_name, _ = os.path.splitext(
-                    os.path.basename(suit_file))
-                if short_name == test_suit:
+        suitfile_subpath = suite_file.replace(test_case_out_path, "")
+        suitfile_subpath = suitfile_subpath.strip(os.sep)
+        if len(partlist) == 0:
+            if testmodule != "":
+                temp_list = suitfile_subpath.split(os.sep)
+                if len(temp_list) > 2 and testmodule == temp_list[1]:
                     is_valid_status = True
+            else:
+                is_valid_status = True
+        else:
+            for partname in partlist:
+                if testmodule != "":
+                    if suitfile_subpath.startswith(
+                            partname + os.sep + testmodule + os.sep):
+                        is_valid_status = True
+                        break
+                else:
+                    if suitfile_subpath.startswith(partname + os.sep):
+                        is_valid_status = True
+                        break
         return is_valid_status
 
     @classmethod
-    def _check_python_test_file(cls, suite_file):
+    def check_python_test_file(cls, suite_file):
         if suite_file.endswith(".py"):
             filename = os.path.basename(suite_file)
             if filename.startswith("test_"):

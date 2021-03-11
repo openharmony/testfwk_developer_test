@@ -22,18 +22,19 @@ import os
 from core.constants import ToolCommandType
 from core.utils import get_file_list
 from core.utils import get_file_list_by_postfix
-from core.build.filter_targets import FilterTargets
+from core.utils import get_build_output_path
 from core.config.config_manager import UserConfigManager
 from core.config.config_manager import FrameworkConfigManager
+from core.config.parse_parts_config import ParsePartsConfig
 
 CMD_KEY_PRODUCTLIST = "productlist"
 CMD_KEY_TYPELIST = "typelist"
 CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
+CMD_KEY_PARTLIST = "partlist"
 CMD_KEY_MODULELIST = "modulelist"
 
 
-TOOL_VERSION_INFO = """DeveloperTest V1.0.0 \
-(default, Dec 27 2018, 20:10:10) Type "help" for more information.
+TOOL_VERSION_INFO = """Welcome to DeveloperTest V1.0.0.
 """
 
 HLEP_COMMAND_INFOMATION = """use help [follow command] for more information:
@@ -41,6 +42,8 @@ HLEP_COMMAND_INFOMATION = """use help [follow command] for more information:
     "show: " + """Display a list of supported show command.
     """ + \
     "run:  " + """Display a list of supported run command.
+    """ + \
+    "list: " + """Display a list of supported device.
     """ + \
     "quit: " + """Exit the test framework application.
 """
@@ -53,63 +56,60 @@ SUPPORT_COMMAND_SHOW = """use show [follow command] for more information:
     """ + \
     "subsystemlist" + """
     """ + \
+    "partlist" + """
+    """ + \
     "modulelist" + """
 """
 
-
-RUNCASES_INFOMATION = "run\n" + """
-    Usage: run [OPTION]...
+RUNCASES_INFOMATION = """run:
     This command is used to execute the selected testcases.
     It includes a series of processes such as use case compilation, \
-    execution, and result collection.
-    """ + """\n""" + "Arguments" + """
-    -t [testtype]         Specify the type of test that needs to be performed,
-                           this parameter is mandatory, Query by typelist.
-                           Example:
-                           %s
-      -ss [subsystemname]  Specify the name of the subsystem to be executed, \
-        Query by subsystemlist.
-        -tm [testmodule]     Specify the name of the module to be executed, \
-        Query by modulelist.
-          -ts [testsuit]     Specify the name of the testsuit to be executed.
-            -tc [testcase]   Specify the case name to execute.
-    -tl [testlevel]        Specifies the execution level of the case.
-                           Note: -l and -c cannot exist at the same time.
-    """ + """\n""" + "Examples" + """
+execution, and result collection.
+
+usage: run [-p PRODUCTFORM]
+           [-t [TESTTYPE [TESTTYPE ...]]]
+           [-ss [SUBSYSTEM [SUBSYSTEM ...]]]
+           [-tp [TESTPART [TESTPART ...]]]
+           [-tm TESTMODULE]
+           [-ts TESTSUIT]
+           [-tc TESTCASE]
+           [-tl TESTLEVEL]
+
+optional arguments:
+  -p PRODUCTFORM, --productform PRODUCTFORM
+                        Specified product form
+  -t [TESTTYPE [TESTTYPE ...]], --testtype [TESTTYPE [TESTTYPE ...]]
+                        Specify test type(UT,MST,ST,PERF,ALL)
+  -ss [SUBSYSTEM [SUBSYSTEM ...]], --subsystem [SUBSYSTEM [SUBSYSTEM ...]]
+                        Specify test subsystem
+  -tp [TESTPART [TESTPART ...]], --testpart [TESTPART [TESTPART ...]]
+                        Specify test testpart
+  -tm TESTMODULE, --testmodule TESTMODULE
+                        Specified test module
+  -ts TESTSUIT, --testsuit TESTSUIT
+                        Specify test suit
+  -tc TESTCASE, --testcase TESTCASE
+                        Specify test case
+  -tl TESTLEVEL, --testlevel TESTLEVEL
+
+Examples:
     run -t UT
     run -t UT -ss aafwk
-    run -t UT -ss aafwk -tm intent_test
-    run -t UT -ss aafwk -tm intent_test -ts intent_base_test
-    run -t UT -ss aafwk -tm intent_test -ts intent_base_test -tl 2
-    run -t UT -ss aafwk -tm intent_test -ts intent_base_test -tc \
-        IntentBaseTest.*
-    run -t UT -ss aafwk -tm intent_test -ts intent_base_test -tc \
-        IntentBaseTest.AaFwk_Intent_Entity_001
+    run -t UT -ss aafwk -tm base_test
+    run -t UT -ss aafwk -tm base_test -ts base_test
+    run -t UT -ss aafwk -tm base_test -ts base_test -tl 2
+    run -t UT -ss aafwk -tm base_test -ts base_test -tc \
+AAFwkBaseTest.*
+    run -t UT -ss aafwk -tm base_test -ts base_test -tc \
+AAFwkBaseTest.object_test_001
     run -t MST
     ...
     run -t ALL
     ...
 """
 
-PLANLIST_INFOMATION = "productlist\n" + """
-    This command is used to display a list of currently \
-        supported product forms.
-"""
-
-TYPELIST_INFOMATION = "typelist\n" + """
-    This command is used to display a list of currently supported test types.
-"""
-
-SUBSYSTEMLIST_INFOMATION = "subsystemlist\n" + """
-    This command is used to display a list of currently supported subsystem.
-"""
-
-MODULELIST_INFOMATION = "modulelist\n" + """
-    This command is used to display a list of currently supported modules.
-"""
-
-HELP_INFOMATION = "help\n" + """
-    This command is used to display help information for a specified target.
+LIST_INFOMATION = "list\n" + """
+    This command is used to display device list.
 """
 
 QUIT_INFOMATION = "quit\n" + """
@@ -157,31 +157,15 @@ def select_user_input(data_list):
         return select_item_value, select_item_index
 
 
-def start_wizard_mode():
-    select_value = "Single device wizard"
-    wizard_mode_list = \
-        ["Non-guided mode", "Single device wizard", "Multi-device wizard"]
-    if len(wizard_mode_list) != 0:
-        print("Please select the wizard mode:")
-        for wizard_mode in wizard_mode_list:
-            print("start wizard mode: %s" % wizard_mode)
-        print("default is [1] %s" % wizard_mode_list[0])
-        select_value, select_index = select_user_input(wizard_mode_list)
-    print(select_value)
-    return select_index
-
-
 def select_productform():
     select_value = "phone"
     productform_list = \
         FrameworkConfigManager().get_framework_config("productform")
     if len(productform_list) != 0:
         print("Please select the current tested product form:")
-        index = 1
-        for product_form in productform_list:
-            print("select {:d} product form: {}".format(index, product_form))
-            index += 1
-        print("default is [1] {}".format(productform_list[0]))
+        for index, element in enumerate(productform_list):
+            print("%d. %s" % (index + 1, element))
+        print("default is [1] %s" % productform_list[0])
         select_value, _ = select_user_input(productform_list)
     print(select_value)
     return select_value
@@ -212,6 +196,7 @@ def display_help_info(para_list):
     if len(para_list) > 1:
         display_help_command_info(para_list[1])
     else:
+        print(TOOL_VERSION_INFO)
         print(HLEP_COMMAND_INFOMATION)
 
 
@@ -229,13 +214,10 @@ def display_show_info(para_list):
 #############################################################################
 #############################################################################
 
-def get_output_path_by_param():
+def get_module_list_from_output_dir():
     module_path_list = []
-    module_list_file_path = os.path.join(
-        sys.source_code_root_path,
-        "out",
-        "release",
-        "module_list_files")
+    module_list_file_path = os.path.join(get_build_output_path(),
+                                         "module_list_files")
     print(module_list_file_path)
     if os.path.exists(module_list_file_path):
         file_list = get_file_list_by_postfix(module_list_file_path, ".mlf")
@@ -250,49 +232,34 @@ def get_output_path_by_param():
     return module_path_list
 
 
-def get_test_dir_by_param(test_case_dir):
+def get_module_list_from_case_dir(test_case_dir):
     file_list = []
-    test_case_tests_path = os.path.join(test_case_dir, "tests")
-    if os.path.exists(test_case_tests_path):
-        test_type_name_list = os.listdir(test_case_tests_path)
-        for test_type in test_type_name_list:
-            file_path = os.path.join(test_case_tests_path, test_type)
-            for dirs in os.walk(file_path):
-                files = get_file_list(find_path=dirs[0])
-                for file_name in files:
-                    if "" != file_name and -1 == file_name.find(__file__):
-                        file_name = os.path.join(dirs[0], file_name)
-                        if os.path.isfile(file_name):
-                            file_name = file_name[len(file_path) + 1:
-                                                  file_name.rfind(os.sep)]
-                            file_list.append(file_name)
+    test_case_tests_path = test_case_dir
+    if not os.path.exists(test_case_tests_path):
+        return file_list
+
+    for test_type in os.listdir(test_case_tests_path):
+        file_path = os.path.join(test_case_tests_path, test_type)
+        for dirs in os.walk(file_path):
+            files = get_file_list(find_path=dirs[0])
+            for file_name in files:
+                if "" != file_name and -1 == file_name.find(__file__):
+                    file_name = os.path.join(dirs[0], file_name)
+                    if os.path.isfile(file_name):
+                        file_name = file_name[len(file_path) + 1: \
+                            file_name.rfind(os.sep)]
+                        file_list.append(file_name)
     return file_list
 
 
-def get_subsystem_module_list():
+def get_module_list():
     module_path_list = []
-    testcase_dir = UserConfigManager().get_user_config("testcases").get("dir")
+    testcase_dir = UserConfigManager().get_test_cases_dir()
     if testcase_dir == "":
-        module_path_list = get_output_path_by_param()
+        module_path_list = get_module_list_from_output_dir()
     else:
-        module_path_list = \
-            get_test_dir_by_param(testcase_dir)
+        module_path_list = get_module_list_from_case_dir(testcase_dir)
     return module_path_list
-
-
-def get_test_dir_by_subsystem(test_case_dir):
-    subsystem_name_list = []
-    testcase_tests_path = os.path.join(test_case_dir, "tests")
-    if os.path.exists(testcase_tests_path):
-        testtype_name_list = os.listdir(testcase_tests_path)
-        for testtype in testtype_name_list:
-            file_path = os.path.join(testcase_tests_path, testtype)
-            subsystemname_list = os.listdir(file_path)
-            for subsystem_name in subsystemname_list:
-                if subsystem_name != "" \
-                        and subsystem_name not in subsystem_name_list:
-                    subsystem_name_list.append(subsystem_name)
-    return subsystem_name_list
 
 
 #############################################################################
@@ -304,8 +271,8 @@ def show_product_list():
     productform_list = FrameworkConfigManager().get_framework_config(
         "productform")
     if 0 != len(productform_list):
-        for product_form in productform_list:
-            print("show product: {}".format(product_form))
+        for index, element in enumerate(productform_list):
+            print("    %d. %s" % (index + 1, element))
     else:
         print("No category specified.")
 
@@ -315,33 +282,45 @@ def show_testtype_list():
     testtype_list = FrameworkConfigManager().get_framework_config(
         "test_category")
     if 0 != len(testtype_list):
-        for test_type in testtype_list:
-            print("show test type:{}".format(test_type))
+        for index, element in enumerate(testtype_list):
+            print("    %d. %s" % (index + 1, element))
     else:
         print("No category specified.")
 
 
 def show_subsystem_list(product_form):
     print("List of currently supported subsystem names:")
-
-    test_case_dir = \
-        UserConfigManager().get_user_config("test_cases").get("dir")
-    if test_case_dir == "":
-        subsystem_name_list = FilterTargets(
-            sys.source_code_root_path).get_part_name_list_by_product(
-            product_form)
-    else:
-        subsystem_name_list = get_test_dir_by_subsystem(test_case_dir)
+    parser = ParsePartsConfig(product_form)
+    subsystem_name_list = parser.get_subsystem_name_list()
+    if len(subsystem_name_list) == 0:
+        return
 
     subsystem_name_list.sort()
-    for subsystem_name in subsystem_name_list:
-        print("show subsystem_name: {}".format(subsystem_name))
+    for index, element in enumerate(subsystem_name_list):
+        print("    %d. %s" % (index + 1, element))
+
+
+def show_partname_list(product_form):
+    print("List of currently supported part names:")
+    parser = ParsePartsConfig(product_form)
+    subsystem_name_list = parser.get_subsystem_name_list()
+    if len(subsystem_name_list) == 0:
+        return
+
+    subsystem_name_list.sort()
+    subsystem_infos = parser.get_subsystem_infos()
+    for subsystem in subsystem_name_list:
+        print("%s:" % subsystem)
+        part_name_list = subsystem_infos[subsystem]
+        part_name_list.sort()
+        for index, element in enumerate(part_name_list):
+            print("    %d. %s" % (index + 1, element))
 
 
 def show_module_list():
     print("List of currently supported module names:")
     subsystem_name_list = []
-    subsystem_module_list = get_subsystem_module_list()
+    subsystem_module_list = get_module_list()
 
     for item in subsystem_module_list:
         if item != "":
@@ -367,14 +346,14 @@ def show_module_list():
 
 
 def display_help_command_info(command):
-    if command == CMD_KEY_PRODUCTLIST:
-        print(PLANLIST_INFOMATION)
-    elif command == CMD_KEY_TYPELIST:
-        print(TYPELIST_INFOMATION)
-    elif command == CMD_KEY_SUBSYSTEMLIST:
-        print(SUBSYSTEMLIST_INFOMATION)
-    elif command == CMD_KEY_MODULELIST:
-        print(MODULELIST_INFOMATION)
+    if command == ToolCommandType.TOOLCMD_KEY_SHOW:
+        print(SUPPORT_COMMAND_SHOW)
+    elif command == ToolCommandType.TOOLCMD_KEY_RUN:
+        print(RUNCASES_INFOMATION)
+    elif command == ToolCommandType.TOOLCMD_KEY_LIST:
+        print(LIST_INFOMATION)
+    elif command == ToolCommandType.TOOLCMD_KEY_QUIT:
+        print(QUIT_INFOMATION)
     else:
         print("'%s' command no help information." % command)
 
@@ -386,10 +365,13 @@ def display_show_command_info(command, product_form="phone"):
         show_testtype_list()
     elif command == CMD_KEY_SUBSYSTEMLIST:
         show_subsystem_list(product_form)
+    elif command == CMD_KEY_PARTLIST:
+        show_partname_list(product_form)
     elif command == CMD_KEY_MODULELIST:
         show_module_list()
     else:
         print("This command is not support.")
+
 
 #############################################################################
 #############################################################################

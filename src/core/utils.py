@@ -16,92 +16,16 @@
 # limitations under the License.
 #
 
+import sys
 import os
-import platform
-import subprocess
-from binascii import hexlify
-from concurrent.futures import wait
-from concurrent.futures import ThreadPoolExecutor
-from _core.logger import platform_logger
-
-COUNT = 0
-UTIL_LOG = platform_logger("utils")
+import time
+from core.config.config_manager import UserConfigManager
 
 
 def get_filename_extension(file):
     _, fullname = os.path.split(file)
     filename, ext = os.path.splitext(fullname)
     return filename, ext
-
-
-def unique_id(type_name, value):
-    global COUNT
-    COUNT += 1
-    return "{}_{}_{:0>4d}".format(type_name, value, COUNT)
-
-
-def concurrent_exec_all_complete(func, params_list, max_size=8):
-    """
-    Provider the ability to execute target function concurrently
-    :param func: target function name
-    :param params_list: the list of params in these target functions
-    :param max_size:  the max size of thread  you wanted  in thread pool
-    :return:
-    """
-    with ThreadPoolExecutor(max_size) as executor:
-        future_params = dict()
-        for params in params_list:
-            future = executor.submit(func, *params)
-            future_params.update({future: params})
-        wait(future_params)  # wait all function complete
-        result_list = []
-        for future in future_params:
-            result_list.append((future.result(), future_params[future]))
-        return result_list
-
-
-def get_decode(input_str):
-    if not isinstance(input_str, str) and not isinstance(input_str, bytes):
-        return_str = str(input_str)
-    else:
-        try:
-            return_str = input_str.decode("utf-8", errors="ignore")
-        except (UnicodeDecodeError, AttributeError):
-            try:
-                return_str = str(input_str)
-            except (TypeError, ValueError):
-                return_str = hexlify(input_str)
-    return return_str
-
-
-def is_proc_running(pid, name=None):
-    if name is None or name == "":
-        return True
-
-    if platform.system() == "Windows":
-        command = "tasklist | findstr \"%s\""
-    else:
-        command = "ps -ef | grep %s"
-
-    proc = subprocess.Popen(command % str(pid), stdout=subprocess.PIPE,
-                            shell=False)
-    out, _ = proc.communicate()
-    out = get_decode(out).strip()
-    return False if out == "" else out.find(name) != -1
-
-
-def get_running_proc_num(name):
-    if name is None or name == "":
-        return 0
-
-    if platform.system() == "Windows":
-        command = "tasklist | findstr {}".format(name)
-    else:
-        command = "ps -ef | grep {}".format(name)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, shell=False)
-    out, _ = proc.communicate()
-    out = get_decode(out).strip()
-    return 0 if out == "" else len(out.splitlines())
 
 
 def create_dir(path):
@@ -134,3 +58,54 @@ def get_file_list_by_postfix(path, postfix=""):
                 if os.path.isfile(file_name):
                     file_list.append(file_name)
     return file_list
+
+
+def get_device_log_file(report_path, serial=None, log_name="device_log"):
+    log_path = os.path.join(report_path, "log")
+    os.makedirs(log_path, exist_ok=True)
+
+    serial = serial or time.time_ns()
+    device_file_name = "{}_{}.log".format(log_name, serial)
+    device_log_file = os.path.join(log_path, device_file_name)
+    return device_log_file
+
+
+def get_build_output_path():
+    if sys.source_code_root_path == "":
+        return ""
+
+    manager = UserConfigManager()
+    para_dic = manager.get_user_config("build", "paramter")
+
+    target_os = para_dic.get("target_os", "")
+    target_cpu = para_dic.get("target_cpu", "")
+    variant = para_dic.get("variant", "")
+    build_output_name = "%s-%s-%s" % (target_os, target_cpu, variant)
+    if build_output_name == "aosp-arm64-release":
+        build_output_name = "release"
+
+    build_output_path = os.path.join(
+        sys.source_code_root_path,
+        "out",
+        build_output_name)
+    return build_output_path
+
+
+def is_32_bit_test():
+    manager = UserConfigManager()
+    para_dic = manager.get_user_config("build", "paramter")
+    target_cpu = para_dic.get("target_cpu", "")
+    if target_cpu == "arm":
+        return True
+    return False
+
+
+def get_decode(stream):
+    if not isinstance(stream, str) and not isinstance(stream, bytes):
+        ret = str(stream)
+    else:
+        try:
+            ret = stream.decode("utf-8", errors="ignore")
+        except (ValueError, AttributeError, TypeError):
+            ret = str(stream)
+    return ret

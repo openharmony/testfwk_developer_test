@@ -1,0 +1,20 @@
+{
+    "string":[
+        {
+            "name":"app_name",
+            "value":"OHOS Test App"
+        },
+        {
+            "name":"hello_msg",
+            "value":"Hello OHOS!"
+        },
+        {
+            "name":"menu_settings",
+            "value":"Settings"
+        },
+        {
+            "name":"title_activity_main",
+            "value":"MainActivity"
+        }
+    ]
+}

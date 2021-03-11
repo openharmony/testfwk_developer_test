@@ -19,26 +19,23 @@ echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 date +%F' '%H:%M:%S
 echo $@
 
-BASE_HOME_PATH=$(cd $(dirname $0);pwd)
+BASE_HOME=$(cd $(dirname $0);pwd)
 RET=0
 
 do_make()
 {
-    pushd ${BASE_HOME_PATH}/src
-        hos_python_filepath="${BASE_HOME_PATH}/../../prebuilts/python/linux-x86/3.7.3/bin/python3"
-        usr_python_filepath="${BASE_HOME_PATH}/python/bin/python3"
-
-        if [[ -f "${hos_python_filepath}" ]]; then
-            python_filepath="${hos_python_filepath}"
-        elif [[ -f "${usr_python_filepath}" ]]; then
-            python_filepath="${usr_python_filepath}"
+    pushd ${BASE_HOME}/src
+        if [[ -f "${BASE_HOME}/python/bin/python3" ]]; then
+            python_filepath="${BASE_HOME}/python/bin/python3"
+        elif [[ -f "${BASE_HOME}/../../prebuilts/python/linux-x86/3.8.5/bin/python3" ]]; then
+            python_filepath="${BASE_HOME}/../../prebuilts/python/linux-x86/3.8.5/bin/python3"
         else
             python_filepath="python3"
         fi
 
         ${python_filepath} -m main "$@"
         if [ "$?" != 0 ]; then
-            echo "xdevice failed!"
+            echo "main failed!"
             $RET=1
         fi
     popd

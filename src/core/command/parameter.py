@@ -16,7 +16,10 @@
 # limitations under the License.
 #
 
+from xdevice import platform_logger
 from core.config.config_manager import FrameworkConfigManager
+
+LOG = platform_logger("Console")
 
 
 class Parameter(object):
@@ -33,11 +36,11 @@ class Parameter(object):
             item = item.strip(" ")
             if not item.isdigit():
                 check_flag = False
-                print("The test level you entered is incorrect.")
+                LOG.warning("The testlevel you entered is incorrect.")
                 break
 
             if item not in level_key_list:
-                print("The test level you entered is incorrect.")
+                LOG.warning("The testlevel you entered is incorrect.")
                 check_flag = False
                 break
 
@@ -52,12 +55,14 @@ class Parameter(object):
     @classmethod
     def get_testtype_list(cls, type_list):
         test_type_list = []
-        if "all" not in type_list:
+        if "ALL" not in type_list:
             test_category_dic = \
                 FrameworkConfigManager().get_test_category_info()
             for item in type_list:
+                item = item.upper()
                 data = test_category_dic.get(item, None)
                 if data is None:
+                    LOG.warning("data is None.")
                     test_type_list = []
                     break
                 test_type_list.append(data[0])
@@ -67,22 +72,23 @@ class Parameter(object):
 
     def check_run_parameter(self, options):
         if options.productform is None or options.productform == "":
-            print("The productform is incorrect.")
+            LOG.warning("The productform is incorrect.")
             return False
 
         productform_list = FrameworkConfigManager().get_framework_config(
             "productform")
         if options.productform not in productform_list:
-            print("The product form you entered is incorrect.")
+            LOG.warning("The productform you entered is incorrect.")
             return False
 
         if "" != options.testcase and "" != options.testlevel:
-            print("The -l and -c parameters cannot exist at the same time.")
+            LOG.warning("The -l and -c parameters cannot exist at the \
+                        same time.")
             return False
 
         level_string = self.get_valid_test_level_string(options.testlevel)
         if options.testlevel != "" and level_string == "":
-            print("The test level you entered is incorrect.")
+            LOG.warning("The testlevel you entered is incorrect.")
             return False
 
         return True

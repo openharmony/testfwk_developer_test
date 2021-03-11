@@ -20,15 +20,14 @@ import sys
 from main import Console
 from xdevice import platform_logger
 
+LOG = platform_logger("main")
+
 
 def main_process():
-    main_log = platform_logger("main")
-    main_log.info(
-        "************* Developer Test Framework Starting **************")
+    LOG.info("************* Developer Test Framework Starting **************")
     console = Console()
     console.console(sys.argv)
-    main_log.info(
-        "************* Developer Test Framework Finished **************")
+    LOG.info("************* Developer Test Framework Finished **************")
 
 
 if __name__ == "__main__":

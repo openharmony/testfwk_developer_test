@@ -21,12 +21,11 @@ TIME /T
 cd %BASE_HOME_PATH%\src
 
 if exist %BASE_HOME_PATH%\python\python.exe (
-    %BASE_HOME_PATH%\python\python.exe -m xdevice %1
+    %BASE_HOME_PATH%\python\python.exe -m main %1
 ) else (
     python -m main %1
 )
 
-%BASE_HOME_PATH%\python\python.exe -m xdevice %1
 cd %BASE_HOME_PATH%
 
 @echo finish time is:

@@ -18,6 +18,8 @@
 
 import os
 import shutil
+import time
+from dataclasses import dataclass
 
 from xdevice import DeviceTestType
 from xdevice import IDriver
@@ -27,6 +29,24 @@ from xdevice import platform_logger
 from core.config.config_manager import UserConfigManager
 
 __all__ = ["LiteUnitTest"]
+
+
+def get_level_para_string(level_string):
+    level_list = list(set(level_string.split(",")))
+    level_para_string = ""
+    for item in level_list:
+        if not item.isdigit():
+            continue
+        item = item.strip(" ")
+        level_para_string += ("Level%s," % item)
+    level_para_string = level_para_string.strip(",")
+    return level_para_string
+
+
+@dataclass
+class GTestConst(object):
+    exec_para_filter = "--gtest_filter"
+    exec_para_level = "--gtest_testsize"
 
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.lite_cpp_test)
@@ -101,7 +121,7 @@ class LiteUnitTest(IDriver):
         if cls.nfs_dir == "":
             cls.log.error("no configure for nfs directory")
             return False
-        pre_result, status, _ = \
+        _, status, _ = \
             cls.lite_device.execute_command_with_timeout("cd /{}".format(
                 UserConfigManager().get_user_config("NFS").get("board_dir")),
             case_type=DeviceTestType.lite_cpp_test)
@@ -113,19 +133,40 @@ class LiteUnitTest(IDriver):
 
     @classmethod
     def _execute_test(cls, request):
-        test_cases = request.config.testdict['BIN']
-        cxx_test_cases = request.config.testdict['CXX']
-        test_cases += cxx_test_cases
-        for test_case in test_cases:
-            case_name = os.path.basename(test_case)
-            shutil.copyfile(test_case, os.path.join(cls.nfs_dir, case_name))
-            case_result, status, _ = \
-                cls.lite_device.execute_command_with_timeout(
-                "./" + case_name, case_type=DeviceTestType.lite_cpp_test)
-            if status:
-                cls.log.info("test case result:\n %s" % case_result)
-                continue
-            cls.log.error("failed case: %s" % test_case)
+        test_case = request.root.source.source_file
+        cls.config = request.config
+        test_para = cls._get_test_para(cls.config.testcase,
+                                       cls.config.testlevel)
+        case_name = os.path.basename(test_case)
+        if os.path.exists(os.path.join(cls.nfs_dir, case_name)):
+            os.remove(os.path.join(cls.nfs_dir, case_name))
+        result_name = case_name + ".xml"
+        result_file = os.path.join(cls.nfs_dir, result_name)
+        if os.path.exists(result_file):
+            os.remove(result_file)
+        shutil.copyfile(test_case, os.path.join(cls.nfs_dir, case_name))
+        cls.lite_device.execute_command_with_timeout(
+            "chmod 777 {}".format(case_name),
+            case_type=DeviceTestType.lite_cpp_test)
+        test_command = "./%s %s" % (case_name, test_para)
+        case_result, status, _ = \
+            cls.lite_device.execute_command_with_timeout(
+            test_command, case_type=DeviceTestType.lite_cpp_test)
+        if status:
+            cls.log.info("test case result:\n %s" % case_result)
+            return
+        cls.log.error("failed case: %s" % test_case)
+
+    @classmethod
+    def _get_test_para(cls, testcase, testlevel):
+        if "" != testcase and "" == testlevel:
+            test_para = "%s=%s" % (GTestConst.exec_para_filter, testcase)
+        elif "" == testcase and "" != testlevel:
+            level_para = get_level_para_string(testlevel)
+            test_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
+        else:
+            test_para = ""
+        return test_para
 
     @classmethod
     def _after_execute_test(cls, request):
@@ -139,23 +180,56 @@ class LiteUnitTest(IDriver):
             return False
         report_path = request.config.report_path
         test_result = os.path.join(report_path, "result")
-        test_cases = request.config.testdict['BIN']
-        for test_case in test_cases:
-            case_name = os.path.basename(test_case)
-            result_name = case_name + ".xml"
-            result_file = os.path.join(cls.nfs_dir, result_name)
-            if not os.path.exists(result_file):
-                cls.log.error("file %s not exist." % result_file)
-                continue
-            file_name = os.path.basename(result_file)
-            if not os.path.exists(test_result):
-                os.mkdir(test_result)
-            final_result = os.path.join(test_result, file_name)
-            shutil.copyfile(result_file,
-                            final_result)
+        test_case = request.root.source.source_file
+        case_name = os.path.basename(test_case)
+        if not os.path.exists(test_result):
+            os.mkdir(test_result)
+        sub_system_module = test_case.split(
+            "unittest" + os.sep)[1].split(os.sep + "bin")[0]
+        if os.sep in sub_system_module:
+            sub_system = sub_system_module.split(os.sep)[0]
+            module_name = sub_system_module.split(os.sep)[1]
+            subsystem_dir = os.path.join(test_result, sub_system)
+            if not os.path.exists(subsystem_dir):
+                os.mkdir(subsystem_dir)
+            module_dir = os.path.join(subsystem_dir, module_name)
+            if not os.path.exists(module_dir):
+                os.mkdir(module_dir)
+            test_result = module_dir
+        else:
+            if sub_system_module != "":
+                test_result = os.path.join(test_result, sub_system_module)
+                if not os.path.exists(test_result):
+                    os.mkdir(test_result)
+        result_name = case_name + ".xml"
+        result_file = os.path.join(cls.nfs_dir, result_name)
+        if not cls._check_xml_exist(result_name):
+            cls.log.error("result xml file %s not exist." % result_name)
+        if not os.path.exists(result_file):
+            cls.log.error("file %s not exist." % result_file)
+            return False
+        file_name = os.path.basename(result_file)
+        final_result = os.path.join(test_result, file_name)
+        shutil.copyfile(result_file,
+                        final_result)
         cls.log.info("after execute test")
         cls.lite_device.close()
         return True
+
+    @classmethod
+    def _check_xml_exist(cls, xml_file, timeout=60):
+        ls_command = \
+            "ls /%s" % \
+            UserConfigManager().get_user_config("NFS").get("board_dir")
+        start_time = time.time()
+        while time.time()-start_time < timeout:
+            result, _, _ = cls.lite_device.execute_command_with_timeout(
+                command=ls_command, case_type=DeviceTestType.cpp_test_lite,
+                timeout=5, receiver=None)
+            if xml_file in result:
+                return True
+            time.sleep(5)
+        return False
 
     @classmethod
     def show_help_info(cls):

@@ -16,99 +16,147 @@
 # limitations under the License.
 #
 
+import time
 import os
 import sys
+
 from core.constants import SchedulerType
 from xdevice import Plugin
 from xdevice import get_plugin
 from xdevice import platform_logger
+from xdevice import Scheduler
+from core.utils import get_build_output_path
 from core.command.parameter import Parameter
 from core.testcase.testcase_manager import TestCaseManager
 from core.config.config_manager import UserConfigManager
+from core.config.parse_parts_config import ParsePartsConfig
+
+LOG = platform_logger("Run")
 
 
 class Run(object):
-    run_log = platform_logger("Run")
-
     def process_command_run(self, command, options):
         para = Parameter()
         test_type_list = para.get_testtype_list(options.testtype)
         if len(test_type_list) == 0:
-            self.run_log.error("The testtype parameter is incorrect.")
+            LOG.error("The testtype parameter is incorrect.")
             return
         options.testtype = test_type_list
 
-        self.run_log.info("")
-        self.run_log.info("------------------------------------")
-        self.run_log.info("Input parameter:")
-        self.run_log.info("productform   = %s" % options.productform)
-        self.run_log.info("testtype      = %s" % options.testtype)
-        self.run_log.info("subsystem     = %s" % options.subsystem)
-        self.run_log.info("testmodule    = %s" % options.testmodule)
-        self.run_log.info("testsuit      = %s" % options.testsuit)
-        self.run_log.info("testcase      = %s" % options.testcase)
-        self.run_log.info("testlevel     = %s" % options.testlevel)
-        self.run_log.info("------------------------------------")
-        self.run_log.info("")
+        parser = ParsePartsConfig(options.productform)
+        partname_list = parser.get_part_list(
+            options.subsystem,
+            options.testpart)
+        options.partname_list = partname_list
+        options.coverage_outpath = self.get_coverage_outpath(options)
+
+        LOG.info("")
+        LOG.info("------------------------------------")
+        LOG.info("Input parameter:")
+        LOG.info("productform   = %s" % options.productform)
+        LOG.info("testtype      = %s" % str(options.testtype))
+        LOG.info("subsystem     = %s" % str(options.subsystem))
+        LOG.info("testpart      = %s" % str(options.testpart))
+        LOG.info("testmodule    = %s" % options.testmodule)
+        LOG.info("testsuit      = %s" % options.testsuit)
+        LOG.info("testcase      = %s" % options.testcase)
+        LOG.info("testlevel     = %s" % options.testlevel)
+        LOG.info("partname_list = %s" % str(options.partname_list))
+        LOG.info("------------------------------------")
+        LOG.info("")
 
         if not para.check_run_parameter(options):
-            self.run_log.error("Input parameter is incorrect.")
+            LOG.error("Input parameter is incorrect.")
             return
 
         if not self._build_test_cases(options):
-            self.run_log.error("Build test cases failed.")
+            LOG.error("Build test cases failed.")
             return
 
-        test_case_path = self._get_tests_out_path(
-            options.productform, options.build_variant)
+        test_case_path = self.get_tests_out_path(options.productform)
         if not os.path.exists(test_case_path):
-            self.run_log.error("%s is not exist." % test_case_path)
+            LOG.error("%s is not exist." % test_case_path)
             return
 
-        test_dictionary = TestCaseManager().get_test_files(test_case_path,
-                                                           options)
-        if not self._check_test_dictionary(test_dictionary):
-            self.run_log.error("The test file list is empty.")
+        test_dict = TestCaseManager().get_test_files(test_case_path, options)
+        if not self._check_test_dictionary(test_dict):
+            LOG.error("The test file list is empty.")
             return
 
-        setattr(options, "testdriver", "LiteUnitTest")
-        options.testdict = test_dictionary
-        options.target_outpath = self.get_target_out_path(
-            options.productform, options.build_variant)
+        if ("distributedtest" in options.testtype and
+                len(options.testtype) == 1):
+            from core.command.distribute_utils \
+                import check_ditributetest_environment
+            from core.command.distribute_utils import make_device_info_file
+            from core.command.distribute_utils \
+                import execute_distribute_test_file
+            from core.command.distribute_utils import make_reports
 
-        scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
-                               plugin_id=SchedulerType.SCHEDULER)[0]
-        if scheduler is None:
-            self.run_log.error("Can not find the scheduler plugin.")
+            local_time = time.localtime()
+            create_time = time.strftime('%Y-%m-%d-%H-%M-%S', local_time)
+            start_time = time.strftime('%Y-%m-%d %H:%M:%S', local_time)
+
+            if not check_ditributetest_environment():
+                return
+
+            result_rootpath = os.path.join(sys.framework_root_dir,
+                "reports",
+                create_time)
+            print(result_rootpath)
+
+            log_path = os.path.join(result_rootpath, "log")
+            tmp_path = os.path.join(result_rootpath, "temp")
+            os.makedirs(log_path, exist_ok=True)
+            os.makedirs(tmp_path, exist_ok=True)
+
+            Scheduler.start_task_log(log_path)
+            make_device_info_file(tmp_path)
+
+            pyfile_list = test_dict["PYT"]
+            for index, element in enumerate(pyfile_list):
+                LOG.info("[%s / %s] Executing: %s" % (index + 1,
+                    len(pyfile_list), element))
+                execute_distribute_test_file(element, result_rootpath)
+
+            make_reports(result_rootpath, start_time)
+            Scheduler.stop_task_log()
         else:
-            scheduler.exec_command(command, options)
+            options.testdict = test_dict
+            options.target_outpath = self.get_target_out_path(
+                options.productform)
 
+            scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
+                                   plugin_id=SchedulerType.SCHEDULER)[0]
+            if scheduler is None:
+                LOG.error("Can not find the scheduler plugin.")
+            else:
+                scheduler.exec_command(command, options)
         return
 
     ##############################################################
     ##############################################################
 
     @classmethod
-    def get_target_out_path(cls, product_form, build_variant):
-        target_out_path = UserConfigManager().get_user_config(
-            "test_cases").get("dir", "")
+    def get_target_out_path(cls, product_form):
+        target_out_path = UserConfigManager().get_test_cases_dir()
         if target_out_path == "":
             target_out_path = os.path.join(
-                sys.source_code_root_path,
-                "out",
-                build_variant,
+                get_build_output_path(),
                 "packages",
                 product_form)
         target_out_path = os.path.abspath(target_out_path)
         return target_out_path
 
-    def _build_test_cases(self, options):
-        if options.coverage == "coverage":
-            self.run_log.info("Coverage testing, no need to compile testcases")
+    @classmethod
+    def _build_test_cases(cls, options):
+        if options.coverage:
+            LOG.info("Coverage testing, no need to compile testcases")
             return True
 
+        is_build_testcase = UserConfigManager().get_user_config_flag(
+            "build", "testcase")
         project_root_path = sys.source_code_root_path
-        if "testcase" in options.build and project_root_path != "":
+        if is_build_testcase and project_root_path != "":
             from core.build.build_manager import BuildManager
             build_manager = BuildManager()
             return build_manager.build_testcases(project_root_path, options)
@@ -127,15 +175,26 @@ class Run(object):
         return is_valid_status
 
     @classmethod
-    def _get_tests_out_path(cls, product_form, build_variant):
-        tests_out_path = UserConfigManager().get_user_config(
-            "test_cases").get("dir")
+    def get_tests_out_path(cls, product_form):
+        tests_out_path = UserConfigManager().get_test_cases_dir()
         if tests_out_path == "":
             tests_out_path = os.path.abspath(os.path.join(
-                sys.source_code_root_path,
-                "out",
-                build_variant,
+                get_build_output_path(),
                 "packages",
                 product_form,
                 "tests"))
         return tests_out_path
+
+    @classmethod
+    def get_coverage_outpath(cls, options):
+        coverage_out_path = ""
+        if options.coverage:
+            coverage_out_path = get_build_output_path()
+            if coverage_out_path == "":
+                coverage_out_path = UserConfigManager().get_user_config(
+                    "coverage").get("outpath", "")
+            if coverage_out_path == "":
+                LOG.error("Coverage test: coverage_outpath is empty.")
+        return coverage_out_path
+
+

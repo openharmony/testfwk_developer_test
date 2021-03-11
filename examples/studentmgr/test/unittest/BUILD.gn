@@ -1,0 +1,92 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+module_output_path = "test_subsystem_examples/studentmgr"
+
+###############################################################################
+
+ohos_resources("hap_res") {
+  resource_dirs = [ "//test/developertest/adapter/examples/studentmgr/test/common/main/java/resources" ]
+  custom_package = "ohos.zunit"
+  hap_profile = "//test/developertest/adapter/examples/studentmgr/test/common/main/java/config.json"
+}
+
+ohos_java_unittest("test_studentmgr_dex_java_maple") {
+  java_files =
+      [ "./src/com/ohos/demo/test/service/EasyMockStudentMgrTest.java" ]
+  deps = [
+    "//test/developertest/examples/studentmgr:studentmgr_java",
+    "//test/developertest/libs/jtr/common/java:unittest_utils_parts_java",
+  ]
+  sub_output_dir = module_output_path
+}
+
+ohos_java_unittest("test_studentmgr_app_java_maple") {
+  test_as_app = true
+  sub_output_dir = module_output_path
+
+  # Test files
+  java_files =
+      [ "./src/com/ohos/demo/test/service/EasyMockStudentMgrTest.java" ]
+
+  deps = [
+    ":hap_res",
+    "//test/developertest/examples/studentmgr:studentmgr_java",
+
+    # customize hap ability
+    "//test/developertest/adapter/examples/studentmgr/test/common/main/java:test_customize_hap_ability_java",
+
+    # common from test subsystem
+    "//test/developertest/libs/jtr/common/java:base_test_framework_java",
+  ]
+  hap_profile = "//test/developertest/adapter/examples/studentmgr/test/common/main/java/config.json"
+  entry_app_dep = [ "//test/developertest/adapter/examples/studentmgr/test/common/shell/java:customize_shell_app" ]
+}
+
+ohos_java_unittest("test_calculator_app_java_maple") {
+  test_as_app = true
+  sub_output_dir = module_output_path
+  java_files = [
+    "./src/com/ohos/demo/test/model/CalculatorTest.java",
+    "./src/com/ohos/demo/test/BaseJunit.java",
+  ]
+
+  deps = [
+    ":hap_res",
+    "//test/developertest/examples/studentmgr:calculator_java",
+
+    # customize hap ability
+    "//test/developertest/adapter/examples/studentmgr/test/common/main/java:test_customize_hap_ability_java",
+
+    # common from test subsystem
+    "//test/developertest/libs/jtr/main/java:test_app_executor_java",
+  ]
+
+  external_deps = [ "ability:abilitykit_java" ]
+
+  external_deps += [ "ability:abilitykit_java_maple" ]
+
+  hap_profile = "//test/developertest/adapter/examples/studentmgr/test/common/main/java/config.json"
+  entry_app_dep = [ "//test/developertest/adapter/examples/studentmgr/test/common/shell/java:customize_shell_app" ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = [
+    ":test_calculator_app_java_maple",
+    ":test_studentmgr_app_java_maple",
+    ":test_studentmgr_dex_java_maple",
+  ]
+}

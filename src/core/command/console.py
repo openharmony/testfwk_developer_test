@@ -25,11 +25,22 @@ from core.constants import ToolCommandType
 from xdevice import platform_logger
 from xdevice import EnvironmentManager
 from core.command.run import Run
+from core.command.display import display_help_info
 from core.command.display import display_show_info
 from core.command.display import show_wizard_mode
 from core.config.config_manager import UserConfigManager
 
+try:
+    if platform.system() != 'Windows':
+        import readline
+except ModuleNotFoundError:
+    print("ModuleNotFoundError: readline module is not exist.")
+except ImportError:
+    print("ImportError: libreadline.so is not exist.")
+
 __all__ = ["Console"]
+LOG = platform_logger("Console")
+
 
 ##############################################################################
 ##############################################################################
@@ -42,7 +53,6 @@ class Console(object):
     """
     __instance = None
     wizard_dic = {}
-    log = platform_logger("Console")
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
@@ -62,16 +72,15 @@ class Console(object):
         """
         Main xDevice console providing user with the interface to interact
         """
+        EnvironmentManager()
         if args is None or len(args) < 2:
             self.wizard_dic = show_wizard_mode()
             print(self.wizard_dic)
-            EnvironmentManager()
             if self._build_version(self.wizard_dic["productform"]):
                 self._console()
             else:
-                self.log.error("Build version failed, exit test framework.")
+                LOG.error("Build version failed, exit test framework.")
         else:
-            EnvironmentManager()
             self.command_parser(" ".join(args[1:]))
 
     def _console(self):
@@ -86,10 +95,10 @@ class Console(object):
                     continue
                 self.command_parser(usr_input)
             except SystemExit:
-                self.log.info("Program exit normally!")
+                LOG.info("Program exit normally!")
                 return
             except (IOError, EOFError, KeyboardInterrupt) as error:
-                self.log.exception("Input Error: %s" % error)
+                LOG.exception("Input Error: %s" % error)
 
     @classmethod
     def argument_parser(cls, para_list):
@@ -102,31 +111,36 @@ class Console(object):
         parser = None
 
         try:
-            parser = argparse.ArgumentParser(
-                description="Specify test para.")
+            parser = argparse.ArgumentParser(description="Specify test para.")
             parser.add_argument("action", type=str.lower,
                                 help="Specify action")
 
             # Developer test general test parameters
             parser.add_argument("-p", "--productform",
                                 action="store",
-                                type=str,
+                                type=str.lower,
                                 dest="productform",
                                 default="phone",
                                 help="Specified product form"
                                 )
             parser.add_argument("-t", "--testtype",
                                 nargs='*',
+                                type=str.upper,
                                 dest="testtype",
-                                default=["ut"],
-                                help="Specify test type(ut,mst,st,perf,all)"
+                                default=["UT"],
+                                help="Specify test type(UT,MST,ST,PERF,ALL)"
                                 )
             parser.add_argument("-ss", "--subsystem",
-                                action="store",
-                                type=str,
+                                nargs='*',
                                 dest="subsystem",
-                                default="",
+                                default=[],
                                 help="Specify test subsystem"
+                                )
+            parser.add_argument("-tp", "--testpart",
+                                nargs='*',
+                                dest="testpart",
+                                default=[],
+                                help="Specify test testpart"
                                 )
             parser.add_argument("-tm", "--testmodule",
                                 action="store",
@@ -158,31 +172,10 @@ class Console(object):
                                 )
 
             # Developer test extended test parameters
-            parser.add_argument("-os", "--target_os_name",
-                                action="store",
-                                type=str,
-                                dest="target_os_name",
-                                default="OHOS",
-                                help="Specify target os name"
-                                )
-            parser.add_argument("-bv", "--build_variant",
-                                action="store",
-                                type=str,
-                                dest="build_variant",
-                                default="release",
-                                help="Specify build variant(release,debug)"
-                                )
-            parser.add_argument("-b", "--build",
-                                nargs='*',
-                                dest="build",
-                                default=["testcase"],
-                                help="Specify build values(version,testcase)"
-                                )
             parser.add_argument("-cov", "--coverage",
-                                action="store",
-                                type=str,
+                                action="store_true",
                                 dest="coverage",
-                                default="",
+                                default=False,
                                 help="Specify coverage"
                                 )
             parser.add_argument("-tf", "--testfile",
@@ -199,68 +192,39 @@ class Console(object):
                                 default="",
                                 help="Specify test resource"
                                 )
-
-            # Developer test other test parameters
-            parser.add_argument("-sn", "--device_sn",
-                                action="store",
-                                type=str,
-                                dest="device_sn",
-                                default="",
-                                help="Specify device serial number"
-                                )
-            parser.add_argument("-c", "--config",
-                                action="store",
-                                type=str,
-                                dest="config",
-                                default="",
-                                help="Specify test config file"
-                                )
-            parser.add_argument("-rp", "--reportpath",
-                                action="store",
-                                type=str,
-                                dest="reportpath",
-                                default="",
-                                help="Specify test report path"
-                                )
-            parser.add_argument("-e", "--exectype",
-                                action="store",
-                                type=str,
-                                dest="exectype",
-                                default="device",
-                                help="Specify test execute type"
-                                )
-            parser.add_argument("-td", "--testdriver",
-                                action="store",
-                                type=str,
-                                dest="test_driver",
-                                default="",
-                                help="Specify test driver id"
-                                )
             (options, unparsed) = parser.parse_known_args(para_list)
+
+            # Set default value
+            options.target_os_name = "OHOS"
+            options.build_variant = "release"
+            options.device_sn = ""
+            options.config = ""
+            options.reportpath = ""
+            options.exectype = "device"
+            options.testdriver = ""
+
         except SystemExit:
             valid_param = False
             parser.print_help()
-            cls.log.warning("Parameter parsing systemexit exception.")
+            LOG.warning("Parameter parsing systemexit exception.")
 
-        return options, unparsed, valid_param, parser
+        return options, unparsed, valid_param
 
     def command_parser(self, args):
         try:
-            self.log.info("Input command: " + args)
             para_list = args.split()
-            (options, _, valid_param, parser) = \
-                self.argument_parser(para_list)
+            options, _, valid_param = self.argument_parser(para_list)
             if options is None or not valid_param:
-                self.log.warning("options is None.")
+                LOG.warning("options is None.")
                 return
 
             command = options.action
             if command == "":
-                self.log.warning("action is empty.")
+                LOG.warning("action is empty.")
                 return
 
             if command.startswith(ToolCommandType.TOOLCMD_KEY_HELP):
-                self._process_command_help(parser, para_list)
+                self._process_command_help(para_list)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_SHOW):
                 self._process_command_show(para_list)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
@@ -272,18 +236,18 @@ class Console(object):
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_LIST):
                 self._process_command_device(command)
             else:
-                self.log.error("command error: %s" % command)
+                print("The %s command is not supported." % command)
         except (AttributeError, IOError, IndexError, ImportError, NameError,
                 RuntimeError, SystemError, TypeError, ValueError,
                 UnicodeError) as exception:
-            self.log.exception(exception, exc_info=False)
+            LOG.exception(exception, exc_info=False)
 
     @classmethod
-    def _process_command_help(cls, parser, para_list):
+    def _process_command_help(cls, para_list):
         if para_list[0] == ToolCommandType.TOOLCMD_KEY_HELP:
-            parser.print_help()
+            display_help_info(para_list)
         else:
-            cls.log.error("Wrong help command.")
+            LOG.error("Wrong help command.")
         return
 
     @classmethod
@@ -291,7 +255,7 @@ class Console(object):
         if para_list[0] == ToolCommandType.TOOLCMD_KEY_SHOW:
             display_show_info(para_list)
         else:
-            cls.log.error("Wrong show command.")
+            LOG.error("Wrong show command.")
         return
 
     @classmethod
@@ -299,7 +263,7 @@ class Console(object):
         if command == ToolCommandType.TOOLCMD_KEY_RUN:
             Run().process_command_run(command, options)
         else:
-            cls.log.error("Wrong run command.")
+            LOG.error("Wrong run command.")
         return
 
     @classmethod
@@ -308,7 +272,7 @@ class Console(object):
             env_manager = EnvironmentManager()
             env_manager.list_devices()
         else:
-            cls.log.error("Wrong list command.")
+            LOG.error("Wrong list command.")
         return
 
     @classmethod
@@ -318,7 +282,7 @@ class Console(object):
             env_manager.env_stop()
             sys.exit(0)
         else:
-            cls.log.error("Wrong exit command.")
+            LOG.error("Wrong exit command.")
         return
 
     @classmethod
@@ -326,7 +290,7 @@ class Console(object):
         build_result = True
         project_root_path = sys.source_code_root_path
         if project_root_path != "":
-            from _core.build.build_manager import BuildManager
+            from core.build.build_manager import BuildManager
             build_manager = BuildManager()
             is_build_version = UserConfigManager().get_user_config_flag(
                 "build", "version")
@@ -337,6 +301,7 @@ class Console(object):
                 build_result = build_manager.build_gn_file(project_root_path,
                                                            product_form)
         return build_result
+
 
 ##############################################################################
 ##############################################################################

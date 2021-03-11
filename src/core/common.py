@@ -22,7 +22,7 @@ __all__ = ["get_source_code_root_path"]
 
 
 def is_source_code_root_path(path):
-    check_name_list = ["build.sh", "base", "build"]
+    check_name_list = ["build/gn/build_ohos.sh", "build", "prebuilts"]
     for item in check_name_list:
         check_path = os.path.join(path, item)
         if not os.path.exists(check_path):
@@ -31,15 +31,14 @@ def is_source_code_root_path(path):
 
 
 def get_source_code_root_path(path):
-    source_code_root_path = path
+    code_root_path = path
     while True:
-        if source_code_root_path == "":
+        if code_root_path == "":
             break
-        if (source_code_root_path == "/" or
-                source_code_root_path.endswith(":\\")):
-            source_code_root_path = ""
+        if code_root_path == "/" or code_root_path.endswith(":\\"):
+            code_root_path = ""
             break
-        if is_source_code_root_path(source_code_root_path):
+        if is_source_code_root_path(code_root_path):
             break
-        source_code_root_path = os.path.dirname(source_code_root_path)
-    return source_code_root_path
+        code_root_path = os.path.dirname(code_root_path)
+    return code_root_path
