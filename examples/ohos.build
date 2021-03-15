@@ -10,19 +10,7 @@
       "test_list": [
         "//test/developertest/examples/calculator/test:unittest",
         "//test/developertest/examples/detector/test:unittest",
-        "//test/developertest/examples/sleep/test:performance",
-        "//test/developertest/examples/distributedb/test:distributedtest"
-      ]
-    },
-     "test_subsystem_examples": {
-      "module_list": [
-        "//test/developertest/examples/string_utils:string_utils_maple_java",
-        "//test/developertest/examples/string_utils:string_app_maple_java"
-      ],
-      "test_list": [
-        "//test/developertest/examples/studentmgr/test:unittest",
-        "//test/developertest/examples/studentmgr/test:performance",
-        "//test/developertest/examples/test/systemtest:systemtest"
+        "//test/developertest/examples/sleep/test:performance"
       ]
     }
   }

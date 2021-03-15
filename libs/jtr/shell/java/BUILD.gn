@@ -16,7 +16,6 @@ import("//build/config/ohos/rules.gni")
 java_library("test_app_shell_context_java") {
   emma_never_instrument = true
   java_files = [
-    "//test/developertest/adapter/libs/jtr/shell/java/src/ohos/unittest/AppContext.java",
     "//test/developertest/libs/jtr/shell/java/src/ohos/unittest/log/HiLogUtil.java",
   ]
   final_jar_path =
