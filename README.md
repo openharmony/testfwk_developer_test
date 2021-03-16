@@ -345,5 +345,8 @@ The Python environment is required.
 
 ## Repositories Involved<a name="section6299103515474"></a>
 
-test\_developertest
+[testing subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/testing-subsystem.md)
 
+**test\_developertest**
+
+[test\_xdevice](https://gitee.com/openharmony/test_xdevice/blob/master/README.md)
