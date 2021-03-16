@@ -49,13 +49,6 @@ def _init_global_config():
         "python"))
     sys.path.insert(2, sys.pytest_dir)
 
-    sys.adapter_dir = os.path.abspath(os.path.join(
-        sys.framework_root_dir,
-        "adapter"
-        "aw",
-        "python"))
-    sys.path.insert(3, sys.adapter_dir)
-
     sys.framework_res_dir = sys.framework_root_dir
     sys.exec_dir = sys.framework_root_dir
 

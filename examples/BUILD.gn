@@ -28,10 +28,6 @@ ohos_subsystem_test("subsystem_examples_test") {
   test_packages = [
     "calculator/test:unittest",
     "detector/test:unittest",
-    "studentmgr/test:unittest",
-    "studentmgr/test:performance",
-    "test/systemtest:systemtest",
-    "distributedb/test:distributedtest",
     "sleep/test:performance",
   ]
 }
