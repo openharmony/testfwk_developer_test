@@ -14,8 +14,6 @@
 import("//build/config/ohos/rules.gni")
 
 java_library("test_app_executor_java") {
-  emma_never_instrument = true
-  java_files = [ "//test/developertest/adapter/libs/jtr/main/java/src/ohos/unittest/TestAbility.java" ]
   final_jar_path = "$root_out_dir/test_platform/libs/test_app_executor_java.jar"
   aosp_deps = [ "maple:framework" ]
   deps = [
