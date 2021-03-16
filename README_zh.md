@@ -349,5 +349,8 @@ developertest/
 
 ## 涉及仓<a name="section6299103515474"></a>
 
-test\_developertest
+[测试子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E6%B5%8B%E8%AF%95%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
+**test\_developertest**
+
+[test\_xdevice](https://gitee.com/openharmony/test_xdevice/blob/master/README_zh.md)
