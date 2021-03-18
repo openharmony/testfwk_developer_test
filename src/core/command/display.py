@@ -200,13 +200,13 @@ def display_help_info(para_list):
         print(HLEP_COMMAND_INFOMATION)
 
 
-def display_show_info(para_list):
+def display_show_info(para_list, productform):
     if len(para_list) == 0 or para_list[0] != ToolCommandType.TOOLCMD_KEY_SHOW:
         print("This command is not support.")
         return
 
     if len(para_list) > 1:
-        display_show_command_info(para_list[1])
+        display_show_command_info(para_list[1], productform)
     else:
         print(SUPPORT_COMMAND_SHOW)
 
