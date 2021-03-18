@@ -226,7 +226,9 @@ class Console(object):
             if command.startswith(ToolCommandType.TOOLCMD_KEY_HELP):
                 self._process_command_help(para_list)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_SHOW):
-                self._process_command_show(para_list)
+                if "productform" in self.wizard_dic:
+                    productform = self.wizard_dic["productform"]
+                self._process_command_show(para_list, productform)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
                 if "productform" in self.wizard_dic:
                     options.productform = self.wizard_dic["productform"]
@@ -251,9 +253,9 @@ class Console(object):
         return
 
     @classmethod
-    def _process_command_show(cls, para_list):
+    def _process_command_show(cls, para_list, productform="phone"):
         if para_list[0] == ToolCommandType.TOOLCMD_KEY_SHOW:
-            display_show_info(para_list)
+            display_show_info(para_list, productform)
         else:
             LOG.error("Wrong show command.")
         return
