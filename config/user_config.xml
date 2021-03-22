@@ -15,17 +15,23 @@
 -->
 <user_config>
   <common>
-    <doublefwk>true</doublefwk>
+    <doublefwk>false</doublefwk>
   </common>
   <build>
     <example>false</example>
     <version>false</version>
-    <testcase>true</testcase>
+    <testcase>false</testcase>
     <paramter>
-      <target_os>aosp</target_os>
+      <target_os>ohos</target_os>
       <target_cpu>arm64</target_cpu>
       <variant>release</variant>
     </paramter>
+    <board_info>
+      <board_series>hispark</board_series>
+      <board_type>taurus</board_type>
+      <board_product>ipcamera</board_product>
+      <build_command>hb build</build_command>
+    </board_info>
   </build>
   <environment>
     <device type="usb-hdc">

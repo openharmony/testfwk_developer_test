@@ -178,11 +178,14 @@ class Run(object):
     def get_tests_out_path(cls, product_form):
         tests_out_path = UserConfigManager().get_test_cases_dir()
         if tests_out_path == "":
-            tests_out_path = os.path.abspath(os.path.join(
-                get_build_output_path(),
-                "packages",
-                product_form,
-                "tests"))
+            if UserConfigManager().get_user_config_flag("common", "doublefwk"):
+                tests_out_path = os.path.abspath(os.path.join(
+                    get_build_output_path(),
+                    "packages",
+                    product_form,
+                    "tests"))
+            else:
+                tests_out_path = os.path.join(get_build_output_path(), "test")
         return tests_out_path
 
     @classmethod

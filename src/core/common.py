@@ -25,9 +25,9 @@ def is_source_code_root_path(path):
     check_name_list = ["build/gn/build_ohos.sh", "build", "prebuilts"]
     for item in check_name_list:
         check_path = os.path.join(path, item)
-        if not os.path.exists(check_path):
-            return False
-    return True
+        if os.path.exists(check_path):
+            return True
+    return False
 
 
 def get_source_code_root_path(path):
