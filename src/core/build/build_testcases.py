@@ -26,6 +26,7 @@ from core.utils import get_build_output_path
 from core.config.config_manager import UserConfigManager
 
 BUILD_FILEPATH = "build/gn/build_ohos.sh"
+BUILD_LITE_FILE = "build/lite/build.py"
 LOG = platform_logger("BuildTestcases")
 
 
@@ -150,10 +151,33 @@ class BuildTestcases(object):
             else:
                 build_result = False
         else:
-            LOG.warning("Error: The %s is not exist" % BUILD_FILEPATH)
+            if not self.is_doublefwk:
+                build_result = self._execute_build_lite_command()
+            else:
+                LOG.warning("Error: The %s is not exist" % BUILD_FILEPATH)
 
         os.chdir(current_path)
         return build_result
+
+    def _execute_build_lite_command(self):
+        if os.path.exists(BUILD_LITE_FILE):
+            temp_user_manager = UserConfigManager()
+            build_command_config = \
+                temp_user_manager.get_user_config("build", "board_info")
+            build_command = [build_command_config.get("build_command", "")]
+            LOG.info("build_command: %s" % str(build_command))
+            try:
+                if subprocess.call(build_command) == 0:
+                    LOG.info("execute build lite command success")
+                    return True
+                else:
+                    LOG.error("execute build lite command failed")
+            except IOError as exception:
+                LOG.error("build lite test case failed, exception=%s"
+                          % exception)
+        else:
+            LOG.warning("Error: The %s is not exist" % BUILD_LITE_FILE)
+        return True
 
     def build_testcases(self, productform, target):
         command = []

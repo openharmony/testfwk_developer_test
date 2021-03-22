@@ -75,14 +75,22 @@ def get_build_output_path():
         return ""
 
     manager = UserConfigManager()
-    para_dic = manager.get_user_config("build", "paramter")
-
-    target_os = para_dic.get("target_os", "")
-    target_cpu = para_dic.get("target_cpu", "")
-    variant = para_dic.get("variant", "")
-    build_output_name = "%s-%s-%s" % (target_os, target_cpu, variant)
-    if build_output_name == "aosp-arm64-release":
-        build_output_name = "release"
+    if manager.get_user_config_flag("common", "doublefwk"):
+        para_dic = manager.get_user_config("build", "paramter")
+        target_os = para_dic.get("target_os", "")
+        target_cpu = para_dic.get("target_cpu", "")
+        variant = para_dic.get("variant", "")
+        build_output_name = "%s-%s-%s" % (target_os, target_cpu, variant)
+        if build_output_name == "ohos-arm64-release":
+            build_output_name = "release"
+    else:
+        para_dic = manager.get_user_config("build", "board_info")
+        board_series = para_dic.get("board_series", "")
+        board_type = para_dic.get("board_type", "")
+        board_product = para_dic.get("board_product", "")
+        first_build_output = "%s_%s" % (board_series, board_type)
+        second_build_output = "%s_%s" % (board_product, first_build_output)
+        build_output_name = os.path.join(first_build_output, second_build_output)
 
     build_output_path = os.path.join(
         sys.source_code_root_path,

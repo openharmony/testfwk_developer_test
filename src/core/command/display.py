@@ -216,8 +216,13 @@ def display_show_info(para_list, productform):
 
 def get_module_list_from_output_dir():
     module_path_list = []
-    module_list_file_path = os.path.join(get_build_output_path(),
-                                         "module_list_files")
+    if UserConfigManager().get_user_config_flag("common", "doublefwk"):
+        module_list_file_path = os.path.join(get_build_output_path(),
+                                             "module_list_files")
+    else:
+        module_list_file_path = os.path.join(get_build_output_path(),
+                                             "test_info",
+                                             "module_list_files")    
     print(module_list_file_path)
     if os.path.exists(module_list_file_path):
         file_list = get_file_list_by_postfix(module_list_file_path, ".mlf")
