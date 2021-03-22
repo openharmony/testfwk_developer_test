@@ -90,7 +90,8 @@ def get_build_output_path():
         board_product = para_dic.get("board_product", "")
         first_build_output = "%s_%s" % (board_series, board_type)
         second_build_output = "%s_%s" % (board_product, first_build_output)
-        build_output_name = os.path.join(first_build_output, second_build_output)
+        build_output_name = os.path.join(first_build_output,
+                                         second_build_output)
 
     build_output_path = os.path.join(
         sys.source_code_root_path,

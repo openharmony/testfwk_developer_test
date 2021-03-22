@@ -20,7 +20,7 @@
   <build>
     <example>false</example>
     <version>false</version>
-    <testcase>true</testcase>
+    <testcase>false</testcase>
     <paramter>
       <target_os>ohos</target_os>
       <target_cpu>arm64</target_cpu>
