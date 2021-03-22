@@ -15,14 +15,9 @@
 -->
 <framework_config>
   <productform>
-    <option name="phone" />
-    <option name="ivi" />
-    <option name="wearable" />
-    <option name="intellitv" />
-    <option name="ipcamera|hi3518ev300|liteos_a" />
-    <option name="ipcamera|hi3518ev300|linux" />
-    <option name="ipcamera|hi3516dv300|liteos_a" />
-    <option name="ipcamera|hi3516dv300|linux" />
+    <option name="ipcamera_hispark_aries" />
+    <option name="ipcamera_hispark_taurus" />
+    <option name="wifiiot_hispark_pegasus" />
   </productform>
   <test_category>
     <option name="UT"

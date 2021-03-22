@@ -33,25 +33,19 @@ class BuildLiteManager(object):
     log = platform_logger("BuildLiteManager")
 
     def __init__(self):
-        self.product_type = ""
-        self.platform = ""
-        self.kernel_type = ""
-
-    def _parse_build_param(self, param_option):
-        if param_option is None or "|" not in param_option.productform:
-            return False
-        if "|" in param_option.productform:
-            self.product_type, self.platform, self.kernel_type = \
-                param_option.productform.split("|")
-        return True
+        self.board_series = ""
+        self.board_type = ""
+        self.board_product = ""
 
     def build_version_and_cases(self):
-        build_command = "python build/lite/ compile %s --platform " \
-                        "%s_%s --test c  -b release" % (self.product_type,
-                                                        self.platform,
-                                                        self.kernel_type)
+        build_command = "hb build -b debug"
         self.log.info("build param:%s" % build_command)
-        return subprocess.call(build_command) == 0
+        build_result = False
+        try:
+            build_result = subprocess.call(build_command) == 0
+        except IOError as exception:
+            self.log.error("build test case failed, exception=%s" % exception)
+        return build_result
 
     def exec_build_test(self, param_option):
         """
@@ -59,7 +53,6 @@ class BuildLiteManager(object):
         :param param_option: build param
         :return:build success or failed
         """
-        self._parse_build_param(param_option)
         if platform.system() == "Linux":
             return self.build_version_and_cases()
         self.log.info("windows environment, only use .bin test cases")
