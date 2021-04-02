@@ -15,30 +15,43 @@
 -->
 <user_config>
   <common>
+    <!-- reserved field to distinguish device form -->
     <doublefwk>false</doublefwk>
   </common>
   <build>
+    <!-- whether compile test demo case, default false -->
     <example>false</example>
+    <!-- whether compile test version, default false -->
     <version>false</version>
+    <!-- whether compile test case, default false -->
     <testcase>false</testcase>
     <paramter>
+      <!-- reserved field, os name -->
       <target_os>ohos</target_os>
+      <!-- reserved field, cpu type -->
       <target_cpu>arm64</target_cpu>
-      <variant>release</variant>
+      <!-- reserved field, version type, default debug -->
+      <variant>debug</variant>
     </paramter>
     <board_info>
+      <!-- board series, default hispark -->
       <board_series>hispark</board_series>
+      <!-- board type, default taurus(3516dv300), aries(3518ev300), pegasus(3861) -->
       <board_type>taurus</board_type>
+      <!-- product name, default ipcamera(3516dv300/3518ev300), wifiiot(3861) -->
       <board_product>ipcamera</board_product>
+      <!-- build command, default hb build -->
       <build_command>hb build</build_command>
     </board_info>
   </build>
   <environment>
+    <!-- reserved field, configure devices that support HDC connection -->
     <device type="usb-hdc">
       <ip></ip>
       <port></port>
       <sn></sn>
     </device>
+    <!-- configure devices that support serial connection -->
     <device type="com"
             label="ipcamera">
       <serial>
@@ -51,12 +64,15 @@
       </serial>
     </device>
   </environment>
+  <!-- configure test cases path -->
   <test_cases>
     <dir></dir>
   </test_cases>
+  <!-- reserved field, configure output path for coverage -->
   <coverage>
     <outpath></outpath>
   </coverage>
+  <!-- configure NFS mount path for test cases -->
   <NFS>
     <host_dir></host_dir>
     <board_dir></board_dir>

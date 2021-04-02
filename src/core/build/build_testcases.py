@@ -25,7 +25,7 @@ from xdevice import platform_logger
 from core.utils import get_build_output_path
 from core.config.config_manager import UserConfigManager
 
-BUILD_FILEPATH = "build/gn/build_ohos.sh"
+BUILD_FILEPATH = "build/build_scripts/build_ohos.sh"
 BUILD_LITE_FILE = "build/lite/build.py"
 LOG = platform_logger("BuildTestcases")
 
