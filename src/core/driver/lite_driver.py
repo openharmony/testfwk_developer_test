@@ -217,7 +217,7 @@ class LiteUnitTest(IDriver):
         return True
 
     @classmethod
-    def _check_xml_exist(cls, xml_file, timeout=60):
+    def _check_xml_exist(cls, xml_file, timeout=10):
         ls_command = \
             "ls /%s" % \
             UserConfigManager().get_user_config("NFS").get("board_dir")
@@ -228,7 +228,7 @@ class LiteUnitTest(IDriver):
                 timeout=5, receiver=None)
             if xml_file in result:
                 return True
-            time.sleep(5)
+            time.sleep(1)
         return False
 
     @classmethod
