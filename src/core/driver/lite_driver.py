@@ -60,17 +60,14 @@ class LiteUnitTest(IDriver):
     lite_device = None
     result = None
 
-    @classmethod
-    def __check_failed__(cls, msg):
-        cls.log.error("check failed {}".format(msg))
+    def __check_failed__(self, msg):
+        self.log.error("check failed {}".format(msg))
         return None
 
-    @classmethod
-    def __check_environment__(cls, device_options):
+    def __check_environment__(self, device_options):
         pass
 
-    @classmethod
-    def __check_config__(cls, config):
+    def __check_config__(self, config):
         """
         1. check serial protocol
         2. login device
@@ -78,10 +75,9 @@ class LiteUnitTest(IDriver):
         :param config: serial device
         :return:
         """
-        cls.log.error("Lite driver check config:{}".format(config))
+        self.log.error("Lite driver check config:{}".format(config))
 
-    @classmethod
-    def __execute__(cls, request):
+    def __execute__(self, request):
         """
 
         1. select test case by subsystem, module, suite
@@ -92,73 +88,70 @@ class LiteUnitTest(IDriver):
         test_case，test_level，test_case_dir
         :return:
         """
-        cls.log.debug("Test suite FilePath: %s" %
+        self.log.debug("Test suite FilePath: %s" %
                       request.root.source.source_file)
-        cls.lite_device = request.config.environment.devices[0]
-        cls.lite_device.connect()
-        if not cls._before_execute_test():
-            cls.log.error("open test dir failed")
+        self.lite_device = request.config.environment.devices[0]
+        self.lite_device.connect()
+        if not self._before_execute_test():
+            self.log.error("open test dir failed")
             return
-        cls.log.debug("open test dir success")
-        if cls._execute_test(request) == "":
-            cls.log.error("execute test command failed")
+        self.log.debug("open test dir success")
+        if self._execute_test(request) == "":
+            self.log.error("execute test command failed")
             return
-        cls.log.info("execute test command success")
-        if not cls._after_execute_test(request):
-            cls.log.error("after execute test failed")
+        self.log.info("execute test command success")
+        if not self._after_execute_test(request):
+            self.log.error("after execute test failed")
             return
-        cls.log.info("lite device execute request success")
+        self.log.info("lite device execute request success")
 
-    @classmethod
-    def _before_execute_test(cls):
+    def _before_execute_test(self):
         """
         need copy test case to nfs dir
         :param request: nfs dir, test case path
         :return:
         """
-        cls.nfs_dir = \
+        self.nfs_dir = \
             UserConfigManager().get_user_config("NFS").get("host_dir")
-        if cls.nfs_dir == "":
-            cls.log.error("no configure for nfs directory")
+        if self.nfs_dir == "":
+            self.log.error("no configure for nfs directory")
             return False
         _, status, _ = \
-            cls.lite_device.execute_command_with_timeout("cd /{}".format(
+            self.lite_device.execute_command_with_timeout("cd /{}".format(
                 UserConfigManager().get_user_config("NFS").get("board_dir")),
             case_type=DeviceTestType.lite_cpp_test)
         if not status:
-            cls.log.error("pre execute command failed")
+            self.log.error("pre execute command failed")
             return False
-        cls.log.info("pre execute command success")
+        self.log.info("pre execute command success")
         return True
 
-    @classmethod
-    def _execute_test(cls, request):
+    def _execute_test(self, request):
         test_case = request.root.source.source_file
-        cls.config = request.config
-        test_para = cls._get_test_para(cls.config.testcase,
-                                       cls.config.testlevel)
+        self.config = request.config
+        test_para = self._get_test_para(self.config.testcase,
+                                       self.config.testlevel)
         case_name = os.path.basename(test_case)
-        if os.path.exists(os.path.join(cls.nfs_dir, case_name)):
-            os.remove(os.path.join(cls.nfs_dir, case_name))
+        if os.path.exists(os.path.join(self.nfs_dir, case_name)):
+            os.remove(os.path.join(self.nfs_dir, case_name))
         result_name = case_name + ".xml"
-        result_file = os.path.join(cls.nfs_dir, result_name)
+        result_file = os.path.join(self.nfs_dir, result_name)
         if os.path.exists(result_file):
             os.remove(result_file)
-        shutil.copyfile(test_case, os.path.join(cls.nfs_dir, case_name))
-        cls.lite_device.execute_command_with_timeout(
+        shutil.copyfile(test_case, os.path.join(self.nfs_dir, case_name))
+        self.lite_device.execute_command_with_timeout(
             "chmod 777 {}".format(case_name),
             case_type=DeviceTestType.lite_cpp_test)
         test_command = "./%s %s" % (case_name, test_para)
         case_result, status, _ = \
-            cls.lite_device.execute_command_with_timeout(
+            self.lite_device.execute_command_with_timeout(
             test_command, case_type=DeviceTestType.lite_cpp_test)
         if status:
-            cls.log.info("test case result:\n %s" % case_result)
+            self.log.info("test case result:\n %s" % case_result)
             return
-        cls.log.error("failed case: %s" % test_case)
+        self.log.error("failed case: %s" % test_case)
 
-    @classmethod
-    def _get_test_para(cls, testcase, testlevel):
+    def _get_test_para(self, testcase, testlevel):
         if "" != testcase and "" == testlevel:
             test_para = "%s=%s" % (GTestConst.exec_para_filter, testcase)
         elif "" == testcase and "" != testlevel:
@@ -168,15 +161,14 @@ class LiteUnitTest(IDriver):
             test_para = ""
         return test_para
 
-    @classmethod
-    def _after_execute_test(cls, request):
+    def _after_execute_test(self, request):
         """
         copy test result to result dir
         :param request:
         :return:
         """
         if request.config is None:
-            cls.log.error("test config is null")
+            self.log.error("test config is null")
             return False
         report_path = request.config.report_path
         test_result = os.path.join(report_path, "result")
@@ -202,28 +194,27 @@ class LiteUnitTest(IDriver):
                 if not os.path.exists(test_result):
                     os.mkdir(test_result)
         result_name = case_name + ".xml"
-        result_file = os.path.join(cls.nfs_dir, result_name)
-        if not cls._check_xml_exist(result_name):
-            cls.log.error("result xml file %s not exist." % result_name)
+        result_file = os.path.join(self.nfs_dir, result_name)
+        if not self._check_xml_exist(result_name):
+            self.log.error("result xml file %s not exist." % result_name)
         if not os.path.exists(result_file):
-            cls.log.error("file %s not exist." % result_file)
+            self.log.error("file %s not exist." % result_file)
             return False
         file_name = os.path.basename(result_file)
         final_result = os.path.join(test_result, file_name)
         shutil.copyfile(result_file,
                         final_result)
-        cls.log.info("after execute test")
-        cls.lite_device.close()
+        self.log.info("after execute test")
+        self.lite_device.close()
         return True
 
-    @classmethod
-    def _check_xml_exist(cls, xml_file, timeout=10):
+    def _check_xml_exist(self, xml_file, timeout=10):
         ls_command = \
             "ls /%s" % \
             UserConfigManager().get_user_config("NFS").get("board_dir")
         start_time = time.time()
         while time.time()-start_time < timeout:
-            result, _, _ = cls.lite_device.execute_command_with_timeout(
+            result, _, _ = self.lite_device.execute_command_with_timeout(
                 command=ls_command, case_type=DeviceTestType.cpp_test_lite,
                 timeout=5, receiver=None)
             if xml_file in result:
@@ -231,22 +222,19 @@ class LiteUnitTest(IDriver):
             time.sleep(1)
         return False
 
-    @classmethod
-    def show_help_info(cls):
+    def show_help_info(self):
         """
         show help info.
         """
-        cls.log.info("this is test driver for cpp test")
+        self.log.info("this is test driver for cpp test")
         return None
 
-    @classmethod
-    def show_driver_info(cls):
+    def show_driver_info(self):
         """
         show driver info.
         """
-        cls.log.info("this is test driver for cpp test")
+        self.log.info("this is test driver for cpp test")
         return None
 
-    @classmethod
-    def __result__(cls):
+    def __result__(self):
         pass
