@@ -16,8 +16,12 @@
 # limitations under the License.
 #
 
+import os
+import sys
+
 from distributed.common.common import get_resource_dir
 from distributed.common.common import get_result_dir
 from distributed.common.common import create_empty_result_file
+from distributed.distribute.distribute import Distribute
 from distributed.common.manager import DeviceManager
 

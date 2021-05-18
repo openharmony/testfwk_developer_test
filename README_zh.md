@@ -166,7 +166,26 @@ developertest/
 
     文件：developertest/config/user\_config.xml
 
-    1.  支持hdc连接的被测设备。
+    1.  测试框架通用配置。
+
+        \[build\]    \# 配置测试用例的编译参数，例如：
+
+        ```
+        <build>
+            <example>false</example>
+            <version>false</version>
+            <testcase>true</testcase>
+            ... ...
+        </build>
+        ```
+
+        >![](public_sys-resources/icon-note.gif) **说明：** 
+        >测试用例的编译参数说明如下：
+        >example：是否编译测试用例示例，默认false。
+        >version：是否编译测试版本，默认false。
+        >testcase：是否编译测试用例，默认true。
+
+    2.  支持hdc连接的被测设备。
 
         \[device\]    \# 配置标签为usb-hdc的环境信息，测试设备的IP地址和hdc映射的端口号，例如：
 
@@ -178,7 +197,25 @@ developertest/
         </device>
         ```
 
-    2.  仅支持串口的被测设备。
+    3.  仅支持串口的被测设备。
+
+        \[board\_info\]    \# 开发板配置信息，例如：
+
+        ```
+        <board_info>
+            <board_series>hispark</board_series>
+            <board_type>taurus</board_type>
+            <board_product>ipcamera</board_product>
+            <build_command>hb build</build_command>
+        </board_info>
+        ```
+
+        >![](public_sys-resources/icon-note.gif) **说明：** 
+        >开发板配置信息如下：
+        >board\_series：开发板系列，默认hispark。
+        >board\_type：开发板类型，默认taurus。
+        >board\_product：目标产品，默认ipcamera。
+        >build\_command：测试版本和用例的编译命令，默认hb build。
 
         \[device\]    \# 配置标签为ipcamera的串口信息，COM口和波特率，例如：
 

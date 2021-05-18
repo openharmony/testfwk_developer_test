@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (c) 2021 Huawei Device Co., Ltd.
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,32 +14,32 @@
      limitations under the License.
 -->
 <TestFileConfig>
-  <testfile_name>
-    <phone>
-      <item></item>
-    </phone>
-    <ivi>
-      <item></item>
-    </ivi>
-    <wearable>
-      <item></item>
-    </wearable>
-    <intellitv>
-      <item></item>
-    </intellitv>
-  </testfile_name>
-  <subsystem_name>
-    <phone>
-      <item></item>
-    </phone>
-    <ivi>
-      <item></item>
-    </ivi>
-    <wearable>
-      <item></item>
-    </wearable>
-    <intellitv>
-      <item></item>
-    </intellitv>
-  </subsystem_name>
+    <testfile_name>
+        <phone>
+            <item></item>
+        </phone>
+        <ivi>
+            <item></item>
+        </ivi>
+        <wearable>
+            <item></item>
+        </wearable>
+        <intellitv>
+            <item></item>
+        </intellitv>
+    </testfile_name>
+    <subsystem_name>
+        <phone>
+            <item></item>
+        </phone>
+        <ivi>
+            <item></item>
+        </ivi>
+        <wearable>
+            <item></item>
+        </wearable>
+        <intellitv>
+            <item></item>
+        </intellitv>
+    </subsystem_name>
 </TestFileConfig>

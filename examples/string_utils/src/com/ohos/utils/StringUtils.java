@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.ohos.utils;
 
 import java.util.Locale;
-
 
 /**
  * handle string method
@@ -33,7 +33,6 @@ public class StringUtils {
         if (str == null) {
             return EMPTY_STRING;
         }
-
         return str.toLowerCase(Locale.getDefault());
     }
 
@@ -47,7 +46,6 @@ public class StringUtils {
         if (str == null) {
             return EMPTY_STRING;
         }
-
         return str.toUpperCase(Locale.getDefault());
     }
 
@@ -61,7 +59,6 @@ public class StringUtils {
         if (str == null) {
             return EMPTY_STRING;
         }
-
         return new StringBuffer(str).reverse().toString();
     }
 }

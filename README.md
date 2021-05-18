@@ -158,13 +158,31 @@ The Python environment is required.
         ```
 
 
--   Configure the developers test module
+-   Configure the developers test module.
 
-    in the configuration file  **developertest/config/user\_config.xml**.
+    Configuration file:  **developertest/config/user\_config.xml**
 
-    1.  For devices that support the Harmony device connector \(hdc\), modify the configuration file as follows:
+    1.  Modify basic configuration parameters.
 
-        Between the  **<device\>**  tags with the  **"usb-hdc"**  attribute, configure the test device IP address and the matched hdc port. For example
+        \[build\]    \# Set build parameters of the test case.
+
+        ```
+        <build>
+            <example>false</example>
+            <version>false</version>
+            <testcase>true</testcase>
+            ... ...
+        </build>
+        ```
+
+        >![](public_sys-resources/icon-note.gif) **NOTE:** 
+        >**example**: whether to build the test case example. The default value is  **false**.
+        >**version**: whether to build the test version. The default value is  **false**.
+        >**testcase**: whether to build the test case. The default value is  **true**.
+
+    2.  For devices that support the Harmony device connector \(hdc\), modify the configuration file as follows:
+
+        \[device\]    \# Configure the device information with the  **"usb-hdc"**  attribute, including the test device IP address and the matched hdc port.
 
         ```
         <device type="usb-hdc">
@@ -174,9 +192,26 @@ The Python environment is required.
         </device>
         ```
 
-    2.  For devices that only support the serial port connection, modify the configuration file as follows:
+    3.  For devices that support serial port connection only, modify the configuration file as follows:
 
-        Between the  **<device\>**  tags with the  **"ipcamera"**  attribute, configure the serial port information, including the COM port and baud rate. For example:
+        \[board\_info\]    \# Configure development board information.
+
+        ```
+        <board_info>
+            <board_series>hispark</board_series>
+            <board_type>taurus</board_type>
+            <board_product>ipcamera</board_product>
+            <build_command>hb build</build_command>
+        </board_info>
+        ```
+
+        >![](public_sys-resources/icon-note.gif) **NOTE:** 
+        >**board\_series**: development board series. The default value is  **hispark**.
+        >**board\_type**: development board type. The default value is  **taurus**.
+        >**board\_product**: target product. The default value is  **ipcamera**.
+        >**build\_command**: command used for building the test version and test case. The default value is  **hb build**.
+
+        \[device\]    \# Configure the serial port information with the  **"ipcamera"**  attribute, including the COM port and baud rate. For example:
 
         ```
         <device type="com" label="ipcamera">

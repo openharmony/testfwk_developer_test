@@ -28,11 +28,8 @@ namespace TestAW {
 
 #define ERR_MSG(...)    fprintf(stderr, __VA_ARGS__)
 #define INF_MSG(...)    fprintf(stdout, __VA_ARGS__)
-#if 0
-#define DBG_MSG(...)    fprintf(stdout,__VA_ARGS__)
-#else
-#define DBG_MSG(...)
-#endif
+#define DBG_MSG(...)    fprintf(stdout, __VA_ARGS__)
+
 #define ID_LARGER_IS_BETTER    true
 #define ID_SMALLER_IS_BETTER   false
 #define _max(a,b) (((a)>=(b)) ? (a) : (b) )
@@ -152,7 +149,7 @@ double BaseLineManager::StrToDouble(const string& str)
 bool BaseLineManager::GetExtraValueDouble(const string testcaseName, const string extra, double &value)
 {
     if (testcaseName == "" || extra == "") {
-        DBG_MSG("[ ERROR    ] invalid arguments: testcaseName=%s, extra=%s\n", testcaseName.c_str(), extra);
+        DBG_MSG("[ ERROR    ] invalid arguments: testcaseName=%s, extra=%s\n", testcaseName.c_str(), extra.c_str());
         return false;
     }
 
@@ -238,7 +235,7 @@ bool GtestPerfTestCase::Initialize()
     m_bHasFloatRange = m_pManager->GetExtraValueDouble(m_strCaseName, "floatrange", m_dbFloatRange);
     // check values is valid, and update them.
     if (m_bHasFloatRange && (m_dbFloatRange < 0 || m_dbFloatRange >= 1)) {
-        DBG_MSG("[ ERROR    ] %s has invalid float range: %f.\n", m_strCaseName, m_dbFloatRange);
+        DBG_MSG("[ ERROR    ] %s has invalid float range: %f.\n", m_strCaseName.c_str(), m_dbFloatRange);
         m_bHasFloatRange = false;
     }
 
