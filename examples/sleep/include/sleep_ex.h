@@ -14,7 +14,6 @@
  */
 
 #include <sys/socket.h>
-#include <linux/genetlink.h>
 #include <string>
 #include <unistd.h>
 

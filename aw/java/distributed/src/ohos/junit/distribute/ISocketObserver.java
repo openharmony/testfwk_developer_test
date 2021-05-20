@@ -16,7 +16,7 @@
 package ohos.junit.distribute;
 
 /**
- * Client for distribute socket
+ * Client for distributed socket
  */
 public interface ISocketObserver {
     /**
