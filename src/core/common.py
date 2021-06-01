@@ -22,7 +22,7 @@ __all__ = ["get_source_code_root_path"]
 
 
 def is_source_code_root_path(path):
-    check_name_list = ["build/build_scripts/build_ohos.sh",
+    check_name_list = ["./build.sh",
                        "build",
                        "prebuilts"]
     for item in check_name_list:
@@ -44,3 +44,10 @@ def get_source_code_root_path(path):
             break
         code_root_path = os.path.dirname(code_root_path)
     return code_root_path
+
+
+def is_open_source_product(product_name):
+    open_source_products = ["Hi3516DV300"]
+    if product_name in open_source_products:
+        return True
+    return False

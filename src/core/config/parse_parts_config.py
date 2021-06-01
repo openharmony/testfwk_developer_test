@@ -20,6 +20,7 @@ import os
 import json
 
 from core.utils import get_build_output_path
+from core.common import is_open_source_product
 from core.config.config_manager import UserConfigManager
 
 
@@ -31,15 +32,14 @@ class ParsePartsConfig(object):
         self.productform = productform
         self.subsystem_infos, self.part_infos = self.get_infos_data()
 
-    @classmethod
-    def get_config_file_path(cls):
+    def get_config_file_path(self):
         manager = UserConfigManager()
         testcase_dir = manager.get_test_cases_dir()
 
         if testcase_dir == "":
             if sys.source_code_root_path != "":
                 config_filepath = os.path.join(
-                    get_build_output_path(),
+                    get_build_output_path(self.productform),
                     "build_configs",
                     "infos_for_testfwk.json")
             else:
@@ -63,7 +63,11 @@ class ParsePartsConfig(object):
                 print("Error: json file load error.")
                 return None, None
 
-        product_data_dic = data_dic.get(self.productform, None)
+        # open source branch, the part form of all product is "phone"
+        if is_open_source_product(self.productform):
+            product_data_dic = data_dic.get("phone", None)
+        else:
+            product_data_dic = data_dic.get(self.productform, None)
         if product_data_dic is None:
             print("Error: product_data_dic is None.")
             return None, None

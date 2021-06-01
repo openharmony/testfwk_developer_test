@@ -14,25 +14,13 @@
      limitations under the License.
 -->
 <user_config>
-  <common>
-    <!-- reserved field to distinguish device form -->
-    <doublefwk>false</doublefwk>
-  </common>
   <build>
     <!-- whether compile test demo case, default false -->
     <example>false</example>
     <!-- whether compile test version, default false -->
     <version>false</version>
     <!-- whether compile test case, default false -->
-    <testcase>false</testcase>
-    <paramter>
-      <!-- reserved field, os name -->
-      <target_os>ohos</target_os>
-      <!-- reserved field, cpu type -->
-      <target_cpu>arm64</target_cpu>
-      <!-- reserved field, version type, default debug -->
-      <variant>debug</variant>
-    </paramter>
+    <testcase>true</testcase>
     <board_info>
       <!-- board series, default hispark -->
       <board_series>hispark</board_series>

@@ -23,6 +23,7 @@ from core.constants import ToolCommandType
 from core.utils import get_file_list
 from core.utils import get_file_list_by_postfix
 from core.utils import get_build_output_path
+from core.utils import scan_support_product
 from core.config.config_manager import UserConfigManager
 from core.config.config_manager import FrameworkConfigManager
 from core.config.parse_parts_config import ParsePartsConfig
@@ -159,8 +160,10 @@ def select_user_input(data_list):
 
 def select_productform():
     select_value = "phone"
-    productform_list = \
+    scan_product_list = scan_support_product()
+    config_product_list = \
         FrameworkConfigManager().get_framework_config("productform")
+    productform_list = scan_product_list + config_product_list
     if len(productform_list) != 0:
         print("Please select the current tested product form:")
         for index, element in enumerate(productform_list):
@@ -214,15 +217,18 @@ def display_show_info(para_list, productform):
 #############################################################################
 #############################################################################
 
-def get_module_list_from_output_dir():
+def get_module_list_from_output_dir(product_form):
     module_path_list = []
-    if UserConfigManager().get_user_config_flag("common", "doublefwk"):
-        module_list_file_path = os.path.join(get_build_output_path(),
-                                             "module_list_files")
+    all_product_list = scan_support_product()
+    if product_form in all_product_list:
+        module_list_file_path = os.path.join(
+            get_build_output_path(product_form),
+            "module_list_files")
     else:
-        module_list_file_path = os.path.join(get_build_output_path(),
-                                             "test_info",
-                                             "module_list_files")    
+        module_list_file_path = os.path.join(
+            get_build_output_path(product_form),
+            "test_info",
+            "module_list_files")
     print(module_list_file_path)
     if os.path.exists(module_list_file_path):
         file_list = get_file_list_by_postfix(module_list_file_path, ".mlf")
@@ -257,11 +263,11 @@ def get_module_list_from_case_dir(test_case_dir):
     return file_list
 
 
-def get_module_list():
+def get_module_list(product_form):
     module_path_list = []
     testcase_dir = UserConfigManager().get_test_cases_dir()
     if testcase_dir == "":
-        module_path_list = get_module_list_from_output_dir()
+        module_path_list = get_module_list_from_output_dir(product_form)
     else:
         module_path_list = get_module_list_from_case_dir(testcase_dir)
     return module_path_list
@@ -273,8 +279,10 @@ def get_module_list():
 
 def show_product_list():
     print("List of currently supported productform:")
-    productform_list = FrameworkConfigManager().get_framework_config(
-        "productform")
+    scan_product_list = scan_support_product()
+    config_product_list = \
+        FrameworkConfigManager().get_framework_config("productform")
+    productform_list = scan_product_list + config_product_list
     if 0 != len(productform_list):
         for index, element in enumerate(productform_list):
             print("    %d. %s" % (index + 1, element))
@@ -322,10 +330,10 @@ def show_partname_list(product_form):
             print("    %d. %s" % (index + 1, element))
 
 
-def show_module_list():
+def show_module_list(product_form):
     print("List of currently supported module names:")
     subsystem_name_list = []
-    subsystem_module_list = get_module_list()
+    subsystem_module_list = get_module_list(product_form)
 
     for item in subsystem_module_list:
         if item != "":
@@ -373,7 +381,7 @@ def display_show_command_info(command, product_form="phone"):
     elif command == CMD_KEY_PARTLIST:
         show_partname_list(product_form)
     elif command == CMD_KEY_MODULELIST:
-        show_module_list()
+        show_module_list(product_form)
     else:
         print("This command is not support.")
 

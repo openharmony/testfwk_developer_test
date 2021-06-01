@@ -21,8 +21,6 @@ import time
 import platform
 import subprocess
 
-from test_adapter_tools import TestAdapterTools
-
 ##############################################################################
 ##############################################################################
 
@@ -32,7 +30,7 @@ if platform.system() != 'Windows':
     QUOTATION_MARKS = "'"
 else:
     QUOTATION_MARKS = "\""
-USB_TOOLS = TestAdapterTools.USB_TOOLS_CONST
+USB_TOOLS = "hdc"
 HDC_TOOLS = "hdc"
 
 

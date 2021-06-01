@@ -44,11 +44,11 @@ namespace {
     const int CMD_LENGTH = 50;
 }
 
-DistributeTestEnvironment::DistributeTestEnvironment()
+DistributeTestEnvironment::DistributeTestEnvironment() : serverPort_(DEFAULT_AGENT_PORT)
 {
 }
 
-DistributeTestEnvironment::DistributeTestEnvironment(std::string cfgInfo)
+DistributeTestEnvironment::DistributeTestEnvironment(std::string cfgInfo) : serverPort_(DEFAULT_AGENT_PORT)
 {
     Init(cfgInfo);
 }
@@ -60,8 +60,8 @@ void DistributeTestEnvironment::Init(std::string fileName)
     if (!clientCfg_.GetCfgVal("agentlist", iplist)) {
         return;
     }
-    size_t posend;
-    int pos = 0;
+    std::string::size_type posend = 0;
+    std::string::size_type pos = 0;
     do {
         std::string ipaddr;
         posend = iplist.find(",", pos);
@@ -71,6 +71,9 @@ void DistributeTestEnvironment::Init(std::string fileName)
             ipaddr = iplist.substr(pos);
         }
         AddClient(ipaddr);
+        if (posend >= iplist.length()) {
+            break;
+        }
         pos = posend + 1;
     } while (posend != std::string::npos);
     std::string strPort;
@@ -185,7 +188,7 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
     pCmdTest->no = globalCommandNo;
     pCmdTest->cmdTestType = htons(cmdType);
     pCmdTest->len = htons(len);
-    int rlen = send(clientList_[devNo].fd, pCmdTest, len + DST_COMMAND_HEAD_LEN, 0);
+    int rlen = send(clientList_[devNo].fd, pCmdTest, static_cast<size_t>(len + DST_COMMAND_HEAD_LEN), 0);
     if (rlen <= 0) {
         HiLog::Error(LABEL, "agent socket is closed.");
         return breturn;
@@ -201,6 +204,10 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
                     auto pCmdTest = reinterpret_cast<DistributedMsg *>(szrbuf);
                     pCmdTest->cmdTestType = ntohs(pCmdTest->cmdTestType);
                     pCmdTest->len = ntohs(pCmdTest->len);
+                    if (pCmdTest->len <= 0) {
+                        times--;
+                        continue;
+                    }
                     recv(clientList_[devNo].fd, pCmdTest->alignmentCmd, pCmdTest->len, 0);
                     HiLog::Info(LABEL, "recv agent data : No.%d command type :%d length :%d",
                         pCmdTest->no, pCmdTest->cmdTestType, pCmdTest->len);
@@ -243,7 +250,8 @@ bool DistributeTestEnvironment::RunTestCmd(size_t devNo, const std::string &strC
     char szbuf[MAX_BUFF_LEN];
     bool breturn = false;
     size_t lenptr = 0;
-    memset_s(szbuf, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+    errno_t ret = EOK;
+    (void)memset_s(szbuf, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
 
     // add 2 '\0'
     size_t rlen = cmdLen + expectValueLen + DST_COMMAND_HEAD_LEN + sizeof(int)*HALF_BUF_LEN + HALF_BUF_LEN;
@@ -257,13 +265,19 @@ bool DistributeTestEnvironment::RunTestCmd(size_t devNo, const std::string &strC
         lenptr = 0;
         *reinterpret_cast<int *>(pCmdTest->alignmentCmd + lenptr) = htons(cmdLen);
         lenptr += sizeof(int);
-        memcpy_s(pCmdTest->alignmentCmd + lenptr, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN - lenptr,
+        ret = memcpy_s(pCmdTest->alignmentCmd + lenptr, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN - lenptr,
             strCommand.c_str(), cmdLen);
+        if (ret != EOK) {
+            return breturn;
+        }
         lenptr += cmdLen + 1;
         *reinterpret_cast<int *>(pCmdTest->alignmentCmd + lenptr) = htons(expectValueLen);
         lenptr += sizeof(int);
-        memcpy_s(pCmdTest->alignmentCmd + lenptr, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN - lenptr,
+        ret = memcpy_s(pCmdTest->alignmentCmd + lenptr, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN - lenptr,
             strExpectValue.c_str(), expectValueLen);
+        if (ret != EOK) {
+            return breturn;
+        }
         lenptr += expectValueLen + 1;
         pCmdTest->len =  lenptr;
         breturn = SendToAgent(devNo, DST_COMMAND_CALL, pCmdTest, pCmdTest->len, onProcessReturn);
@@ -281,7 +295,10 @@ bool DistributeTestEnvironment::SendMessage(size_t devNo, const std::string &str
         char szbuf[MAX_BUFF_LEN] = {0};
         auto pCmdTest = reinterpret_cast<DistributedMsg *>(szbuf);
         pCmdTest->cmdTestType = DST_COMMAND_MSG;
-        memcpy_s(pCmdTest->alignmentCmd, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN, strMsg.c_str(), msgLen);
+        errno_t ret = memcpy_s(pCmdTest->alignmentCmd, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN, strMsg.c_str(), msgLen);
+        if (ret != EOK) {
+            return breturn;
+        }
         pCmdTest->len = msgLen;
         breturn = SendToAgent(devNo, DST_COMMAND_MSG, pCmdTest, msgLen, onProcessReturnMsg);
     } else {
@@ -292,12 +309,20 @@ bool DistributeTestEnvironment::SendMessage(size_t devNo, const std::string &str
 
 bool DistributeTestEnvironment::Notify(size_t devNo, const std::string &strMsg, int msgLen)
 {
+    int dstMax = MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN;
+    if (msgLen < 0 || msgLen >= dstMax) {
+        return false;
+    }
+
     bool breturn = false;
     if ((msgLen + DST_COMMAND_HEAD_LEN) <= MAX_BUFF_LEN) {
         char szbuf[MAX_BUFF_LEN] = {0};
         auto pCmdTest = reinterpret_cast<DistributedMsg *>(szbuf);
         pCmdTest->cmdTestType = DST_COMMAND_NOTIFY;
-        memcpy_s(pCmdTest->alignmentCmd, MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN, strMsg.c_str(), msgLen);
+        errno_t ret = memcpy_s(pCmdTest->alignmentCmd, dstMax, strMsg.c_str(), msgLen);
+        if (ret != EOK) {
+            return breturn;
+        }
         pCmdTest->alignmentCmd[msgLen] = 0;
         pCmdTest->len = msgLen;
         breturn = SendToAgent(devNo, DST_COMMAND_NOTIFY, pCmdTest, msgLen, nullptr);

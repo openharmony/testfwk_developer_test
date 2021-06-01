@@ -26,6 +26,8 @@ from xdevice import get_plugin
 from xdevice import platform_logger
 from xdevice import Scheduler
 from core.utils import get_build_output_path
+from core.utils import scan_support_product
+from core.common import is_open_source_product
 from core.command.parameter import Parameter
 from core.testcase.testcase_manager import TestCaseManager
 from core.config.config_manager import UserConfigManager
@@ -141,7 +143,7 @@ class Run(object):
         target_out_path = UserConfigManager().get_test_cases_dir()
         if target_out_path == "":
             target_out_path = os.path.join(
-                get_build_output_path(),
+                get_build_output_path(product_form),
                 "packages",
                 product_form)
         target_out_path = os.path.abspath(target_out_path)
@@ -178,21 +180,30 @@ class Run(object):
     def get_tests_out_path(cls, product_form):
         tests_out_path = UserConfigManager().get_test_cases_dir()
         if tests_out_path == "":
-            if UserConfigManager().get_user_config_flag("common", "doublefwk"):
-                tests_out_path = os.path.abspath(os.path.join(
-                    get_build_output_path(),
-                    "packages",
-                    product_form,
-                    "tests"))
+            all_product_list = scan_support_product()
+            if product_form in all_product_list:
+                if is_open_source_product(product_form):
+                    tests_out_path = os.path.abspath(os.path.join(
+                        get_build_output_path(product_form),
+                        "packages",
+                        "phone",
+                        "tests"))
+                else:
+                    tests_out_path = os.path.abspath(os.path.join(
+                        get_build_output_path(product_form),
+                        "packages",
+                        product_form,
+                        "tests"))
             else:
-                tests_out_path = os.path.join(get_build_output_path(), "test")
+                tests_out_path = os.path.join(
+                    get_build_output_path(product_form), "test")
         return tests_out_path
 
     @classmethod
     def get_coverage_outpath(cls, options):
         coverage_out_path = ""
         if options.coverage:
-            coverage_out_path = get_build_output_path()
+            coverage_out_path = get_build_output_path(options.productform)
             if coverage_out_path == "":
                 coverage_out_path = UserConfigManager().get_user_config(
                     "coverage").get("outpath", "")

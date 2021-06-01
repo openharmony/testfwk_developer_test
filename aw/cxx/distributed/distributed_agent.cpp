@@ -79,7 +79,9 @@ int DistributedAgent::InitAgentServer()
 
     int num = 1;
     if (setsockopt(serverSockFd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(num)) != 0) {
-        return -1;
+        close(serverSockFd);
+        serverSockFd = -1;
+        return serverSockFd;
     }
 
     struct sockaddr_in addr;
@@ -102,7 +104,9 @@ int DistributedAgent::InitAgentServer()
 
     if (listen(serverSockFd, 1) < 0) {
         HiLog::Error(DistributedAgent::LABEL, "%s agent listen error.\n", agentIpAddr_.c_str());
-        return -1;
+        close(serverSockFd);
+        serverSockFd = -1;
+        return serverSockFd;
     }
     HiLog::Info(DistributedAgent::LABEL, "listen %s .......", agentIpAddr_.c_str());
     mpthCmdProcess_ = std::make_unique<std::thread>([=]() {
@@ -125,6 +129,7 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
     sinSize = sizeof(struct sockaddr_in);
     bzero(&clientAddr, sizeof(clientAddr));
     receiveLen = DistributedAgent::RECE_LEN;
+
     while (receiveLen > 0) {
         HiLog::Info(DistributedAgent::LABEL, "wait client .......\n");
         if ((clientSockFd = accept(serverSockFd, (struct sockaddr *)&clientAddr, &sinSize)) > 0) {
@@ -158,24 +163,34 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
         pcline->len = ntohs(pcline->len);
         HiLog::Info(DistributedAgent::LABEL, "test agent get message type:%d .\n", pcline->cmdTestType);
         if (pcline->len > 0 && static_cast<unsigned long>(pcline->len) <= (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN)) {
-            receiveLen = recv(clientSockFd_, pcline->alignmentCmd, pcline->len, 0);
+            receiveLen = recv(clientSockFd_, pcline->alignmentCmd, static_cast<size_t>(pcline->len), 0);
             HiLog::Info(DistributedAgent::LABEL, "agent get message cmd=%s .\n", pcline->alignmentCmd);
             switch (pcline->cmdTestType) {
                 case DST_COMMAND_CALL: {
-                    int cmdLen = ntohs(*reinterpret_cast<int *>(pcline->alignmentCmd));
+                    errno_t ret = EOK;
+                    unsigned int cmdLen = ntohs(*reinterpret_cast<int *>(pcline->alignmentCmd));
                     rlen = sizeof(int);
                     // check cmdLen length < 100, copy command + args data ;
                     char *pAlignmentCmd = new char[cmdLen + 1];
-                    memcpy_s(pAlignmentCmd, cmdLen + 1, pcline->alignmentCmd + rlen, cmdLen);
+                    ret = memcpy_s(pAlignmentCmd, cmdLen + 1, pcline->alignmentCmd + rlen, cmdLen);
+                    if (ret != EOK) {
+                        delete []pAlignmentCmd;
+                        return -1;
+                    }
                     pAlignmentCmd[cmdLen] = '\0';
                     rlen += cmdLen + 1;
-                    int eValueLen = ntohs(*reinterpret_cast<int *>(pcline->alignmentCmd + rlen));
+                    unsigned int eValueLen = ntohs(*reinterpret_cast<int *>(pcline->alignmentCmd + rlen));
                     rlen += sizeof(int);
                     char *pszEValue = new char[eValueLen + 1];
-                    memcpy_s(pszEValue, eValueLen + 1, pcline->alignmentCmd + rlen, eValueLen);
+                    ret = memcpy_s(pszEValue, eValueLen + 1, pcline->alignmentCmd + rlen, eValueLen);
+                    if (ret != EOK) {
+                        delete []pAlignmentCmd;
+                        delete []pszEValue;
+                        return -1;
+                    }
                     pszEValue[eValueLen] = '\0';
                     int nresult = OnProcessCmd(pAlignmentCmd, cmdLen, pszEValue, eValueLen);
-                    memset_s(returnValue, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+                    (void)memset_s(returnValue, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_CALL);
@@ -184,14 +199,14 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     pclinereturn->len = htons(rlen);
                     HiLog::Info(DistributedAgent::LABEL, "agent get message :%s .\n",
                                 pclinereturn->alignmentCmd);
-                    send(clientSockFd_, pclinereturn, rlen + DST_COMMAND_HEAD_LEN, 0);
+                    send(clientSockFd_, pclinereturn, static_cast<size_t>(rlen + DST_COMMAND_HEAD_LEN), 0);
                     delete []pAlignmentCmd;
                     delete []pszEValue;
                     break;
                 }
                 case DST_COMMAND_MSG: {
                     int nresult = 0;
-                    memset_s(returnValue, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+                    (void)memset_s(returnValue, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_MSG);
@@ -199,12 +214,13 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     std::string resultcmd = pclinereturn->alignmentCmd;
                     nresult = OnProcessMsg(pcline->alignmentCmd, pcline->len, resultcmd, pclinereturn->len);
                     if (resultcmd == "") {
-                        strcpy_s(pclinereturn->alignmentCmd, pclinereturn->len, "agent return message");
-                    } else {
-                        strcpy_s(pclinereturn->alignmentCmd, pclinereturn->len, resultcmd.c_str());
+                        resultcmd = "agent return message";
+                    }
+                    if (strcpy_s(pclinereturn->alignmentCmd, pclinereturn->len, resultcmd.c_str()) != EOK) {
+                        return -1;
                     }
                     pclinereturn->len = htons(nresult);
-                    send(clientSockFd_, pclinereturn, nresult + DST_COMMAND_HEAD_LEN, 0);
+                    send(clientSockFd_, pclinereturn, static_cast<size_t>(nresult + DST_COMMAND_HEAD_LEN), 0);
                     break;
                 }
                 case DST_COMMAND_NOTIFY: {
@@ -227,14 +243,13 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
 
 void DistributedAgent::OnNotifyImf(DistributedMsg *pcline)
 {
-    int nresult = 0;
     char alignmentCmd[DistributedAgent::CMD_LENGTH];
     char szMsg[MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH];
     int cmdNo = 0;
-    memset_s(alignmentCmd, DistributedAgent::CMD_LENGTH, 0, DistributedAgent::CMD_LENGTH);
-    memset_s(szMsg,
-             MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH, 0,
-             MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH);
+    (void)memset_s(alignmentCmd, DistributedAgent::CMD_LENGTH, 0, DistributedAgent::CMD_LENGTH);
+    (void)memset_s(szMsg,
+        MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH, 0,
+        MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH);
     for (cmdNo = 0; cmdNo < DistributedAgent::CMD_LENGTH; cmdNo++) {
         if (pcline->alignmentCmd[cmdNo] == ':') {
             break;
@@ -243,10 +258,17 @@ void DistributedAgent::OnNotifyImf(DistributedMsg *pcline)
     if (cmdNo >= DistributedAgent::CMD_LENGTH) {
         HiLog::Error(DistributedAgent::LABEL, "error command.\n");
     }  else {
-        memcpy_s(alignmentCmd, DistributedAgent::CMD_LENGTH, pcline->alignmentCmd, cmdNo);
-        memcpy_s(szMsg, MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH,
-                 pcline->alignmentCmd + cmdNo + 1, pcline->len - cmdNo - 1);
-        nresult = OnNotify(alignmentCmd, szMsg, pcline->len - cmdNo);
+        errno_t ret = EOK;
+        ret = memcpy_s(alignmentCmd, DistributedAgent::CMD_LENGTH, pcline->alignmentCmd, cmdNo);
+        if (ret != EOK) {
+            return;
+        }
+        ret = memcpy_s(szMsg, MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH,
+            pcline->alignmentCmd + cmdNo + 1, pcline->len - cmdNo - 1);
+        if (ret != EOK) {
+            return;
+        }
+        OnNotify(alignmentCmd, szMsg, pcline->len - cmdNo);
     }
 }
 
@@ -288,10 +310,11 @@ int DistributedAgent::OnProcessCmd(const std::string &strCommand, int cmdLen,
     char alignmentCmd[DistributedAgent::CMD_LENGTH];
     char szArgs[MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH];
     int cmdNo = 0;
-    memset_s(alignmentCmd, DistributedAgent::CMD_LENGTH, 0, DistributedAgent::CMD_LENGTH);
-    memset_s(szArgs,
-             MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH, 0,
-             MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH);
+
+    (void)memset_s(alignmentCmd, DistributedAgent::CMD_LENGTH, 0, DistributedAgent::CMD_LENGTH);
+    (void)memset_s(szArgs,
+        MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH, 0,
+        MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH);
     for (cmdNo = 0; cmdNo < DistributedAgent::CMD_LENGTH; cmdNo++) {
         if (strCommand[cmdNo] == ':') {
             break;
@@ -302,9 +325,20 @@ int DistributedAgent::OnProcessCmd(const std::string &strCommand, int cmdLen,
         nresult = -1;
         return nresult;
     }
-    memcpy_s(alignmentCmd, DistributedAgent::CMD_LENGTH, strCommand.c_str(), cmdNo);
-    memcpy_s(szArgs, MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH,
-             strCommand.c_str() + cmdNo + 1, cmdLen - cmdNo - 1);
+
+    errno_t ret = EOK;
+    ret = memcpy_s(alignmentCmd, DistributedAgent::CMD_LENGTH, strCommand.c_str(), cmdNo);
+    if (ret != EOK) {
+        return -1;
+    }
+    ret = memcpy_s(szArgs,
+        MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH,
+        strCommand.c_str() + cmdNo + 1,
+        cmdLen - cmdNo - 1);
+    if (ret != EOK) {
+        return -1;
+    }
+
     nresult = OnProcessCmd(alignmentCmd, cmdNo, szArgs, cmdLen - cmdNo, strExpectValue, expectValueLen);
     return nresult;
 }

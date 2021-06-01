@@ -49,6 +49,20 @@ def _init_global_config():
         "python"))
     sys.path.insert(2, sys.pytest_dir)
 
+    sys.adapter_dir = os.path.abspath(os.path.join(
+        sys.framework_root_dir,
+        "adapter"
+        "aw",
+        "python"))
+    sys.path.insert(3, sys.adapter_dir)
+
+    sys.hmh_script = os.path.abspath(os.path.join(
+        sys.framework_root_dir,
+        "..",
+        "test-tools",
+        "hmh"))
+    sys.path.insert(4, sys.hmh_script)
+
     sys.framework_res_dir = sys.framework_root_dir
     sys.exec_dir = sys.framework_root_dir
 
@@ -84,6 +98,11 @@ def _load_internal_plugins():
     except (ModuleNotFoundError, ImportError):
         pass
 
+    try:
+        import script.report
+        _iter_module_plugins([script.report])
+    except (ModuleNotFoundError, ImportError):
+        pass
 
 _init_global_config()
 del _init_global_config

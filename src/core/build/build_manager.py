@@ -18,6 +18,7 @@
 
 import os
 from xdevice import platform_logger
+from core.utils import scan_support_product
 from core.config.config_manager import UserConfigManager
 from core.build.select_targets import SelectTargets
 from core.build.build_testcases import BuildTestcases
@@ -68,9 +69,8 @@ class BuildManager(object):
         return build_result
 
     def _compile_testcases(self, project_root_path, para):
-        is_doublefwk = UserConfigManager().get_user_config_flag(
-            "common", "doublefwk")
-        if not is_doublefwk:
+        all_product_list = scan_support_product()
+        if para.productform not in all_product_list:
             from core.build.build_lite_manager import BuildLiteManager
             build_lite_manager = BuildLiteManager()
             return build_lite_manager.exec_build_test(para)

@@ -17,6 +17,7 @@
 #
 
 from xdevice import platform_logger
+from core.utils import scan_support_product
 from core.config.config_manager import FrameworkConfigManager
 
 LOG = platform_logger("Console")
@@ -73,12 +74,6 @@ class Parameter(object):
     def check_run_parameter(self, options):
         if options.productform is None or options.productform == "":
             LOG.warning("The productform is incorrect.")
-            return False
-
-        productform_list = FrameworkConfigManager().get_framework_config(
-            "productform")
-        if options.productform not in productform_list:
-            LOG.warning("The productform you entered is incorrect.")
             return False
 
         if "" != options.testcase and "" != options.testlevel:
