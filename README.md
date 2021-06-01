@@ -18,7 +18,6 @@ This module allows you to develop new test cases for new features, or modify exi
 developertest/
 ├── aw                            # Static libraries of the test framework
 │   ├── cxx                      # C++ libraries
-│   ├── java                     # Java libraries
 │   └── python                   # Python libraries
 ├── config                        # Test framework configuration
 │   ├── build_config.xml         # Test case build configuration
@@ -158,20 +157,17 @@ The Python environment is required.
         ```
 
 
--   Configure the developers test module.
+-   Configure the developers test module in the configuration file  **developertest/config/user\_config.xml**.
+    1.  Modify basic configuration parameters of the test framework.
 
-    Configuration file:  **developertest/config/user\_config.xml**
-
-    1.  Modify basic configuration parameters.
-
-        \[build\]    \# Set build parameters of the test case.
+        \[build\]    \# Configure build parameters of the test case.
 
         ```
         <build>
             <example>false</example>
             <version>false</version>
             <testcase>true</testcase>
-            ... ...
+            ...
         </build>
         ```
 
@@ -192,7 +188,7 @@ The Python environment is required.
         </device>
         ```
 
-    3.  For devices that support serial port connection only, modify the configuration file as follows:
+    3.  For devices that only support the serial port connection, modify the configuration file as follows:
 
         \[board\_info\]    \# Configure development board information.
 
@@ -211,7 +207,7 @@ The Python environment is required.
         >**board\_product**: target product. The default value is  **ipcamera**.
         >**build\_command**: command used for building the test version and test case. The default value is  **hb build**.
 
-        \[device\]    \# Configure the serial port information with the  **"ipcamera"**  attribute, including the COM port and baud rate. For example:
+        \[device\]    \# Configure the serial port information with the  **"ipcamera"**  attribute, including the COM port and baud rate.
 
         ```
         <device type="com" label="ipcamera">
@@ -227,11 +223,8 @@ The Python environment is required.
         ```
 
 
--   \(Optional\) Modify the configuration of the  **developertest**  module. If a test case has been compiled, specify the compilation output directory of the test case. In this case, the test platform will not recompile the test case.
-
-    Configuration file:  **config/user\_config.xml**
-
-    1.  Specify the output directory of the test case, that is, the compilation output directory between the  **<test\_cases\>**  tags. Example:
+-   \(Optional\) Modify the configuration file  **config/user\_config.xml**  of the  **developertest**  module. If a test case has been compiled, specify the compilation output directory of the test case. In this case, the test platform will not recompile the test case.
+    1.  Specify the output directory of the test case, that is, the compilation output directory between the  **<test\_cases\>**  tags. 
 
         ```
         <test_cases>
@@ -250,7 +243,7 @@ The Python environment is required.
 
 
 -   Prepare the test environment. \(Check that the test environment is ready if the tested device only supports serial port connection.\)
-    -   The system image and file system have been burnt into a development board and are running properly on the development board. In system mode, for example, the device prompt  **OHOS\#**  is displayed during shell login.
+    -   The system image and file system have been burnt into a development board and are running properly on the development board. For example, in system mode, device prompt  **OHOS\#**  is displayed during shell login, indicating that the system is running properly.
     -   The development host has been connected to the serial port of the development board and the network port.
     -   The IP addresses of the development host and development board are in the same network segment and can ping each other.
     -   An empty directory is created on the development host for mounting test cases through the NFS, and the NFS service is started properly.

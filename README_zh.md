@@ -18,7 +18,6 @@
 developertest/
 ├── aw                            # 测试框架的静态库
 │   ├── cxx                      # 支持C++
-│   ├── java                     # 支持Java
 │   └── python                   # 支持Python
 ├── config                        # 测试框架配置
 │   ├── build_config.xml         # 用例编译配置

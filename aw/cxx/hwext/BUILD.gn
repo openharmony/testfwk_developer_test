@@ -27,6 +27,6 @@ ohos_static_library("performance_test_static") {
     "//third_party/googletest:gtest",
     "//utils/native/base:utils",
   ]
-  aosp_deps = [ "shared_library:libxml2" ]
+  public_deps = [ "//third_party/libxml2:libxml2" ]
   public_configs = [":performance_test_config"]
 }

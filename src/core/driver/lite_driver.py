@@ -219,7 +219,7 @@ class LiteUnitTest(IDriver):
                 timeout=5, receiver=None)
             if xml_file in result:
                 return True
-            time.sleep(1)
+            time.sleep(5)
         return False
 
     def show_help_info(self):

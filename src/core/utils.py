@@ -70,34 +70,68 @@ def get_device_log_file(report_path, serial=None, log_name="device_log"):
     return device_log_file
 
 
-def get_build_output_path():
+def get_build_output_path(product_form):
     if sys.source_code_root_path == "":
         return ""
-
-    manager = UserConfigManager()
-    if manager.get_user_config_flag("common", "doublefwk"):
-        para_dic = manager.get_user_config("build", "paramter")
-        target_os = para_dic.get("target_os", "")
-        target_cpu = para_dic.get("target_cpu", "")
-        variant = para_dic.get("variant", "")
-        build_output_name = "%s-%s-%s" % (target_os, target_cpu, variant)
-        if build_output_name == "ohos-arm64-release":
-            build_output_name = "release"
+    standard_large_system_list = scan_support_product()
+    property_info = parse_product_info(product_form)
+    if product_form in standard_large_system_list:
+        if property_info is not None:
+            target_os = property_info.get("target_os")
+            target_cpu = property_info.get("target_cpu")
+            build_output_name = "%s-%s-%s" % (target_os, target_cpu, "release")
+        else:
+            return ""
     else:
-        para_dic = manager.get_user_config("build", "board_info")
+        para_dic = UserConfigManager().get_user_config("build", "board_info")
         board_series = para_dic.get("board_series", "")
         board_type = para_dic.get("board_type", "")
         board_product = para_dic.get("board_product", "")
-        first_build_output = "%s_%s" % (board_series, board_type)
-        second_build_output = "%s_%s" % (board_product, first_build_output)
-        build_output_name = os.path.join(first_build_output,
+        fist_build_output = "%s_%s" % (board_series, board_type)
+        second_build_output = "%s_%s" % (board_product, fist_build_output)
+        build_output_name = os.path.join(fist_build_output,
                                          second_build_output)
-
-    build_output_path = os.path.join(
-        sys.source_code_root_path,
-        "out",
-        build_output_name)
+    build_output_path = os.path.join(sys.source_code_root_path,
+                                     "out",
+                                     build_output_name)
     return build_output_path
+
+
+def scan_support_product():
+    # scan standard and large system info
+    product_form_dir = os.path.join(sys.source_code_root_path,
+                                    "productdefine",
+                                    "common",
+                                    "products")
+    productform_list = []
+    if os.path.exists(product_form_dir):
+        for product_form_file in os.listdir(product_form_dir):
+            if os.path.isdir(os.path.join(product_form_dir,
+                                          product_form_file)):
+                continue
+            product_file = os.path.basename(product_form_file)
+            if product_file.endswith(".build") or "parts" in product_file or \
+                    "x86_64" in product_file or "32" in product_file:
+                continue
+            product_name, _ = os.path.splitext(product_file)
+            productform_list.append(product_name)
+    return productform_list
+
+
+def parse_product_info(product_form):
+    build_prop = os.path.join(sys.source_code_root_path,
+                              "out",
+                              "build_configs",
+                              product_form,
+                              "preloader",
+                              "build.prop")
+    with open(build_prop, 'r') as pro_file:
+        properties = {}
+        for line in pro_file:
+            if line.find('=') > 0:
+                strs = line.replace('\n', '').split('=')
+                properties[strs[0]] = strs[1]
+    return properties
 
 
 def is_32_bit_test():

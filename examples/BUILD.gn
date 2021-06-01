@@ -17,8 +17,6 @@ ohos_subsystem("subsystem_examples") {
   subsystem_packages = [
     "calculator:calculator",
     "detector:detector",
-    "string_utils:string_utils_maple_java",
-    "string_utils:string_app_maple_java",
     "calculator:calculator_static",
   ]
 }
@@ -28,6 +26,7 @@ ohos_subsystem_test("subsystem_examples_test") {
   test_packages = [
     "calculator/test:unittest",
     "detector/test:unittest",
+    "distributedb/test:distributedtest",
     "sleep/test:performance",
   ]
 }

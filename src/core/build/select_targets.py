@@ -64,7 +64,7 @@ class SelectTargets(object):
 
             part_path_list = []
             default_part_path = os.path.join(
-                get_build_output_path(),
+                get_build_output_path(productform),
                 "module_list_files",
                 origin_part_name)
             if os.path.exists(default_part_path):
@@ -72,7 +72,7 @@ class SelectTargets(object):
 
             if build_out_dir != ".":
                 product_part_path = os.path.join(
-                    get_build_output_path(),
+                    get_build_output_path(productform),
                     build_out_dir,
                     "module_list_files",
                     origin_part_name)
