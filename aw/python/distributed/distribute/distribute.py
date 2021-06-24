@@ -186,19 +186,28 @@ class Distribute:
         return ipaddress[0]
 
     def _query_device_uuid(self, device):
+        """
+        1. Run the dumpsys DdmpDeviceMonitorService command to query the value
+           of dev_nodeid.
+        2. The dump information reported by the soft bus. Local device info,
+           should be placed first.
+        Note: The dump information may not comply with the JSON format.
+        """
         dumpsys_command = "dumpsys DdmpDeviceMonitorService"
         device_info = device.shell_with_output(dumpsys_command)
         if device_info == "":
             return ""
 
-        begin = device_info.find('{')
-        end = device_info.find('}')
-        if begin == -1 or end == -1:
+        begin = device_info.find("dev_nodeid")
+        if (begin == -1):
             return ""
 
-        local_device_info = device_info[begin:end + 1]
-        device_info_json = json.loads(local_device_info)
-        return device_info_json["dev_nodeid"]
+        end = device_info.find(",", begin)
+        if (end == -1):
+            return ""
+
+        dev_nodeid_info = device_info[begin:end].replace('"', "")
+        return dev_nodeid_info.split(":")[1]
 
     def _write_device_config(self, device_info, file_path):
         file_dir, file_name = os.path.split(file_path)
