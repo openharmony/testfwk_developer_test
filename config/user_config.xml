@@ -63,6 +63,7 @@
   <!-- configure NFS mount path for test cases -->
   <NFS>
     <host_dir></host_dir>
+    <mnt_cmd></mnt_cmd>
     <board_dir></board_dir>
   </NFS>
 </user_config>
