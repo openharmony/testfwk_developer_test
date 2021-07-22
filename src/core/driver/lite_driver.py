@@ -57,6 +57,7 @@ class LiteUnitTest(IDriver):
     config = None
     log = platform_logger("LiteUnitTest")
     nfs_dir = ""
+    mnt_cmd = ""
     lite_device = None
     result = None
 
@@ -105,6 +106,32 @@ class LiteUnitTest(IDriver):
             return
         self.log.info("lite device execute request success")
 
+    def _mount_nfs_server(self):
+        #before execute each suits bin, mount nfs
+        self.mnt_cmd = "mount {}".format(UserConfigManager().get_user_config(
+            "NFS").get("mnt_cmd"))
+        if self.mnt_cmd == "mount ":
+            self.log.error("no configure for mount command")
+            return
+        
+        filter_result, status, _ = \
+            self.lite_device.execute_command_with_timeout(
+            self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test, timeout=3)
+        if "already mounted" in filter_result:
+            self.log.info("nfs has been mounted")
+            return
+            
+        for i in range(0, 2):
+            if status:
+                self.log.info("execute mount command success")
+                return
+            self.log.info("try mount %d" % (i + 2))
+            _, status, _ = self.lite_device.execute_command_with_timeout(
+                self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test,
+                timeout=3)
+
+        self.log.error("execute mount command failed")
+
     def _before_execute_test(self):
         """
         need copy test case to nfs dir
@@ -116,6 +143,7 @@ class LiteUnitTest(IDriver):
         if self.nfs_dir == "":
             self.log.error("no configure for nfs directory")
             return False
+        self._mount_nfs_server()
         _, status, _ = \
             self.lite_device.execute_command_with_timeout("cd /{}".format(
                 UserConfigManager().get_user_config("NFS").get("board_dir")),
