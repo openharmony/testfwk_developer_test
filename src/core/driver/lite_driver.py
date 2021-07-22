@@ -116,7 +116,7 @@ class LiteUnitTest(IDriver):
         
         filter_result, status, _ = \
             self.lite_device.execute_command_with_timeout(
-            self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test, timeout=10)
+            self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test, timeout=3)
         if "already mounted" in filter_result:
             self.log.info("nfs has been mounted")
             return
@@ -128,7 +128,7 @@ class LiteUnitTest(IDriver):
             self.log.info("try mount %d" % (i + 2))
             _, status, _ = self.lite_device.execute_command_with_timeout(
                 self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test,
-                timeout=10)
+                timeout=3)
 
         self.log.error("execute mount command failed")
 
