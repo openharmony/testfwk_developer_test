@@ -283,3 +283,27 @@ class BuildConfigManager(object):
 
     def get_build_path(self):
         return self.filepath
+
+class FuzzerConfigManager(object):
+    def __init__(self, config_path=""):
+        if config_path == "":
+            self.filepath = self.filepath = os.path.abspath(os.path.join(
+                CONFIG_PATH, ConfigFileConst.FUZZCONFIG_FILEPATH))
+        else:
+            self.filepath = config_path
+
+    def get_fuzzer_config(self, target_name):
+        config_list = []
+        try:
+            LOG.info("fuzzer config file :%s" % self.filepath)
+            if os.path.exists(self.filepath):
+                tree = ET.parse(self.filepath)
+                root = tree.getroot()
+                node = root.find(target_name)
+                LOG.info("before for")
+                for sub in node:
+                    if sub.text is not None:
+                        config_list.append(sub.text)
+        except ET.ParseError as xml_exception:
+            LOG.error(("Parse %s fail!" % self.filepath) + xml_exception.args)
+        return config_list

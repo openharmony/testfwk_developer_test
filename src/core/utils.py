@@ -152,3 +152,22 @@ def get_decode(stream):
         except (ValueError, AttributeError, TypeError):
             ret = str(stream)
     return ret
+
+def parse_fuzzer_info():
+    path_list = []
+    bin_list = []
+    list_path = os.path.join(sys.source_code_root_path, "test",
+        "developertest", "libs", "fuzzlib", "fuzzer_list.txt")
+    with open(list_path, 'r') as list_file:
+        for line in list_file.readlines():
+            striped_str = line.strip()
+            path_list.append(striped_str.split(":")[0][3:])
+            bin_list.append(striped_str.split(":")[1].split("(")[0])
+    return path_list, bin_list
+
+def get_fuzzer_path(filename):
+    path_list, bin_list = parse_fuzzer_info()
+    for i, name in enumerate(bin_list):
+        if name == filename:
+            return os.path.join(sys.source_code_root_path, path_list[i])
+    return ""

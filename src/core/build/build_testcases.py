@@ -202,6 +202,18 @@ class BuildTestcases(object):
             LOG.warning("Error: The %s is not exist" % BUILD_LITE)
         return False
 
+    def build_fuzz_testcases(self, para):
+        self._delete_testcase_dir(para.productform)
+        helper_path = os.path.join("..", "libs", "fuzzlib", "fuzzer_helper.py")
+        command = [sys.executable, helper_path, 'make',
+                   'make_temp_test', para.productform]
+        if subprocess.call(command, shell=False) == 0:
+            build_result = True
+        else:
+            build_result = False
+        self._merge_testcase_dir(para.productform)
+        return build_result
+
     def build_testcases(self, productform, target):
         command = []
         if self.is_build_example:

@@ -11,24 +11,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/features.gni")
 import("//build/test.gni")
 
-#################################group#########################################
-group("unittest") {
-  testonly = true
-  deps = []
+module_output_path = "subsystem_examples/calculator"
 
-  deps += [ "unittest/common:unittest" ]
+##############################fuzztest##########################################
+ohos_fuzztest("CalculatorFuzzTest") {
+  module_out_path = module_output_path
 
-  if (is_phone_product) {
-    deps += [ "unittest/phone:unittest" ]
-  }
+  include_dirs = []
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "parse_fuzzer.cpp" ]
 }
 
+###############################################################################
 group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [ "fuzztest/common/parse_fuzzer:fuzztest" ]
+  deps += [
+    # deps file
+    ":CalculatorFuzzTest",
+  ]
 }
 ###############################################################################

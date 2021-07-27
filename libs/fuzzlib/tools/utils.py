@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+#
 # Copyright (c) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -10,25 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+import os
+import signal
+import sys
+import string
+from templates import REPORT_SUMMARY_HTML_TEMPLATE
 
-import("//build/test.gni")
-
-#################################group#########################################
-group("unittest") {
-  testonly = true
-  deps = []
-
-  deps += [ "unittest/common:unittest" ]
-
-  if (is_phone_product) {
-    deps += [ "unittest/phone:unittest" ]
-  }
-}
-
-group("fuzztest") {
-  testonly = true
-  deps = []
-
-  deps += [ "fuzztest/common/parse_fuzzer:fuzztest" ]
-}
-###############################################################################

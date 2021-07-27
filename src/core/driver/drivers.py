@@ -17,10 +17,10 @@
 #
 
 import os
+import re
 import time
 import platform
 from dataclasses import dataclass
-
 
 from xdevice import DeviceTestType
 from xdevice import DeviceLabelType
@@ -31,7 +31,9 @@ from xdevice import IDriver
 from xdevice import platform_logger
 from xdevice import Plugin
 from core.utils import get_decode
+from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
+from core.config.config_manager import FuzzerConfigManager
 
 
 __all__ = [
@@ -186,7 +188,68 @@ def _sleep_according_to_result(result):
     if result:
         time.sleep(1)
 
+def _create_fuzz_crash_file(filepath, filename):
+    if not os.path.exists(filepath):
+        with open(filepath, "w", encoding='utf-8') as file_desc:
+            time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
+                                       time.localtime())
+            file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            file_desc.write(
+                '<testsuites disabled="0" name="AllTests" '
+                'time="300" timestamp="%s" errors="0" '
+                'failures="1" tests="1">\n' % time_stamp)
+            file_desc.write(
+                '  <testsuite disabled="0" name="%s" time="300" '
+                'errors="0" failures="1" tests="1">\n' % filename)
+            file_desc.write(
+                '    <testcase name="%s" time="300" classname="%s" '
+                'status="run">\n' % (filename, filename))
+            file_desc.write(
+                '      <failure type="" '
+                'message="Fuzzer crash. See ERROR in log file">\n')
+            file_desc.write('      </failure>\n')
+            file_desc.write('    </testcase>\n')
+            file_desc.write('  </testsuite>\n')
+            file_desc.write('</testsuites>\n')
+    return
 
+def _create_fuzz_pass_file(filepath, filename):
+    if not os.path.exists(filepath):
+        with open(filepath, "w", encoding='utf-8') as file_desc:
+            time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
+                                       time.localtime())
+            file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            file_desc.write(
+                '<testsuites disabled="0" name="AllTests" '
+                'time="300" timestamp="%s" errors="0" '
+                'failures="0" tests="1">\n' % time_stamp)
+            file_desc.write(
+                '  <testsuite disabled="0" name="%s" time="300" '
+                'errors="0" failures="0" tests="1">\n' % filename)
+            file_desc.write(
+                '    <testcase name="%s" time="300" classname="%s" '
+                'status="run"/>\n' % (filename, filename))
+            file_desc.write('  </testsuite>\n')
+            file_desc.write('</testsuites>\n')
+    return
+
+def _create_fuzz_result_file(filepath, filename, error_message):
+    error_message = str(error_message)
+    error_message = error_message.replace("\"", "")
+    error_message = error_message.replace("<", "")
+    error_message = error_message.replace(">", "")
+    error_message = error_message.replace("&", "")
+    if "AddressSanitizer" in error_message:
+        LOG.error("FUZZ TEST CRASH")
+        _create_fuzz_crash_file(filepath, filename)
+    elif re.search(r'Done (\b\d+\b) runs in (\b\d+\b) second',
+                   error_message, re.M) is not None:
+        LOG.info("FUZZ TEST PASS")
+        _create_fuzz_pass_file(filepath, filename)
+    else:
+        LOG.error("FUZZ TEST UNAVAILABLE")
+        _create_empty_result_file(filepath, filename, error_message)
+    return
 ##############################################################################
 ##############################################################################
 
@@ -209,6 +272,11 @@ class ResultManager(object):
     def get_test_results(self, error_message=""):
         # Get test result files
         filepath = self.obtain_test_result_file()
+        if "fuzztest" == self.config.testtype[0]:
+            LOG.info("create fuzz test report")
+            _create_fuzz_result_file(filepath, self.testsuite_name,
+                                     error_message)
+            return filepath
         if not os.path.exists(filepath):
             _create_empty_result_file(filepath, self.testsuite_name,
                                       error_message)
@@ -394,6 +462,10 @@ class CppTestDriver(IDriver):
             "rm -rf %s" % self.config.target_test_path)
         self.config.device.execute_shell_command(
             "mkdir -p %s" % self.config.target_test_path)
+        if "fuzztest" == self.config.testtype[0]:
+            self.config.device.execute_shell_command(
+                "mkdir -p %s" % os.path.join(self.config.target_test_path,
+                "corpus"))
 
     def _run_gtest(self, suite_file):
         from xdevice import Variables
@@ -407,6 +479,7 @@ class CppTestDriver(IDriver):
 
         # push testsuite file
         self.config.device.push_file(suite_file, self.config.target_test_path)
+        self._push_corpus_if_exist(filename)
 
         # push resource files
         resource_manager = ResourceManager()
@@ -453,6 +526,12 @@ class CppTestDriver(IDriver):
             resource_dir,
             self.config.device)
 
+    def _push_corpus_if_exist(self, filename):
+        if "fuzztest" == self.config.testtype[0]:
+            corpus_path = os.path.join(get_fuzzer_path(filename), "corpus")
+            self.config.device.push_file(corpus_path,
+                os.path.join(self.config.target_test_path, "corpus"))
+
     @staticmethod
     def _get_test_para(testcase,
                        testlevel,
@@ -472,6 +551,14 @@ class CppTestDriver(IDriver):
             test_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
         else:
             test_para = ""
+
+        if "fuzztest" == testtype[0]:
+            cfg_list = FuzzerConfigManager(os.path.join(get_fuzzer_path(
+                filename), "project.xml")).get_fuzzer_config("fuzztest")
+            LOG.info("config list :%s" % str(cfg_list))
+            test_para += "corpus -max_len=" + cfg_list[0] + \
+                         " -max_total_time=" + cfg_list[1] + \
+                         " -rss_limit_mb=" + cfg_list[2]
         return test_para
 
 
