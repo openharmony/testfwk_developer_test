@@ -46,6 +46,7 @@ class ToolCommandType(object):
     TOOLCMD_KEY_RUN = "run"
     TOOLCMD_KEY_QUIT = "quit"
     TOOLCMD_KEY_LIST = "list"
+    TOOLCMD_KEY_GEN = "gen"
 
     @property
     def run_command(self):
@@ -64,6 +65,7 @@ class ConfigFileConst(object):
     RESOURCECONFIG_FILEPATH = "harmony_test.xml"
     CASE_RESOURCE_FILEPATH = "ohos_test.xml"
     SCENECONFIG_FILEPATH = "scene_config.xml"
+    FUZZCONFIG_FILEPATH = "fuzz_config.xml"
 
     @property
     def framework_config_file(self):

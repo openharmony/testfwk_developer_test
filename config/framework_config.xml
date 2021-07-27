@@ -35,6 +35,9 @@
     <option name="SEC"
             desc="security"
             timeout="900" />
+    <option name="FUZZ"
+            desc="fuzztest"
+            timeout="900" />
     <option name="RELI"
             desc="reliability"
             timeout="900" />

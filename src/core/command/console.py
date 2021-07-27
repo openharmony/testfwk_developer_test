@@ -25,6 +25,7 @@ from core.constants import ToolCommandType
 from xdevice import platform_logger
 from xdevice import EnvironmentManager
 from core.command.run import Run
+from core.command.gen import Gen
 from core.command.display import display_help_info
 from core.command.display import display_show_info
 from core.command.display import show_wizard_mode
@@ -192,6 +193,20 @@ class Console(object):
                                 default="",
                                 help="Specify test resource"
                                 )
+            parser.add_argument("-dp", "--dirpath",
+                                action="store",
+                                type=str,
+                                dest="dirpath",
+                                default="",
+                                help="Specify fuzz test dirpath"
+                                )
+            parser.add_argument("-fn", "--fuzzername",
+                                action="store",
+                                type=str,
+                                dest="fuzzername",
+                                default="",
+                                help="Specify fuzzer name"
+                                )
             (options, unparsed) = parser.parse_known_args(para_list)
 
             # Set default value
@@ -229,6 +244,8 @@ class Console(object):
                 if "productform" in self.wizard_dic:
                     productform = self.wizard_dic["productform"]
                 self._process_command_show(para_list, productform)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_GEN):
+                self._process_command_gen(command, options)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
                 if "productform" in self.wizard_dic:
                     options.productform = self.wizard_dic["productform"]
@@ -258,6 +275,14 @@ class Console(object):
             display_show_info(para_list, productform)
         else:
             LOG.error("Wrong show command.")
+        return
+
+    @classmethod
+    def _process_command_gen(cls, command, options):
+        if command == ToolCommandType.TOOLCMD_KEY_GEN:
+            Gen().process_command_gen(options)
+        else:
+            LOG.error("Wrong gen command.")
         return
 
     @classmethod

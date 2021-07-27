@@ -22,6 +22,7 @@ from core.utils import scan_support_product
 from core.config.config_manager import UserConfigManager
 from core.build.select_targets import SelectTargets
 from core.build.build_testcases import BuildTestcases
+from core.command.gen import Gen
 
 LOG = platform_logger("BuildManager")
 
@@ -56,6 +57,16 @@ class BuildManager(object):
         else:
             LOG.info("Test case compilation failed, please modify.")
             build_result = False
+        return build_result
+
+    @classmethod
+    def _compile_fuzz_test_case(cls, project_root_path, para):
+        build_result = BuildTestcases(
+            project_root_path).build_fuzz_testcases(para)
+        if build_result:
+            LOG.info("Test case compilation successed.")
+        else:
+            LOG.info("Test case compilation failed, please modify.")
         return build_result
 
     @classmethod
@@ -100,10 +111,15 @@ class BuildManager(object):
             "BUILD.gn")
 
         self._make_gn_file(build_cfg_filepath, target_list)
-        build_result = self._compile_test_cases_by_target(
-            project_root_path,
-            para.productform,
-            "make_temp_test")
+        if "fuzztest" in para.testtype:
+            Gen().gen_fuzzer_list_file(target_list)
+            build_result = self._compile_fuzz_test_case(
+                project_root_path, para)
+        else:
+            build_result = self._compile_test_cases_by_target(
+                project_root_path,
+                para.productform,
+                "make_temp_test")
         self._make_gn_file(build_cfg_filepath, [])
 
         return build_result
