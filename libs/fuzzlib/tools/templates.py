@@ -94,11 +94,11 @@ PROJECT_DEMO_TEMPLATE = """\
 #include <stddef.h>
 #include <stdint.h>
 
-const int FUZZ_DATA_LEN = 3
-const int FUZZ_FST_DATA = 0
-const int FUZZ_SND_DATA = 1
-const int FUZZ_TRD_DATA = 2
-const int FUZZ_FTH_DATA = 3
+const int FUZZ_DATA_LEN = 3;
+const int FUZZ_FST_DATA = 0;
+const int FUZZ_SND_DATA = 1;
+const int FUZZ_TRD_DATA = 2;
+const int FUZZ_FTH_DATA = 3;
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
