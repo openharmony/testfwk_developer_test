@@ -163,9 +163,8 @@ def parse_fuzzer_info():
         for line in list_file.readlines():
             striped_str = line.strip()
             if platform.system() == "Windows":
-                path_list.append(striped_str.split(":")[0][3:] + ":" +
-                                 striped_str.split(":")[1].split("(")[0])
-                bin_list.append(striped_str.split(":")[2].split("(")[0])
+                path_list.append(striped_str.split(" ")[0])
+                bin_list.append(striped_str.split(" ")[1])
             else:
                 path_list.append(striped_str.split(":")[0][3:])
                 bin_list.append(striped_str.split(":")[1].split("(")[0])
