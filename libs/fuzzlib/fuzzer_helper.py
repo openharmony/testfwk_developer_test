@@ -162,7 +162,6 @@ def make(args,  stdout=None):
         './build.sh',
         '--gn-args',
         'build_example=true',
-        '--target-variant sanitizer',
         '--build-target'
     ]
     build_script.append(args.project_name)
