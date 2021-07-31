@@ -132,7 +132,7 @@ def generate(args):
     with open(file_path, 'w') as filehandle:
         filehandle.write(PROJECT_XML_TEMPLATE % template_args)
 
-    file_path = os.path.join(project_dir_path, "%s.cc" % args.project_name)
+    file_path = os.path.join(project_dir_path, "%s.cpp" % args.project_name)
     with open(file_path, 'w') as filehandle:
         filehandle.write(PROJECT_DEMO_TEMPLATE % template_args)
 
@@ -162,7 +162,6 @@ def make(args,  stdout=None):
         './build.sh',
         '--gn-args',
         'build_example=true',
-        '--target-variant sanitizer',
         '--build-target'
     ]
     build_script.append(args.project_name)
