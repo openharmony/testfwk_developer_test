@@ -53,10 +53,9 @@ class Gen(object):
         fuzz_path = os.path.join(sys.source_code_root_path, options.dirpath)
         LOG.info("fuzz_path = %s" % fuzz_path)
         if not os.path.exists(fuzz_path):
-            LOG.error("%s is not exist." % fuzz_path)
-            return
+            os.makedirs(fuzz_path)
+            LOG.info("make folder %s" % fuzz_path)
 
-        LOG.info("%s exist." % fuzz_path)
         command = [sys.executable, helper_path, 'generate',
                    options.fuzzername, fuzz_path]
         LOG.info("command %s" % command)
