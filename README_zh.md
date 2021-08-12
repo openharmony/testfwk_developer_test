@@ -198,24 +198,6 @@ developertest/
 
     3.  仅支持串口的被测设备。
 
-        \[board\_info\]    \# 开发板配置信息，例如：
-
-        ```
-        <board_info>
-            <board_series>hispark</board_series>
-            <board_type>taurus</board_type>
-            <board_product>ipcamera</board_product>
-            <build_command>hb build</build_command>
-        </board_info>
-        ```
-
-        >![](public_sys-resources/icon-note.gif) **说明：** 
-        >开发板配置信息如下：
-        >board\_series：开发板系列，默认hispark。
-        >board\_type：开发板类型，默认taurus。
-        >board\_product：目标产品，默认ipcamera。
-        >build\_command：测试版本和用例的编译命令，默认hb build。
-
         \[device\]    \# 配置标签为ipcamera的串口信息，COM口和波特率，例如：
 
         ```

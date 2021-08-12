@@ -190,23 +190,6 @@ The Python environment is required.
 
     3.  For devices that only support the serial port connection, modify the configuration file as follows:
 
-        \[board\_info\]    \# Configure development board information.
-
-        ```
-        <board_info>
-            <board_series>hispark</board_series>
-            <board_type>taurus</board_type>
-            <board_product>ipcamera</board_product>
-            <build_command>hb build</build_command>
-        </board_info>
-        ```
-
-        >![](public_sys-resources/icon-note.gif) **NOTE:** 
-        >**board\_series**: development board series. The default value is  **hispark**.
-        >**board\_type**: development board type. The default value is  **taurus**.
-        >**board\_product**: target product. The default value is  **ipcamera**.
-        >**build\_command**: command used for building the test version and test case. The default value is  **hb build**.
-
         \[device\]    \# Configure the serial port information with the  **"ipcamera"**  attribute, including the COM port and baud rate.
 
         ```

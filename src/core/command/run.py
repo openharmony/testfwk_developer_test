@@ -25,8 +25,10 @@ from xdevice import Plugin
 from xdevice import get_plugin
 from xdevice import platform_logger
 from xdevice import Scheduler
+from xdevice import DeviceTestType
 from core.utils import get_build_output_path
 from core.utils import scan_support_product
+from core.utils import is_lite_product
 from core.common import is_open_source_product
 from core.command.parameter import Parameter
 from core.testcase.testcase_manager import TestCaseManager
@@ -132,6 +134,20 @@ class Run(object):
             if scheduler is None:
                 LOG.error("Can not find the scheduler plugin.")
             else:
+                if is_lite_product(options.productform,
+                                   sys.source_code_root_path):
+                    options.testcases_path = options.target_outpath
+                    options.resource_path = os.path.abspath(os.path.join(
+                        sys.framework_root_dir, "..", "resource"))
+                    print(options.testcases_path)
+                    print(options.resource_path)
+                    if options.productform.find("wifiiot") != -1:
+                        scheduler.update_test_type_in_source(".bin",
+                            DeviceTestType.ctest_lite)
+                        scheduler.update_ext_type_in_source("BIN",
+                            DeviceTestType.ctest_lite)
+                    else:
+                        print("productform is not wifiiot")
                 scheduler.exec_command(command, options)
         return
 
@@ -178,26 +194,27 @@ class Run(object):
 
     @classmethod
     def get_tests_out_path(cls, product_form):
-        tests_out_path = UserConfigManager().get_test_cases_dir()
-        if tests_out_path == "":
+        testcase_path = UserConfigManager().get_test_cases_dir()
+        if testcase_path == "":
             all_product_list = scan_support_product()
             if product_form in all_product_list:
                 if is_open_source_product(product_form):
-                    tests_out_path = os.path.abspath(os.path.join(
+                    testcase_path = os.path.abspath(os.path.join(
                         get_build_output_path(product_form),
                         "packages",
                         "phone",
                         "tests"))
                 else:
-                    tests_out_path = os.path.abspath(os.path.join(
+                    testcase_path = os.path.abspath(os.path.join(
                         get_build_output_path(product_form),
                         "packages",
                         product_form,
                         "tests"))
             else:
-                tests_out_path = os.path.join(
+                testcase_path = os.path.join(
                     get_build_output_path(product_form), "test")
-        return tests_out_path
+        LOG.info("testcase_path=%s" % testcase_path)
+        return testcase_path
 
     @classmethod
     def get_coverage_outpath(cls, options):

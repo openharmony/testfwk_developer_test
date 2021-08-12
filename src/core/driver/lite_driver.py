@@ -25,10 +25,28 @@ from xdevice import DeviceTestType
 from xdevice import IDriver
 from xdevice import Plugin
 from xdevice import platform_logger
+from xdevice import DeviceLabelType
+from xdevice import ComType
+from xdevice import ParserType
+from xdevice import ShellHandler
+from xdevice import ExecuteTerminate
+from xdevice import LiteDeviceExecuteCommandError
+from xdevice import get_plugin
+from xdevice import JsonParser
+from xdevice import get_config_value
+from xdevice import get_kit_instances
+from xdevice import check_result_report
+from xdevice import get_device_log_file
+from xdevice import get_test_component_version
+from xdevice import ParamError
+from core.utils import get_filename_extension
+from core.testkit.kit_lite import DeployKit
+
 
 from core.config.config_manager import UserConfigManager
 
-__all__ = ["LiteUnitTest"]
+__all__ = ["LiteUnitTest", "CTestDriver", "JSUnitTestLiteDriver"]
+LOG = platform_logger("LiteUnitTest")
 
 
 def get_level_para_string(level_string):
@@ -113,14 +131,14 @@ class LiteUnitTest(IDriver):
         if self.mnt_cmd == "mount ":
             self.log.error("no configure for mount command")
             return
-        
+
         filter_result, status, _ = \
             self.lite_device.execute_command_with_timeout(
             self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test, timeout=3)
         if "already mounted" in filter_result:
             self.log.info("nfs has been mounted")
             return
-            
+
         for i in range(0, 2):
             if status:
                 self.log.info("execute mount command success")
@@ -266,3 +284,266 @@ class LiteUnitTest(IDriver):
 
     def __result__(self):
         pass
+
+
+@Plugin(type=Plugin.DRIVER, id=DeviceTestType.ctest_lite)
+class CTestDriver(IDriver):
+    """
+    CTest is a test that runs a native test package on given lite device.
+    """
+    config = None
+    result = ""
+    error_message = ""
+    version_cmd = "AT+CSV"
+
+    def __init__(self):
+        self.file_name = ""
+
+    def __check_environment__(self, device_options):
+        if len(device_options) != 1 or \
+                device_options[0].label != DeviceLabelType.wifiiot:
+            self.error_message = "check environment failed"
+            return False
+        return True
+
+    def __check_config__(self, config=None):
+        del config
+        self.config = None
+
+    def __execute__(self, request):
+        from xdevice import Variables
+        try:
+            self.config = request.config
+            self.config.device = request.config.environment.devices[0]
+
+            if request.config.resource_path:
+                current_dir = request.config.resource_path
+            else:
+                current_dir = Variables.exec_dir
+
+            config_file = request.root.source.config_file.strip()
+            if config_file:
+                source = os.path.join(current_dir, config_file)
+                self.file_name = os.path.basename(config_file).split(".")[0]
+            else:
+                source = request.root.source.source_string.strip()
+
+            self._run_ctest(source=source, request=request)
+
+        except (LiteDeviceExecuteCommandError, Exception) as exception:
+            LOG.error(exception, error_no=getattr(exception, "error_no",
+                                                  "00000"))
+            self.error_message = exception
+        finally:
+            if request.root.source.test_name.startswith("{"):
+                report_name = "report"
+            else:
+                report_name = get_filename_extension(
+                    request.root.source.test_name)[0]
+
+            self.result = check_result_report(request.config.report_path,
+                                              self.result,
+                                              self.error_message,
+                                              report_name)
+
+    def _run_ctest(self, source=None, request=None):
+        if not source:
+            LOG.error("Error: %s don't exist." % source, error_no="00101")
+            return
+
+        try:
+            parsers = get_plugin(Plugin.PARSER, ParserType.ctest_lite)
+            version = get_test_component_version(self.config)
+            parser_instances = []
+            for parser in parsers:
+                parser_instance = parser.__class__()
+                parser_instance.suites_name = self.file_name
+                parser_instance.product_info.setdefault("Version", version)
+                parser_instance.listeners = request.listeners
+                parser_instances.append(parser_instance)
+            handler = ShellHandler(parser_instances)
+
+            reset_cmd = self._reset_device(request, source)
+            self.result = "%s.xml" % os.path.join(request.config.report_path,
+                                                  "result", self.file_name)
+
+            self.config.device.device.com_dict.get(
+                ComType.deploy_com).connect()
+
+            result, _, error = self.config.device.device. \
+                execute_command_with_timeout(
+                    command=reset_cmd,
+                    case_type=DeviceTestType.ctest_lite,
+                    key=ComType.deploy_com,
+                    timeout=90,
+                    receiver=handler)
+
+            device_log_file = get_device_log_file(request.config.report_path,
+                                                  request.config.device.
+                                                  __get_serial__())
+
+            device_log_file_open = os.open(device_log_file, os.O_WRONLY |
+                os.O_CREAT | os.O_APPEND, 0o755)
+            with os.fdopen(device_log_file_open, "a") as file_name:
+                file_name.write("{}{}".format(
+                    "\n".join(result.split("\n")[0:-1]), "\n"))
+                file_name.flush()
+        finally:
+            self.config.device.device.com_dict.get(ComType.deploy_com).close()
+
+    def _reset_device(self, request, source):
+        json_config = JsonParser(source)
+        reset_cmd = []
+        kit_instances = get_kit_instances(json_config,
+                                          request.config.resource_path,
+                                          request.config.testcases_path)
+        from xdevice import Scheduler
+
+        for (kit_instance, kit_info) in zip(kit_instances,
+                                            json_config.get_kits()):
+            if not isinstance(kit_instance, DeployKit):
+                continue
+            if not self.file_name:
+                self.file_name = get_config_value(
+                    'burn_file', kit_info)[0].split("\\")[-1].split(".")[0]
+            reset_cmd = kit_instance.burn_command
+            if not Scheduler.is_execute:
+                raise ExecuteTerminate("ExecuteTerminate", error_no="00300")
+
+            kit_instance.__setup__(self.config.device,
+                source_file=request.root.source.source_file.strip())
+
+        reset_cmd = [int(item, 16) for item in reset_cmd]
+        return reset_cmd
+
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
+
+
+
+@Plugin(type=Plugin.DRIVER, id=DeviceTestType.jsunit_test_lite)
+class JSUnitTestLiteDriver(IDriver):
+    """
+    JSUnitTestDriver is a Test that runs a native test package on given device.
+    """
+
+    def __init__(self):
+        self.result = ""
+        self.error_message = ""
+        self.kits = []
+        self.config = None
+
+    def __check_environment__(self, device_options):
+        pass
+
+    def __check_config__(self, config):
+        pass
+
+    def _get_driver_config(self, json_config):
+        bundle_name = get_config_value('bundle-name',
+                                       json_config.get_driver(), False)
+        if not bundle_name:
+            raise ParamError("Can't find bundle-name in config file.",
+                             error_no="00108")
+        else:
+            self.config.bundle_name = bundle_name
+
+        ability = get_config_value('ability',
+                                   json_config.get_driver(), False)
+        if not ability:
+            self.config.ability = "default"
+        else:
+            self.config.ability = ability
+
+    def __execute__(self, request):
+        try:
+            LOG.debug("Start execute xdevice extension JSUnit Test")
+
+            self.config = request.config
+            self.config.device = request.config.environment.devices[0]
+
+            config_file = request.root.source.config_file
+            suite_file = request.root.source.source_file
+
+            if not suite_file:
+                raise ParamError(
+                    "test source '%s' not exists" %
+                    request.root.source.source_string, error_no="00101")
+
+            if not os.path.exists(config_file):
+                LOG.error("Error: Test cases don't exist %s." % config_file,
+                          error_no="00101")
+                raise ParamError(
+                    "Error: Test cases don't exist %s." % config_file,
+                    error_no="00101")
+
+            self.file_name = os.path.basename(
+                request.root.source.source_file.strip()).split(".")[0]
+
+            self.result = "%s.xml" % os.path.join(
+                request.config.report_path, "result", self.file_name)
+
+            json_config = JsonParser(config_file)
+            self.kits = get_kit_instances(json_config,
+                                          self.config.resource_path,
+                                          self.config.testcases_path)
+
+            self._get_driver_config(json_config)
+
+            from xdevice import Scheduler
+            for kit in self.kits:
+                if not Scheduler.is_execute:
+                    raise ExecuteTerminate("ExecuteTerminate",
+                                           error_no="00300")
+                if kit.__class__.__name__ == CKit.liteinstall:
+                    kit.bundle_name = self.config.bundle_name
+                kit.__setup__(self.config.device, request=request)
+
+            self._run_jsunit(request)
+
+        except Exception as exception:
+            self.error_message = exception
+        finally:
+            report_name = "report" if request.root.source. \
+                test_name.startswith("{") else get_filename_extension(
+                request.root.source.test_name)[0]
+
+            self.result = check_result_report(
+                request.config.report_path, self.result, self.error_message,
+                report_name)
+
+            for kit in self.kits:
+                kit.__teardown__(self.config.device)
+
+            self.config.device.close()
+
+    def _run_jsunit(self, request):
+        parser_instances = []
+        parsers = get_plugin(Plugin.PARSER, ParserType.jsuit_test_lite)
+        for parser in parsers:
+            parser_instance = parser.__class__()
+            parser_instance.suites_name = self.file_name
+            parser_instance.listeners = request.listeners
+            parser_instances.append(parser_instance)
+        handler = ShellHandler(parser_instances)
+
+        command = "./bin/aa start -p %s -n %s" % \
+                  (self.config.bundle_name, self.config.ability)
+        result, _, error = self.config.device.execute_command_with_timeout(
+            command=command,
+            timeout=300,
+            receiver=handler)
+
+        device_log_file = get_device_log_file(request.config.report_path,
+            request.config.device.
+            __get_serial__())
+
+        device_log_file_open = os.open(device_log_file, os.O_WRONLY |
+            os.O_CREAT | os.O_APPEND, 0o755)
+        with os.fdopen(device_log_file_open, "a") as file_name:
+            file_name.write("{}{}".format(
+                "\n".join(result.split("\n")[0:-1]), "\n"))
+            file_name.flush()
+
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""

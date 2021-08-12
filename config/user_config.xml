@@ -21,16 +21,6 @@
     <version>false</version>
     <!-- whether compile test case, default false -->
     <testcase>true</testcase>
-    <board_info>
-      <!-- board series, default hispark -->
-      <board_series>hispark</board_series>
-      <!-- board type, default taurus(3516dv300), aries(3518ev300), pegasus(3861) -->
-      <board_type>taurus</board_type>
-      <!-- product name, default ipcamera(3516dv300/3518ev300), wifiiot(3861) -->
-      <board_product>ipcamera</board_product>
-      <!-- build command, default hb build -->
-      <build_command>hb build</build_command>
-    </board_info>
   </build>
   <environment>
     <!-- reserved field, configure devices that support HDC connection -->
@@ -40,8 +30,7 @@
       <sn></sn>
     </device>
     <!-- configure devices that support serial connection -->
-    <device type="com"
-            label="ipcamera">
+    <device type="com" label="ipcamera">
       <serial>
         <com></com>
         <type>cmd</type>
