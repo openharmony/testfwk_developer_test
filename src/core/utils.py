@@ -74,9 +74,10 @@ def get_device_log_file(report_path, serial=None, log_name="device_log"):
 def get_build_output_path(product_form):
     if sys.source_code_root_path == "":
         return ""
+
     standard_large_system_list = scan_support_product()
-    property_info = parse_product_info(product_form)
     if product_form in standard_large_system_list:
+        property_info = parse_product_info(product_form)
         if property_info is not None:
             target_os = property_info.get("target_os")
             target_cpu = property_info.get("target_cpu")
@@ -84,14 +85,15 @@ def get_build_output_path(product_form):
         else:
             return ""
     else:
-        para_dic = UserConfigManager().get_user_config("build", "board_info")
-        board_series = para_dic.get("board_series", "")
-        board_type = para_dic.get("board_type", "")
-        board_product = para_dic.get("board_product", "")
-        fist_build_output = "%s_%s" % (board_series, board_type)
-        second_build_output = "%s_%s" % (board_product, fist_build_output)
-        build_output_name = os.path.join(fist_build_output,
+        board_info_list = product_form.split("_")
+        if len(board_info_list) < 3:
+            return ""
+
+        first_build_output = board_info_list[1] + "_" + board_info_list[2]
+        second_build_output = product_form
+        build_output_name = os.path.join(first_build_output,
                                          second_build_output)
+
     build_output_path = os.path.join(sys.source_code_root_path,
                                      "out",
                                      build_output_name)
@@ -126,6 +128,9 @@ def parse_product_info(product_form):
                               product_form,
                               "preloader",
                               "build.prop")
+    if not os.path.exists(build_prop):
+        return {}
+
     with open(build_prop, 'r') as pro_file:
         properties = {}
         for line in pro_file:
@@ -154,6 +159,7 @@ def get_decode(stream):
             ret = str(stream)
     return ret
 
+
 def parse_fuzzer_info():
     path_list = []
     bin_list = []
@@ -170,9 +176,17 @@ def parse_fuzzer_info():
                 bin_list.append(striped_str.split(":")[1].split("(")[0])
     return path_list, bin_list
 
+
 def get_fuzzer_path(filename):
     path_list, bin_list = parse_fuzzer_info()
     for i, name in enumerate(bin_list):
         if name == filename:
             return os.path.join(sys.source_code_root_path, path_list[i])
     return ""
+
+
+def is_lite_product(product_form, code_root_path):
+    if code_root_path is None or code_root_path == "":
+        return True if len(product_form.split("_")) >= 3 else False
+    else:
+        return True if product_form not in scan_support_product() else False

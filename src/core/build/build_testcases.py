@@ -159,48 +159,25 @@ class BuildTestcases(object):
         build_result = False
         current_path = os.getcwd()
         os.chdir(self.project_rootpath)
+
         command.append("--product-name")
         command.append(productform)
         command.append("--export-para")
         command.append("PYCACHE_ENABLE:true")
 
-        # scan standard and large system
-        all_scan_product_list = scan_support_product()
-        if productform in all_scan_product_list:
-            if os.path.exists(BUILD_FILEPATH):
-                build_command = [BUILD_FILEPATH]
-                build_command.extend(command)
-                LOG.info("build_command: %s" % str(build_command))
-                if subprocess.call(build_command) == 0:
-                    build_result = True
-                else:
-                    build_result = False
+        if os.path.exists(BUILD_FILEPATH):
+            build_command = [BUILD_FILEPATH]
+            build_command.extend(command)
+            LOG.info("build_command: %s" % str(build_command))
+            if subprocess.call(build_command) == 0:
+                build_result = True
             else:
-                LOG.warning("Error: The %s is not exist" % BUILD_FILEPATH)
+                build_result = False
         else:
-            build_result = self._execute_build_lite_cmd()
+            LOG.warning("Error: The %s is not exist" % BUILD_FILEPATH)
+
         os.chdir(current_path)
         return build_result
-
-    def _execute_build_lite_cmd(self):
-        if os.path.exists(BUILD_LITE):
-            temp_user_manager = UserConfigManager()
-            build_command_config = \
-                temp_user_manager.get_user_config("build", "board_info")
-            build_command = [build_command_config.get("build_command", "")]
-            LOG.info("build_command: %s" % str(build_command))
-            try:
-                if subprocess.call(build_command) == 0:
-                    LOG.info("execute build lite command success")
-                    return True
-                else:
-                    LOG.error("execute build lite command success")
-            except IOError as exception:
-                LOG.error("build lite test case failed, exception=%s"
-                          % exception)
-        else:
-            LOG.warning("Error: The %s is not exist" % BUILD_LITE)
-        return False
 
     def build_fuzz_testcases(self, para):
         self._delete_testcase_dir(para.productform)
@@ -245,17 +222,6 @@ class BuildTestcases(object):
         command.append("--gn-args")
         command.append(BUILD_TARGET_PLATFORM % productform)
         return self._execute_build_command(productform, command)
-
-    def build_all_testcases(self):
-        command = []
-        if self.is_build_example:
-            command.append("--gn-args")
-            command.append("build_example=true")
-        command.append("--build-target")
-        command.append("make_test")
-        command.append("--gn-args")
-        command.append(BUILD_TARGET_PLATFORM % "all")
-        return self._execute_build_command(command)
 
 
 ##############################################################################

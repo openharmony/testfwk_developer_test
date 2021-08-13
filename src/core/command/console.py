@@ -30,6 +30,7 @@ from core.command.display import display_help_info
 from core.command.display import display_show_info
 from core.command.display import show_wizard_mode
 from core.config.config_manager import UserConfigManager
+from core.utils import is_lite_product
 
 try:
     if platform.system() != 'Windows':
@@ -238,17 +239,19 @@ class Console(object):
                 LOG.warning("action is empty.")
                 return
 
+            if "productform" in self.wizard_dic.keys():
+                productform = self.wizard_dic["productform"]
+                options.productform = productform
+            else:
+                productform = options.productform
+
             if command.startswith(ToolCommandType.TOOLCMD_KEY_HELP):
                 self._process_command_help(para_list)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_SHOW):
-                if "productform" in self.wizard_dic:
-                    productform = self.wizard_dic["productform"]
                 self._process_command_show(para_list, productform)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_GEN):
                 self._process_command_gen(command, options)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
-                if "productform" in self.wizard_dic:
-                    options.productform = self.wizard_dic["productform"]
                 self._process_command_run(command, options)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_QUIT):
                 self._process_command_quit(command)
@@ -314,13 +317,23 @@ class Console(object):
 
     @classmethod
     def _build_version(cls, product_form):
-        build_result = True
+        is_build_version = UserConfigManager().get_user_config_flag(
+            "build", "version")
+
         project_root_path = sys.source_code_root_path
-        if project_root_path != "":
+        if project_root_path == "":
+            return True
+
+        build_result = True
+        if is_lite_product(product_form, sys.source_code_root_path):
+            if not is_build_version:
+                return True
+            from core.build.build_lite_manager import BuildLiteManager
+            build_lite_manager = BuildLiteManager(project_root_path)
+            build_result = build_lite_manager.build_version(product_form)
+        else:
             from core.build.build_manager import BuildManager
             build_manager = BuildManager()
-            is_build_version = UserConfigManager().get_user_config_flag(
-                "build", "version")
             if is_build_version:
                 build_result = build_manager.build_version(project_root_path,
                                                            product_form)

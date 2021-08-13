@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+import os
 import platform
 import subprocess
 
@@ -32,29 +33,75 @@ class BuildLiteManager(object):
     """
     log = platform_logger("BuildLiteManager")
 
-    def __init__(self):
-        self.board_series = ""
-        self.board_type = ""
-        self.board_product = ""
+    def __init__(self, project_root_path):
+        self.project_rootpath = project_root_path
 
-    def build_version_and_cases(self):
-        build_command = "hb build -b debug"
-        self.log.info("build param:%s" % build_command)
+    def build_testcases(self, param):
+        if platform.system() != "Linux":
+            self.log.info("Windows environment, only use .bin test cases")
+            return True
+
+        current_path = os.getcwd()
+        os.chdir(self.project_rootpath)
+
+        command = []
+        if param.productform.find("wifiiot") == -1:
+            command.append("hb")
+            command.append("build")
+            command.append("-p")
+            command.append("%s@hisilicon" % param.productform)
+            command.append("-b")
+            command.append("debug")
+            if param.testsuit != "":
+                command.append("target=%s" % param.testsuit)
+        else:
+            build_script = os.path.abspath(os.path.join(
+                os.path.dirname(__file__),
+                "build_lite_testcases.sh"))
+            print("build_script=%s" % build_script)
+            command.append(build_script)
+            command.append("product=%s" % param.productform)
+            command.append("kernel=liteos_m")
+            if param.testsuit != "":
+                command.append("target=%s" % param.testsuit)
+        self.log.info("build_command: %s" % str(command))
+
         build_result = False
         try:
-            build_result = subprocess.call(build_command) == 0
+            build_result = subprocess.call(command) == 0
         except IOError as exception:
             self.log.error("build test case failed, exception=%s" % exception)
+
+        if build_result:
+            self.log.info("build test case successed.")
+        else:
+            self.log.info("build test case failed.")
+
+        os.chdir(os.path.realpath(current_path))
         return build_result
 
-    def exec_build_test(self, param_option):
-        """
-        build os lite version and test cases
-        :param param_option: build param
-        :return:build success or failed
-        """
-        if platform.system() == "Linux":
-            return self.build_version_and_cases()
-        self.log.info("windows environment, only use .bin test cases")
-        return True
+    def build_version(self, productform):
+        current_path = os.getcwd()
+        os.chdir(self.project_rootpath)
 
+        command = []
+        command.append("hb")
+        command.append("build")
+        command.append("-p")
+        command.append("%s@hisilicon" % productform)
+        command.append("-f")
+        self.log.info("build_command: %s" % str(command))
+
+        build_result = False
+        try:
+            build_result = subprocess.call(command) == 0
+        except IOError as exception:
+            self.log.error("build version failed, exception=%s" % exception)
+
+        if build_result:
+            self.log.info("build version successed.")
+        else:
+            self.log.info("build version failed.")
+
+        os.chdir(os.path.realpath(current_path))
+        return build_result

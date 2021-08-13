@@ -69,22 +69,12 @@ class BuildManager(object):
             LOG.info("Test case compilation failed, please modify.")
         return build_result
 
-    @classmethod
-    def _compile_all_test_cases(cls, project_root_path):
-        if BuildTestcases(project_root_path).build_all_testcases():
-            LOG.info("Test case compilation successed.")
-            build_result = True
-        else:
-            LOG.info("Test case compilation failed, please modify.")
-            build_result = False
-        return build_result
-
     def _compile_testcases(self, project_root_path, para):
         all_product_list = scan_support_product()
         if para.productform not in all_product_list:
             from core.build.build_lite_manager import BuildLiteManager
-            build_lite_manager = BuildLiteManager()
-            return build_lite_manager.exec_build_test(para)
+            build_lite_manager = BuildLiteManager(project_root_path)
+            return build_lite_manager.build_testcases(para)
 
         if para.testsuit != "":
             return self._compile_test_cases_by_target(
