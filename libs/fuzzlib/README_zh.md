@@ -1,191 +1,234 @@
-# 测试框架DTFuzz测试指导
+# 测试框架Fuzzing安全测试指导
 
-- [简介](#section7730298375831)
+- [Fuzzing简介](#section7730298375831)
+- [Fuzzing测试关注的风险接口](#section00067164921)
 - [使用测试框架DTFuzz](#section0009871491)
+  - [配置启动测试框架](#section005187487501)
+  - [单个Fuzz用例初始化](#section372106507189)
+  - [Fuzz用例编写](#section98175917)
+  - [Fuzz用例编译](#section00816581589)
+  - [Fuzz用例执行](#section7510974319)
 - [测试结果与日志](#section016190470)
 
-## 简介<a name="section7730298375831"></a>
+## Fuzzing简介<a name="section7730298375831"></a>
 
 模糊测试（fuzzing test）是一种软件测试技术，其核心思想是将自动或半自动生成的随机数据输入到一个程序中，并监视程序异常，如崩溃，断言（assertion）失败，以发现可能的程序错误，比如内存泄漏，访问越界等。
 
-使用测试框架DTFuzz，需要完成DTFuzz初始化、DTFuzz用例编写、DTFuzz用例编译和DTFuzz用例执行几步。
+Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.org/docs/LibFuzzer.html)作为Fuzzing引擎进行构建，libFuzzer是一个基于LLVM编译时路径插桩，可以对被测库API进行路径引导测试的Fuzzing引擎。
+
+使用Fuzzing测试框架，需要完成fuzzer测试用例初始化、fuzzer用例编写、fuzzer用例编译和fuzzer用例执行几步。
 
 
 
-## 使用测试框架DTFuzz<a name="section0009871491"></a>
+## Fuzzing测试关注的风险接口<a name="section00067164921"></a>
 
-- 测试框架配置
+开发者应该了解自身模块的接口数据输入是基于不可信的来源输入，特别是针对
 
-  文件：config/user_config.xml
+- 解析处理远程发送来的TCP/UDP或者蓝牙等协议数据
+- 通过复杂的文件解码处理等，包括音视频、图片解码、解压缩等
+- IPC跨进程的数据输入处理
 
-  配置测试用例的编译参数
+通过Fuzzing的覆盖引导能力，可以有效的探测和消减外部输入造成的内存安全问题，也可以极大的增强系统稳定性。
 
-  ```
-  <build>
-      <example>false</example>
-      <version>false</version>
-      <testcase>true</testcase>
-      ... ...
-  </build>
-  ```
 
-  ![img](../../public_sys-resources/icon-note.gif) **说明：** 测试用例的编译参数说明如下：
 
-  example：是否编译测试用例示例，默认false。
+## 使用测试框架开展Fuzzing<a name="section0009871491"></a>
 
-  version：是否编译测试版本，默认false。
+### 配置启动测试框架<a name="section005187487501"></a>
 
-  testcase：是否编译测试用例，默认true。
+参考[ 开发者测试组件](https://gitee.com/openharmony/test_developertest/blob/master/README_zh.md)中的描述完成测试框架安装、设备连接配置，并在linux环境下通过
 
-- 启动测试框架
+```
+./start.sh
+```
 
-  打开test/developertest目录，Windows环境启动测试框架执行
+启动测试框架。
 
-  ```
-  start.bat
-  ```
 
-  Linux环境启动测试框架执行
 
-  ```
-  ./start.sh
-  ```
+### 单个Fuzz用例初始化<a name="section372106507189"></a>
 
-- 设备形态选择
+1. Fuzz测试用例生成
 
-  根据实际的开发板选择，设备形态配置：developertest/config/framework_config.xml。
+   执行gen命令用于fuzzer源文件生成，会自动生成fuzzer源文件、fuzzer配置文件和corpus语料，目录结构如下
 
-- 单个DTFuzz初始化
+   ```
+   parse_fuzzer/
+   ├── corpus                        # Fuzz语料目录
+   │   ├── init                      # Fuzz语料
+   ├── BUILD.gn                      # Fuzz用例编译配置
+   ├── parse_fuzzer.cpp              # Fuzz用例源文件
+   ├── parse_fuzzer.h                # Fuzz用例头文件
+   ├── project.xml                   # Fuzz选项配置文件
+   ```
 
-  1. DTFuzz源文件生成
+2. 命令参数说明，参数可以指定fuzzer名称和fuzzer路径
 
-     执行gen命令用于DTFuzz源文件生成，会自动生成DTFuzz源文件、DTFuzz options配置文件和corpus语料，目录结构如下
+   ```
+   gen -t TESTTYPE -fn FUZZERNAME -dp DIRECTORYPATH
+   ```
 
-     ```
-     parse_fuzzer/
-     ├── corpus                        # DTFuzz语料目录
-     │   ├── init                      # DTFuzz语料
-     ├── BUILD.gn                      # DTFuzz用例编译配置
-     ├── parse_fuzzer.cpp              # DTFuzz用例源文件
-     ├── parse_fuzzer.h                # DTFuzz用例头文件
-     ├── project.xml                   # DTFuzz选项配置文件
-     ```
+   | 参数 | 描述       | 说明           | 备注                                       |
+   | ---- | ---------- | -------------- | ------------------------------------------ |
+   | -t   | testtype   | 测试类型       | 目前仅支持"FUZZ"                           |
+   | -fn  | fuzzername | fuzzer名称     | 为显式区分Fuzz用例，名称必须以"fuzzer"结尾 |
+   | -dp  | dirpath    | fuzzer生成路径 | 路径不存在则自动创建目录                   |
 
-  2. 命令参数说明，参数可以指定DTFuzz名称和DTFuzz路径
+3. gen命令示例，-t、-fn和-dp均为必选项
 
-     ```
-     gen -t TESTTYPE -fn FUZZERNAME -dp DIRECTORYPATH
-     ```
+   ```
+   gen -t FUZZ -fn parse_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
+   ```
+   
+   执行完毕后会在test/developertest/example/calculator/test/fuzztest/common目录下生成一个Fuzz用例demo。
 
-     | 参数 | 说明           | 备注                                     |
-     | ---- | -------------- | ---------------------------------------- |
-     | -t   | 测试类型       | 目前仅支持"FUZZ"                         |
-     | -fn  | DTFuzz名称     | 为显式区分DTFuzz，名称必须以"fuzzer"结尾 |
-     | -dp  | DTFuzz生成路径 | 路径不存在则自动创建目录                 |
 
-  3. gen命令示例，-t、-fn和-dp均为必选项
 
-     ```
-     gen -t FUZZ -fn parse_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
-     ```
+### Fuzz用例编写<a name="section98175917"></a>
 
-- DTFuzz用例编写
+1. 源文件编写
 
-  1. 源文件编写
+   Fuzz用例主要在**${fuzzer名称}.cpp**源文件中，一个Fuzz用例仅支持一个接口进行fuzz测试。
 
-     DTFuzz用例主要在${DTFuzz名称}.cpp源文件中，一个DTFuzz仅支持一个接口进行fuzz测试。
+   源文件包含两个接口：
 
-     源文件包含两个接口：
+   | 接口                            | 说明                             |
+   | ------------------------------- | -------------------------------- |
+   | LLVMFuzzerTestOneInput          | Fuzz入口函数，由Fuzz框架调用     |
+   | DoSomethingInterestingWithMyAPI | 被测试接口，实现各业务被测试逻辑 |
 
-     | 接口                            | 说明                             |
-     | ------------------------------- | -------------------------------- |
-     | LLVMFuzzerTestOneInput          | DTFuzz入口函数，由Fuzz框架调用   |
-     | DoSomethingInterestingWithMyAPI | 被测试接口，实现各业务被测试逻辑 |
+   ![img](../../public_sys-resources/icon-note.gif) **说明：** DoSomethingInterestingWithMyAPI接口名称允许依据业务逻辑修改。两接口参数data和size为fuzz测试标准化参数，不可修改。
 
-     ![img](../../public_sys-resources/icon-note.gif) **说明：** DoSomethingInterestingWithMyAPI接口名称允许依据业务逻辑修改。两接口参数data和size为fuzz测试标准化参数，不可修改。
+   ```
+   #include "parse_fuzzer.h"
+   
+   #include <stddef.h>
+   #include <stdint.h>
+   
+   const int FUZZ_DATA_LEN = 3;
+   const int FUZZ_FST_DATA = 0;
+   const int FUZZ_SND_DATA = 1;
+   const int FUZZ_TRD_DATA = 2;
+   const int FUZZ_FTH_DATA = 3;
+   
+   namespace OHOS {
+       bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+       {
+           bool result = false;
+           if (size >= FUZZ_DATA_LEN) {
+               result = data[FUZZ_FST_DATA] == 'F' &&
+                   data[FUZZ_SND_DATA] == 'U' &&
+                   data[FUZZ_TRD_DATA] == 'Z' &&
+                   data[FUZZ_FTH_DATA] == 'Z';
+           }
+           return result;
+       }
+   }
+   
+   /* Fuzzer entry point */
+   extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+   {
+       /* Run your code on data */
+       OHOS::DoSomethingInterestingWithMyAPI(data, size);
+       return 0;
+   }
+   ```
 
-  2. BUILD.gn编写
+   
 
-     [ohos_fuzztest] # 配置DTFuzz模板，例如：
+2. BUILD.gn编写
 
-     ```
-     ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
+   基于[ohos_fuzztest] # 配置Fuzz模板，例如：
+
+   ```
+   ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
+     module_out_path = module_output_path
      
-       module_out_path = module_output_path
-       
-       include_dirs = []
-       cflags = [
-         "-g",
-         "-O0",
-         "-Wno-unused-variable",
-         "-fno-omit-frame-pointer",
-       ]
-       sources = [ "parse_fuzzer.cpp" ]
-     }
-     ```
-
-     [group] # 引用测试套，例如：
-
-     ```
-     group("fuzztest") {
-       testonly = true
-       deps = []
-       
-       deps += [
-         # deps file
-         ":CalculatorFuzzTest",     #引用测试套
-       ]
-     }
-     ```
-
-  3. DTFuzz配置编写
-
-     project.xml为DTFuzz参数配置文件，包括：
-
-     ```
-     <!-- maximum length of a test input -->
-     <max_len>1000</max_len>
-     <!-- maximum total time in seconds to run the DTFuzz -->
-     <max_total_time>300</max_total_time>
-     <!-- memory usage limit in Mb -->
-     <rss_limit_mb>4096</rss_limit_mb>
-     ```
-
-- DTFuzz用例编译
-
-  添加DTFuzz用例编译：
-
-  1. 在需要DTFuzz测试的对应模块ohos.build添加DTFuzz用例路径，如在examples/ohos.build添加：
-
-     ```
-     "test_list": [
-       "//test/developertest/examples/calculator/test:unittest",
-       "//test/developertest/examples/calculator/test:fuzztest", #添加DTFuzz用例路径
-       "//test/developertest/examples/detector/test:unittest",
-       "//test/developertest/examples/sleep/test:performance",
-       "//test/developertest/examples/distributedb/test:distributedtest"
+     include_dirs = []
+     cflags = [
+       "-g",
+       "-O0",
+       "-Wno-unused-variable",
+       "-fno-omit-frame-pointer",
      ]
-     ```
+     sources = [ "parse_fuzzer.cpp" ]
+   }
+   ```
 
-  2. 在用例路径下的BUILD.gn添加group，如examples/calculator/test的BUILD.gn
+   [group] # 引用测试套，例如：
 
-     ```
-     group("fuzztest") {
-       testonly = true
-       deps = []
-       
-       deps += [ "fuzztest/common/parse_fuzzer:fuzztest" ]
-     }
-     ```
+   ```
+   group("fuzztest") {
+     testonly = true
+     deps = []
+     
+     deps += [
+       # deps file
+       ":CalculatorFuzzTest",     #引用测试套
+     ]
+   }
+   ```
 
-- DTFuzz用例执行
+   
 
-  DTFuzz能力集成在测试类型-t中新增FUZZ类型，执行DTFuzz测试指令示例，其中-t为必选，-ss和-tm为可选
+3. Fuzz配置编写
 
-  ```
-  run -t FUZZ -ss subsystem_examples -tm calculator
-  ```
-  
+   project.xml为DTFuzz参数配置文件，提供基于libFuzzer参数的动态配置，更多参数配置可参考[libFuzzer参数配置](https://llvm.org/docs/LibFuzzer.html#options)：
+
+   ```
+   <!-- maximum length of a test input -->
+   <max_len>1000</max_len>
+   <!-- maximum total time in seconds to run the DTFuzz -->
+   <max_total_time>300</max_total_time>
+   <!-- memory usage limit in Mb -->
+   <rss_limit_mb>4096</rss_limit_mb>
+   ```
+
+   
+
+### Fuzz用例编译<a name="section00816581589"></a>
+
+添加Fuzz用例编译到模块的test_list中：
+
+1. 在需要DTFuzz测试的对应模块ohos.build添加Fuzz用例路径，如在examples/ohos.build添加：
+
+   ```
+   "test_list": [
+     "//test/developertest/examples/calculator/test:unittest",
+     "//test/developertest/examples/calculator/test:fuzztest", #添加DTFuzz用例路径
+     "//test/developertest/examples/detector/test:unittest",
+     "//test/developertest/examples/sleep/test:performance",
+     "//test/developertest/examples/distributedb/test:distributedtest"
+   ]
+   ```
+
+2. 在用例路径下的BUILD.gn添加group，如examples/calculator/test的BUILD.gn
+
+   ```
+   group("fuzztest") {
+     testonly = true
+     deps = []
+     
+     deps += [ "fuzztest/common/parse_fuzzer:fuzztest" ]
+   }
+   ```
+   
+   
+
+### Fuzz用例执行<a name="section7510974319"></a>
+
+Fuzz能力集成，在测试类型-t中新增FUZZ类型，执行Fuzz测试指令示例，其中-t为必选，-ss和-tm为可选
+
+```
+run -t FUZZ -ss subsystem_examples -tm calculator
+```
+
+| 参数 | 描述       | 说明     | 备注                     |
+| ---- | ---------- | -------- | ------------------------ |
+| -t   | TESTTYPE   | 测试类型 |                          |
+| -ss  | SUBSYSTEM  | 子系统   | 被测试子系统             |
+| -tm  | TESTMODULE | 模块     | 被测试模块，如calculator |
+
 - Windows环境脱离源码执行
 
   Windows环境可通过归档DTFuzz用例配置文件project.xml、语料corpus和可执行文件执行DTFuzz。
@@ -245,6 +288,8 @@
      ```
      run -t FUZZ
      ```
+     
+     
 
 ## 测试结果与日志<a name="section016190470"></a>
 
