@@ -16,20 +16,26 @@
 # limitations under the License.
 #
 
+import json
 import os
 import re
+import shutil
 import time
 import platform
+import zipfile
 from dataclasses import dataclass
 
 from xdevice import DeviceTestType
 from xdevice import DeviceLabelType
 from xdevice import ExecuteTerminate
 from xdevice import DeviceError
+from xdevice import ShellHandler
 
 from xdevice import IDriver
 from xdevice import platform_logger
 from xdevice import Plugin
+from xdevice import get_plugin
+from xdevice_extension._core.constants import CommonParserType
 from core.utils import get_decode
 from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
@@ -38,6 +44,7 @@ from core.config.config_manager import FuzzerConfigManager
 
 __all__ = [
     "CppTestDriver",
+    "JSUnitTestDriver",
     "disable_keyguard",
     "GTestConst"]
 
@@ -564,3 +571,239 @@ class CppTestDriver(IDriver):
 
 ##############################################################################
 ##############################################################################
+
+@Plugin(type=Plugin.DRIVER, id=DeviceTestType.jsunit_test)
+class JSUnitTestDriver(IDriver):
+    """
+    JSUnitTestDriver is a Test that runs a native test package on given device.
+    """
+
+    def __init__(self):
+        self.config = None
+        self.result = ""
+        self.start_time = None
+        self.ability_name = ""
+        self.package_name = ""
+
+    def __check_environment__(self, device_options):
+        pass
+
+    def __check_config__(self, config):
+        pass
+
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
+
+    def __execute__(self, request):
+        try:
+            LOG.info("developertest driver")
+            self.result = os.path.join(request.config.report_path,
+                                       "result",
+                                       '.'.join((request.get_module_name(),
+                                                 "xml")))
+            self.config = request.config
+            self.config.target_test_path = DEFAULT_TEST_PATH
+            self.config.device = request.config.environment.devices[0]
+
+            suite_file = request.root.source.source_file
+            if not suite_file:
+                LOG.error("test source '%s' not exists" %
+                          request.root.source.source_string)
+                return
+
+            if not self.config.device:
+                result = ResultManager(suite_file, self.config)
+                result.set_is_coverage(False)
+                result.make_empty_result_file(
+                    "No test device is found")
+                return
+
+            package_name, ability_name = self._get_package_and_ability_name(
+                suite_file)
+            self.package_name = package_name
+            self.ability_name = ability_name
+            self.config.test_hap_out_path = \
+                "/data/data/%s/files/" % self.package_name
+
+            self._init_jsunit_test()
+            self._run_jsunit(suite_file)
+            self.generate_console_output(request)
+
+        finally:
+            self.config.device.stop_catch_device_log()
+
+    def _init_jsunit_test(self):
+        self.config.device.hdc_command("target mount")
+        self.config.device.execute_shell_command(
+            "rm -rf %s" % self.config.target_test_path)
+        self.config.device.execute_shell_command(
+            "mkdir -p %s" % self.config.target_test_path)
+        self.config.device.execute_shell_command(
+            "mount -o rw,remount,rw /%s" % "system")
+        self.config.device.hdc_command("shell hilog -r")
+
+
+    def _run_jsunit(self, suite_file):
+        filename = os.path.basename(suite_file)
+
+        resource_manager = ResourceManager()
+        resource_data_dic, resource_dir = \
+            resource_manager.get_resource_data_dic(suite_file)
+        resource_manager.process_preparer_data(resource_data_dic, resource_dir,
+                                               self.config.device)
+
+        main_result = self._install_hap(suite_file)
+        result = ResultManager(suite_file, self.config)
+
+        if main_result:
+            self._execute_hapfile_jsunittest()
+            self._uninstall_hap(self.package_name)
+        else:
+            self.result = result.get_test_results("Error: install hap failed")
+            LOG.error("Error: install hap failed")
+
+        resource_manager.process_cleaner_data(resource_data_dic, resource_dir,
+                                              self.config.device)
+
+    def generate_console_output(self, request):
+        report_name = request.get_module_name()
+        parsers = get_plugin(
+            Plugin.PARSER, CommonParserType.jsunit)
+        if parsers:
+            parsers = parsers[:1]
+        for listener in request.listeners:
+            listener.device_sn = self.config.device.device_sn
+        parser_instances = []
+
+        for parser in parsers:
+            parser_instance = parser.__class__()
+            parser_instance.suites_name = "{}_suites".format(report_name)
+            parser_instance.suites_name = request.listeners
+            parser_instance.listeners = request.listeners
+            parser_instances.append(parser_instance)
+        handler = ShellHandler(parser_instances)
+
+        from xdevice_extension._core import utils
+        command = "hdc_std -t %s shell hilog -x " % self.config.device. \
+            device_sn
+
+        output = utils.start_standing_subprocess(command, return_result=True)
+        LOG.debug("start to parsing hilog")
+        handler.__read__(output)
+        handler.__done__()
+
+
+    def _execute_hapfile_jsunittest(self):
+        _unlock_screen(self.config.device)
+        _unlock_device(self.config.device)
+
+        try:
+            return_message = self.start_hap_activity()
+        except (ExecuteTerminate, DeviceError) as exception:
+            return_message = str(exception.args)
+
+        _lock_screen(self.config.device)
+        return return_message
+
+    def _install_hap(self, suite_file):
+        message = self.config.device.hdc_command("install %s" % suite_file)
+        message = str(message).rstrip()
+        if message == "" or "success" in message:
+            return_code = True
+            if message != "":
+                LOG.info(message)
+        else:
+            return_code = False
+            if message != "":
+                LOG.warning(message)
+
+        _sleep_according_to_result(return_code)
+        return return_code
+
+    def start_hap_activity(self):
+        try:
+            command = "aa start -d 123 -a %s.MainAbility -b %s" \
+                      % (self.package_name, self.package_name)
+            self.start_time = time.time()
+            result_value = self.config.device.execute_shell_command(
+                command, timeout=TIME_OUT)
+            LOG.info("result_value [[[[[%s]]]]]" % result_value)
+
+            if "success" in str(result_value).lower():
+                LOG.info("execute %s's testcase success. result value=%s"
+                         % (self.package_name, result_value))
+                time.sleep(60)
+            else:
+                LOG.info("execute %s's testcase failed. result value=%s"
+                         % (self.package_name, result_value))
+
+            _sleep_according_to_result(result_value)
+            return_message = result_value
+        except (ExecuteTerminate, DeviceError) as exception:
+            return_message = exception.args
+
+        return return_message
+
+    def _uninstall_hap(self, package_name):
+        return_message = self.config.device.execute_shell_command(
+            "bm uninstall -n %s" % package_name)
+        _sleep_according_to_result(return_message)
+        return return_message
+
+    @staticmethod
+    def _get_package_and_ability_name(hap_filepath):
+        package_name = ""
+        ability_name = ""
+
+        if os.path.exists(hap_filepath):
+            filename = os.path.basename(hap_filepath)
+
+            #unzip the hap file
+            hap_bak_path = os.path.abspath(os.path.join(
+                os.path.dirname(hap_filepath),
+                "%s.bak" % filename))
+            zf_desc = zipfile.ZipFile(hap_filepath)
+            try:
+                zf_desc.extractall(path=hap_bak_path)
+            except RuntimeError as error:
+                print(error)
+            zf_desc.close()
+
+            #verify config.json file
+            app_profile_path = os.path.join(hap_bak_path, "config.json")
+            if not os.path.exists(app_profile_path):
+                print("file %s not exist" % app_profile_path)
+                return package_name, ability_name
+
+            if os.path.isdir(app_profile_path):
+                print("%s is a folder, and not a file" % app_profile_path)
+                return package_name, ability_name
+
+            #get package_name and ability_name value
+            load_dict = {}
+            with open(app_profile_path, 'r') as load_f:
+                load_dict = json.load(load_f)
+            profile_list = load_dict.values()
+            for profile in profile_list:
+                package_name = profile.get("package")
+                if not package_name:
+                    continue
+
+                abilities = profile.get("abilities")
+                for abilitie in abilities:
+                    abilities_name = abilitie.get("name")
+                    if abilities_name.startswith("."):
+                        ability_name = package_name + abilities_name[
+                                       abilities_name.find("."):]
+                    else:
+                        ability_name = abilities_name
+                    break
+                break
+
+            #delete hap_bak_path
+            if os.path.exists(hap_bak_path):
+                shutil.rmtree(hap_bak_path)
+        else:
+            print("file %s not exist" % hap_filepath)
+
+        return package_name, ability_name

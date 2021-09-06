@@ -21,6 +21,7 @@ from xdevice import platform_logger
 from core.utils import scan_support_product
 from core.config.config_manager import UserConfigManager
 from core.build.select_targets import SelectTargets
+from core.build.pretreat_targets import PretreatTargets
 from core.build.build_testcases import BuildTestcases
 from core.command.gen import Gen
 
@@ -95,6 +96,9 @@ class BuildManager(object):
             LOG.warning("No build target found.")
             return False
 
+        pretreat = PretreatTargets(target_list)
+        pretreat.pretreat_targets_from_list()
+
         build_cfg_filepath = os.path.join(project_root_path,
             "test",
             "developertest",
@@ -111,6 +115,7 @@ class BuildManager(object):
                 para.productform,
                 "make_temp_test")
         self._make_gn_file(build_cfg_filepath, [])
+        pretreat.disassemble_targets_from_list()
 
         return build_result
 
