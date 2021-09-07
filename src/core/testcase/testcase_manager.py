@@ -30,6 +30,7 @@ TESTFILE_TYPE_DATA_DIC = {
     "PYT": [],
     "CXX": [],
     "BIN": [],
+    "JST": [],
 }
 FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
 
@@ -109,7 +110,7 @@ class TestCaseManager(object):
                 if suffix_name == ".dex":
                     suite_file_dictionary["DEX"].append(suite_file)
                 elif suffix_name == ".hap":
-                    suite_file_dictionary["HAP"].append(suite_file)
+                    suite_file_dictionary["JST"].append(suite_file)
                 elif suffix_name == ".py":
                     if not self.check_python_test_file(suite_file):
                         continue
