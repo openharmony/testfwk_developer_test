@@ -23,6 +23,7 @@ import shutil
 import time
 import platform
 import zipfile
+import stat
 from dataclasses import dataclass
 
 from xdevice import DeviceTestType
@@ -36,6 +37,7 @@ from xdevice import platform_logger
 from xdevice import Plugin
 from xdevice import get_plugin
 from xdevice_extension._core.constants import CommonParserType
+from xdevice_extension._core.environment.dmlib import process_command_ret
 from core.utils import get_decode
 from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
@@ -597,10 +599,9 @@ class JSUnitTestDriver(IDriver):
     def __execute__(self, request):
         try:
             LOG.info("developertest driver")
-            self.result = os.path.join(request.config.report_path,
-                                       "result",
-                                       '.'.join((request.get_module_name(),
-                                                 "xml")))
+            self.result = os.path.join(
+                request.config.report_path, "result",
+                '.'.join((request.get_module_name(), "xml")))
             self.config = request.config
             self.config.target_test_path = DEFAULT_TEST_PATH
             self.config.device = request.config.environment.devices[0]
@@ -625,10 +626,21 @@ class JSUnitTestDriver(IDriver):
             self.config.test_hap_out_path = \
                 "/data/data/%s/files/" % self.package_name
 
-            self._init_jsunit_test()
-            self._run_jsunit(suite_file)
-            self.generate_console_output(request)
+            hilog = get_device_log_file(
+                request.config.report_path,
+                request.config.device.__get_serial__() + "_" + request.
+                get_module_name(),
+                "device_hilog")
 
+            hilog_open = os.open(hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+                                 0o755)
+
+            with os.fdopen(hilog_open, "a") as hilog_file_pipe:
+                self.config.device.start_catch_device_log(hilog_file_pipe)
+                self._init_jsunit_test()
+                self._run_jsunit(suite_file)
+                hilog_file_pipe.flush()
+                self.generate_console_output(hilog, request)
         finally:
             self.config.device.stop_catch_device_log()
 
@@ -665,7 +677,9 @@ class JSUnitTestDriver(IDriver):
         resource_manager.process_cleaner_data(resource_data_dic, resource_dir,
                                               self.config.device)
 
-    def generate_console_output(self, request):
+    def generate_console_output(self, device_log_file, request):
+        result_message = self.read_device_log(device_log_file)
+
         report_name = request.get_module_name()
         parsers = get_plugin(
             Plugin.PARSER, CommonParserType.jsunit)
@@ -677,21 +691,30 @@ class JSUnitTestDriver(IDriver):
 
         for parser in parsers:
             parser_instance = parser.__class__()
-            parser_instance.suites_name = "{}_suites".format(report_name)
-            parser_instance.suites_name = request.listeners
+            parser_instance.suites_name = report_name
+            parser_instance.suite_name = report_name
             parser_instance.listeners = request.listeners
             parser_instances.append(parser_instance)
         handler = ShellHandler(parser_instances)
+        process_command_ret(result_message, handler)
 
-        from xdevice_extension._core import utils
-        command = "hdc_std -t %s shell hilog -x " % self.config.device. \
-            device_sn
+    def read_device_log(self, device_log_file):
+        device_log_file_open = os.open(device_log_file, os.O_RDONLY,
+                                       stat.S_IWUSR | stat.S_IRUSR)
 
-        output = utils.start_standing_subprocess(command, return_result=True)
-        LOG.debug("start to parsing hilog")
-        handler.__read__(output)
-        handler.__done__()
-
+        result_message = ""
+        with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
+                as file_read_pipe:
+            while True:
+                data = file_read_pipe.readline()
+                if not data or not data.strip():
+                    break
+                # only filter JSApp log
+                if data.find("JSApp:") != -1:
+                    result_message += data
+                    if data.find("[end] run suites end") != -1:
+                        break
+        return result_message
 
     def _execute_hapfile_jsunittest(self):
         _unlock_screen(self.config.device)
@@ -727,7 +750,6 @@ class JSUnitTestDriver(IDriver):
             self.start_time = time.time()
             result_value = self.config.device.execute_shell_command(
                 command, timeout=TIME_OUT)
-            LOG.info("result_value [[[[[%s]]]]]" % result_value)
 
             if "success" in str(result_value).lower():
                 LOG.info("execute %s's testcase success. result value=%s"
