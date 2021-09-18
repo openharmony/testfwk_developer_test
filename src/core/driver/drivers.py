@@ -625,6 +625,7 @@ class JSUnitTestDriver(IDriver):
             self.ability_name = ability_name
             self.config.test_hap_out_path = \
                 "/data/data/%s/files/" % self.package_name
+            self.config.device.hdc_command("shell hilog -r")
 
             hilog = get_device_log_file(
                 request.config.report_path,
@@ -652,7 +653,6 @@ class JSUnitTestDriver(IDriver):
             "mkdir -p %s" % self.config.target_test_path)
         self.config.device.execute_shell_command(
             "mount -o rw,remount,rw /%s" % "system")
-        self.config.device.hdc_command("shell hilog -r")
 
 
     def _run_jsunit(self, suite_file):
@@ -754,7 +754,7 @@ class JSUnitTestDriver(IDriver):
             if "success" in str(result_value).lower():
                 LOG.info("execute %s's testcase success. result value=%s"
                          % (self.package_name, result_value))
-                time.sleep(60)
+                time.sleep(5)
             else:
                 LOG.info("execute %s's testcase failed. result value=%s"
                          % (self.package_name, result_value))
