@@ -43,6 +43,8 @@
             <filefilter name="readmeOpenSourcefileNamePolicyFilter" desc="Filters for README.OpenSource file policies">
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
+                 <filteritem type="filename" name="icon.png" desc="hap icon of js test example case, self-developed file"/>
+                 <filteritem type="filename" name="icon-note.gif" desc="icon used in README, self-developed file"/>
             </filefilter>
         </filefilterlist>
         <licensematcherlist>
