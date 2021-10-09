@@ -101,7 +101,7 @@ class PretreatTargets(object):
                 shutil.copy(os.path.join(target_path, file), test_path)
                 with open(os.path.join(test_path, "List.test.js"), 'a') \
                         as list_data:
-                    list_data.write("require('./%s')" % file)
+                    list_data.write("require('./%s')\n" % file)
 
         #modify i18n json file
         i18n_path = os.path.join(target_path, "src", "main", "js",
