@@ -379,7 +379,7 @@ subsystem  # 子系统
     
     import("//build/test.gni")
     
-    module_output_path = "subsystem_examples/calculator"
+    module_output_path = "developertest/calculator"
     
     config("module_private_config") {
       visibility = [ ":*" ]
@@ -419,7 +419,7 @@ subsystem  # 子系统
     	```
     3. 指定文件输出路径
     	```
-    	module_output_path = "subsystem_examples/calculator"
+    	module_output_path = "developertest/calculator"
     	```
     	> **说明：** 此处输出路径为部件/模块名。
     
@@ -481,7 +481,7 @@ subsystem  # 子系统
     
     import("//build/test.gni")
     
-    module_output_path = "subsystem_examples/app_info"
+    module_output_path = "developertest/app_info"
     
     ohos_js_unittest("GetAppInfoJsTest") {
       module_out_path = module_output_path
@@ -511,7 +511,7 @@ subsystem  # 子系统
     3. 指定文件输出路径
     
     	```
-    	module_output_path = "subsystem_examples/app_info"
+    	module_output_path = "developertest/app_info"
     	```
     	> **说明：** 此处输出路径为部件/模块名。
     	

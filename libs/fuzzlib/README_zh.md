@@ -220,7 +220,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 Fuzz能力集成，在测试类型-t中新增FUZZ类型，执行Fuzz测试指令示例，其中-t为必选，-ss和-tm为可选
 
 ```
-run -t FUZZ -ss subsystem_examples -tm calculator
+run -t FUZZ -ss developertest -tm calculator
 ```
 
 | 参数 | 描述       | 说明     | 备注                     |

@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_subsystem("subsystem_examples") {
+ohos_subsystem("developertest") {
   subsystem_packages = [
     "calculator:calculator",
     "detector:detector",

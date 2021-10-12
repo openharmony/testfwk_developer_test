@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 
-module_output_path = "subsystem_examples/calculator"
+module_output_path = "developertest/calculator"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("CalculatorFuzzTest") {
