@@ -33,9 +33,7 @@ config("module_private_config") {
   #ldflags = [ "-llog" ]
 
   # library path
-  lib_dirs = [
-    "//foundation/appexecfwk/libs",
-  ]
+  lib_dirs = [ "//foundation/appexecfwk/libs" ]
 }
 
 ohos_distributedtest("DistributeDemo") {
