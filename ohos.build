@@ -1,7 +1,7 @@
 {
-  "subsystem": "subsystem_examples",
+  "subsystem": "developertest",
   "parts": {
-    "subsystem_examples": {
+    "developertest": {
       "module_list": [
         "//test/developertest/examples/app_info:app_info",
         "//test/developertest/examples/detector:detector",
