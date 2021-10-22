@@ -18,6 +18,8 @@ module_output_path = "developertest/app_info"
 ohos_js_unittest("GetAppInfoJsTest") {
   module_out_path = module_output_path
 
+  suite_path =
+      "//test/developertest/examples/app_info/test/unittest/common/get_app_info"
   hap_profile = "./config.json"
   certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
 }
