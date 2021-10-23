@@ -95,6 +95,8 @@ def _load_internal_plugins():
     try:
         import xdevice_extension._core.environment
         _iter_module_plugins([xdevice_extension._core.environment])
+        import xdevice_extension._core.driver
+        _iter_module_plugins([xdevice_extension._core.driver])
     except (ModuleNotFoundError, ImportError):
         pass
 

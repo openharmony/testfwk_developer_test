@@ -162,8 +162,6 @@ class BuildTestcases(object):
 
         command.append("--product-name")
         command.append(productform)
-        command.append("--export-para")
-        command.append("PYCACHE_ENABLE:true")
 
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]

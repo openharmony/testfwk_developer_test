@@ -754,7 +754,7 @@ class JSUnitTestDriver(IDriver):
             if "success" in str(result_value).lower():
                 LOG.info("execute %s's testcase success. result value=%s"
                          % (self.package_name, result_value))
-                time.sleep(5)
+                time.sleep(30)
             else:
                 LOG.info("execute %s's testcase failed. result value=%s"
                          % (self.package_name, result_value))
