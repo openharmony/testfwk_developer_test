@@ -17,8 +17,10 @@
 #
 
 import os
+import shutil
 import xml.etree.ElementTree as ElementTree
 from xdevice import platform_logger
+from xdevice import DeviceTestType
 from core.constants import ConfigFileConst
 
 LOG = platform_logger("ResourceManager")
@@ -159,6 +161,31 @@ class ResourceManager(object):
                 command = command.strip()
                 device.hdc_command(command)
 
+    def lite_process_resource_file(self, resource_dir, preparer_list):
+        for item in preparer_list:
+            if "name" not in item.keys():
+                continue
+
+            if item["name"] == "push":
+                copy_value = item["value"]
+                find_key = "->"
+                pos = copy_value.find(find_key)
+                src = os.path.join(resource_dir, copy_value[0:pos].strip())
+                dst = copy_value[pos + len(find_key):len(copy_value)].strip()
+                shutil.copy(src, dst)
+
+            elif item["name"] == "pull":
+                copy_value = item["value"]
+                find_key = "->"
+                pos = copy_value.find(find_key)
+                src = os.path.join(resource_dir, copy_value[0:pos].strip())
+                dst = copy_value[pos + len(find_key):len(copy_value)].strip()
+                shutil.copyfile(dst, src)
+            else:
+                command = item["name"] + " " + item["value"]
+                command = command.strip()
+                self.lite_device.execute_command_with_timeout(command, case_type=DeviceTestType.lite_cpp_test)
+
     @classmethod
     def get_env_data(cls, environment_list):
         env_data_dic = {}
@@ -241,6 +268,13 @@ class ResourceManager(object):
             LOG.info("++++++++++++++preparer+++++++++++++++")
             preparer_list = data_dic["preparer"]
             self.process_resource_file(resource_dir, preparer_list, device)
+        return
+
+    def lite_process_preparer_data(self, data_dic, resource_dir):
+        if "preparer" in data_dic.keys():
+            LOG.info("++++++++++++++preparer+++++++++++++++")
+            preparer_list = data_dic["preparer"]
+            self.lite_process_resource_file(resource_dir, preparer_list)
         return
 
     def process_cleaner_data(self, data_dic, resource_dir, device):
