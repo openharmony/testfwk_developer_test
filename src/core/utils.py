@@ -124,9 +124,8 @@ def scan_support_product():
 def parse_product_info(product_form):
     build_prop = os.path.join(sys.source_code_root_path,
                               "out",
-                              "build_configs",
-                              product_form,
                               "preloader",
+                              product_form,
                               "build.prop")
     if not os.path.exists(build_prop):
         return {}
