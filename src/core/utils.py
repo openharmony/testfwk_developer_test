@@ -20,6 +20,7 @@ import sys
 import os
 import platform
 import time
+import json
 from core.config.config_manager import UserConfigManager
 
 
@@ -77,11 +78,9 @@ def get_build_output_path(product_form):
 
     standard_large_system_list = scan_support_product()
     if product_form in standard_large_system_list:
-        property_info = parse_product_info(product_form)
-        if property_info is not None:
-            target_os = property_info.get("target_os")
-            target_cpu = property_info.get("target_cpu")
-            build_output_name = "%s-%s-%s" % (target_os, target_cpu, "release")
+        device_name = parse_device_name(product_form)
+        if device_name is not None:
+            build_output_name = device_name
         else:
             return ""
     else:
@@ -119,6 +118,21 @@ def scan_support_product():
             product_name, _ = os.path.splitext(product_file)
             productform_list.append(product_name)
     return productform_list
+
+
+def parse_device_name(product_form):
+    device_json_file = os.path.join(sys.source_code_root_path,
+                                    "productdefine", "common", "products",
+                                    "{}.json".format(product_form))
+    if not os.path.exists(device_json_file):
+        return None
+
+    with open(device_json_file, 'r') as json_file:
+        json_info = json.load(json_file)
+    if not json_info:
+        return None
+    device_name = json_info.get('product_device')
+    return device_name
 
 
 def parse_product_info(product_form):
