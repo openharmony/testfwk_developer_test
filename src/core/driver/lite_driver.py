@@ -41,8 +41,7 @@ from xdevice import get_test_component_version
 from xdevice import ParamError
 from core.utils import get_filename_extension
 from core.testkit.kit_lite import DeployKit
-
-
+from core.config.resource_manager import ResourceManager
 from core.config.config_manager import UserConfigManager
 
 __all__ = ["LiteUnitTest", "CTestDriver", "JSUnitTestLiteDriver"]
@@ -185,6 +184,11 @@ class LiteUnitTest(IDriver):
         if os.path.exists(result_file):
             os.remove(result_file)
         shutil.copyfile(test_case, os.path.join(self.nfs_dir, case_name))
+        # push resource files
+        resource_manager = ResourceManager()
+        resource_data_dic, resource_dir = \
+            resource_manager.get_resource_data_dic(test_case)
+        resource_manager.lite_process_preparer_data(resource_data_dic, resource_dir)
         self.lite_device.execute_command_with_timeout(
             "chmod 777 {}".format(case_name),
             case_type=DeviceTestType.lite_cpp_test)
@@ -245,14 +249,28 @@ class LiteUnitTest(IDriver):
             self.log.error("result xml file %s not exist." % result_name)
         if not os.path.exists(result_file):
             self.log.error("file %s not exist." % result_file)
+            self._clear_nfs_space()
             return False
         file_name = os.path.basename(result_file)
         final_result = os.path.join(test_result, file_name)
         shutil.copyfile(result_file,
                         final_result)
         self.log.info("after execute test")
+        self._clear_nfs_space()
         self.lite_device.close()
         return True
+
+    def _clear_nfs_space(self):
+        _, status, _ = \
+            self.lite_device.execute_command_with_timeout(
+                "cd ..",
+                case_type=DeviceTestType.lite_cpp_test)
+        _, status, _ = \
+            self.lite_device.execute_command_with_timeout(
+                "umount %s" % UserConfigManager().get_user_config("NFS").get("board_dir"),
+                case_type=DeviceTestType.lite_cpp_test)
+        shutil.rmtree(self.nfs_dir)
+        os.mkdir(self.nfs_dir)
 
     def _check_xml_exist(self, xml_file, timeout=10):
         ls_command = \
