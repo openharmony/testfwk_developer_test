@@ -46,10 +46,10 @@ ohos_distributedtest("DistributeDemo") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
-    "hilog:libhilog",
+    "hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   deps = [
@@ -68,10 +68,10 @@ ohos_distributedtest("DistributeDemoAgent") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
-    "hilog:libhilog",
+    "hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   deps = [
