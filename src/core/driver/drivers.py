@@ -290,9 +290,7 @@ class ResultManager(object):
             _create_empty_result_file(filepath, self.testsuite_name,
                                       error_message)
         if "benchmark" == self.config.testtype[0]:
-            if self.device.is_directory(
-                    os.path.join(self.device_testpath, "benchmark")):
-                self._obtain_benchmark_result()
+            self._obtain_benchmark_result()
         # Get coverage data files
         if self.is_coverage:
             self.obtain_coverage_data()
@@ -310,24 +308,22 @@ class ResultManager(object):
         if not os.path.exists(benchmark_dir):
             os.makedirs(benchmark_dir)
 
-        print("benchmark_dir =%s", benchmark_dir)
-        if not self.device.pull_file(
-                os.path.join(self.device_testpath, "benchmark"),
-                benchmark_dir):
+        LOG.info("benchmark_dir = %s" % benchmark_dir)
+        self.device.pull_file(os.path.join(self.device_testpath,
+            "%s.json" % self.testsuite_name), benchmark_dir)
+        if not os.path.exists(os.path.join(benchmark_dir,
+            "%s.json" % self.testsuite_name)):
             os.rmdir(benchmark_dir)
         return benchmark_dir
 
     def get_result_sub_save_path(self):
-        find_key = os.sep + "tests" + os.sep
+        find_key = os.sep + "benchmark" + os.sep
         file_dir, _ = os.path.split(self.testsuite_path)
         pos = file_dir.find(find_key)
         subpath = ""
         if -1 != pos:
             subpath = file_dir[pos + len(find_key):]
-            pos1 = subpath.find(os.sep)
-            if -1 != pos1:
-                subpath = subpath[pos1 + len(os.sep):]
-        print("subpath = " + subpath)
+        LOG.info("subpath = " + subpath)
         return subpath
 
     def obtain_test_result_file(self):
