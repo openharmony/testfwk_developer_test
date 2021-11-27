@@ -111,7 +111,7 @@ namespace {
     void AccessVectorElementByAt()
     {
         constexpr int testLen = 5;
-        std :: vector<int> testVec(testLen, 0);
+        std::vector<int> testVec(testLen, 0);
         for (int i = 0; i < testLen; i++) {
             testVec.at(i) = i * i;
         }
