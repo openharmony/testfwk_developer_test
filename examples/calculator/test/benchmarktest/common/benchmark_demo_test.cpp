@@ -35,7 +35,7 @@ namespace {
     {
         string str = "benchmark test";
         return str.size();
-    } 
+    }
     
     /*
      * Feature: benchmark test
@@ -86,7 +86,7 @@ namespace {
      * CaseDescription: Testcase for testing "AccessVectorElementByOperator"
      *                  function.
      */
-    static void BenchmarkTestVectorOperator(benchmark:: State &state)
+    static void BenchmarkTestVectorOperator(benchmark::State &state)
     {
         for (auto _ : state) {
             AccessVectorElementByOperator();
@@ -111,7 +111,7 @@ namespace {
     void AccessVectorElementByAt()
     {
         constexpr int testLen = 5;
-        std:: vector<int> testVec(testLen, 0);
+        std :: vector<int> testVec(testLen, 0);
         for (int i = 0; i < testLen; i++) {
             testVec.at(i) = i * i;
         }
@@ -147,14 +147,14 @@ namespace {
      
     /*
      * Feature: benchmark test
-     * Function: ExampleFixtureTest
+     * Function: BenchmarkDemoTest
      * SubFunction: NA
      * FunctionPoint: NA
      * EnvConditions: NA
      * CaseDescription: Defining a fixture tests class that derives from
      *                  benchmark::Fixture.
      */
-    class ExampleFixtureTest : public benchmark::Fixture {
+    class BenchmarkDemoTest : public benchmark::Fixture {
     public:
         void SetUp(const ::benchmark::State &state)
         {
@@ -178,7 +178,7 @@ namespace {
      * CaseDescription: Define a testcase that accesses a class member
      *                  variable.
      */
-    BENCHMARK_F(ExampleFixtureTest, CalculatedAreaTestCase)(
+    BENCHMARK_F(BenchmarkDemoTest, CalculatedAreaTestCase)(
         benchmark::State &st)
     {
         long int area = 0;
@@ -187,10 +187,9 @@ namespace {
         }
     }
     
-    BENCHMARK_REGISTER_F(ExampleFixtureTest, CalculatedAreaTestCase);
+    BENCHMARK_REGISTER_F(BenchmarkDemoTest, CalculatedAreaTestCase);
     /************************************************************************/
 }
 
 // Run the benchmark
 BENCHMARK_MAIN();
-
