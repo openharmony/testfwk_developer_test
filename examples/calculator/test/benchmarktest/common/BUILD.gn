@@ -29,4 +29,3 @@ group("benchmarktest") {
     ":BenchmarkDemoTest",
   ]
 }
-
