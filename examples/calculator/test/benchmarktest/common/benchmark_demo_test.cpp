@@ -20,54 +20,37 @@
 using namespace std;
 
 namespace {
-    /*************************************************************************
-     * Demo01--Demonstrate the simple usage of benchmarks.
-     */
-
-    /*
-     * Feature: benchmark test
-     * Function: SimpleExample
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: To be tested function.
+    /**
+     * @tc.name: BenchmarkTestExample
+     * @tc.desc: Testcase for testing 'SimpleExample' function.
+     * @tc.type: FUNC
+     * @tc.require: AR00000000 SR00000000
      */
     size_t SimpleExample()
     {
         string str = "benchmark test";
         return str.size();
     }
-    
-    /*
-     * Feature: benchmark test
-     * Function: BenchmarkTestExample
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Testcase for testing 'SimpleExample' function.
-     */
+
     static void BenchmarkTestExample(benchmark::State &state)
     {
         for (auto _ : state) {
+            /* @tc.steps: step1.call SimpleExample in loop */
             SimpleExample();
         }
     }
     
-    // Register the function as a benchmark
+    /* Register the function as a benchmark */
     BENCHMARK(BenchmarkTestExample);
-    // Register benchmark and explicitly set the fix iterations.
+    /* Register benchmark and explicitly set the fix iterations */
     BENCHMARK(BenchmarkTestExample)->Iterations(1000);
-    
-    /*************************************************************************
-     * Demo02--By comparing the performance of tow methonds for accessing
-     *         elements in the "std::vector" container to demonstrate the
-     *         usage of benchmark.
-     */
-     
-    /*
-     * Feature: benchmark test
-     * Function: AccessVectorElementByOperator
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Access vector container elements using operators[].
+
+    /**
+     * @tc.name: BenchmarkTestVectorOperator
+     * @tc.desc: Testcase for testing "AccessVectorElementByOperator"
+     *           function.
+     * @tc.type: FUNC
+     * @tc.require: AR00000000 SR00000000
      */
     void AccessVectorElementByOperator()
     {
@@ -77,18 +60,11 @@ namespace {
             testVec[i] = i * i;
         }
     }
-    
-    /*
-     * Feature: benchmark test
-     * Function: BenchmarkTestVectorOperator
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Testcase for testing "AccessVectorElementByOperator"
-     *                  function.
-     */
+
     static void BenchmarkTestVectorOperator(benchmark::State &state)
     {
         for (auto _ : state) {
+            /* @tc.steps: step1.call AccessVectorElementByOperator in loop */
             AccessVectorElementByOperator();
         }
     }
@@ -101,12 +77,12 @@ namespace {
     BENCHMARK(BenchmarkTestVectorOperator)->Iterations(1000)->Repetitions(3)->
         ReportAggregatesOnly();
 
-    /*
-     * Feature: benchmark test
-     * Function: AccessVectorElementByAt
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Access vector container elements using at().
+    /**
+     * @tc.name: BenchmarkTestVectorAt
+     * @tc.desc: Testcase for testing "AccessVectorElementByAt"
+     *           function.
+     * @tc.type: FUNC
+     * @tc.require: AR00000000 SR00000000
      */
     void AccessVectorElementByAt()
     {
@@ -116,50 +92,32 @@ namespace {
             testVec.at(i) = i * i;
         }
     }
-    
-    /*
-     * Feature: benchmark test
-     * Function: BenchmarkTestVectorAt
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Testcase for testing "AccessVectorElementByAt"
-     *                  function.
-     */
-     
+
     static void BenchmarkTestVectorAt(benchmark::State &state)
     {
         for (auto _ : state) {
+            /* @tc.steps: step1.call AccessVectorElementByAt in loop */
             AccessVectorElementByAt();
         }
     }
-    
-    /*
-     * Register the function as a benchmark, set iterations repetitions.
-     * And set "ReportAggregatesOnly", it will display the statistics Mean,
-     * Median and Standard Deviation of Repeated Benchmarks.
-     */
+
     BENCHMARK(BenchmarkTestVectorAt)->Iterations(1000)->Repetitions(3)->
         ReportAggregatesOnly();
 
-    /*************************************************************************
-     * Demo03--Use a example to demonstrate the usage of benchmarks fixtures.
-     */
-     
-    /*
-     * Feature: benchmark test
-     * Function: BenchmarkDemoTest
-     * SubFunction: NA
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Defining a fixture tests class that derives from
-     *                  benchmark::Fixture.
+    /**
+     * @tc.name: CalculatedAreaTestCase
+     * @tc.desc: Define a testcase that accesses a class member
+     *           variable.
+     * @tc.type: FUNC
+     * @tc.require: AR00000000 SR00000000
      */
     class BenchmarkDemoTest : public benchmark::Fixture {
     public:
         void SetUp(const ::benchmark::State &state)
         {
-            phoneWidth_ = 1080;   // 1080 is default width
-            phoneHeight_ = 2244;  // 2244 is default height
+            /* @tc.setup: width and height assigned */
+            phoneWidth_ = 1080;
+            phoneHeight_ = 2244;
         }
 
         void TearDown(const ::benchmark::State &state)
@@ -169,26 +127,18 @@ namespace {
         int phoneWidth_;
         int phoneHeight_;
     };
-    
-    /*
-     * Feature: benchmark test
-     * Function: CalculatedAreaTestCase
-     * FunctionPoint: NA
-     * EnvConditions: NA
-     * CaseDescription: Define a testcase that accesses a class member
-     *                  variable.
-     */
+
     BENCHMARK_F(BenchmarkDemoTest, CalculatedAreaTestCase)(
         benchmark::State &st)
     {
         long int area = 0;
         for (auto _ : st) {
+            /* @tc.steps: step1.calculate area */
             area = phoneWidth_ * phoneHeight_;
         }
     }
     
     BENCHMARK_REGISTER_F(BenchmarkDemoTest, CalculatedAreaTestCase);
-    /************************************************************************/
 }
 
 // Run the benchmark
