@@ -24,7 +24,7 @@ namespace {
      * @tc.name: BenchmarkTestExample
      * @tc.desc: Testcase for testing 'SimpleExample' function.
      * @tc.type: FUNC
-     * @tc.require: AR00000000 SR00000000
+     * @tc.require: Issue Number
      */
     size_t SimpleExample()
     {
@@ -50,7 +50,7 @@ namespace {
      * @tc.desc: Testcase for testing "AccessVectorElementByOperator"
      *           function.
      * @tc.type: FUNC
-     * @tc.require: AR00000000 SR00000000
+     * @tc.require: Issue Number
      */
     void AccessVectorElementByOperator()
     {
@@ -82,7 +82,7 @@ namespace {
      * @tc.desc: Testcase for testing "AccessVectorElementByAt"
      *           function.
      * @tc.type: FUNC
-     * @tc.require: AR00000000 SR00000000
+     * @tc.require: Issue Number
      */
     void AccessVectorElementByAt()
     {
@@ -109,7 +109,7 @@ namespace {
      * @tc.desc: Define a testcase that accesses a class member
      *           variable.
      * @tc.type: FUNC
-     * @tc.require: AR00000000 SR00000000
+     * @tc.require: Issue Number
      */
     class BenchmarkDemoTest : public benchmark::Fixture {
     public:
