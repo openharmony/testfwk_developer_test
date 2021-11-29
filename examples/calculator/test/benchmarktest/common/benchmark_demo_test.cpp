@@ -116,8 +116,8 @@ namespace {
         void SetUp(const ::benchmark::State &state)
         {
             /* @tc.setup: width and height assigned */
-            phoneWidth_ = 1080;
-            phoneHeight_ = 2244;
+            phoneWidth_ = 1080;  /* 1080 is default width */
+            phoneHeight_ = 2244; /* 2244 is default height */
         }
 
         void TearDown(const ::benchmark::State &state)
