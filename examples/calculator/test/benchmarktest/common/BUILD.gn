@@ -13,29 +13,19 @@
 
 import("//build/test.gni")
 
-#################################group#########################################
-group("unittest") {
-  testonly = true
-  deps = []
+module_output_path = "developertest/calculator"
 
-  deps += [ "unittest/common:unittest" ]
-
-  if (is_phone_product) {
-    deps += [ "unittest/phone:unittest" ]
-  }
-}
-
-group("fuzztest") {
-  testonly = true
-  deps = []
-
-  deps += [ "fuzztest/common/parse_fuzzer:fuzztest" ]
+ohos_benchmarktest("BenchmarkDemoTest") {
+  module_out_path = module_output_path
+  sources = [ "benchmark_demo_test.cpp" ]
 }
 
 group("benchmarktest") {
   testonly = true
   deps = []
 
-  deps += [ "benchmarktest/common:benchmarktest" ]
+  deps += [
+    # deps file
+    ":BenchmarkDemoTest",
+  ]
 }
-###############################################################################

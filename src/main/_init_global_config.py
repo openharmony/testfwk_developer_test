@@ -58,9 +58,7 @@ def _init_global_config():
 
     sys.hmh_script = os.path.abspath(os.path.join(
         sys.framework_root_dir,
-        "..",
-        "test-tools",
-        "hmh"))
+        "libs"))
     sys.path.insert(4, sys.hmh_script)
 
     sys.framework_res_dir = sys.framework_root_dir
@@ -90,7 +88,8 @@ def _iter_module_plugins(packages):
 
 def _load_internal_plugins():
     import core.driver
-    _iter_module_plugins([core.driver])
+    import benchmark.report.benchmark_reporter
+    _iter_module_plugins([core.driver, benchmark.report.benchmark_reporter])
 
     try:
         import xdevice_extension._core.environment
