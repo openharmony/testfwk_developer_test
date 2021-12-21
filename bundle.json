@@ -1,0 +1,57 @@
+{
+    "name": "@ohos/test_developertest",
+    "version": "",
+    "description": "开发过程采用测试驱动开发模式，开发者基于系统新增特性可以通过开发者自己开发用例保证，对于系统已有特性的修改，也可通过修改项目中原有自测试用例保证，开发者自测试旨在帮助开发者在开发阶段就能开发出高质量代码",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/test_developertest",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "test"
+    ],
+    "keywords": [
+        "test",
+        "developertest"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "test/developertest"
+    },
+    "component": {
+        "name": "developer_test",
+        "subsystem": "developertest",
+        "syscap": [],
+        "features": [],
+        "adated_system_type": [
+            "small"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
