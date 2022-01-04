@@ -104,27 +104,27 @@ bool DistributeDemoAgent::TearDown()
 
 // The entry of handlingthe major test case message
 int DistributeDemoAgent::OnProcessMsg(const std::string &strMsg, int len,
-    std::string &strReturnValue, int returnValueLen)
+    std::string &strReturnValue, int returnBufLen)
 {
     int nret = 0;
     std::string returnStr = "agent return message.";
     if ((len > CMD_LEN) && (strMsg.find("\0\1\0\1") == 1)) {
-        for (int i = 0; i < returnValueLen; i++) {
+        for (int i = 0; i < returnBufLen; i++) {
             strReturnValue  += std::to_string((i + 1) % RETURN_HALF);
         }
-        nret = returnValueLen;
+        nret = returnBufLen;
     } else {
         HiLog::Info(LABEL, "receive message=%s.", strMsg.c_str());
         if (strncmp(strMsg.c_str(), "recall", MSG_CALL_LEN) == 0) {
             returnStr = "I get recall message.";
             int ptrlen = returnStr.size();
-            if (ptrlen > returnValueLen) {
-                ptrlen = returnValueLen - 1;
+            if (ptrlen > returnBufLen) {
+                ptrlen = returnBufLen - 1;
             }
             strReturnValue = returnStr;
             nret = ptrlen;
         } else {
-            nret =  DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
+            nret =  DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnBufLen);
         }
     }
     return nret;
