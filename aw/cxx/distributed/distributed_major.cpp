@@ -48,9 +48,9 @@ DistributeTestEnvironment::DistributeTestEnvironment() : serverPort_(DEFAULT_AGE
 {
 }
 
-DistributeTestEnvironment::DistributeTestEnvironment(std::string cfgInfo) : serverPort_(DEFAULT_AGENT_PORT)
+DistributeTestEnvironment::DistributeTestEnvironment(std::string cfgFile) : serverPort_(DEFAULT_AGENT_PORT)
 {
-    Init(cfgInfo);
+    Init(cfgFile);
 }
 
 void DistributeTestEnvironment::Init(std::string fileName)
@@ -439,13 +439,13 @@ int DistributeTest::GetReturnVal()
  * param :
  *     devNo: the serial number of agent device.
  *     msg : message of the testcase sent to the agent
- *     msgLen: length of strMsg
+ *     len: length of strMsg
  * return : if false is return, send operation failed.
  */
-bool DistributeTest::SendMessage(AGENT_NO devNo, const std::string &msg, int msgLen)
+bool DistributeTest::SendMessage(AGENT_NO devNo, const std::string &msg, int len)
 {
     if (g_pDistributetestEnv != nullptr) {
-        return g_pDistributetestEnv->SendMessage(devNo, msg, msgLen,
+        return g_pDistributetestEnv->SendMessage(devNo, msg, len,
             [&](const std::string &szreturnbuf, int rlen)->bool {
                 HiLog::Info(LABEL, "onprocessmsg len :%d.", rlen);
                 return OnMsgProc(szreturnbuf, rlen);
@@ -460,23 +460,23 @@ bool DistributeTest::SendMessage(AGENT_NO devNo, const std::string &msg, int msg
  * param :
  *     devNo: the serial number of agent device.
  *     msg : message of the testcase sent to the agent
- *     msgLen: length of message
+ *     len: length of message
  *     onProcessReturnMsg: callback function that handles the agent device return message and real
  *                         length of return value
  * return : if false is return, send operation failed.
  */
-bool DistributeTest::SendMessage(AGENT_NO devNo, const std::string &msg, int msgLen,
+bool DistributeTest::SendMessage(AGENT_NO devNo, const std::string &msg, int len,
     std::function<bool(const std::string &, int)> onProcessReturnMsg)
 {
     if (g_pDistributetestEnv != nullptr) {
-        return g_pDistributetestEnv->SendMessage(devNo, msg, msgLen, onProcessReturnMsg);
+        return g_pDistributetestEnv->SendMessage(devNo, msg, len, onProcessReturnMsg);
     }
     return false;
 }
 
-bool DistributeTest::OnMsgProc(const std::string &strBuf, int len)
+bool DistributeTest::OnMsgProc(const std::string &szbuf, int len)
 {
-    return (strBuf == "") ? false : true;
+    return (szbuf == "") ? false : true;
 }
 
 /*
