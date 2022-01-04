@@ -251,7 +251,7 @@ bool DistributeTestEnvironment::RunTestCmd(size_t devNo, const std::string &strC
     bool breturn = false;
     size_t lenptr = 0;
     errno_t ret = EOK;
-    (void)memset_s(szbuf, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+    memset_s(szbuf, sizeof(szbuf), 0, MAX_BUFF_LEN);
 
     // add 2 '\0'
     size_t rlen = cmdLen + expectValueLen + DST_COMMAND_HEAD_LEN + sizeof(int)*HALF_BUF_LEN + HALF_BUF_LEN;
