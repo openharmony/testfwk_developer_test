@@ -186,8 +186,18 @@ int DistributeDemoAgent::AddTwoValue(const std::string &strArgs, int argsLen, co
     int val1 = 0;
     int val2 = 0;
     int val3 = 0;
-    sscanf_s(strArgs.c_str(), "%d %d", &val1, &val2);
-    sscanf_s(strExpectValue.c_str(), "%d", &val3);
+    int ret1;
+    int ret2;
+    ret1 = sscanf_s(strArgs.c_str(), "%d %d", &val1, &val2);
+    if (ret1 != 2) {
+        HiLog::Error(LABEL, "sscanf_s failed. ret1 != 2");
+        return -1;
+    }
+    ret2 = sscanf_s(strExpectValue.c_str(), "%d", &val3);
+    if (ret2 != 1) {
+        HiLog::Error(LABEL, "sscanf_s failed. ret2 != 1");
+        return -1;
+    }
     EXPECT_TRUE(val3 == (val1 + val2));
     return val1 + val2;
 }
