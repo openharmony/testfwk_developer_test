@@ -282,7 +282,7 @@ void DistributedAgent::OnNotifyImf(DistributedMsg *pcline)
  *     returnbuflen: max length of strReturnValue
  * return : real length of strReturnValue filled
  */
-int DistributedAgent::OnProcessMsg(const std::string &strMsg, int len,
+int DistributedAgent::OnProcessMsg(const std::string &strMsg, int msgLen,
     std::string &strReturnValue, int returnBufLen)
 {
     // default test code
