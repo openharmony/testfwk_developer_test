@@ -251,8 +251,10 @@ bool DistributeTestEnvironment::RunTestCmd(size_t devNo, const std::string &strC
     bool breturn = false;
     size_t lenptr = 0;
     errno_t ret = EOK;
-    memset_s(szbuf, sizeof(szbuf), 0, MAX_BUFF_LEN);
-
+    ret = memset_s(szbuf, sizeof(szbuf), 0, MAX_BUFF_LEN);
+    if (ret != EOK) {
+        return breturn;
+    }
     // add 2 '\0'
     size_t rlen = cmdLen + expectValueLen + DST_COMMAND_HEAD_LEN + sizeof(int)*HALF_BUF_LEN + HALF_BUF_LEN;
     if (rlen <= MAX_BUFF_LEN) {
