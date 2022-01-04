@@ -189,7 +189,7 @@ int DistributeDemoAgent::AddTwoValue(const std::string &strArgs, int argsLen, co
     int ret1;
     int ret2;
     ret1 = sscanf_s(strArgs.c_str(), "%d %d", &val1, &val2);
-    if (ret1 != 2) {
+    if (ret1 < 2) {
         HiLog::Error(LABEL, "sscanf_s failed. ret1 != 2");
         return -1;
     }
