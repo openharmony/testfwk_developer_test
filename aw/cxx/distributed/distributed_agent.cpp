@@ -147,7 +147,11 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
     HiLog::Info(DistributedAgent::LABEL, "accept testcase runner IP:%s port:%d \n",
                 inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port);
     while (mbStop_ != true) {
-        memset_s(buff, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+        errno_t ret = EOK;
+        ret = memset_s(buff, sizeof(buff), 0, MAX_BUFF_LEN);
+        if (ret != EOK) {
+            return -1;
+        }
         // every cmd length less than MAX_BUFF_LEN bytes;
         int cmdLen = recv(clientSockFd_, buff, DST_COMMAND_HEAD_LEN, 0);
         if (static_cast<unsigned long>(cmdLen) <  DST_COMMAND_HEAD_LEN) {
@@ -190,7 +194,10 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     }
                     pszEValue[eValueLen] = '\0';
                     int nresult = OnProcessCmd(pAlignmentCmd, cmdLen, pszEValue, eValueLen);
-                    (void)memset_s(returnValue, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+                    ret = memset_s(returnValue, sizeof(returnValue), 0, MAX_BUFF_LEN);
+                    if (ret != EOK) {
+                        return -1;
+                    }
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_CALL);
@@ -205,8 +212,12 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     break;
                 }
                 case DST_COMMAND_MSG: {
+                    errno_t ret = EOK;
                     int nresult = 0;
-                    (void)memset_s(returnValue, MAX_BUFF_LEN, 0, MAX_BUFF_LEN);
+                    ret = memset_s(returnValue, sizeof(returnValue), 0, MAX_BUFF_LEN);
+                    if (ret != EOK) {
+                        return -1;
+                    }
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_MSG);
@@ -246,7 +257,11 @@ void DistributedAgent::OnNotifyImf(DistributedMsg *pcline)
     char alignmentCmd[DistributedAgent::CMD_LENGTH];
     char szMsg[MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH];
     int cmdNo = 0;
-    (void)memset_s(alignmentCmd, DistributedAgent::CMD_LENGTH, 0, DistributedAgent::CMD_LENGTH);
+    errno_t ret = EOK;
+    ret = memset_s(alignmentCmd, sizeof(alignmentCmd), 0, DistributedAgent::CMD_LENGTH);
+    if (ret != EOK) {
+        return;
+    }
     (void)memset_s(szMsg,
         MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH, 0,
         MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH);
@@ -259,7 +274,7 @@ void DistributedAgent::OnNotifyImf(DistributedMsg *pcline)
         HiLog::Error(DistributedAgent::LABEL, "error command.\n");
     }  else {
         errno_t ret = EOK;
-        ret = memcpy_s(alignmentCmd, DistributedAgent::CMD_LENGTH, pcline->alignmentCmd, cmdNo);
+        ret = memcpy_s(alignmentCmd, sizeof(alignmentCmd), pcline->alignmentCmd, cmdNo);
         if (ret != EOK) {
             return;
         }
@@ -282,7 +297,7 @@ void DistributedAgent::OnNotifyImf(DistributedMsg *pcline)
  *     returnbuflen: max length of strReturnValue
  * return : real length of strReturnValue filled
  */
-int DistributedAgent::OnProcessMsg(const std::string &strMsg, int len,
+int DistributedAgent::OnProcessMsg(const std::string &strMsg, int msgLen,
     std::string &strReturnValue, int returnBufLen)
 {
     // default test code
@@ -310,8 +325,11 @@ int DistributedAgent::OnProcessCmd(const std::string &strCommand, int cmdLen,
     char alignmentCmd[DistributedAgent::CMD_LENGTH];
     char szArgs[MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH];
     int cmdNo = 0;
-
-    (void)memset_s(alignmentCmd, DistributedAgent::CMD_LENGTH, 0, DistributedAgent::CMD_LENGTH);
+    errno_t ret = EOK;
+    ret = memset_s(alignmentCmd, sizeof(alignmentCmd), 0, DistributedAgent::CMD_LENGTH);
+    if (ret != EOK) {
+        return -1;
+    }
     (void)memset_s(szArgs,
         MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH, 0,
         MAX_BUFF_LEN / DistributedAgent::HALF_NUM - DistributedAgent::CMD_LENGTH);
@@ -327,7 +345,7 @@ int DistributedAgent::OnProcessCmd(const std::string &strCommand, int cmdLen,
     }
 
     errno_t ret = EOK;
-    ret = memcpy_s(alignmentCmd, DistributedAgent::CMD_LENGTH, strCommand.c_str(), cmdNo);
+    ret = memcpy_s(alignmentCmd, sizeof(alignmentCmd), strCommand.c_str(), cmdNo);
     if (ret != EOK) {
         return -1;
     }

@@ -104,27 +104,27 @@ bool DistributeDemoAgent::TearDown()
 
 // The entry of handlingthe major test case message
 int DistributeDemoAgent::OnProcessMsg(const std::string &strMsg, int len,
-    std::string &strReturnValue, int returnValueLen)
+    std::string &strReturnValue, int returnBufLen)
 {
     int nret = 0;
     std::string returnStr = "agent return message.";
     if ((len > CMD_LEN) && (strMsg.find("\0\1\0\1") == 1)) {
-        for (int i = 0; i < returnValueLen; i++) {
+        for (int i = 0; i < returnBufLen; i++) {
             strReturnValue  += std::to_string((i + 1) % RETURN_HALF);
         }
-        nret = returnValueLen;
+        nret = returnBufLen;
     } else {
         HiLog::Info(LABEL, "receive message=%s.", strMsg.c_str());
         if (strncmp(strMsg.c_str(), "recall", MSG_CALL_LEN) == 0) {
             returnStr = "I get recall message.";
             int ptrlen = returnStr.size();
-            if (ptrlen > returnValueLen) {
-                ptrlen = returnValueLen - 1;
+            if (ptrlen > returnBufLen) {
+                ptrlen = returnBufLen - 1;
             }
             strReturnValue = returnStr;
             nret = ptrlen;
         } else {
-            nret =  DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
+            nret =  DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnBufLen);
         }
     }
     return nret;
@@ -186,8 +186,18 @@ int DistributeDemoAgent::AddTwoValue(const std::string &strArgs, int argsLen, co
     int val1 = 0;
     int val2 = 0;
     int val3 = 0;
-    sscanf_s(strArgs.c_str(), "%d %d", &val1, &val2);
-    sscanf_s(strExpectValue.c_str(), "%d", &val3);
+    int ret1;
+    int ret2;
+    ret1 = sscanf_s(strArgs.c_str(), "%d %d", &val1, &val2);
+    if (ret1 <=0 || ret1 == 1) {
+        HiLog::Error(LABEL, "sscanf_s failed. ret1 != 2");
+        return -1;
+    }
+    ret2 = sscanf_s(strExpectValue.c_str(), "%d", &val3);
+    if (ret2 != 1) {
+        HiLog::Error(LABEL, "sscanf_s failed. ret2 != 1");
+        return -1;
+    }
     EXPECT_TRUE(val3 == (val1 + val2));
     return val1 + val2;
 }

@@ -33,7 +33,10 @@ int Sub(int e1, int e2)
 int Mul(int e1, int e2)
 {
     int result = e1 * e2;
-    if (!e1 || (result / e1) != e2) {
+    if (e1 == 0) {
+        return 0;
+    }
+    if ((result / e1) != e2) {
         result = -1;
     }
     return result;
