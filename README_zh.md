@@ -61,9 +61,9 @@ subsystem  # 子系统
 > **注意：** 测试用例根据不同设备形态差异分为通用用例和非通用用例，建议将通用用例存放在common目录下，非通用用例存放在相应设备形态目录下。
 
 ###  测试用例编写
-本测试框架支持多种语言用例编写，针对不同语言提供了不同的模板以供编写参考。
+本测试框架支持多种类型测试，针对不同测试类型提供了不同的用例编写模板以供参考。
 
-**C++参考示例**
+**TDD测试（C++）**
 
 - 用例源文件命名规范
 
@@ -243,7 +243,8 @@ subsystem  # 子系统
         |模糊测试      |FUZZ|
     
 
-**JavaScript参考示例**
+**TDD测试（JS）**
+
 
 - 用例源文件命名规范
 
@@ -373,10 +374,20 @@ subsystem  # 子系统
     	 })
     	```
 
+**Fuzz测试**
+
+[Fuzz用例编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/fuzzlib/README_zh.md)
+
+
+**Benchmark测试**
+
+[Benchmark用例编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/benchmark/README_zh.md)
+
+
 ### 测试用例编译文件编写
 根据测试用例目录规划，当执行某一用例时，测试框架会根据编译文件逐层查找，最终找到所需用例进行编译。下面通过不同示例来讲解gn文件如何编写。
 
-#### 测试用例编译配置文件
+#### TDD测试
 针对不同语言，下面提供不同的编译模板以供参考。
 
 - **C++用例编译配置示例**
@@ -612,6 +623,14 @@ subsystem  # 子系统
     	}
     	```
     	> **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
+
+#### Fuzz测试
+
+[Fuzz编译文件编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/fuzzlib/README_zh.md)
+
+#### Benchmark测试
+
+[Benchmark编译文件编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/benchmark/README_zh.md)
       
 #### 编译入口配置文件ohos.build
     
@@ -627,9 +646,10 @@ subsystem  # 子系统
     "system_kits": [
           
     ],
-    "test_list": [
-      "//system/subsystem/partA/calculator/test:unittest"  //配置模块calculator下的test
-    ]
+    "test_list": [ //配置模块calculator下的test
+      "//system/subsystem/partA/calculator/test:unittest",  
+      "//system/subsystem/partA/calculator/test:fuzztest",
+      "//system/subsystem/partA/calculator/test:benchmarktest"
  }
 ```
 > **说明：** test_list中配置的是对应模块的测试用例。
@@ -762,7 +782,7 @@ subsystem  # 子系统
 	```
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
@@ -802,7 +822,7 @@ subsystem  # 子系统
 	```
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
