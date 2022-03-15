@@ -92,7 +92,7 @@ class FilterConfigManager(object):
                     if child.tag != target_name:
                         continue
                     for child2 in child:
-                        if child2.tag != product_form.lower():
+                        if child2.tag.lower() != product_form.lower():
                             continue
                         for child3 in child2:
                             if child3.text != "" and child3.text is not None:

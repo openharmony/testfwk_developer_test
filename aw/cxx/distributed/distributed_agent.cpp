@@ -94,7 +94,7 @@ int DistributedAgent::InitAgentServer()
     }
 
     addr.sin_port = htons(agentPort_);
-    int err = ::bind(serverSockFd, (struct sockaddr *)&addr, sizeof(addr));
+    int err = ::bind(serverSockFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
     if (err < 0) {
         HiLog::Error(DistributedAgent::LABEL, "agent bind error.\n");
         close(serverSockFd);
@@ -132,7 +132,7 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
 
     while (receiveLen > 0) {
         HiLog::Info(DistributedAgent::LABEL, "wait client .......\n");
-        if ((clientSockFd = accept(serverSockFd, (struct sockaddr *)&clientAddr, &sinSize)) > 0) {
+        if ((clientSockFd = accept(serverSockFd, reinterpret_cast<struct sockaddr *>(&clientAddr), &sinSize)) > 0) {
             break;
         }
         receiveLen--;
@@ -153,9 +153,9 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
             return -1;
         }
         // every cmd length less than MAX_BUFF_LEN bytes;
-        int cmdLen = recv(clientSockFd_, buff, DST_COMMAND_HEAD_LEN, 0);
-        if (static_cast<unsigned long>(cmdLen) <  DST_COMMAND_HEAD_LEN) {
-            if (cmdLen == 0) {
+        int recvCmdLen = recv(clientSockFd_, buff, DST_COMMAND_HEAD_LEN, 0);
+        if (static_cast<unsigned long>(recvCmdLen) <  DST_COMMAND_HEAD_LEN) {
+            if (recvCmdLen == 0) {
                 HiLog::Info(DistributedAgent::LABEL, "agent connect socket closed, IP:%s .\n",
                             inet_ntoa(clientAddr.sin_addr));
                 mbStop_ = true;

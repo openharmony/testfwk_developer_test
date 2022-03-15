@@ -41,7 +41,7 @@ public:
     ~DistributedCfg();
     bool OpenCfg(std::string fileName);
     bool GetCfgVal(std::string key, std::string &value);
-    std::string GetValueInString(std::string str, size_t devNO);
+    std::string GetValueInString(std::string str, size_t devNo);
     std::string GetDeviceIp(std::string fileName, size_t devNo);
     std::string GetDeviceUuid(std::string fileName, size_t devNo);
     static std::unique_ptr<DistributedCfg>& GetInstance();

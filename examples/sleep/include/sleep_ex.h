@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#include <sys/socket.h>
-#include <string>
-#include <unistd.h>
+#ifndef EXAMPLE_SLEEP_H_
+#define EXAMPLE_SLEEP_H_
 
 typedef void (*time_callback)(void *);
 int Msleep(unsigned long milisec);
 double ElapsedTime(time_callback func, void* arg);
+
+#endif // EXAMPLE_SLEEP_H_
