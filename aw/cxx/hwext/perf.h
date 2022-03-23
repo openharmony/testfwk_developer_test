@@ -19,7 +19,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include <time.h>
+#include <ctime>
 #include "securec.h"
 
 #include <gtest/gtest.h>

@@ -32,8 +32,10 @@ static double TimeDiff(struct timeval *x , struct timeval *y)
         return 0;
     }
 
-    double xUs = (double)x->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL + (double)x->tv_usec;
-    double yUs = (double)y->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL + (double)y->tv_usec;
+    double xUs = reinterpret_cast<double>(x->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL)
+     + reinterpret_cast<double>(x->tv_usec);
+    double yUs = reinterpret_cast<double>(y->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL)
+     + reinterpret_cast<double>(y->tv_usec);
 
     return (yUs - xUs);
 }
@@ -52,7 +54,7 @@ int Msleep(unsigned long miliSec)
 {
     struct timespec req = {0, 0};
     struct timespec rem = {0, 0};
-    time_t sec = (int)(miliSec / SleepTest::ID_SE_TO_MS_LEVEL);
+    time_t sec = reinterpret_cast<int>(miliSec / SleepTest::ID_SE_TO_MS_LEVEL);
     miliSec = miliSec - (sec * SleepTest::ID_SE_TO_MS_LEVEL);
     req.tv_sec = sec;
     req.tv_nsec = miliSec * SleepTest::ID_MS_TO_NS_LEVEL;

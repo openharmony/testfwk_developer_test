@@ -13,7 +13,11 @@
  * limitations under the License.
  */
 
+#ifndef _EXAMPLE_DETECTOR_H_
+#define _EXAMPLE_DETECTOR_H_
 #include <stdio.h>
 
 bool IsPrime(int n);
 bool FileExist(const char* fileName);
+
+#endif // _EXAMPLE_DETECTOR_H_

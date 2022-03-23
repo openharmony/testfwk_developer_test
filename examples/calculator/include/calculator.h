@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <iostream>
+#ifndef _EXAMPLE_CALCULATOR_H_
+#define _EXAMPLE_CALCULATOR_H_
 
 int Add(int e1, int e2);
 int Sub(int e1, int e2);
 int Mul(int e1, int e2);
 int Div(int e1, int e2);
 
+#endif // _EXAMPLE_CALCULATOR_H_
