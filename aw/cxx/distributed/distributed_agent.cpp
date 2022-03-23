@@ -103,12 +103,12 @@ int DistributedAgent::InitAgentServer()
     }
 
     if (listen(serverSockFd, 1) < 0) {
-        HiLog::Error(DistributedAgent::LABEL, "%s agent listen error.\n", agentIpAddr_.c_str());
+        HiLog::Error(DistributedAgent::LABEL, "agent listen error.\n");
         close(serverSockFd);
         serverSockFd = -1;
         return serverSockFd;
     }
-    HiLog::Info(DistributedAgent::LABEL, "listen %s .......", agentIpAddr_.c_str());
+
     mpthCmdProcess_ = std::make_unique<std::thread>([=]() {
         DoCmdServer(serverSockFd);
     });
@@ -196,6 +196,8 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     int nresult = OnProcessCmd(pAlignmentCmd, cmdLen, pszEValue, eValueLen);
                     ret = memset_s(returnValue, sizeof(returnValue), 0, MAX_BUFF_LEN);
                     if (ret != EOK) {
+                        delete []pAlignmentCmd;
+                        delete []pszEValue;
                         return -1;
                     }
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
