@@ -32,7 +32,7 @@ int Sub(int e1, int e2)
 int Mul(int e1, int e2)
 {
     int result = e1 * e2;
-    if (e1 == 0) {
+    if (!e1) {
         return 0;
     }
     if ((result / e1) != e2) {
@@ -43,7 +43,7 @@ int Mul(int e1, int e2)
 
 int Div(int e1, int e2)
 {
-    if (e2 == 0) {
+    if (!e2) {
         return -1;
     }
 

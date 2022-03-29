@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,7 +78,7 @@ int DistributedAgent::InitAgentServer()
     }
 
     int num = 1;
-    if (setsockopt(serverSockFd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(num)) != 0) {
+    if (setsockopt(serverSockFd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(num))) {
         close(serverSockFd);
         serverSockFd = -1;
         return serverSockFd;
@@ -155,7 +155,7 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
         // every cmd length less than MAX_BUFF_LEN bytes;
         int recvCmdLen = recv(clientSockFd_, buff, DST_COMMAND_HEAD_LEN, 0);
         if (static_cast<unsigned long>(recvCmdLen) <  DST_COMMAND_HEAD_LEN) {
-            if (recvCmdLen == 0) {
+            if (!recvCmdLen) {
                 HiLog::Info(DistributedAgent::LABEL, "agent connect socket closed, IP:%s .\n",
                             inet_ntoa(clientAddr.sin_addr));
                 mbStop_ = true;

@@ -103,7 +103,7 @@ bool BaseLineManager::ReadXmlFile(string baselinePath)
 
     xmlNodePtr ptrRootNode = xmlDocGetRootElement(ptrXmlDoc);
     if (ptrRootNode == nullptr || ptrRootNode->name == nullptr ||
-        xmlStrcmp(ptrRootNode->name, reinterpret_cast<const xmlChar*>(XML_TAG_ROOT)) != 0) {
+        xmlStrcmp(ptrRootNode->name, reinterpret_cast<const xmlChar*>(XML_TAG_ROOT))) {
         xmlFreeDoc(ptrXmlDoc);
         return false;
     }
@@ -138,7 +138,7 @@ bool BaseLineManager::IsNoBaseline()
     return m_bNoBaseline;
 }
 
-double BaseLineManager::StrToDouble(const string& str)
+double BaseLineManager::StrtoDouble(const string& str)
 {
     istringstream iss(str);
     double num;
@@ -157,7 +157,7 @@ bool BaseLineManager::GetExtraValueDouble(const string testcaseName, const strin
         map<string, string> properties = *iter;
         if (properties.count(XML_TAG_CASENAME) == 1 && properties[XML_TAG_CASENAME] == testcaseName) {
             if (properties.count(extra) == 1) {
-                value = StrToDouble(properties[extra]);
+                value = StrtoDouble(properties[extra]);
             }
             break;
         }

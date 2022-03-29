@@ -138,7 +138,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 
 2. BUILD.gn编写
 
-   基于[ohos_fuzztest] # 配置Fuzz模板，例如：
+   基于[ohos_fuzztest]配置Fuzz模板，例如：
 
    ```
    ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
@@ -155,7 +155,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    }
    ```
 
-   [group] # 引用测试套，例如：
+   [group]引用测试套，例如：
 
    ```
    group("fuzztest") {

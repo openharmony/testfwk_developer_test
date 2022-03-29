@@ -6,7 +6,7 @@
 
 ```
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 XXXX Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -158,7 +158,7 @@ BENCHMARK_MAIN();
 
    ```
    /*
-    * Copyright (c) 2021 Huawei Device Co., Ltd.
+    * Copyright (c) 2021 XXXX Device Co., Ltd.
     * Licensed under the Apache License, Version 2.0 (the "License");
     * you may not use this file except in compliance with the License.
     * You may obtain a copy of the License at
@@ -242,10 +242,11 @@ BENCHMARK_MAIN();
 
    benchmark还支持其他多种参数，具体介绍和使用参考[benchmark](https://gitee.com/openharmony/third_party_benchmark/blob/master/README.md)
 
-﻿## 用例编译  
+﻿
+## 用例编译
 
 ```  
-# Copyright (c) 2021 Huawei Device Co., Ltd.  
+# Copyright (c) 2021 XXXX Device Co., Ltd.  
 # Licensed under the Apache License, Version 2.0 (the "License");  
 # you may not use this file except in compliance with the License.  
 # You may obtain a copy of the License at  
@@ -283,7 +284,7 @@ group("unittest") {
 1. 添加文件头注释信息  
 
    ```  
-   # Copyright (c) 2021 Huawei Device Co., Ltd.  
+   # Copyright (c) 2021 XXXX Device Co., Ltd.  
    # Licensed under the Apache License, Version 2.0 (the "License");  
    # you may not use this file except in compliance with the License.  
    # You may obtain a copy of the License at  
