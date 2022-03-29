@@ -63,7 +63,7 @@ public:
 
 private:
     bool ReadXmlFile(std::string path);
-    double StrToDouble(const std::string &str);
+    double StrtoDouble(const std::string &str);
 
 private:
     BaselineConfig m_bastCfg;
