@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,7 @@ bool DistributeDemoAgent::SetUp()
     Options options;
     options.createIfMissing = true;
     options.encrypt = false;
-    options.persistant = true;
+    options.persistent = true;
     std::string storeId = g_storeId;
     Status status = g_manager->GetKvStore(options, storeId, [&](std::unique_ptr<AppKvStore> kvStore) {
         g_kvStorePtr = std::move(kvStore);
@@ -115,7 +115,7 @@ int DistributeDemoAgent::OnProcessMsg(const std::string &strMsg, int len,
         nret = returnBufLen;
     } else {
         HiLog::Info(LABEL, "receive message=%s.", strMsg.c_str());
-        if (strncmp(strMsg.c_str(), "recall", MSG_CALL_LEN) == 0) {
+        if (!strncmp(strMsg.c_str(), "recall", MSG_CALL_LEN)) {
             returnStr = "I get recall message.";
             int ptrlen = returnStr.size();
             if (ptrlen > returnBufLen) {

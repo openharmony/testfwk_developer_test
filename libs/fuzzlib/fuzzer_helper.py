@@ -112,8 +112,8 @@ def generate(args):
 
     template_args = {
         'project_name': args.project_name,
-        'author': "@fixme",
-        'email': "@fixme"
+        'author': "",
+        'email': ""
     }
 
     project_dir_path = os.path.join(args.project_path, args.project_name)

@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -44,8 +44,8 @@ class BuildTestcases(object):
         user_manager = UserConfigManager()
         self.is_build_example = user_manager.get_user_config_flag(
             "build", "example")
-        self.build_paramter_dic = user_manager.get_user_config(
-            "build", "paramter")
+        self.build_parameter_dic = user_manager.get_user_config(
+            "build", "parameter")
 
     @classmethod
     def _copy_folder(cls, source_dir, target_dir):
