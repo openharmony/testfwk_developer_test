@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISTRIBUTED_MAJOR_H
-#define DISTRIBUTED_MAJOR_H
+#ifndef AW_CXX_DISTRIBUTED_DISTRIBUTED_MAJOR_H_
+#define AW_CXX_DISTRIBUTED_DISTRIBUTED_MAJOR_H_
 
 #include <vector>
 #include <map>
@@ -92,7 +92,7 @@ protected:
     int GetReturnVal();
 
 private:
-    void OnProcessNotify() {};
+    void OnProcessNotify() {}
     int returnVal_;
 
     static void SetUpTestCase(void);
@@ -101,14 +101,14 @@ private:
     // init network environment, obtain all the address of agent and connect
     int InitEnv(std::vector<std::string> clientList);
 
-    virtual void SetUp() {};
-    virtual void TearDown() {};
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 
-    virtual void OnNotify() {};
+    virtual void OnNotify() {}
     virtual bool OnProcessValue(const std::string &szbuf, int len);
     virtual bool OnMsgProc(const std::string &szbuf, int len);
 };
 } // namespace DistributeSystemTest
 } // namespace OHOS
 
-#endif // DISTRIBUTED_MAJOR_H
+#endif // AW_CXX_DISTRIBUTED_DISTRIBUTED_MAJOR_H_

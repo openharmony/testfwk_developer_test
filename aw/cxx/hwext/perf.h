@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_AW_CXX_HWEXT_PERF_H
-#define TEST_AW_CXX_HWEXT_PERF_H
+#ifndef AW_CXX_HWEXT_PERF_H_
+#define AW_CXX_HWEXT_PERF_H_
 
 #include <string>
 #include <list>
@@ -80,7 +80,7 @@ public:
         std::string testClassName = "",
         std::string testInterfaceName = "");
 
-    ~GtestPerfTestCase() {};
+    ~GtestPerfTestCase() {}
 
     // expect result is larger than or equal baseline*(1.0-float_range).
     bool ExpectLarger(double testValue);
@@ -164,6 +164,7 @@ private:
     bool    m_bTestResult;
     double  m_dbTestResult;
 };
-} // TestAW
-} // OHOS
-#endif // TEST_AW_CXX_HWEXT_PERF_H
+} // namespace TestAW
+} // namespace OHOS
+
+#endif // AW_CXX_HWEXT_PERF_H_

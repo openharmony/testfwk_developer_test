@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef UNTITLED_CSV_TO_XML_H
-#define UNTITLED_CSV_TO_XML_H
+#ifndef AW_CXX_DISTRIBUTED_UTILS_CSV_TRANSFORM_XML_H_
+#define AW_CXX_DISTRIBUTED_UTILS_CSV_TRANSFORM_XML_H_
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -35,7 +36,7 @@ class CsvTransformXml {
 
 public:
 
-    CsvTransformXml(std::string targetFile)
+    explicit CsvTransformXml(std::string targetFile)
     {
         SetFileName(targetFile);
         SetCvsFileName();
@@ -137,4 +138,5 @@ public:
     }
 };
 
-#endif // UNTITLED_CVS_TO_XML_H
+#endif // AW_CXX_DISTRIBUTED_UTILS_CSV_TRANSFORM_XML_H_
+

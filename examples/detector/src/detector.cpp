@@ -50,6 +50,9 @@ bool IsPrime(int n)
 
 bool FileExist(const char* fileName)
 {
+    if (fileName == nullptr) {
+        return false;
+    }
     struct stat myStat;
     return (!stat(fileName, &myStat));
 }

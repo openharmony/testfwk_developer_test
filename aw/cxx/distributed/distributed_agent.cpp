@@ -85,7 +85,11 @@ int DistributedAgent::InitAgentServer()
     }
 
     struct sockaddr_in addr;
-    memset_s(&addr, sizeof(addr), 0, sizeof(addr));
+    errno_t ret = EOK;
+    ret = memset_s(&addr, sizeof(addr), 0, sizeof(addr));
+    if (ret != EOK) {
+        return -1;
+    }
     addr.sin_family = AF_INET;
     if (agentIpAddr_ != "") {
         inet_pton(AF_INET, agentIpAddr_.c_str(), &addr.sin_addr);
@@ -203,7 +207,9 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_CALL);
-                    sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN), "%d", nresult);
+                    if (sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN), "%d", nresult) < 0) {
+                        return -1;
+                    }
                     rlen = strlen(pclinereturn->alignmentCmd) + 1;
                     pclinereturn->len = htons(rlen);
                     HiLog::Info(DistributedAgent::LABEL, "agent get message :%s .\n",

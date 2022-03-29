@@ -25,6 +25,10 @@ const int FUZZ_FTH_DATA = 3;
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
+        if (data == nullptr) {
+            return false;
+        }
+
         bool result = false;
         if (size >= FUZZ_DATA_LEN) {
             result = data[FUZZ_FST_DATA] == 'F' &&
@@ -34,7 +38,7 @@ namespace OHOS {
         }
         return result;
     }
-}
+} // namespace.OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

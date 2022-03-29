@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISTRIBUTED_AGENT_H
-#define DISTRIBUTED_AGENT_H
+#ifndef AW_CXX_DISTRIBUTED_DISTRIBUTED_AGENT_H_
+#define AW_CXX_DISTRIBUTED_DISTRIBUTED_AGENT_H_
 
 #include <map>
 #include <vector>
@@ -47,7 +47,7 @@ public:
 protected:
     virtual bool SetUp();
     virtual bool TearDown();
-    virtual void OnLocalInit() {};
+    virtual void OnLocalInit() {}
     virtual int OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
         const std::string &strExpectValue, int expectValueLen);
     virtual int OnProcessMsg(const std::string &strMsg, int msgLen, std::string &strReturnValue, int returnBufLen);
@@ -69,4 +69,5 @@ private:
 } // namespace DistributeSystemTest
 } // namespace OHOS
 
-#endif // DISTRIBUTED_AGENT_H
+#endif // AW_CXX_DISTRIBUTED_DISTRIBUTED_AGENT_H_
+

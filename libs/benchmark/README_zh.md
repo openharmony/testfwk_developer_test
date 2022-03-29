@@ -263,20 +263,20 @@ import("//build/test.gni")
   
 module_output_path = "developertest/calculator"  
    
-ohos_unittest("BenchmarkDemoTest") {  
-  module_out_path = module_output_path  
-  sources = [ "benchmark_demo_test.cpp" ]  
+ohos_benchmarktest("BenchmarkDemoTest") {
+  module_out_path = module_output_path
+  sources = [ "benchmark_demo_test.cpp" ]
 }
 
-group("unittest") {  
-  testonly = true  
-  deps = []  
-  
-  deps += [  
-	# deps file  
-	":BenchmarkDemoTest",  
-  ] 
-}  
+group("benchmarktest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    # deps file
+    ":BenchmarkDemoTest",
+  ]
+} 
 ```
 
 详细内容如下：  
@@ -315,9 +315,9 @@ group("unittest") {
 4. 指定测试套名称  
 
    ```  
-   ohos_unittest("BenchmarkDemoTest") {   # benchmark测试编译模板
-     module_out_path = module_output_path  
-     sources = [ "benchmark_demo_test.cpp" ]  # 指定测试用例文件
+   ohos_benchmarktest("BenchmarkDemoTest") {
+     module_out_path = module_output_path
+     sources = [ "benchmark_demo_test.cpp" ]
    }
    ```
 

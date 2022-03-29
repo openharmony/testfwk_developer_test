@@ -24,19 +24,19 @@ using namespace OHOS::TestAW;
 static BaseLineManager m_baseline(PERF_BASELINE_CONFIG_PATH);
 class SpentTimeTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
-    static void TearDownTestCase(void) {};
-    void SetUp() {};
-    void TearDown() {};
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+    void SetUp() {}
+    void TearDown() {}
 };
 
 static void LoopMsleep(void* pMsec)
 {
-    if (pMsec == NULL) {
+    if (pMsec == nullptr) {
         return;
     }
 
-    int msec = *(int*)pMsec;
+    int msec = *reinterpret_cast<int*> (pMsec);
     for (int index = 0; index < msec; index++) {
         Msleep(1);
     }
