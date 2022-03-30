@@ -45,11 +45,11 @@ public:
     DistributeDemo() = default;
     ~DistributeDemo() = default;
 
-    static void SetUpTestCase(void) {};
-    static void TearDownTestCase(void) {};
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 
-    virtual void SetUp() {};
-    virtual void TearDown() {};
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 };
 
 /**

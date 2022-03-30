@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef SERVICEDEMO_CALC_MULTI_H
-#define SERVICEDEMO_CALC_MULTI_H
+#ifndef EXAMPLE_LITE_C_DEMO_INCLUDE_CALC_MULTI_H_
+#define EXAMPLE_LITE_C_DEMO_INCLUDE_CALC_MULTI_H_
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -30,4 +30,4 @@ int calc_multi(int a, int b);
 #endif
 #endif
 
-#endif // SERVICEDEMO_CALC_MULTI_H
+#endif // EXAMPLE_LITE_C_DEMO_INCLUDE_CALC_MULTI_H_

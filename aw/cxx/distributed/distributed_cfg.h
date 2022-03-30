@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISTRIBUTED_CFG_H
-#define DISTRIBUTED_CFG_H
+#ifndef AW_CXX_DISTRIBUTED_DISTRIBUTED_CFG_H_
+#define AW_CXX_DISTRIBUTED_DISTRIBUTED_CFG_H_
 
 #include <map>
 #include <iostream>
@@ -52,4 +52,5 @@ private:
 };
 } // namespace DistributeSystemTest
 } // namespace OHOS
-#endif
+
+#endif // AW_CXX_DISTRIBUTED_DISTRIBUTED_CFG_H_

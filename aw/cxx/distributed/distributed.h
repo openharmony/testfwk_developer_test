@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef _DISTRIBUTED_H_
-#define _DISTRIBUTED_H_
+#ifndef AW_CXX_DISTRIBUTED_DISTRIBUTED_H_
+#define AW_CXX_DISTRIBUTED_DISTRIBUTED_H_
 
 #include <iostream>
 #include "securec.h"
@@ -50,4 +50,4 @@ using DistDeviceInfo = DistDevInfo;
 } // namespace DistributeSystemTest
 } // namespace OHOS
 
-#endif // _DISTRIBUTED_H_
+#endif // AW_CXX_DISTRIBUTED_DISTRIBUTED_H_
