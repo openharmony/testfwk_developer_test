@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef _DISTRIBUTED_H_
-#define _DISTRIBUTED_H_
+#ifndef AW_CXX_DISTRIBUTED_DISTRIBUTED_H_
+#define AW_CXX_DISTRIBUTED_DISTRIBUTED_H_
 
 #include <iostream>
 #include "securec.h"
 
 namespace OHOS {
 namespace DistributeSystemTest {
-static const int MAX_BUFF_LEN = 1024;
-static const int DST_COMMAND_NOTIFY = 0;
-static const int DST_COMMAND_CALL = 1;
-static const int DST_COMMAND_MSG = 2;
-static const int DST_COMMAND_END = 3;
-static const int DEFAULT_AGENT_PORT = 6789;
+constexpr int MAX_BUFF_LEN = 1024;
+constexpr int DST_COMMAND_NOTIFY = 0;
+constexpr int DST_COMMAND_CALL = 1;
+constexpr int DST_COMMAND_MSG = 2;
+constexpr int DST_COMMAND_END = 3;
+constexpr int DEFAULT_AGENT_PORT = 6789;
 
 struct DistributedCmd {
     int no;  // record command no, as return no.
@@ -50,4 +50,4 @@ using DistDeviceInfo = DistDevInfo;
 } // namespace DistributeSystemTest
 } // namespace OHOS
 
-#endif // _DISTRIBUTED_H_
+#endif // AW_CXX_DISTRIBUTED_DISTRIBUTED_H_

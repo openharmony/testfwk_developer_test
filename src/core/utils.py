@@ -155,7 +155,7 @@ def parse_product_info(product_form):
 
 def is_32_bit_test():
     manager = UserConfigManager()
-    para_dic = manager.get_user_config("build", "paramter")
+    para_dic = manager.get_user_config("build", "parameter")
     target_cpu = para_dic.get("target_cpu", "")
     if target_cpu == "arm":
         return True

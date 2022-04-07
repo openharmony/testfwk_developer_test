@@ -32,8 +32,6 @@ namespace TestAW {
 
 #define ID_LARGER_IS_BETTER    true
 #define ID_SMALLER_IS_BETTER   false
-#define _max(a,b) (((a)>=(b)) ? (a) : (b) )
-#define _min(a,b) (((a)<=(b)) ? (a) : (b))
 
 namespace {
     const auto XML_TAG_ROOT       = "configuration";
@@ -103,7 +101,7 @@ bool BaseLineManager::ReadXmlFile(string baselinePath)
 
     xmlNodePtr ptrRootNode = xmlDocGetRootElement(ptrXmlDoc);
     if (ptrRootNode == nullptr || ptrRootNode->name == nullptr ||
-        xmlStrcmp(ptrRootNode->name, reinterpret_cast<const xmlChar*>(XML_TAG_ROOT)) != 0) {
+        xmlStrcmp(ptrRootNode->name, reinterpret_cast<const xmlChar*>(XML_TAG_ROOT))) {
         xmlFreeDoc(ptrXmlDoc);
         return false;
     }
@@ -138,7 +136,7 @@ bool BaseLineManager::IsNoBaseline()
     return m_bNoBaseline;
 }
 
-double BaseLineManager::StrToDouble(const string& str)
+double BaseLineManager::StrtoDouble(const string& str)
 {
     istringstream iss(str);
     double num;
@@ -157,7 +155,7 @@ bool BaseLineManager::GetExtraValueDouble(const string testcaseName, const strin
         map<string, string> properties = *iter;
         if (properties.count(XML_TAG_CASENAME) == 1 && properties[XML_TAG_CASENAME] == testcaseName) {
             if (properties.count(extra) == 1) {
-                value = StrToDouble(properties[extra]);
+                value = StrtoDouble(properties[extra]);
             }
             break;
         }
@@ -182,7 +180,7 @@ GtestPerfTestCase::GtestPerfTestCase(BaseLineManager* pManager,
 
     // get test case name from GTEST API.
     // should be use tester->XXX() instead of this.
-    if (tester != nullptr) {
+    if (tester != nullptr && ::testing::UnitTest::GetInstance() != nullptr) {
         m_strCaseName = string(::testing::UnitTest::GetInstance()->current_test_info()->name());
     }
 
@@ -284,11 +282,11 @@ bool GtestPerfTestCase::ExpectValue(double testValue, bool isLargerBetter)
     } else {
         double baseValue = -1;
         if (isLargerBetter) {
-            baseValue = _max(m_dbLastValue, m_dbBaseLine);
+            baseValue = (m_dbLastValue >= m_dbBaseLine) ? m_dbLastValue : m_dbBaseLine;
             EXPECT_GE(testValue, (baseValue * (1.0 - m_dbFloatRange)));
             m_bTestResult = (testValue >= (baseValue * (1.0 - m_dbFloatRange))) ? true : false;
         } else {
-            baseValue = _min(m_dbLastValue, m_dbBaseLine);
+            baseValue = (m_dbLastValue <= m_dbBaseLine) ? m_dbLastValue : m_dbBaseLine;
             EXPECT_LE(testValue, (baseValue * (1.0 + m_dbFloatRange)));
             m_bTestResult = (testValue <= (baseValue * (1.0 + m_dbFloatRange))) ? true : false;
         }
@@ -311,22 +309,22 @@ bool GtestPerfTestCase::SaveResult(double testValue)
 
     INF_MSG("[ PERF     ] %s: baseline:%f, test_result: %f\n", m_strCaseName.c_str(), m_dbBaseLine, testValue);
 
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    (void)memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, "%g", m_dbBaseLine) > 0) {
         m_pTester->RecordProperty("baseline", buffer);
     }
 
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    (void)memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, "%d", m_dCaseVersion) > 0) {
         m_pTester->RecordProperty("tc_version", buffer);
     }
 
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    (void)memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, "%g", m_dbLastValue) > 0) {
         m_pTester->RecordProperty("lastvalue", m_bHasLastValue ? buffer : "");
     }
 
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    (void)memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, "%g", testValue) > 0) {
         m_pTester->RecordProperty("value", buffer);
     }
@@ -337,5 +335,5 @@ bool GtestPerfTestCase::SaveResult(double testValue)
 
     return true;
 }
-} // TestAW
-} // OHOS
+} // namespace TestAW
+} // namespace OHOS

@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef UNTITLED_CSV_TO_XML_H
-#define UNTITLED_CSV_TO_XML_H
+#ifndef AW_CXX_DISTRIBUTED_UTILS_CSV_TRANSFORM_XML_H_
+#define AW_CXX_DISTRIBUTED_UTILS_CSV_TRANSFORM_XML_H_
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -35,7 +36,7 @@ class CsvTransformXml {
 
 public:
 
-    CsvTransformXml(std::string targetFile)
+    explicit CsvTransformXml(std::string targetFile)
     {
         SetFileName(targetFile);
         SetCvsFileName();
@@ -67,7 +68,7 @@ public:
         int testCaseSum = vecLines_.size() / 3; // one item case_result from csv includes 3 strings
         int failCaseSum = 0;
         for (std::string s : vecLines_) {
-            if (s.compare("FAILED") == 0) {
+            if (!s.compare("FAILED")) {
                 failCaseSum++;
             }
         }
@@ -78,7 +79,7 @@ public:
                << "\" failures=\""<< failCaseSum << "\" disabled=\"0\" errors=\"0\" time=\"192.553\">" << std::endl;
         unsigned long i = 0;
         while (i < vecLines_.size()) {
-            if (vecLines_.at(i + 2).compare("FAILED") == 0) {  // the result of every case intervals 2 string
+            if (!(vecLines_.at(i + 2).compare("FAILED"))) {  // the result of every case intervals 2 string
                 xmlOut << "    <testcase name=\""<< vecLines_.at(i)
                        <<"\" status=\"run\" time=\"\" classname=\"" << fileName_ << "\" level=\"3\">" << std::endl;
                 xmlOut << "      <failure message=\"NULL\"></failure>"<< std::endl;
@@ -137,4 +138,5 @@ public:
     }
 };
 
-#endif // UNTITLED_CVS_TO_XML_H
+#endif // AW_CXX_DISTRIBUTED_UTILS_CSV_TRANSFORM_XML_H_
+

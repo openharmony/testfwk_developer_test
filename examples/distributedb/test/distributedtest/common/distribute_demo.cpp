@@ -45,11 +45,11 @@ public:
     DistributeDemo() = default;
     ~DistributeDemo() = default;
 
-    static void SetUpTestCase(void) {};
-    static void TearDownTestCase(void) {};
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 
-    virtual void SetUp() {};
-    virtual void TearDown() {};
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 };
 
 /**
@@ -151,7 +151,7 @@ HWTEST_F(DistributeDemo, getkvstore_001, TestSize.Level0) {
     Options options;
     options.createIfMissing = true;
     options.encrypt = false;
-    options.persistant = true;
+    options.persistent = true;
     std::string appId = "com.ohos.nb.service.user1_test";
     std::string storeId = "student_1";
     manager = AppDistributedKvDataManager::GetInstance(appId, "/data/test");

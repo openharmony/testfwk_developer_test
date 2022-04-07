@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,14 +78,18 @@ int DistributedAgent::InitAgentServer()
     }
 
     int num = 1;
-    if (setsockopt(serverSockFd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(num)) != 0) {
+    if (setsockopt(serverSockFd, SOL_SOCKET, SO_REUSEADDR, &num, sizeof(num))) {
         close(serverSockFd);
         serverSockFd = -1;
         return serverSockFd;
     }
 
     struct sockaddr_in addr;
-    memset_s(&addr, sizeof(addr), 0, sizeof(addr));
+    errno_t ret = EOK;
+    ret = memset_s(&addr, sizeof(addr), 0, sizeof(addr));
+    if (ret != EOK) {
+        return -1;
+    }
     addr.sin_family = AF_INET;
     if (agentIpAddr_ != "") {
         inet_pton(AF_INET, agentIpAddr_.c_str(), &addr.sin_addr);
@@ -94,7 +98,7 @@ int DistributedAgent::InitAgentServer()
     }
 
     addr.sin_port = htons(agentPort_);
-    int err = ::bind(serverSockFd, (struct sockaddr *)&addr, sizeof(addr));
+    int err = ::bind(serverSockFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
     if (err < 0) {
         HiLog::Error(DistributedAgent::LABEL, "agent bind error.\n");
         close(serverSockFd);
@@ -103,12 +107,12 @@ int DistributedAgent::InitAgentServer()
     }
 
     if (listen(serverSockFd, 1) < 0) {
-        HiLog::Error(DistributedAgent::LABEL, "%s agent listen error.\n", agentIpAddr_.c_str());
+        HiLog::Error(DistributedAgent::LABEL, "agent listen error.\n");
         close(serverSockFd);
         serverSockFd = -1;
         return serverSockFd;
     }
-    HiLog::Info(DistributedAgent::LABEL, "listen %s .......", agentIpAddr_.c_str());
+
     mpthCmdProcess_ = std::make_unique<std::thread>([=]() {
         DoCmdServer(serverSockFd);
     });
@@ -132,7 +136,7 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
 
     while (receiveLen > 0) {
         HiLog::Info(DistributedAgent::LABEL, "wait client .......\n");
-        if ((clientSockFd = accept(serverSockFd, (struct sockaddr *)&clientAddr, &sinSize)) > 0) {
+        if ((clientSockFd = accept(serverSockFd, reinterpret_cast<struct sockaddr *>(&clientAddr), &sinSize)) > 0) {
             break;
         }
         receiveLen--;
@@ -153,9 +157,9 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
             return -1;
         }
         // every cmd length less than MAX_BUFF_LEN bytes;
-        int cmdLen = recv(clientSockFd_, buff, DST_COMMAND_HEAD_LEN, 0);
-        if (static_cast<unsigned long>(cmdLen) <  DST_COMMAND_HEAD_LEN) {
-            if (cmdLen == 0) {
+        int recvCmdLen = recv(clientSockFd_, buff, DST_COMMAND_HEAD_LEN, 0);
+        if (static_cast<unsigned long>(recvCmdLen) <  DST_COMMAND_HEAD_LEN) {
+            if (!recvCmdLen) {
                 HiLog::Info(DistributedAgent::LABEL, "agent connect socket closed, IP:%s .\n",
                             inet_ntoa(clientAddr.sin_addr));
                 mbStop_ = true;
@@ -196,12 +200,15 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     int nresult = OnProcessCmd(pAlignmentCmd, cmdLen, pszEValue, eValueLen);
                     ret = memset_s(returnValue, sizeof(returnValue), 0, MAX_BUFF_LEN);
                     if (ret != EOK) {
+                        delete []pAlignmentCmd;
+                        delete []pszEValue;
                         return -1;
                     }
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_CALL);
-                    sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN), "%d", nresult);
+                    (void)sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN),
+                                    "%d", nresult) < 0);
                     rlen = strlen(pclinereturn->alignmentCmd) + 1;
                     pclinereturn->len = htons(rlen);
                     HiLog::Info(DistributedAgent::LABEL, "agent get message :%s .\n",

@@ -32,7 +32,7 @@ bool IsPrime(int n)
         return false;
     }
 
-    if (n % DetectorTest::HALF == 0) {
+    if (!(n % DetectorTest::HALF)) {
         return n == DetectorTest::HALF;
     }
 
@@ -40,7 +40,7 @@ bool IsPrime(int n)
         if (i > (n / i)) {
             break;
         }
-        if (n % i == 0) {
+        if (!(n % i)) {
             return false;
         }
     }
@@ -50,6 +50,9 @@ bool IsPrime(int n)
 
 bool FileExist(const char* fileName)
 {
+    if (fileName == nullptr) {
+        return false;
+    }
     struct stat myStat;
-    return (stat(fileName, &myStat) == 0);
+    return (!stat(fileName, &myStat));
 }

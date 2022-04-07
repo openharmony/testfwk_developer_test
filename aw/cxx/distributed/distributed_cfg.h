@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISTRIBUTED_CFG_H
-#define DISTRIBUTED_CFG_H
+#ifndef AW_CXX_DISTRIBUTED_DISTRIBUTED_CFG_H_
+#define AW_CXX_DISTRIBUTED_DISTRIBUTED_CFG_H_
 
 #include <map>
 #include <iostream>
@@ -41,7 +41,7 @@ public:
     ~DistributedCfg();
     bool OpenCfg(std::string fileName);
     bool GetCfgVal(std::string key, std::string &value);
-    std::string GetValueInString(std::string str, size_t devNO);
+    std::string GetValueInString(std::string str, size_t devNo);
     std::string GetDeviceIp(std::string fileName, size_t devNo);
     std::string GetDeviceUuid(std::string fileName, size_t devNo);
     static std::unique_ptr<DistributedCfg>& GetInstance();
@@ -52,4 +52,5 @@ private:
 };
 } // namespace DistributeSystemTest
 } // namespace OHOS
-#endif
+
+#endif // AW_CXX_DISTRIBUTED_DISTRIBUTED_CFG_H_

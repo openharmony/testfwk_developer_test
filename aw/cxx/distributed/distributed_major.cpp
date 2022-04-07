@@ -130,7 +130,7 @@ int DistributeTestEnvironment::ConnectAgent(size_t devNo)
     addr.sin_port = htons(serverPort_);
     int connectCount = 0;
     for (connectCount = 0; connectCount < CONNECT_TIME; connectCount++) {  // try connect to agent 3 times.
-        if (connect(clientSockFd, (struct sockaddr *)&addr, sizeof(addr)) == 0) {
+        if (!connect(clientSockFd, reinterpret<struct sockaddr *>(&addr), sizeof(addr))) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));  // delay 10ms
@@ -184,11 +184,11 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
     }
     globalCommandNo++;
     char szrbuf[MAX_BUFF_LEN] = {0};
-    auto pCmdTest = reinterpret_cast<DistributedMsg *>(pstrMsg);
-    pCmdTest->no = globalCommandNo;
-    pCmdTest->cmdTestType = htons(cmdType);
-    pCmdTest->len = htons(len);
-    int rlen = send(clientList_[devNo].fd, pCmdTest, static_cast<size_t>(len + DST_COMMAND_HEAD_LEN), 0);
+    auto pCmdMsg = reinterpret_cast<DistributedMsg *>(pstrMsg);
+    pCmdMsg->no = globalCommandNo;
+    pCmdMsg->cmdTestType = htons(cmdType);
+    pCmdMsg->len = htons(len);
+    int rlen = send(clientList_[devNo].fd, pCmdMsg, static_cast<size_t>(len + DST_COMMAND_HEAD_LEN), 0);
     if (rlen <= 0) {
         HiLog::Error(LABEL, "agent socket is closed.");
         return breturn;
@@ -223,7 +223,7 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
                         HiLog::Error(LABEL, "get error message. type is :%d", pCmdTest->cmdTestType);
                     }
                 } else {
-                    if (rlen == 0) {
+                    if (!rlen) {
                         // peer socket is closed.
                         HiLog::Error(LABEL, "device socket close.");
                         break;

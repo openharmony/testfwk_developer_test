@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -462,11 +462,13 @@ class CppTestDriver(IDriver):
             self.config.device.stop_catch_device_log()
 
     def _init_gtest(self):
-        self.config.device.hdc_command("remount")
+        self.config.device.hdc_command("target mount")
         self.config.device.execute_shell_command(
             "rm -rf %s" % self.config.target_test_path)
         self.config.device.execute_shell_command(
             "mkdir -p %s" % self.config.target_test_path)
+        self.config.device.execute_shell_command(
+            "mount -o rw,remount,rw /")
         if "fuzztest" == self.config.testtype[0]:
             self.config.device.execute_shell_command(
                 "mkdir -p %s" % os.path.join(self.config.target_test_path,
@@ -648,7 +650,7 @@ class JSUnitTestDriver(IDriver):
         self.config.device.execute_shell_command(
             "mkdir -p %s" % self.config.target_test_path)
         self.config.device.execute_shell_command(
-            "mount -o rw,remount,rw /%s" % "system")
+            "mount -o rw,remount,rw /")
 
 
     def _run_jsunit(self, suite_file):

@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-#include <cstdint>
-#include <unistd.h>
-#include <climits>
-#include <cstdio>
-#include <cstdlib>
-#include <fcntl.h>
+#ifndef _EXAMPLE_CALCULATOR_PARSE_FUZZER_H_
+#define _EXAMPLE_CALCULATOR_PARSE_FUZZER_H_
 
 #define FUZZ_PROJECT_NAME "parse_fuzzer"
+
+#endif // _EXAMPLE_CALCULATOR_PARSE_FUZZER_H_

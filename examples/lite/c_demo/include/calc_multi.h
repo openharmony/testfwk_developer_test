@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef SERVICEDEMO_CALC_MULTI_H
-#define SERVICEDEMO_CALC_MULTI_H
+#ifndef EXAMPLE_LITE_C_DEMO_INCLUDE_CALC_MULTI_H_
+#define EXAMPLE_LITE_C_DEMO_INCLUDE_CALC_MULTI_H_
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -30,4 +30,4 @@ int calc_multi(int a, int b);
 #endif
 #endif
 
-#endif // SERVICEDEMO_CALC_MULTI_H
+#endif // EXAMPLE_LITE_C_DEMO_INCLUDE_CALC_MULTI_H_
