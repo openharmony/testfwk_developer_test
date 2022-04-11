@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef _EXAMPLE_CALCULATOR_PARSE_FUZZER_H_
-#define _EXAMPLE_CALCULATOR_PARSE_FUZZER_H_
+#ifndef EXAMPLE_CALCULATOR_FUZZER_H_
+#define EXAMPLE_CALCULATOR_FUZZER_H_
 
-#define FUZZ_PROJECT_NAME "parse_fuzzer"
+#define FUZZ_PROJECT_NAME "Calculator_fuzzer"
 
-#endif // _EXAMPLE_CALCULATOR_PARSE_FUZZER_H_
+#endif // EXAMPLE_CALCULATOR_FUZZER_H_

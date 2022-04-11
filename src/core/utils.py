@@ -173,29 +173,17 @@ def get_decode(stream):
     return ret
 
 
-def parse_fuzzer_info():
-    path_list = []
-    bin_list = []
-    list_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.realpath(__file__)))), "libs", "fuzzlib", "fuzzer_list.txt")
-    with open(list_path, 'r') as list_file:
-        for line in list_file.readlines():
-            striped_str = line.strip()
-            if platform.system() == "Windows":
-                path_list.append(striped_str.split(" ")[0])
-                bin_list.append(striped_str.split(" ")[1])
-            else:
-                path_list.append(striped_str.split(":")[0][3:])
-                bin_list.append(striped_str.split(":")[1].split("(")[0])
-    return path_list, bin_list
-
-
-def get_fuzzer_path(filename):
-    path_list, bin_list = parse_fuzzer_info()
-    for i, name in enumerate(bin_list):
-        if name == filename:
-            return os.path.join(sys.source_code_root_path, path_list[i])
-    return ""
+def get_fuzzer_path(suite_file):
+    filename = os.path.basename(suite_file)
+    suitename = filename.split("FuzzTest")[0]
+    current_dir = os.path.dirname(suite_file)
+    while True:
+        if os.path.exists(os.path.join(current_dir, "tests")):
+            res_path = os.path.join(os.path.join(current_dir, "tests"), "res")
+            break
+        current_dir = os.path.dirname(current_dir)
+    fuzzer_path = os.path.join(res_path, "%s_fuzzer" % suitename)
+    return fuzzer_path
 
 
 def is_lite_product(product_form, code_root_path):
