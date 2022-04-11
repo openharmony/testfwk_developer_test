@@ -51,7 +51,7 @@ ohos_distributedtest("DistributeDemo") {
   ]
 
   deps = [
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/app_distributeddata/:app_distributeddata",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/:distributeddata_inner",
     "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter:distributeddata_adapter",
     "//third_party/googletest:gtest",
     "//utils/native/base:utils",
@@ -73,7 +73,7 @@ ohos_distributedtest("DistributeDemoAgent") {
   ]
 
   deps = [
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/app_distributeddata/:app_distributeddata",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/:distributeddata_inner",
     "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter:distributeddata_adapter",
     "//third_party/googletest:gtest",
     "//utils/native/base:utils",
