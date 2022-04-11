@@ -481,12 +481,13 @@ class CppTestDriver(IDriver):
                                         self.config.testlevel,
                                         self.config.testtype,
                                         self.config.target_test_path,
+                                        suite_file,
                                         filename)
         is_coverage_test = True if self.config.coverage else False
 
         # push testsuite file
         self.config.device.push_file(suite_file, self.config.target_test_path)
-        self._push_corpus_if_exist(filename)
+        self._push_corpus_if_exist(suite_file)
 
         # push resource files
         resource_manager = ResourceManager()
@@ -533,9 +534,9 @@ class CppTestDriver(IDriver):
             resource_dir,
             self.config.device)
 
-    def _push_corpus_if_exist(self, filename):
+    def _push_corpus_if_exist(self, suite_file):
         if "fuzztest" == self.config.testtype[0]:
-            corpus_path = os.path.join(get_fuzzer_path(filename), "corpus")
+            corpus_path = os.path.join(get_fuzzer_path(suite_file), "corpus")
             self.config.device.push_file(corpus_path,
                 os.path.join(self.config.target_test_path, "corpus"))
 
@@ -544,6 +545,7 @@ class CppTestDriver(IDriver):
                        testlevel,
                        testtype,
                        target_test_path,
+                       suite_file,
                        filename):
         if "benchmark" == testtype[0]:
             test_para = (" --benchmark_out_format=json"
@@ -561,7 +563,7 @@ class CppTestDriver(IDriver):
 
         if "fuzztest" == testtype[0]:
             cfg_list = FuzzerConfigManager(os.path.join(get_fuzzer_path(
-                filename), "project.xml")).get_fuzzer_config("fuzztest")
+                suite_file), "project.xml")).get_fuzzer_config("fuzztest")
             LOG.info("config list :%s" % str(cfg_list))
             test_para += "corpus -max_len=" + cfg_list[0] + \
                          " -max_total_time=" + cfg_list[1] + \
