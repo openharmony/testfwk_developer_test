@@ -53,12 +53,12 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    执行gen命令用于fuzzer源文件生成，会自动生成fuzzer源文件、fuzzer配置文件和corpus语料，目录结构如下
 
    ```
-   parse_fuzzer/
+   Calculator_fuzzer/
    ├── corpus                        # Fuzz语料目录
    │   ├── init                      # Fuzz语料
    ├── BUILD.gn                      # Fuzz用例编译配置
-   ├── parse_fuzzer.cpp              # Fuzz用例源文件
-   ├── parse_fuzzer.h                # Fuzz用例头文件
+   ├── Calculator_fuzzer.cpp              # Fuzz用例源文件
+   ├── Calculator_fuzzer.h                # Fuzz用例头文件
    ├── project.xml                   # Fuzz选项配置文件
    ```
 
@@ -71,13 +71,13 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    | 参数 | 描述       | 说明           | 备注                                       |
    | ---- | ---------- | -------------- | ------------------------------------------ |
    | -t   | testtype   | 测试类型       | 目前仅支持"FUZZ"                           |
-   | -fn  | fuzzername | fuzzer名称     | 为显式区分Fuzz用例，名称必须以"fuzzer"结尾 |
+   | -fn  | fuzzername | fuzzer名称     | 为显式区分Fuzz用例，名称必须以测试套前缀 + _fuzzer形式命名 |
    | -dp  | dirpath    | fuzzer生成路径 | 路径不存在则自动创建目录                   |
 
 3. gen命令示例，-t、-fn和-dp均为必选项
 
    ```
-   gen -t FUZZ -fn parse_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
+   gen -t FUZZ -fn Calculator_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
    ```
    
    执行完毕后会在test/developertest/example/calculator/test/fuzztest/common目录下生成一个Fuzz用例demo。
@@ -100,7 +100,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ![img](../../public_sys-resources/icon-note.gif) **说明：** DoSomethingInterestingWithMyAPI接口名称允许依据业务逻辑修改。两接口参数data和size为fuzz测试标准化参数，不可修改。
 
    ```
-   #include "parse_fuzzer.h"
+   #include "Calculator_fuzzer.h"
    
    #include <stddef.h>
    #include <stdint.h>
@@ -143,7 +143,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ```
    ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
      module_out_path = module_output_path
-     
+     fuzz_config_file = "//test/developertest/examples/calculator/test/fuzztest/common/Calculator_fuzzer"
      include_dirs = []
      cflags = [
        "-g",
@@ -151,7 +151,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
        "-Wno-unused-variable",
        "-fno-omit-frame-pointer",
      ]
-     sources = [ "parse_fuzzer.cpp" ]
+     sources = [ "Calculator_fuzzer.cpp" ]
    }
    ```
 
@@ -209,7 +209,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
      testonly = true
      deps = []
      
-     deps += [ "fuzztest/common/parse_fuzzer:fuzztest" ]
+     deps += [ "fuzztest/common/Calculator_fuzzer:fuzztest" ]
    }
    ```
    
@@ -233,55 +233,29 @@ run -t FUZZ -ss developertest -tm calculator
 
   Windows环境可通过归档DTFuzz用例配置文件project.xml、语料corpus和可执行文件执行DTFuzz。
 
-  1. 归档用例配置文件、语料
+  1. 归档用例配置文件、语料以及用例可执行文件
 
      新建目录，如：
 
      ```
-     D:\test\res\parse_fuzzer
+     D:\test\tests
      ```
 
-     parse_fuzzer用例的配置文件project.xml、语料corpus拷贝到该路径下。如有多个需要执行的用例，在res目录下新建多个xxx_fuzzer目录。
+     用例可执行文件为DTFuzz源文件编译产出文件，为DTFuzz用例在设备中实际执行文件，以二进制形式存储在out/release/package/phone/tests/fuzztest下，名称为对应的测试套名。测试套的配置文件均编译输出在out/release/package/phone/tests/res目录下对应的XXXX_fuzzer目录中。将编译生成的配置文件res目录以及用例可执行文件fuzztest目录直接拷贝到该路径下即可。
 
-  2. 归档用例可执行文件
-
-     用例可执行文件为DTFuzz源文件编译产出文件，为DTFuzz用例在设备中实际执行文件，以二进制形式存储在out/release/package/phone/tests/fuzztest下，名称为对应的测试套名。
      
-     新建目录，如：
-     
-     ```
-     D:\test\cases
-     ```
-     
-     将fuzztest目录拷贝到该路径下。
-     
-  3. 配置执行用例
-  
-     libs\fuzzlib中新建fuzzer_list.txt，其中配置需要执行的DTFuzz用例，如需要执行parse_fuzzer用例：
-  
-     ```
-     #格式：用例配置文件和语料归档路径 可执行文件名
-     D:\test\res\parse_fuzzer CalculatorFuzzTest
-     ```
-  
-     ![img](../../public_sys-resources/icon-note.gif) **说明：** 
-  
-     1.fuzzer_list.txt中可配置多行，每行对应一个DTFuzz用例
-  
-     2.路径与可执行文件名严格一一对应，如例子中路径归档的是parse_fuzzer用例的配置文件和语料，CalculatorFuzzTest为parse_fuzzer用例的可执行文件。
-  
-  4. 配置用例路径
+  2. 配置用例路径
   
      config\user_config.xml中配置用例归档路径：
   
      ```
      <!-- configure test cases path -->
      <test_cases>
-       <dir>D:\test\cases</dir>     #用例可执行文件归档路径
+       <dir>D:\test\tests</dir>     #用例可执行文件归档路径
      </test_cases>
      ```
   
-  5. 执行用例
+  3. 执行用例
   
      执行DTFuzz命令示例，无需参数-ss、-tm
   
