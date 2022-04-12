@@ -19,7 +19,7 @@ module_output_path = "developertest/calculator"
 ##############################fuzztest##########################################
 ohos_fuzztest("CalculatorFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//test/developertest/examples/calculator/test/fuzztest/common/Calculator_fuzzer"
+  fuzz_config_file = "//test/developertest/examples/calculator/test/fuzztest/common/calculator_fuzzer"
   include_dirs = []
   cflags = [
     "-g",
@@ -27,7 +27,7 @@ ohos_fuzztest("CalculatorFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "Calculator_fuzzer.cpp" ]
+  sources = [ "calculator_fuzzer.cpp" ]
 }
 
 ###############################################################################

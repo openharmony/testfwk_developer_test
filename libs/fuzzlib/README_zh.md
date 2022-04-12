@@ -53,12 +53,12 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    执行gen命令用于fuzzer源文件生成，会自动生成fuzzer源文件、fuzzer配置文件和corpus语料，目录结构如下
 
    ```
-   Calculator_fuzzer/
+   calculator_fuzzer/
    ├── corpus                        # Fuzz语料目录
    │   ├── init                      # Fuzz语料
    ├── BUILD.gn                      # Fuzz用例编译配置
-   ├── Calculator_fuzzer.cpp              # Fuzz用例源文件
-   ├── Calculator_fuzzer.h                # Fuzz用例头文件
+   ├── calculator_fuzzer.cpp              # Fuzz用例源文件
+   ├── calculator_fuzzer.h                # Fuzz用例头文件
    ├── project.xml                   # Fuzz选项配置文件
    ```
 
@@ -71,13 +71,13 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    | 参数 | 描述       | 说明           | 备注                                       |
    | ---- | ---------- | -------------- | ------------------------------------------ |
    | -t   | testtype   | 测试类型       | 目前仅支持"FUZZ"                           |
-   | -fn  | fuzzername | fuzzer名称     | 为显式区分Fuzz用例，名称必须以测试套前缀 + _fuzzer形式命名 |
+   | -fn  | fuzzername | fuzzer名称     | 为显式区分Fuzz用例，名称必须以测试套前缀小写 + _fuzzer形式命名 |
    | -dp  | dirpath    | fuzzer生成路径 | 路径不存在则自动创建目录                   |
 
 3. gen命令示例，-t、-fn和-dp均为必选项
 
    ```
-   gen -t FUZZ -fn Calculator_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
+   gen -t FUZZ -fn calculator_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
    ```
    
    执行完毕后会在test/developertest/example/calculator/test/fuzztest/common目录下生成一个Fuzz用例demo。
@@ -100,7 +100,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ![img](../../public_sys-resources/icon-note.gif) **说明：** DoSomethingInterestingWithMyAPI接口名称允许依据业务逻辑修改。两接口参数data和size为fuzz测试标准化参数，不可修改。
 
    ```
-   #include "Calculator_fuzzer.h"
+   #include "calculator_fuzzer.h"
    
    #include <stddef.h>
    #include <stdint.h>
@@ -143,7 +143,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ```
    ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
      module_out_path = module_output_path
-     fuzz_config_file = "//test/developertest/examples/calculator/test/fuzztest/common/Calculator_fuzzer"
+     fuzz_config_file = "//test/developertest/examples/calculator/test/fuzztest/common/calculator_fuzzer"
      include_dirs = []
      cflags = [
        "-g",
@@ -151,7 +151,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
        "-Wno-unused-variable",
        "-fno-omit-frame-pointer",
      ]
-     sources = [ "Calculator_fuzzer.cpp" ]
+     sources = [ "calculator_fuzzer.cpp" ]
    }
    ```
 
@@ -190,10 +190,10 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 
 添加Fuzz用例编译到模块的test_list中：
 
-1. 在需要DTFuzz测试的对应模块ohos.build添加Fuzz用例路径，如在examples/ohos.build添加：
+1. 在需要DTFuzz测试的对应模块bundle.json中添加Fuzz用例路径，如在bundle.json添加：
 
    ```
-   "test_list": [
+   "tests": [
      "//test/developertest/examples/calculator/test:unittest",
      "//test/developertest/examples/calculator/test:fuzztest", #添加DTFuzz用例路径
      "//test/developertest/examples/detector/test:unittest",
@@ -209,7 +209,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
      testonly = true
      deps = []
      
-     deps += [ "fuzztest/common/Calculator_fuzzer:fuzztest" ]
+     deps += [ "fuzztest/common/calculator_fuzzer:fuzztest" ]
    }
    ```
    
@@ -241,7 +241,8 @@ run -t FUZZ -ss developertest -tm calculator
      D:\test\tests
      ```
 
-     用例可执行文件为DTFuzz源文件编译产出文件，为DTFuzz用例在设备中实际执行文件，以二进制形式存储在out/release/package/phone/tests/fuzztest下，名称为对应的测试套名。测试套的配置文件均编译输出在out/release/package/phone/tests/res目录下对应的XXXX_fuzzer目录中。将编译生成的配置文件res目录以及用例可执行文件fuzztest目录直接拷贝到该路径下即可。
+     用例可执行文件为DTFuzz源文件编译产出文件，以二进制形式存储在out/release/package/phone/tests/fuzztest下。测试用例的配置文件均编译输出在out/release/package/phone/tests/res目录下对应的xxxx_fuzzer目录中。
+     将fuzztest目录以及res目录直接拷贝到该路径下即可。
 
      
   2. 配置用例路径
@@ -257,10 +258,10 @@ run -t FUZZ -ss developertest -tm calculator
   
   3. 执行用例
   
-     执行DTFuzz命令示例，无需参数-ss、-tm
+     执行DTFuzz命令示例
   
      ```
-     run -t FUZZ
+     run -t FUZZ -ts CalculatorFuzzTest
      ```
      
      
