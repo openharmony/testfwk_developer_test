@@ -29,7 +29,7 @@ group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [ "fuzztest/common/Calculator_fuzzer:fuzztest" ]
+  deps += [ "fuzztest/common/calculator_fuzzer:fuzztest" ]
 }
 
 group("benchmarktest") {

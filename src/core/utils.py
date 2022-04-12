@@ -182,7 +182,7 @@ def get_fuzzer_path(suite_file):
             res_path = os.path.join(os.path.join(current_dir, "tests"), "res")
             break
         current_dir = os.path.dirname(current_dir)
-    fuzzer_path = os.path.join(res_path, "%s_fuzzer" % suitename)
+    fuzzer_path = os.path.join(res_path, "%s_fuzzer" % suitename.lower())
     return fuzzer_path
 
 

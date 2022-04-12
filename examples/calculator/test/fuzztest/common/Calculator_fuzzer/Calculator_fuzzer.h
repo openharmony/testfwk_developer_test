@@ -16,6 +16,6 @@
 #ifndef EXAMPLE_CALCULATOR_FUZZER_H_
 #define EXAMPLE_CALCULATOR_FUZZER_H_
 
-#define FUZZ_PROJECT_NAME "Calculator_fuzzer"
+#define FUZZ_PROJECT_NAME "calculator_fuzzer"
 
 #endif // EXAMPLE_CALCULATOR_FUZZER_H_
