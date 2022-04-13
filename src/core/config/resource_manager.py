@@ -24,7 +24,6 @@ from xdevice import DeviceTestType
 from core.constants import ConfigFileConst
 
 LOG = platform_logger("ResourceManager")
-DEFAULT_TIMEOUT = "1"
 
 
 ##############################################################################
@@ -245,7 +244,7 @@ class ResourceManager(object):
 
     @classmethod
     def get_nodeattrib_data(cls, data_dic):
-        curr_timeout = DEFAULT_TIMEOUT
+        curr_timeout = ""
         if "nodeattrib" in data_dic.keys():
             LOG.info("++++++++++++++nodeattrib+++++++++++++++")
             nodeattrib_list = data_dic["nodeattrib"]
