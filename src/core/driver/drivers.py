@@ -639,7 +639,7 @@ class JSUnitTestDriver(IDriver):
             with os.fdopen(hilog_open, "a") as hilog_file_pipe:
                 self.config.device.start_catch_device_log(hilog_file_pipe)
                 self._init_jsunit_test()
-                self._run_jsunit(suite_file)
+                self._run_jsunit(suite_file, hilog)
                 hilog_file_pipe.flush()
                 self.generate_console_output(hilog, request)
         finally:
@@ -654,13 +654,13 @@ class JSUnitTestDriver(IDriver):
         self.config.device.execute_shell_command(
             "mount -o rw,remount,rw /")
 
-
-    def _run_jsunit(self, suite_file):
+    def _run_jsunit(self, suite_file, device_log_file):
         filename = os.path.basename(suite_file)
 
         resource_manager = ResourceManager()
         resource_data_dic, resource_dir = \
             resource_manager.get_resource_data_dic(suite_file)
+        timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir,
                                                self.config.device)
 
@@ -669,6 +669,25 @@ class JSUnitTestDriver(IDriver):
 
         if main_result:
             self._execute_hapfile_jsunittest()
+            try:
+                if timeout:
+                    time.sleep(float(timeout))
+                device_log_file_open = os.open(device_log_file, os.O_RDONLY,
+                                                   stat.S_IWUSR | stat.S_IRUSR)
+                with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
+                        as file_read_pipe:
+                    start_time = int(time.time())
+                    while True:
+                        data = file_read_pipe.readline()
+                        if data.find("JSApp:") != -1 and data.find("[end] run suites end") != -1:
+                            LOG.info("execute testcase successfully.")
+                            break
+                        if int(time.time()) - start_time > 300:
+                            LOG.info("execute testcase timeout.")
+                            break
+
+            finally:
+                _lock_screen(self.config.device)
             self._uninstall_hap(self.package_name)
         else:
             self.result = result.get_test_results("Error: install hap failed")
@@ -725,7 +744,6 @@ class JSUnitTestDriver(IDriver):
         except (ExecuteTerminate, DeviceError) as exception:
             return_message = str(exception.args)
 
-        _lock_screen(self.config.device)
         return return_message
 
     def _install_hap(self, suite_file):
@@ -754,7 +772,6 @@ class JSUnitTestDriver(IDriver):
             if "success" in str(result_value).lower():
                 LOG.info("execute %s's testcase success. result value=%s"
                          % (self.package_name, result_value))
-                time.sleep(30)
             else:
                 LOG.info("execute %s's testcase failed. result value=%s"
                          % (self.package_name, result_value))

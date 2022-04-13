@@ -24,7 +24,7 @@ from xdevice import DeviceTestType
 from core.constants import ConfigFileConst
 
 LOG = platform_logger("ResourceManager")
-DEFAULT_TIMEOUT = "300"
+DEFAULT_TIMEOUT = "1"
 
 
 ##############################################################################
