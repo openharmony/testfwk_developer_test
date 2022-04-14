@@ -54,6 +54,8 @@ LOG = platform_logger("Drivers")
 DEFAULT_TEST_PATH = "/%s/%s/" % ("data", "test")
 
 TIME_OUT = 900 * 1000
+JS_TIMEOUT = 10
+CYCLE_TIMES = 30
 
 
 ##############################################################################
@@ -670,20 +672,29 @@ class JSUnitTestDriver(IDriver):
         if main_result:
             self._execute_hapfile_jsunittest()
             try:
+                status = False
+                actiontime = JS_TIMEOUT
+                times = CYCLE_TIMES
                 if timeout:
-                    time.sleep(float(timeout))
+                    actiontime = timeout
+                    times = 1
                 device_log_file_open = os.open(device_log_file, os.O_RDONLY,
                                                    stat.S_IWUSR | stat.S_IRUSR)
                 with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
                         as file_read_pipe:
+                    for i in range(0, times):
+                        if status:
+                            break
+                        else:
+                            time.sleep(float(actiontime))
                     start_time = int(time.time())
                     while True:
                         data = file_read_pipe.readline()
                         if data.find("JSApp:") != -1 and data.find("[end] run suites end") != -1:
                             LOG.info("execute testcase successfully.")
+                            status = True
                             break
-                        if int(time.time()) - start_time > 300:
-                            LOG.info("execute testcase timeout.")
+                            if int(time.time()) - start_time > 5:
                             break
 
             finally:
