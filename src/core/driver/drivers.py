@@ -687,19 +687,19 @@ class JSUnitTestDriver(IDriver):
                             break
                         else:
                             time.sleep(float(actiontime))
-                    start_time = int(time.time())
-                    while True:
-                        data = file_read_pipe.readline()
-                        if data.find("JSApp:") != -1 and data.find("[end] run suites end") != -1:
-                            LOG.info("execute testcase successfully.")
-                            status = True
-                            break
+                        start_time = int(time.time())
+                        while True:
+                            data = file_read_pipe.readline()
+                            if data.find("JSApp:") != -1 and data.find("[end] run suites end") != -1:
+                                LOG.info("execute testcase successfully.")
+                                status = True
+                                break
                             if int(time.time()) - start_time > 5:
-                            break
+                                break
 
             finally:
                 _lock_screen(self.config.device)
-            self._uninstall_hap(self.package_name)
+                self._uninstall_hap(self.package_name)
         else:
             self.result = result.get_test_results("Error: install hap failed")
             LOG.error("Error: install hap failed")
