@@ -355,7 +355,7 @@ class ResultManager(object):
                                   result_josn_file_path)
             result_file_path = result_josn_file_path
         else:
-            LOG.error("%s not exist", remote_result_file)
+            LOG.info("%s not exist", remote_result_file)
 
         return result_file_path
 
@@ -538,7 +538,7 @@ class CppTestDriver(IDriver):
 
     def _push_corpus_if_exist(self, suite_file):
         if "fuzztest" == self.config.testtype[0]:
-            corpus_path = os.path.join(get_fuzzer_path(suite_file), "corpus")
+            corpus_path = os.path.join(get_fuzzer_path(suite_file), os.path.join("corpus", "init"))
             self.config.device.push_file(corpus_path,
                 os.path.join(self.config.target_test_path, "corpus"))
 
