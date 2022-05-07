@@ -168,7 +168,9 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
      ]
    }
    ```
-
+   **注意：** 
+   - 测试套名称采用大驼峰风格，并且以FuzzTest结尾，测试套前缀与fuzzer目录名相对应。
+   - module_out_path为测试套编译输出目录，内容为部件+模块名。
    
 
 3. Fuzz配置编写
