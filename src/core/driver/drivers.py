@@ -737,7 +737,7 @@ class JSUnitTestDriver(IDriver):
                 as file_read_pipe:
             while True:
                 data = file_read_pipe.readline()
-                if not data or not data.strip():
+                if not data:
                     break
                 # only filter JSApp log
                 if data.find("JSApp:") != -1:
