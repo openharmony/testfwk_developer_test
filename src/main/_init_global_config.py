@@ -22,12 +22,20 @@ def _init_global_config():
     import os
 
     # insert src path for loading xdevice modules
+    # 当前脚本运行的绝对路径 去掉最后两个路径
+    # framework_src_dir = OpenHarmony/test/developertest
     sys.framework_src_dir = os.path.abspath(os.path.dirname(
         os.path.dirname(__file__)))
+
+    # 将目录存放到sys.path模块中，新添加的目录会优先于其他目录被import检查 0代表最高优先级
     sys.path.insert(0, sys.framework_src_dir)
+
+    # 当前脚本运行的绝对路径 去掉最后两个路径
+    # framework_root_dir = OpenHarmony/test/developertest
     sys.framework_root_dir = os.path.abspath(os.path.dirname(
         os.path.dirname(os.path.dirname(__file__))))
 
+    # sys.xdevice_dir = OpenHarmony/test/xdevice/src
     sys.xdevice_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "..",
@@ -35,6 +43,7 @@ def _init_global_config():
         "src"))
     sys.path.insert(0, sys.xdevice_dir)
 
+    # sys.xdevice_extension_dir = OpenHarmony/xdevice/extension/src
     sys.xdevice_extension_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "..",
@@ -43,12 +52,14 @@ def _init_global_config():
         "src"))
     sys.path.insert(1, sys.xdevice_extension_dir)
 
+    # pytest_dir = OpenHarmony/test/developertest/aw/python
     sys.pytest_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "aw",
         "python"))
     sys.path.insert(2, sys.pytest_dir)
 
+    # adapter_dir = OpenHarmony/test/developertest/adapter/aw/python
     sys.adapter_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "adapter"
@@ -56,18 +67,23 @@ def _init_global_config():
         "python"))
     sys.path.insert(3, sys.adapter_dir)
 
+    # hmh_script = OpenHarmony/test/developertest/libs
     sys.hmh_script = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "libs"))
     sys.path.insert(4, sys.hmh_script)
 
+    # framework_res_dir = OpenHarmony/test/developertest
     sys.framework_res_dir = sys.framework_root_dir
+
+    # exec_dir = OpenHarmony/test/developertest
     sys.exec_dir = sys.framework_root_dir
 
     from core.common import get_source_code_root_path
     sys.source_code_root_path = get_source_code_root_path(
         sys.framework_root_dir)
 
+    # python的参数配置 设置脚本路径 调度python的xdevice
     from xdevice import Variables
     Variables.exec_dir = sys.framework_root_dir
 
@@ -76,6 +92,8 @@ def _iter_module_plugins(packages):
     import importlib
     import pkgutil
     for package in packages:
+
+        # 获取__path__对象属性的值，若不存在，默认为“”
         pkg_path = getattr(package, "__path__", "")
         pkg_name = getattr(package, "__name__", "")
         if not pkg_name or not pkg_path:
