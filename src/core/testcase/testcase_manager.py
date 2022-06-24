@@ -18,6 +18,12 @@
 
 import os
 import copy
+import json
+import sys
+from json import JSONDecodeError
+from core.utils import get_build_output_path
+from core.common import is_open_source_product
+
 from core.utils import get_file_list_by_postfix
 from core.config.config_manager import FilterConfigManager
 from xdevice import platform_logger
@@ -79,22 +85,25 @@ class TestCaseManager(object):
             "subsystem_name", options.productform)
         filter_list_test_file = FilterConfigManager().get_filtering_list(
             "testfile_name", options.productform)
-
+        # 遍历测试用例输出目录下面的所有文件夹，每个文件夹对应一个子系统
         for part_name in os.listdir(test_case_out_path):
             part_case_dir = os.path.join(test_case_out_path, part_name)
             if not os.path.isdir(part_case_dir):
                 continue
-
+            # 如果子系统在fiter_config.xml配置文件的<subsystem_name>下面配置过，则过滤
             if part_name in filter_part_list:
                 continue
 
+            # 获取子系统目录下面的所有文件路径列表
             suite_file_list = get_file_list_by_postfix(part_case_dir)
             for suite_file in suite_file_list:
+                # 如果文件在resource目录下面，需要过滤
                 if -1 != suite_file.replace(test_case_out_path, "").find(
                         os.sep + "resource" + os.sep):
                     continue
 
                 file_name = os.path.basename(suite_file)
+                # 如果文件在fiter_config.xml配置文件的<testfile_name>下面配置过，则过滤
                 if file_name in filter_list_test_file:
                     continue
 
@@ -121,6 +130,27 @@ class TestCaseManager(object):
                     suite_file_dictionary["BIN"].append(suite_file)
 
         return suite_file_dictionary
+
+    def get_acts_test_files(self, acts_test_case_path, options):
+        LOG.info("acts test case path: " + acts_test_case_path)
+        acts_suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
+        if os.path.exists(acts_test_case_path):
+            # 获取acts测试用例输出目录下面的所有文件路径列表
+            acts_suite_file_list = get_file_list_by_postfix(acts_test_case_path)
+            for acts_suite_file in acts_suite_file_list:
+                file_name = os.path.basename(acts_suite_file)
+                prefix_name, suffix_name = os.path.splitext(file_name)
+                if suffix_name != ".hap":
+                    continue
+                # 如果acts测试指定了-ts，只有完全匹配的HAP包才会加入最终执行的队列
+                if options.testsuit != "" and options.testsuit != prefix_name:
+                    continue
+                if not self.check_hap_test_file(acts_suite_file):
+                    continue
+                acts_suit_file_dic["JST"].append(acts_suite_file)
+        else:
+            LOG.error("acts %s is not exist." % acts_test_case_path)
+        return acts_suit_file_dic
 
     @classmethod
     def get_valid_suite_file(cls, test_case_out_path, suite_file, options):
@@ -166,3 +196,28 @@ class TestCaseManager(object):
             if filename.startswith("test_"):
                 return True
         return False
+
+    @classmethod
+    def check_hap_test_file(cls, hap_file_path):
+        try:
+            if hap_file_path.endswith(".hap"):
+                json_file_path = hap_file_path.replace(".hap", ".json")
+                if os.path.exists(json_file_path):
+                    with open(json_file_path, 'r') as json_file:
+                        data_dic = json.load(json_file)
+                        if not data_dic:
+                            return False
+                        else:
+                            if "kits" in data_dic.keys():
+                                kits_list = data_dic.get("kits")
+                                if len(kits_list) > 0:
+                                    kits_dict = kits_list[0]
+                                    if "test-file-name" in kits_dict.keys():
+                                        return True
+                                    else:
+                                        return False
+                                else:
+                                    return False
+            return False
+        except JSONDecodeError:
+            return False
