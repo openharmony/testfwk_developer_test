@@ -347,9 +347,6 @@ class Console(object):
             if is_build_version:
                 build_result = build_manager.build_version(project_root_path,
                                                            product_form)
-            else:
-                build_result = build_manager.build_gn_file(project_root_path,
-                                                           product_form)
         return build_result
 
 
