@@ -73,7 +73,7 @@ class BuildTestcases(object):
 
         testcase_outpath = ""
 
-        # get_build_output_path = OpenHarmony/out/rk3568/build_configs/platforms_info/toolchain_to_variant.json
+        # 路径注释 get_build_output_path = OpenHarmony/out/rk3568/build_configs/platforms_info/toolchain_to_variant.json
         toolchain_filepath = os.path.join(
             get_build_output_path(productform),
             "build_configs",

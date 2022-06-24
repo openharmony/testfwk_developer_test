@@ -41,8 +41,7 @@ LOG = platform_logger("Run")
 class Run(object):
     def process_command_run(self, command, options):
         para = Parameter()
-        # 过滤options中的test type参数，确保都是合法的，最终的数据结构为：
-        # [{unittest:300,moduletest:300}]
+        # 过滤options中的test type参数，确保都是合法的，最终的数据结构为：[{unittest:300,moduletest:300}]
         test_type_list = para.get_testtype_list(options.testtype)
         if len(test_type_list) == 0:
             LOG.error("The testtype parameter is incorrect.")
@@ -81,17 +80,11 @@ class Run(object):
             LOG.error("Build test cases failed.")
             return
 
-
-        # test_case_path = self.get_tests_out_path(options.productform)
-        # if not os.path.exists(test_case_path):
-        #    LOG.error("%s is not exist." % test_case_path)
-        #    return
-
- 		if "actstest" in options.testtype:
+        if "actstest" in options.testtype:
             test_dict = self.get_acts_test_dict(options)
         else:
-			test_dict = self.get_test_dict(options)
-        	# test_dict = TestCaseManager().get_test_files(test_case_path, options)
+            test_dict = self.get_test_dict(options)
+
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
             return
@@ -260,6 +253,6 @@ class Run(object):
         if not os.path.exists(test_case_path):
             LOG.error("%s is not exist." % test_case_path)
             return
-        # 根据测试用例目录文件的后缀名，将测试文件按照DEX、JST、PYT、CXX、BIN进行分类，存放到字典中
+
         test_dict = TestCaseManager().get_test_files(test_case_path, options)
         return test_dict

@@ -25,8 +25,8 @@ from core.constants import ConfigFileConst
 
 LOG = platform_logger("config_manager")
 
-# framework_res_dir = OpenHarmony/test/developertest
-# CONFIG_PATH = OpenHarmony/test/developertest/config
+# 变量注释 framework_res_dir = OpenHarmony/test/developertest
+# 变量注释 CONFIG_PATH = OpenHarmony/test/developertest/config
 CONFIG_PATH = os.path.join(sys.framework_res_dir, "config")
 
 # framework_config.xml
@@ -34,7 +34,7 @@ class FrameworkConfigManager(object):
     def __init__(self, filepath=""):
         if filepath == "":
 
-            # filepath = OpenHarmony/test/developertest/config/framework_config.xml
+            # 变量注释 filepath = OpenHarmony/test/developertest/config/framework_config.xml
             self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.FRAMECONFIG_FILEPATH))
         else:
@@ -94,7 +94,7 @@ class FilterConfigManager(object):
     def __init__(self, filepath=""):
         if filepath == "":
 
-            # filepath = OpenHarmony/test/developertest/config/filter_config.xml
+            # 变量注释 filepath = OpenHarmony/test/developertest/config/filter_config.xml
             self.filepath = os.path.abspath(
                 os.path.join(CONFIG_PATH,
                              ConfigFileConst.FILTERCONFIG_FILEPATH))
@@ -162,7 +162,7 @@ class UserConfigManager(object):
     def __init__(self, config_file=""):
         if config_file == "":
 
-            # filepath = OpenHarmony/test/developertest/config/user_config.xml
+            # 变量注释 filepath = OpenHarmony/test/developertest/config/user_config.xml
             self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.USERCONFIG_FILEPATH))
         else:
@@ -283,7 +283,7 @@ class BuildConfigManager(object):
     def __init__(self, filepath=""):
         if filepath == "":
 
-            # filepath = OpenHarmony/test/developertest/config/build_config.xml
+            # 变量注释 filepath = OpenHarmony/test/developertest/config/build_config.xml
             self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.BUILDCONFIG_FILEPATH))
         else:
@@ -311,7 +311,7 @@ class FuzzerConfigManager(object):
     def __init__(self, config_path=""):
         if config_path == "":
 
-            # filepath = OpenHarmony/test/developertest/config/fuzz_config.xml
+            # 变量注释 filepath = OpenHarmony/test/developertest/config/fuzz_config.xml
             self.filepath = self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.FUZZCONFIG_FILEPATH))
         else:

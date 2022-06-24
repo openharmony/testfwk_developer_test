@@ -118,7 +118,7 @@ class BuildManager(object):
             LOG.warning("No build target found.")
             return False
 
-        # build_cfg_filepath = OpenHarmony/test/developertest/BUILD.gn
+        # 路径拼接 build_cfg_filepath = OpenHarmony/test/developertest/BUILD.gn
         build_cfg_filepath = os.path.join(project_root_path,
                                           "test",
                                           "developertest",
