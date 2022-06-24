@@ -82,15 +82,16 @@ class Run(object):
             return
 
 
-        test_case_path = self.get_tests_out_path(options.productform)
-        if not os.path.exists(test_case_path):
-            LOG.error("%s is not exist." % test_case_path)
-            return
+        # test_case_path = self.get_tests_out_path(options.productform)
+        # if not os.path.exists(test_case_path):
+        #    LOG.error("%s is not exist." % test_case_path)
+        #    return
 
  		if "actstest" in options.testtype:
             test_dict = self.get_acts_test_dict(options)
         else:
-        	test_dict = TestCaseManager().get_test_files(test_case_path, options)
+			test_dict = self.get_test_dict(options)
+        	# test_dict = TestCaseManager().get_test_files(test_case_path, options)
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
             return
