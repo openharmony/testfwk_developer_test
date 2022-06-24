@@ -25,6 +25,7 @@ import platform
 import zipfile
 import stat
 from dataclasses import dataclass
+from json import JSONDecodeError
 
 from xdevice import DeviceTestType
 from xdevice import DeviceLabelType
@@ -658,11 +659,18 @@ class JSUnitTestDriver(IDriver):
 
     def _run_jsunit(self, suite_file, device_log_file):
         filename = os.path.basename(suite_file)
+        _, suffix_name = os.path.splitext(filename)
 
         resource_manager = ResourceManager()
-        resource_data_dic, resource_dir = \
-            resource_manager.get_resource_data_dic(suite_file)
-        timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
+        resource_data_dic, resource_dir = resource_manager.get_resource_data_dic(suite_file)
+        if suffix_name == ".hap":
+            json_file_path = suite_file.replace(".hap", ".json")
+            if os.path.exists(json_file_path):
+                timeout = self._get_json_shell_timeout(json_file_path)
+            else:
+                timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
+        else:
+            timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir,
                                                self.config.device)
 
@@ -799,6 +807,23 @@ class JSUnitTestDriver(IDriver):
             "bm uninstall -n %s" % package_name)
         _sleep_according_to_result(return_message)
         return return_message
+
+    @classmethod
+    def _get_json_shell_timeout(cls, json_filepath):
+        test_timeout = 300
+        try:
+            with open(json_filepath, 'r') as json_file:
+                data_dic = json.load(json_file)
+                if not data_dic:
+                    return test_timeout
+                else:
+                    if "driver" in data_dic.keys():
+                        driver_dict = data_dic.get("driver")
+                        if driver_dict and "test-timeout" in driver_dict.keys():
+                            test_timeout = int(driver_dict["shell-timeout"]) / 1000
+                    return test_timeout
+        except JSONDecodeError:
+            return test_timeout
 
     @staticmethod
     def _get_package_and_ability_name(hap_filepath):
