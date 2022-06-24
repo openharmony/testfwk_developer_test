@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 
+# 执行如下命令 获取到的信息
+#    show subsystemlist 通过show subsystemlist得到子系统名称列表
+#    show partlist      通过show partlist得到对应子系统下的部件名
+#    show modulelist    通过show modulelist得到对应部件名下的模块列表
+
 import sys
 import os
 
@@ -28,10 +33,37 @@ from core.config.config_manager import UserConfigManager
 from core.config.config_manager import FrameworkConfigManager
 from core.config.parse_parts_config import ParsePartsConfig
 
+# 支持的设备名称
+#    1. ohos-sdk
+#    2. rk3568
+#    3. Hi3516DV300
+#    4. DAYU
+#    5. ohos-arm64
+#    6. ipcamera_hispark_aries
+#    7. ipcamera_hispark_taurus
+#    8. wifiiot_hispark_pegasus
 CMD_KEY_PRODUCTLIST = "productlist"
+
+# 测试用例类型
+#     1. UT
+#     2. MST
+#     3. ST
+#     4. PERF
+#     5. SEC
+#     6. FUZZ
+#     7. RELI
+#     8. DST
+#     9. BENCHMARK
+#     10. ALL
 CMD_KEY_TYPELIST = "typelist"
+
+# 子系统名称列表
 CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
+
+# 子系统下的部件名
 CMD_KEY_PARTLIST = "partlist"
+
+# 部件下的模块
 CMD_KEY_MODULELIST = "modulelist"
 
 
@@ -157,12 +189,20 @@ def select_user_input(data_list):
                 sys.exit(0)
         return select_item_value, select_item_index
 
-
+# 选择productform
 def select_productform():
     select_value = "phone"
+
+    # scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
     scan_product_list = scan_support_product()
+
+    # 从framework_config.xml里取productform节点的value:ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus
     config_product_list = \
         FrameworkConfigManager().get_framework_config("productform")
+
+    # productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
+    # ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
+
     productform_list = scan_product_list + config_product_list
     if len(productform_list) != 0:
         print("Please select the current tested product form:")
@@ -217,10 +257,14 @@ def display_show_info(para_list, productform):
 #############################################################################
 #############################################################################
 
+# 获取模块列表 从 OpenHarmony/out/rk3568/module_list_files或者 OpenHarmony/out/rk3568/test_info/module_list_files里获取
 def get_module_list_from_output_dir(product_form):
     module_path_list = []
     all_product_list = scan_support_product()
     if product_form in all_product_list:
+        # get_build_output_path = Openharmony/out/product_form/
+        # module_list_file_path = Openharmony/out/product_form/module_list_files/
+        # product_form choosed according to the input,such as rk3568
         module_list_file_path = os.path.join(
             get_build_output_path(product_form),
             "module_list_files")
@@ -231,6 +275,8 @@ def get_module_list_from_output_dir(product_form):
             "module_list_files")
     print(module_list_file_path)
     if os.path.exists(module_list_file_path):
+
+        # 遍历查找目录路径下存在后缀为.mlf文件的文件
         file_list = get_file_list_by_postfix(module_list_file_path, ".mlf")
         for file in file_list:
             module_path = \
@@ -300,7 +346,7 @@ def show_testtype_list():
     else:
         print("No category specified.")
 
-
+# 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取subsystemlist
 def show_subsystem_list(product_form):
     print("List of currently supported subsystem names:")
     parser = ParsePartsConfig(product_form)
@@ -312,7 +358,7 @@ def show_subsystem_list(product_form):
     for index, element in enumerate(subsystem_name_list):
         print("    %d. %s" % (index + 1, element))
 
-
+# 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
 def show_partname_list(product_form):
     print("List of currently supported part names:")
     parser = ParsePartsConfig(product_form)
@@ -329,7 +375,8 @@ def show_partname_list(product_form):
         for index, element in enumerate(part_name_list):
             print("    %d. %s" % (index + 1, element))
 
-
+# 从 OpenHarmony/out/rk3568/module_list_files或者 OpenHarmony/out/rk3568/test_info/module_list_files里获取modulelist，就是里面的文件
+# 这里有点奇怪 跟前面的子系统 部件 不对应
 def show_module_list(product_form):
     print("List of currently supported module names:")
     subsystem_name_list = []
