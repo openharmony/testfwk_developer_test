@@ -19,7 +19,6 @@
 # 执行如下命令 获取到的信息
 #    show subsystemlist 通过show subsystemlist得到子系统名称列表
 #    show partlist      通过show partlist得到对应子系统下的部件名
-#    show modulelist    通过show modulelist得到对应部件名下的模块列表
 
 import sys
 import os
@@ -63,10 +62,6 @@ CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
 # 子系统下的部件名
 CMD_KEY_PARTLIST = "partlist"
 
-# 部件下的模块
-CMD_KEY_MODULELIST = "modulelist"
-
-
 TOOL_VERSION_INFO = """Welcome to DeveloperTest V1.0.0.
 """
 
@@ -90,8 +85,6 @@ SUPPORT_COMMAND_SHOW = """use show [follow command] for more information:
     "subsystemlist" + """
     """ + \
     "partlist" + """
-    """ + \
-    "modulelist" + """
 """
 
 RUNCASES_INFOMATION = """run:
@@ -103,7 +96,6 @@ usage: run [-p PRODUCTFORM]
            [-t [TESTTYPE [TESTTYPE ...]]]
            [-ss [SUBSYSTEM [SUBSYSTEM ...]]]
            [-tp [TESTPART [TESTPART ...]]]
-           [-tm TESTMODULE]
            [-ts TESTSUIT]
            [-tc TESTCASE]
            [-tl TESTLEVEL]
@@ -117,8 +109,6 @@ optional arguments:
                         Specify test subsystem
   -tp [TESTPART [TESTPART ...]], --testpart [TESTPART [TESTPART ...]]
                         Specify test testpart
-  -tm TESTMODULE, --testmodule TESTMODULE
-                        Specified test module
   -ts TESTSUIT, --testsuit TESTSUIT
                         Specify test suit
   -tc TESTCASE, --testcase TESTCASE
