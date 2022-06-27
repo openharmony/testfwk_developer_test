@@ -33,6 +33,7 @@ BUILD_LITE = "build/lite/build.py"
 BUILD_TARGET_PLATFORM = "build_platform=\"%s\""
 BUILD_PRODUCT_NAME = "product_name=%s"
 BUILD_TARGET_SUBSYSTEM = "target_subsystem=%s"
+BUILD_TARGET_SUITE = "suite=%s"
 LOG = platform_logger("BuildTestcases")
 
 
@@ -208,7 +209,8 @@ class BuildTestcases(object):
         acts_build_command.append("system_size=standard")
         if len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUBSYSTEM % para.subsystem[0])
-
+        if para.testsuit != "":
+            acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
             build_command.extend(acts_build_command)
