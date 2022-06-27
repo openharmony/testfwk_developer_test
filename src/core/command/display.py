@@ -257,67 +257,6 @@ def display_show_info(para_list, productform):
 #############################################################################
 #############################################################################
 
-# 获取模块列表 从 OpenHarmony/out/rk3568/module_list_files或者 OpenHarmony/out/rk3568/test_info/module_list_files里获取
-def get_module_list_from_output_dir(product_form):
-    module_path_list = []
-    all_product_list = scan_support_product()
-    if product_form in all_product_list:
-        # get_build_output_path = Openharmony/out/product_form/
-        # module_list_file_path = Openharmony/out/product_form/module_list_files/
-        # product_form choosed according to the input,such as rk3568
-        module_list_file_path = os.path.join(
-            get_build_output_path(product_form),
-            "module_list_files")
-    else:
-        module_list_file_path = os.path.join(
-            get_build_output_path(product_form),
-            "test_info",
-            "module_list_files")
-    print(module_list_file_path)
-    if os.path.exists(module_list_file_path):
-
-        # 遍历查找目录路径下存在后缀为.mlf文件的文件
-        file_list = get_file_list_by_postfix(module_list_file_path, ".mlf")
-        for file in file_list:
-            module_path = \
-                file[len(module_list_file_path) + 1: file.rfind(os.sep)]
-            if module_path != "" and module_path not in module_path_list:
-                module_path_list.append(module_path)
-    else:
-        print("%s does not exist." % module_list_file_path)
-    module_path_list.sort()
-    return module_path_list
-
-
-def get_module_list_from_case_dir(test_case_dir):
-    file_list = []
-    test_case_tests_path = test_case_dir
-    if not os.path.exists(test_case_tests_path):
-        return file_list
-
-    for test_type in os.listdir(test_case_tests_path):
-        file_path = os.path.join(test_case_tests_path, test_type)
-        for dirs in os.walk(file_path):
-            files = get_file_list(find_path=dirs[0])
-            for file_name in files:
-                if "" != file_name and -1 == file_name.find(__file__):
-                    file_name = os.path.join(dirs[0], file_name)
-                    if os.path.isfile(file_name):
-                        file_name = file_name[len(file_path) + 1: \
-                            file_name.rfind(os.sep)]
-                        file_list.append(file_name)
-    return file_list
-
-
-def get_module_list(product_form):
-    module_path_list = []
-    testcase_dir = UserConfigManager().get_test_cases_dir()
-    if testcase_dir == "":
-        module_path_list = get_module_list_from_output_dir(product_form)
-    else:
-        module_path_list = get_module_list_from_case_dir(testcase_dir)
-    return module_path_list
-
 
 #############################################################################
 #############################################################################
@@ -375,36 +314,6 @@ def show_partname_list(product_form):
         for index, element in enumerate(part_name_list):
             print("    %d. %s" % (index + 1, element))
 
-# 从 OpenHarmony/out/rk3568/module_list_files或者 OpenHarmony/out/rk3568/test_info/module_list_files里获取modulelist，就是里面的文件
-# 这里有点奇怪 跟前面的子系统 部件 不对应
-def show_module_list(product_form):
-    print("List of currently supported module names:")
-    subsystem_name_list = []
-    subsystem_module_list = get_module_list(product_form)
-
-    for item in subsystem_module_list:
-        if item != "":
-            subsystem_name = item.split(os.sep)[0]
-            if subsystem_name not in subsystem_name_list:
-                subsystem_name_list.append(subsystem_name)
-
-    for subsystem_name in subsystem_name_list:
-        print("%s:" % subsystem_name)
-        index = 0
-        module_value_list = []
-        for item in subsystem_module_list:
-            find_key = subsystem_name + os.sep
-            pos_subsystem = item.find(find_key)
-            if pos_subsystem >= 0:
-                subsystem_module_dir = \
-                    item[pos_subsystem + len(find_key):len(item)]
-                module_value = subsystem_module_dir.split(os.sep)[0]
-                if module_value not in module_value_list:
-                    module_value_list.append(module_value)
-                    index += 1
-                    print("    %d. %s" % (index, module_value))
-
-
 def display_help_command_info(command):
     if command == ToolCommandType.TOOLCMD_KEY_SHOW:
         print(SUPPORT_COMMAND_SHOW)
@@ -427,8 +336,6 @@ def display_show_command_info(command, product_form="phone"):
         show_subsystem_list(product_form)
     elif command == CMD_KEY_PARTLIST:
         show_partname_list(product_form)
-    elif command == CMD_KEY_MODULELIST:
-        show_module_list(product_form)
     else:
         print("This command is not support.")
 
