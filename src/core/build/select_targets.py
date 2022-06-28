@@ -48,7 +48,7 @@ class SelectTargets(object):
     def _get_part_path_data(cls, productform):
         part_path_dic = {}
         parser = ParsePartsConfig(productform)
-
+        # 获取infos_for_testfwk.json配置文件中“phone”节点下“part_infos”节点数据
         part_infos = parser.get_part_infos()
         if part_infos is None:
             LOG.error("part_infos is None.")
@@ -63,13 +63,14 @@ class SelectTargets(object):
             build_out_dir = part_info.get("build_out_dir")
 
             part_path_list = []
+            # default_part_path：~/OpenHarmony/out/rk3568/module_list_files/部件名（以rk3568举例）
             default_part_path = os.path.join(
                 get_build_output_path(productform),
                 "module_list_files",
                 origin_part_name)
             if os.path.exists(default_part_path):
                 part_path_list.append(default_part_path)
-
+            # 如果build_out_dir不是当前目录，将新目录加到part_path_list中
             if build_out_dir != ".":
                 product_part_path = os.path.join(
                     get_build_output_path(productform),
@@ -84,12 +85,18 @@ class SelectTargets(object):
     def _get_target_list_from_path(self, typelist, check_path):
         target_list = []
         if os.path.exists(check_path):
+            # 获取部件编译输出目录（~/OpenHarmony/out/rk3568/module_list_files/部件名1）中.mlf文件列表
             mlf_file_list = get_file_list_by_postfix(
                 check_path, ".mlf")
+            # 遍历mlf_file_list中所有目录下面mlf文件中的label列表
             for filepath in mlf_file_list:
+                # 获取mlf文件中的JSON数据信息列表
                 mlf_info_list = self._get_mlf_data_from_file(filepath)
                 for data in mlf_info_list:
+                    # 举例："test_type": "moduletest"
                     test_type = data.get("test_type")
+                    # 举例："label": "//base/accessibility/services/test:aams_accessibility_keyevent_filter_test
+                    # (//build/toolchain/ohos:ohos_clang_arm)"
                     target_path = data.get("label")
                     if "ALL" in typelist:
                         target_list.append(target_path)
@@ -100,6 +107,8 @@ class SelectTargets(object):
 
     def _get_target_list_by_type(self, productform, typelist):
         target_list = []
+        # 获取所有部件编译输出信息列表：[{“部件名1”：[~/OpenHarmony/out/rk3568/module_list_files/部件名1]}]
+        # 或者{“部件名1”：[~/OpenHarmony/out/rk3568/module_list_files/部件名1，~/OpenHarmony/out/rk3568/编译目录build_out_dir/module_list_files/部件名1]}
         part_path_dic = self._get_part_path_data(productform)
         for item in part_path_dic:
             part_path_list = part_path_dic.get(item)
@@ -147,16 +156,19 @@ class SelectTargets(object):
             LOG.warning(
                 "The part cannot be empty When the module is not empty.")
             return []
-
+        # productform不为空，typelist（test type[UT,MST,ST,PERF,ALL]）不为空
+        # partlist和testmodule为空，通过testtype获取部件列表
         if len(partlist) == 0 and testmodule == "":
             target_list = self._get_target_list_by_type(productform, typelist)
             return target_list
-
+        # productform不为空，typelist（test type[UT,MST,ST,PERF,ALL]）不为空
+        # partlist不为空，testmodule为空，通过testtype、partlist一起获取部件列表
         if len(partlist) != 0 and testmodule == "":
             target_list = self._get_target_list_by_part(productform, typelist,
                                                         partlist)
             return target_list
-
+        # productform不为空，typelist（test type[UT,MST,ST,PERF,ALL]）不为空
+        # partlist不为空，testmodule不为空，通过testtype、partlist、testmodule一起获取部件列表
         if len(partlist) != 0 and testmodule != "":
             target_list = self._get_target_list_by_module(productform,
                                                           typelist,
@@ -165,6 +177,11 @@ class SelectTargets(object):
 
         return target_list
 
+    # 通过infos_for_testfwk.json文件获取所有子部件信息编译目录信息：
+    # [{“部件名1”：[~/OpenHarmony/out/rk3568/module_list_files/部件名1]}]
+    # 然后遍历这些目录中的mlf文件，获取其中定义的label，返回label集合
+    # 遍历时通过testmodule控制遍历的部件指定模块目录，如果不定义，则遍历子部件下面所有模块目录
+    # 遍历时通过partlist控制遍历指定部件目录，如果不定义，则遍历infos_for_testfwk.json文件中定义的所有子部件目录
     def filter_build_targets(self, para):
         productform = para.productform
         typelist = para.testtype

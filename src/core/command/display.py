@@ -16,6 +16,10 @@
 # limitations under the License.
 #
 
+# 执行如下命令 获取到的信息
+#    show subsystemlist 通过show subsystemlist得到子系统名称列表
+#    show partlist      通过show partlist得到对应子系统下的部件名
+
 import sys
 import os
 
@@ -28,12 +32,35 @@ from core.config.config_manager import UserConfigManager
 from core.config.config_manager import FrameworkConfigManager
 from core.config.parse_parts_config import ParsePartsConfig
 
+# 支持的设备名称
+#    1. ohos-sdk
+#    2. rk3568
+#    3. Hi3516DV300
+#    4. DAYU
+#    5. ohos-arm64
+#    6. ipcamera_hispark_aries
+#    7. ipcamera_hispark_taurus
+#    8. wifiiot_hispark_pegasus
 CMD_KEY_PRODUCTLIST = "productlist"
-CMD_KEY_TYPELIST = "typelist"
-CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
-CMD_KEY_PARTLIST = "partlist"
-CMD_KEY_MODULELIST = "modulelist"
 
+# 测试用例类型
+#     1. UT
+#     2. MST
+#     3. ST
+#     4. PERF
+#     5. SEC
+#     6. FUZZ
+#     7. RELI
+#     8. DST
+#     9. BENCHMARK
+#     10. ALL
+CMD_KEY_TYPELIST = "typelist"
+
+# 子系统名称列表
+CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
+
+# 子系统下的部件名
+CMD_KEY_PARTLIST = "partlist"
 
 TOOL_VERSION_INFO = """Welcome to DeveloperTest V1.0.0.
 """
@@ -58,8 +85,6 @@ SUPPORT_COMMAND_SHOW = """use show [follow command] for more information:
     "subsystemlist" + """
     """ + \
     "partlist" + """
-    """ + \
-    "modulelist" + """
 """
 
 RUNCASES_INFOMATION = """run:
@@ -71,7 +96,6 @@ usage: run [-p PRODUCTFORM]
            [-t [TESTTYPE [TESTTYPE ...]]]
            [-ss [SUBSYSTEM [SUBSYSTEM ...]]]
            [-tp [TESTPART [TESTPART ...]]]
-           [-tm TESTMODULE]
            [-ts TESTSUIT]
            [-tc TESTCASE]
            [-tl TESTLEVEL]
@@ -85,8 +109,6 @@ optional arguments:
                         Specify test subsystem
   -tp [TESTPART [TESTPART ...]], --testpart [TESTPART [TESTPART ...]]
                         Specify test testpart
-  -tm TESTMODULE, --testmodule TESTMODULE
-                        Specified test module
   -ts TESTSUIT, --testsuit TESTSUIT
                         Specify test suit
   -tc TESTCASE, --testcase TESTCASE
@@ -157,12 +179,20 @@ def select_user_input(data_list):
                 sys.exit(0)
         return select_item_value, select_item_index
 
-
+# 选择productform
 def select_productform():
     select_value = "phone"
+
+    # scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
     scan_product_list = scan_support_product()
+
+    # 从framework_config.xml里取productform节点的value:ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus
     config_product_list = \
         FrameworkConfigManager().get_framework_config("productform")
+
+    # productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
+    # ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
+
     productform_list = scan_product_list + config_product_list
     if len(productform_list) != 0:
         print("Please select the current tested product form:")
@@ -217,61 +247,6 @@ def display_show_info(para_list, productform):
 #############################################################################
 #############################################################################
 
-def get_module_list_from_output_dir(product_form):
-    module_path_list = []
-    all_product_list = scan_support_product()
-    if product_form in all_product_list:
-        module_list_file_path = os.path.join(
-            get_build_output_path(product_form),
-            "module_list_files")
-    else:
-        module_list_file_path = os.path.join(
-            get_build_output_path(product_form),
-            "test_info",
-            "module_list_files")
-    print(module_list_file_path)
-    if os.path.exists(module_list_file_path):
-        file_list = get_file_list_by_postfix(module_list_file_path, ".mlf")
-        for file in file_list:
-            module_path = \
-                file[len(module_list_file_path) + 1: file.rfind(os.sep)]
-            if module_path != "" and module_path not in module_path_list:
-                module_path_list.append(module_path)
-    else:
-        print("%s does not exist." % module_list_file_path)
-    module_path_list.sort()
-    return module_path_list
-
-
-def get_module_list_from_case_dir(test_case_dir):
-    file_list = []
-    test_case_tests_path = test_case_dir
-    if not os.path.exists(test_case_tests_path):
-        return file_list
-
-    for test_type in os.listdir(test_case_tests_path):
-        file_path = os.path.join(test_case_tests_path, test_type)
-        for dirs in os.walk(file_path):
-            files = get_file_list(find_path=dirs[0])
-            for file_name in files:
-                if "" != file_name and -1 == file_name.find(__file__):
-                    file_name = os.path.join(dirs[0], file_name)
-                    if os.path.isfile(file_name):
-                        file_name = file_name[len(file_path) + 1: \
-                            file_name.rfind(os.sep)]
-                        file_list.append(file_name)
-    return file_list
-
-
-def get_module_list(product_form):
-    module_path_list = []
-    testcase_dir = UserConfigManager().get_test_cases_dir()
-    if testcase_dir == "":
-        module_path_list = get_module_list_from_output_dir(product_form)
-    else:
-        module_path_list = get_module_list_from_case_dir(testcase_dir)
-    return module_path_list
-
 
 #############################################################################
 #############################################################################
@@ -300,7 +275,7 @@ def show_testtype_list():
     else:
         print("No category specified.")
 
-
+# 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取subsystemlist
 def show_subsystem_list(product_form):
     print("List of currently supported subsystem names:")
     parser = ParsePartsConfig(product_form)
@@ -312,7 +287,7 @@ def show_subsystem_list(product_form):
     for index, element in enumerate(subsystem_name_list):
         print("    %d. %s" % (index + 1, element))
 
-
+# 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
 def show_partname_list(product_form):
     print("List of currently supported part names:")
     parser = ParsePartsConfig(product_form)
@@ -328,35 +303,6 @@ def show_partname_list(product_form):
         part_name_list.sort()
         for index, element in enumerate(part_name_list):
             print("    %d. %s" % (index + 1, element))
-
-
-def show_module_list(product_form):
-    print("List of currently supported module names:")
-    subsystem_name_list = []
-    subsystem_module_list = get_module_list(product_form)
-
-    for item in subsystem_module_list:
-        if item != "":
-            subsystem_name = item.split(os.sep)[0]
-            if subsystem_name not in subsystem_name_list:
-                subsystem_name_list.append(subsystem_name)
-
-    for subsystem_name in subsystem_name_list:
-        print("%s:" % subsystem_name)
-        index = 0
-        module_value_list = []
-        for item in subsystem_module_list:
-            find_key = subsystem_name + os.sep
-            pos_subsystem = item.find(find_key)
-            if pos_subsystem >= 0:
-                subsystem_module_dir = \
-                    item[pos_subsystem + len(find_key):len(item)]
-                module_value = subsystem_module_dir.split(os.sep)[0]
-                if module_value not in module_value_list:
-                    module_value_list.append(module_value)
-                    index += 1
-                    print("    %d. %s" % (index, module_value))
-
 
 def display_help_command_info(command):
     if command == ToolCommandType.TOOLCMD_KEY_SHOW:
@@ -380,8 +326,6 @@ def display_show_command_info(command, product_form="phone"):
         show_subsystem_list(product_form)
     elif command == CMD_KEY_PARTLIST:
         show_partname_list(product_form)
-    elif command == CMD_KEY_MODULELIST:
-        show_module_list(product_form)
     else:
         print("This command is not support.")
 

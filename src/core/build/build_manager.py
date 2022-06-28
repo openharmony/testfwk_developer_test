@@ -48,6 +48,10 @@ class BuildManager(object):
                 gn_file.write("  ]\n")
             gn_file.write("}\n")
 
+    # 根据目标编译测试用例
+    # project_root_path 工程根目录
+    # product_form 产品形态，指令第一步选择的产品
+    # build_target 编译目标
     @classmethod
     def _compile_test_cases_by_target(cls, project_root_path, product_form,
                                       build_target):
@@ -57,6 +61,19 @@ class BuildManager(object):
             build_result = True
         else:
             LOG.info("Test case compilation failed, please modify.")
+            build_result = False
+        return build_result
+
+    # 根据目标编译acts测试用例
+    # project_root_path 工程根目录
+    # para 指令参数
+    @classmethod
+    def _compile_acts_test_cases(cls, project_root_path, para):
+        if BuildTestcases(project_root_path).build_acts_testcases(para):
+            LOG.info("Acts test case compilation successed.")
+            build_result = True
+        else:
+            LOG.info("Acts test compilation failed, please modify.")
             build_result = False
         return build_result
 
@@ -70,19 +87,23 @@ class BuildManager(object):
             LOG.info("Test case compilation failed, please modify.")
         return build_result
 
+    # 编译入口
     def _compile_testcases(self, project_root_path, para):
+        # 获取所有支持的产品，3.1Release版本为["DAYU","Hi3516DV300","ohos-arm64","ohos-sdk","rk3568"]
         all_product_list = scan_support_product()
         if para.productform not in all_product_list:
             from core.build.build_lite_manager import BuildLiteManager
             build_lite_manager = BuildLiteManager(project_root_path)
             return build_lite_manager.build_testcases(para)
 
+        # 如果测试集不为空，build_target为测试集
         if para.testsuit != "":
             return self._compile_test_cases_by_target(
                 project_root_path,
                 para.productform,
                 para.testsuit)
 
+        # 如果测试集为空，部件列表为空，模块列表为空，测试类型中含有“ALL”，build_target为"make_test"
         if (len(para.partname_list) == 0 and para.testmodule == "" and
                 "ALL" in para.testtype):
             return self._compile_test_cases_by_target(
@@ -90,16 +111,18 @@ class BuildManager(object):
                 para.productform,
                 "make_test")
 
+        # 如果测试集为空，三个条件（部件列表为空，模块列表为空，测试类型中含有“ALL”）不同时成立
         target_list = SelectTargets(
             project_root_path).filter_build_targets(para)
         if len(target_list) == 0:
             LOG.warning("No build target found.")
             return False
 
+        # 路径拼接 build_cfg_filepath = OpenHarmony/test/developertest/BUILD.gn
         build_cfg_filepath = os.path.join(project_root_path,
-            "test",
-            "developertest",
-            "BUILD.gn")
+                                          "test",
+                                          "developertest",
+                                          "BUILD.gn")
 
         self._make_gn_file(build_cfg_filepath, target_list)
         if "fuzztest" in para.testtype:
@@ -155,7 +178,14 @@ class BuildManager(object):
         LOG.info("**************************************************")
         LOG.info("")
 
-        build_result = self._compile_testcases(project_root_path, param)
+        build_acts_result = True
+        build_result = True
+        if "actstest" in param.testtype:
+            LOG.info("**********************Start build acts testcases****************************")
+            build_acts_result = self._compile_acts_test_cases(project_root_path, param)
+        else:
+            LOG.info("**********************Start build subsystem testcases****************************")
+            build_result = self._compile_testcases(project_root_path, param)
 
         LOG.info("")
         LOG.info("**************************************************")
@@ -163,7 +193,7 @@ class BuildManager(object):
         LOG.info("**************************************************")
         LOG.info("")
 
-        return build_result
+        return build_result and build_acts_result
 
 
 ##############################################################################

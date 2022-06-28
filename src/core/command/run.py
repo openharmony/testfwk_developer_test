@@ -41,17 +41,20 @@ LOG = platform_logger("Run")
 class Run(object):
     def process_command_run(self, command, options):
         para = Parameter()
+        # 过滤options中的test type参数，确保都是合法的，最终的数据结构为：[{unittest:300,moduletest:300}]
         test_type_list = para.get_testtype_list(options.testtype)
         if len(test_type_list) == 0:
             LOG.error("The testtype parameter is incorrect.")
             return
         options.testtype = test_type_list
-
+        # 初始化ParsePartsConfig，根据productform获取对应的所有子系统名称列表、子系统下的部件名列表
         parser = ParsePartsConfig(options.productform)
+        # 获取部件名列表
         partname_list = parser.get_part_list(
             options.subsystem,
             options.testpart)
         options.partname_list = partname_list
+        # 获取编译结果输出目录
         options.coverage_outpath = self.get_coverage_outpath(options)
 
         LOG.info("")
@@ -68,21 +71,20 @@ class Run(object):
         LOG.info("partname_list = %s" % str(options.partname_list))
         LOG.info("------------------------------------")
         LOG.info("")
-
+        # options参数校验
         if not para.check_run_parameter(options):
             LOG.error("Input parameter is incorrect.")
             return
-
+        # 编译测试用例
         if not self._build_test_cases(options):
             LOG.error("Build test cases failed.")
             return
 
-        test_case_path = self.get_tests_out_path(options.productform)
-        if not os.path.exists(test_case_path):
-            LOG.error("%s is not exist." % test_case_path)
-            return
+        if "actstest" in options.testtype:
+            test_dict = self.get_acts_test_dict(options)
+        else:
+            test_dict = self.get_test_dict(options)
 
-        test_dict = TestCaseManager().get_test_files(test_case_path, options)
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
             return
@@ -170,13 +172,14 @@ class Run(object):
         if options.coverage:
             LOG.info("Coverage testing, no need to compile testcases")
             return True
-
+        # 从user_config.xml文件获取<testcase>的配置，判断是否编译测试用例
         is_build_testcase = UserConfigManager().get_user_config_flag(
             "build", "testcase")
         project_root_path = sys.source_code_root_path
         if is_build_testcase and project_root_path != "":
             from core.build.build_manager import BuildManager
             build_manager = BuildManager()
+            # 实际编译调用逻辑
             return build_manager.build_testcases(project_root_path, options)
         else:
             return True
@@ -217,6 +220,16 @@ class Run(object):
         return testcase_path
 
     @classmethod
+    def get_acts_tests_out_path(cls, product_form):
+        acts_testcase_path = os.path.abspath(os.path.join(
+            get_build_output_path(product_form),
+            "suites",
+            "acts",
+            "testcases"))
+        LOG.info("acts_testcase_path=%s" % acts_testcase_path)
+        return acts_testcase_path
+
+    @classmethod
     def get_coverage_outpath(cls, options):
         coverage_out_path = ""
         if options.coverage:
@@ -228,4 +241,18 @@ class Run(object):
                 LOG.error("Coverage test: coverage_outpath is empty.")
         return coverage_out_path
 
+    def get_acts_test_dict(self, options):
+        # 获取测试用例编译结果路径
+        acts_test_case_path = self.get_acts_tests_out_path(options.productform)
+        acts_test_dict = TestCaseManager().get_acts_test_files(acts_test_case_path, options)
+        return acts_test_dict
 
+    def get_test_dict(self, options):
+        # 获取测试用例编译结果路径
+        test_case_path = self.get_tests_out_path(options.productform)
+        if not os.path.exists(test_case_path):
+            LOG.error("%s is not exist." % test_case_path)
+            return
+
+        test_dict = TestCaseManager().get_test_files(test_case_path, options)
+        return test_dict

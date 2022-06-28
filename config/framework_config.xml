@@ -23,6 +23,9 @@
     <option name="UT"
             desc="unittest"
             timeout="300" />
+    <option name="ACTS"
+            desc="actstest"
+            timeout="300" />
     <option name="MST"
             desc="moduletest"
             timeout="300" />
@@ -52,6 +55,7 @@
   </test_category>
   <all_category>
     <option name="unittest" />
+    <option name="actstest" />
     <option name="moduletest" />
     <option name="systemtest" />
     <option name="performance" />

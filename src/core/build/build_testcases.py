@@ -31,6 +31,9 @@ from core.config.config_manager import UserConfigManager
 BUILD_FILEPATH = "./build.sh"
 BUILD_LITE = "build/lite/build.py"
 BUILD_TARGET_PLATFORM = "build_platform=\"%s\""
+BUILD_PRODUCT_NAME = "product_name=%s"
+BUILD_TARGET_SUBSYSTEM = "target_subsystem=%s"
+BUILD_TARGET_SUITE = "suite=%s"
 LOG = platform_logger("BuildTestcases")
 
 
@@ -40,7 +43,10 @@ LOG = platform_logger("BuildTestcases")
 class BuildTestcases(object):
     def __init__(self, project_rootpath):
         self.project_rootpath = project_rootpath
-
+        self.xts_project_rootpath = os.path.join(sys.source_code_root_path,
+                                                 "test",
+                                                 "xts",
+                                                 "acts")
         user_manager = UserConfigManager()
         self.is_build_example = user_manager.get_user_config_flag(
             "build", "example")
@@ -67,6 +73,8 @@ class BuildTestcases(object):
             return ""
 
         testcase_outpath = ""
+
+        # 路径注释 get_build_output_path = OpenHarmony/out/rk3568/build_configs/platforms_info/toolchain_to_variant.json
         toolchain_filepath = os.path.join(
             get_build_output_path(productform),
             "build_configs",
@@ -86,6 +94,18 @@ class BuildTestcases(object):
             testcase_outpath = testcase_outpath[pos:len(testcase_outpath)]
         return testcase_outpath
 
+    @classmethod
+    def _delete_acts_testcase_dir(cls, productform):
+        acts_testcase_out_dir = os.path.join(
+            get_build_output_path(productform),
+            "suites",
+            "acts",
+            "testcases")
+        LOG.info("acts_testcase_out_dir=%s" % acts_testcase_out_dir)
+        # 删除~/OpenHarmony/out/rk3568/suites/acts/testcases目录内容
+        if os.path.exists(acts_testcase_out_dir):
+            shutil.rmtree(acts_testcase_out_dir)
+
     def _delete_testcase_dir(self, productform):
         if is_open_source_product(productform):
             package_out_dir = os.path.join(
@@ -101,12 +121,14 @@ class BuildTestcases(object):
                 "tests")
 
         LOG.info("package_out_dir=%s" % package_out_dir)
+        # 删除~/OpenHarmony/out/rk3568/packages/phone/tests目录内容
         if os.path.exists(package_out_dir):
             shutil.rmtree(package_out_dir)
 
         phone_out_dir = os.path.join(
             self.project_rootpath, "out", "release", "tests")
         LOG.info("phone_out_dir=%s" % phone_out_dir)
+        # 删除~/OpenHarmony/out/release/tests目录内容
         if os.path.exists(phone_out_dir):
             shutil.rmtree(phone_out_dir)
 
@@ -177,6 +199,32 @@ class BuildTestcases(object):
         os.chdir(current_path)
         return build_result
 
+    def _execute_build_acts_command(self, para):
+        build_result = False
+        acts_build_command = []
+        current_path = os.getcwd()
+        # acts_rootpath = ~/OpenHarmony/test/xts/acts
+        os.chdir(self.xts_project_rootpath)
+        acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
+        acts_build_command.append("system_size=standard")
+        if len(para.subsystem) > 0:
+            acts_build_command.append(BUILD_TARGET_SUBSYSTEM % para.subsystem[0])
+        if para.testsuit != "":
+            acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
+        if os.path.exists(BUILD_FILEPATH):
+            build_command = [BUILD_FILEPATH]
+            build_command.extend(acts_build_command)
+            LOG.info("build_acts_command: %s" % str(build_command))
+            if subprocess.call(build_command) == 0:
+                build_result = True
+            else:
+                build_result = False
+        else:
+            LOG.warning("Build Acts Testcase Error: The %s is not exist" % BUILD_FILEPATH)
+
+        os.chdir(current_path)
+        return build_result
+
     def build_fuzz_testcases(self, para):
         self._delete_testcase_dir(para.productform)
         helper_path = os.path.join("..", "libs", "fuzzlib", "fuzzer_helper.py")
@@ -189,6 +237,7 @@ class BuildTestcases(object):
         self._merge_testcase_dir(para.productform)
         return build_result
 
+    # 编译测试用例（编译命令拼接）
     def build_testcases(self, productform, target):
         command = []
         if self.is_build_example:
@@ -201,6 +250,12 @@ class BuildTestcases(object):
         self._delete_testcase_dir(productform)
         build_result = self._execute_build_command(productform, command)
         self._merge_testcase_dir(productform)
+        return build_result
+
+    # 编译ACTS测试用例
+    def build_acts_testcases(self, para):
+        self._delete_acts_testcase_dir(para.productform)
+        build_result = self._execute_build_acts_command(para)
         return build_result
 
     def build_gn_file(self, productform):

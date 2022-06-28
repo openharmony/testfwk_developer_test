@@ -48,6 +48,7 @@ def get_source_code_root_path(path):
 
 def is_open_source_product(product_name):
     open_source_products = ["Hi3516DV300"]
+    return True
     if product_name in open_source_products:
         return True
     return False
