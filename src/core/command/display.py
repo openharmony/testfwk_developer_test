@@ -45,15 +45,16 @@ CMD_KEY_PRODUCTLIST = "productlist"
 
 # 测试用例类型
 #     1. UT
-#     2. MST
-#     3. ST
-#     4. PERF
-#     5. SEC
-#     6. FUZZ
-#     7. RELI
-#     8. DST
-#     9. BENCHMARK
-#     10. ALL
+#     2. ACTS
+#     3. MST
+#     4. ST
+#     5. PERF
+#     6. SEC
+#     7. FUZZ
+#     8. RELI
+#     9. DST
+#     10. BENCHMARK
+#     11. ALL
 CMD_KEY_TYPELIST = "typelist"
 
 # 子系统名称列表
@@ -61,6 +62,9 @@ CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
 
 # 子系统下的部件名
 CMD_KEY_PARTLIST = "partlist"
+
+# acts子系统名称列表
+CMD_KEY_SUBSYSTEMLIST_ACTS = "actssubsystemlist"
 
 TOOL_VERSION_INFO = """Welcome to DeveloperTest V1.0.0.
 """
@@ -264,7 +268,6 @@ def show_product_list():
     else:
         print("No category specified.")
 
-
 def show_testtype_list():
     print("List of currently supported test types:")
     testtype_list = FrameworkConfigManager().get_framework_config(
@@ -286,6 +289,16 @@ def show_subsystem_list(product_form):
     subsystem_name_list.sort()
     for index, element in enumerate(subsystem_name_list):
         print("    %d. %s" % (index + 1, element))
+
+def show_acts_subsystem_list():
+    print("List of currently supported acts subsystem names:")
+    sub_list = ['global','security','useriam','multimedia','appexecfwk','account','communication','notification',
+    'aafwk','miscservices','powermgr','startup','sensor','distributeddatamgr','update','graphic','ace',
+    'storage','distributedhardware','compileruntime','usb','multimodalinput','resourceschedule',
+    'telephony','hiviewdfx','location','settingsdata','barrierfree','customization']
+    sub_list.sort()
+    for index, element in enumerate(sub_list):
+        print("    %d. %s" % (index + 1, element.strip()))
 
 # 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
 def show_partname_list(product_form):
@@ -326,6 +339,8 @@ def display_show_command_info(command, product_form="phone"):
         show_subsystem_list(product_form)
     elif command == CMD_KEY_PARTLIST:
         show_partname_list(product_form)
+    elif command == CMD_KEY_SUBSYSTEMLIST_ACTS:
+        show_acts_subsystem_list()
     else:
         print("This command is not support.")
 

@@ -209,8 +209,11 @@ class BuildTestcases(object):
         acts_build_command.append("system_size=standard")
         if len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUBSYSTEM % para.subsystem[0])
-        if para.testsuit != "":
+        if para.testsuit != "" and len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
+        elif para.testsuit != "" and len(para.subsystem) == 0:
+            LOG.error("Please specify subsystem.")
+            return
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
             build_command.extend(acts_build_command)

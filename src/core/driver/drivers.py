@@ -99,6 +99,8 @@ class DisplayOutputReceiver:
 class GTestConst(object):
     exec_para_filter = "--gtest_filter"
     exec_para_level = "--gtest_testsize"
+    exec_acts_para_filter = "--jstest_filter"
+    exec_acts_para_level = "--jstest_testsize"
 
 
 def get_device_log_file(report_path, serial=None, log_name="device_log"):
@@ -807,6 +809,28 @@ class JSUnitTestDriver(IDriver):
             "bm uninstall -n %s" % package_name)
         _sleep_according_to_result(return_message)
         return return_message
+
+    @staticmethod
+    def _get_acts_test_para(testcase,
+                       testlevel,
+                       testtype,
+                       target_test_path,
+                       suite_file,
+                       filename):
+        if "actstest" == testtype[0]:
+            test_para = (" --actstest_out_format=json"
+                         " --actstest_out=%s%s.json") % (
+                            target_test_path, filename)
+            return test_para
+
+        if "" != testcase and "" == testlevel:
+            test_para = "%s=%s" % (GTestConst.exec_acts_para_filter, testcase)
+        elif "" == testcase and "" != testlevel:
+            level_para = get_level_para_string(testlevel)
+            test_para = "%s=%s" % (GTestConst.exec_acts_para_level, level_para)
+        else:
+            test_para = ""
+        return test_para
 
     @classmethod
     def _get_json_shell_timeout(cls, json_filepath):

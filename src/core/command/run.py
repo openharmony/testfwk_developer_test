@@ -141,8 +141,6 @@ class Run(object):
                     options.testcases_path = options.target_outpath
                     options.resource_path = os.path.abspath(os.path.join(
                         sys.framework_root_dir, "..", "resource"))
-                    print(options.testcases_path)
-                    print(options.resource_path)
                     if options.productform.find("wifiiot") != -1:
                         scheduler.update_test_type_in_source(".bin",
                             DeviceTestType.ctest_lite)
