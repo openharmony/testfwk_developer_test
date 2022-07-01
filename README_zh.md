@@ -738,10 +738,10 @@ subsystem  # 子系统
 
 由于Windows环境下无法实现用例编译，因此执行用例前需要在Linux环境下进行用例编译，用例编译命令：
 ```
-./build.sh --product-name Hi3516DV300 --build-target make_test
+./build.sh --product-name {product_name} --build-target make_test
 ```
 >说明: 
-> - product-name：指定编译产品名称，例如Hi3516DV300。
+> - product-name：指定编译产品名称。
 > - build-target：指定所需编译用例，make_test表示指定全部用例，实际开发中可指定特定用例。
 
 编译完成后，测试用例将自动保存在out/ohos-arm-release/packages/phone/tests目录下。
@@ -772,7 +772,9 @@ subsystem  # 子系统
 	```
 2. 选择产品形态
 
-    进入测试框架，系统会自动提示您选择产品形态，请根据实际的开发板进行选择。例如：Hi3516DV300。
+    进入测试框架，系统会自动提示您选择产品形态，请根据实际的开发板进行选择。
+
+	如需手动添加，请在config/framework_config.xml的\<productform\>标签内增加产品项。
 
 3. 执行测试用例
 
@@ -812,7 +814,9 @@ subsystem  # 子系统
 	```
 2. 选择产品形态
 
-    进入测试框架，系统会自动提示您选择产品形态，请根据实际的开发板进行选择。例如：Hi3516DV300。
+    进入测试框架，系统会自动提示您选择产品形态，请根据实际的开发板进行选择。
+
+	如需手动添加，请在config/framework_config.xml的\<productform\>标签内增加产品项。
 
 3. 执行测试用例
 
