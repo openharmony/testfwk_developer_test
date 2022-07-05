@@ -207,7 +207,7 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_CALL);
-                    sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN),"%d",nresult);
+                    sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN), "%d", nresult);
                     rlen = strlen(pclinereturn->alignmentCmd) + 1;
                     pclinereturn->len = htons(rlen);
                     HiLog::Info(DistributedAgent::LABEL, "agent get message :%s .\n",
