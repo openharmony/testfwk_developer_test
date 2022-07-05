@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import json
 import os
+import shutil
 import time
 import platform
 import subprocess
@@ -26,12 +27,16 @@ import subprocess
 
 __all__ = ["DeviceAdapter", "HDCDeviceAdapter"]
 
+import zipfile
+
 if platform.system() != 'Windows':
     QUOTATION_MARKS = "'"
 else:
     QUOTATION_MARKS = "\""
-USB_TOOLS = "hdc"
-HDC_TOOLS = "hdc"
+
+USB_HDC = "HDC"
+USB_TOOLS = "hdc_std"
+HDC_TOOLS = "hdc_std"
 
 
 ##############################################################################
@@ -85,12 +90,18 @@ class DeviceAdapter:
     def __init__(self, remote_ip="", repote_port="", device_sn="", name=""):
         self.device_sn = device_sn
         self.name = name
-        self.test_path = "/%s/%s" % ("data", "test")
+        self.test_path = "/data/test"
         self.device_para = self.get_device_para(
             remote_ip,
             repote_port,
             device_sn)
-        self.init_device()
+        self.device_hdc_para = self.get_device_hdc_para(
+            device_sn
+        )
+        if len(self.device_para) == 3:
+            self.init_device()
+        if len(self.device_hdc_para) == 1:
+            self.init_device_hdc()
 
     ###############################################################
     ###############################################################
@@ -102,8 +113,19 @@ class DeviceAdapter:
         self.shell('chmod 777 %s' % self.test_path)
         self.shell("mount -o rw,remount,rw /%s" % "system")
 
+    def init_device_hdc(self):
+        self.target_mount()
+        self.hdc_shell('rm -rf %s' % self.test_path)
+        self.hdc_shell('mkdir -p %s' % self.test_path)
+        self.hdc_shell('chmod 777 %s' % self.test_path)
+        self.hdc_shell("mount -o rw,remount,rw /%s" % "system")
+
     def remount(self):
         command = "%s %s remount" % (USB_TOOLS, self.device_para)
+        self.execute_command(command)
+
+    def target_mount(self):
+        command = "%s %s target mount" % (HDC_TOOLS, self.device_hdc_para)
         self.execute_command(command)
 
     def push_file(self, srcpath, despath):
@@ -114,10 +136,26 @@ class DeviceAdapter:
             despath)
         return self.execute_command(command)
 
+    def push_hdc_file(self,srcpath, despath):
+        command = "%s %s file send %s %s" % (
+            USB_TOOLS, 
+            self.device_hdc_para,  
+            srcpath,
+            despath)
+        return self.execute_command(command)
+
     def pull_file(self, srcpath, despath):
         command = "%s %s pull %s %s" % (
             USB_TOOLS,
             self.device_para,
+            srcpath,
+            despath)
+        return self.execute_command(command)
+
+    def pull_hdc_file(self, srcpath, despath):
+        command = "%s %s file recv %s %s" % (
+            HDC_TOOLS,
+            self.device_hdc_para,
             srcpath,
             despath)
         return self.execute_command(command)
@@ -179,7 +217,6 @@ class DeviceAdapter:
             time.sleep(1)
         return return_code
 
-
     ###############################################################
     ###############################################################
 
@@ -195,11 +232,21 @@ class DeviceAdapter:
             if "" == device_sn:
                 device_para = "-H %s -P %s" % (remote_ip, remote_port)
             else:
-                device_para = "-H %s -P %s -s %s" % (
+                device_para = "-H %s -P %s -t %s" % (
                     remote_ip, remote_port, device_sn)
         return device_para
 
-    def execute_command(self, command, print_flag=True, timeout=900):
+    @classmethod
+    def get_device_hdc_para(cls, device_sn=""):
+        if " " == device_sn:
+            device_hdc_para = ""
+        else:
+            device_hdc_para = "-t %s" % device_sn
+
+        return device_hdc_para
+
+    @classmethod
+    def execute_command(cls, command, print_flag=True, timeout=900):
         try:
             if print_flag:
                 print("command: " + command)
@@ -211,7 +258,8 @@ class DeviceAdapter:
         print("results: failed")
         return False
 
-    def execute_command_with_output(self, command, print_flag=True):
+    @classmethod
+    def execute_command_with_output(cls, command, print_flag=True):
         if print_flag:
             print("command: " + command)
 
@@ -237,6 +285,14 @@ class DeviceAdapter:
             command,
             QUOTATION_MARKS))
 
+    def hdc_shell(self, command=""):
+        return self.execute_command("%s %s shell %s%s%s" % (
+            USB_HDC,
+            self.device_hdc_para,
+            QUOTATION_MARKS,
+            command,
+            QUOTATION_MARKS))
+
     def execute_shell_command(self, command):
         return self.shell(command)
 
@@ -248,7 +304,17 @@ class DeviceAdapter:
             command,
             QUOTATION_MARKS))
 
-    def check_path_legal(self, path):
+    def hdc_std_shell_with(self, command=""):
+        return self.execute_command_with_output("%s %s shell %s%s%s" % (
+            USB_TOOLS,
+            self.device_hdc_para,
+            QUOTATION_MARKS,
+            command,
+            QUOTATION_MARKS
+        ))
+
+    @classmethod
+    def check_path_legal(cls, path):
         if path and " " in path:
             return "\"%s\"" % path
         return path
@@ -267,17 +333,30 @@ class HDCDeviceAdapter:
     def __init__(self, remote_ip="", repote_port="", device_sn="", name=""):
         self.device_sn = device_sn
         self.name = name
-        self.test_path = "/%s/%s/" % ("data", "test")
+        self.test_path = "/data/test/"
         self.device_para = self.get_device_para(
             remote_ip,
             repote_port,
             device_sn)
-        self.init_device()
+        self.device_hdc_para = self.get_device_hdc_para(
+            device_sn
+        )
+        if len(self.device_para) == 3:
+            self.init_device()
+        if len(self.device_hdc_para) == 1:
+            self.init_device_hdc()
 
     ###############################################################
     ###############################################################
 
     def init_device(self):
+        self.remount()
+        self.shell('rm -rf %s' % self.test_path)
+        self.shell('mkdir -p %s' % self.test_path)
+        self.shell('chmod 777 %s' % self.test_path)
+        self.shell("mount -o rw,remount,rw /%s" % "system")
+
+    def init_device_hdc(self):
         self.remount()
         self.shell('rm -rf %s' % self.test_path)
         self.shell('mkdir -p %s' % self.test_path)
@@ -318,7 +397,6 @@ class HDCDeviceAdapter:
         self.unlock_screen()
         self.unlock_device()
 
-
     ###############################################################
     ###############################################################
 
@@ -338,7 +416,17 @@ class HDCDeviceAdapter:
                     remote_ip, remote_port, device_sn)
         return device_para
 
-    def execute_command(self, command, print_flag=True, timeout=900):
+    @classmethod
+    def get_device_hdc_para(cls, device_sn=""):
+        if " " == device_sn:
+            device_para = ""
+        else:
+            device_para = "-t %s" % device_sn
+
+        return device_para
+
+    @classmethod
+    def execute_command(cls, command, print_flag=True, timeout=900):
         try:
             if print_flag:
                 print("command: " + command)
@@ -350,7 +438,8 @@ class HDCDeviceAdapter:
         print("results: failed")
         return False
 
-    def execute_command_with_output(self, command, print_flag=True):
+    @classmethod
+    def execute_command_with_output(cls, command, print_flag=True):
         if print_flag:
             print("command: " + command)
 
@@ -384,7 +473,17 @@ class HDCDeviceAdapter:
             command,
             QUOTATION_MARKS))
 
-    def check_path_legal(self, path):
+    def hdc_std_shell_with(self, command=""):
+        return self.execute_command_with_output("%s %s shell %s%s%s" % (
+            HDC_TOOLS,
+            self.device_hdc_para,
+            QUOTATION_MARKS,
+            command,
+            QUOTATION_MARKS
+        ))
+
+    @classmethod
+    def check_path_legal(cls, path):
         if path and " " in path:
             return "\"%s\"" % path
         return path

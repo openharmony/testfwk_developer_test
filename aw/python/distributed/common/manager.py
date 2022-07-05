@@ -17,6 +17,7 @@
 #
 
 import os
+
 from distributed.common.devices import DeviceAdapter
 from distributed.common.devices import HDCDeviceAdapter
 
@@ -25,13 +26,13 @@ from distributed.common.devices import HDCDeviceAdapter
 ##############################################################################
 
 class DeviceManager:
-    def __init__(self):
+    def __init__(self, result_path):
         self.has_hdc_tool = False
         self.phone_device_list = []
         self.ivi_device_list = []
         self.tv_device_list = []
         self.watch_device_list = []
-        self.make_device_list()
+        self.make_device_list(result_path)
 
     def make_device_adapter(self, device_info_list, device_name):
         if self.has_hdc_tool:
@@ -46,9 +47,8 @@ class DeviceManager:
                 name=device_name)
         return device
 
-    def make_device_list(self):
-        device_info_list = self.get_device_info_list()
-        print(device_info_list)
+    def make_device_list(self, result_path):
+        device_info_list = self.get_device_info_list(result_path)
 
         for item in device_info_list:
             if len(item) != 4:
@@ -79,9 +79,10 @@ class DeviceManager:
                 setattr(self, device.name, device)
         return
 
-    def get_device_info_list(self):
+    @staticmethod
+    def get_device_info_list(result):
         device_info_list = []
-        tmp_path = os.path.join(os.environ.get('PYTEST_RESULTPATH'), "temp")
+        tmp_path = os.path.join(result, "temp")
         device_info_file_path = os.path.join(tmp_path,
             "device_info_file.txt")
 
@@ -95,7 +96,5 @@ class DeviceManager:
                     device_info_list.append(temp)
         return device_info_list
 
-
 ##############################################################################
 ##############################################################################
-

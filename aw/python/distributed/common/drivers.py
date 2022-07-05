@@ -69,15 +69,40 @@ class ITestDriver:
 ##############################################################################
 
 
-class CppTestDriver(ITestDriver):
-    def __init__(self, device):
-        self.device = device
+class DexTestDriver:
+    __metaclass__ = ABCMeta
 
-    def execute(self, suite_file, background=False):
+    @abstractmethod
+    def execute(self, suite_file, push_flag=False):
+        pass
+
+
+##############################################################################
+##############################################################################
+
+
+class HapTestDriver:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def execute(self, suite_file, push_flag=False):
+        pass
+
+
+##############################################################################
+##############################################################################
+
+
+class CppTestDriver(ITestDriver):
+    def __init__(self, device, hdc_tool):
+        self.device = device
+        self.hdc_tool = hdc_tool
+
+    def execute(self, suite_file, result_path, background=False):
         file_name = os.path.basename(suite_file)
 
         long_command_path = tempfile.mkdtemp(prefix="long_command_",
-            dir=os.path.join(os.environ.get('PYTEST_RESULTPATH'), "temp"))
+            dir=os.path.join(result_path, "temp"))
         command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s" % (
             DEVICE_TEST_PATH,
             file_name,
@@ -87,7 +112,10 @@ class CppTestDriver(ITestDriver):
         sh_file_name, file_path = make_long_command_file(command,
             long_command_path,
             file_name)
-        self.device.push_file(file_path, DEVICE_TEST_PATH)
+        if self.hdc_tool != "hdc":
+            self.device.push_file(file_path, DEVICE_TEST_PATH)
+        else:
+            self.device.push_hdc_file(file_path, DEVICE_TEST_PATH)
 
         # push resource files
         resource_manager = ResourceManager()
@@ -103,9 +131,10 @@ class CppTestDriver(ITestDriver):
             sh_command = "sh %s" % (
                 os.path.join(DEVICE_TEST_PATH, sh_file_name))
 
-        return self.device.shell(sh_command)
-
+        if self.hdc_tool != "hdc":
+            return self.device.shell(sh_command)
+        else:
+            return self.device.hdc_shell(sh_command)
 
 ##############################################################################
 ##############################################################################
-

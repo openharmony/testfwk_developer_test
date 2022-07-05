@@ -207,8 +207,7 @@ int DistributedAgent::DoCmdServer(int serverSockFd)
                     auto pclinereturn = reinterpret_cast<DistributedMsg *>(returnValue);
                     pclinereturn->no = pcline->no;
                     pclinereturn->cmdTestType = htons(DST_COMMAND_CALL);
-                    (void)sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN),
-                                    "%d", nresult) < 0);
+                    sprintf_s(pclinereturn->alignmentCmd, (MAX_BUFF_LEN - DST_COMMAND_HEAD_LEN),"%d",nresult);
                     rlen = strlen(pclinereturn->alignmentCmd) + 1;
                     pclinereturn->len = htons(rlen);
                     HiLog::Info(DistributedAgent::LABEL, "agent get message :%s .\n",
@@ -351,7 +350,6 @@ int DistributedAgent::OnProcessCmd(const std::string &strCommand, int cmdLen,
         return nresult;
     }
 
-    errno_t ret = EOK;
     ret = memcpy_s(alignmentCmd, sizeof(alignmentCmd), strCommand.c_str(), cmdNo);
     if (ret != EOK) {
         return -1;
