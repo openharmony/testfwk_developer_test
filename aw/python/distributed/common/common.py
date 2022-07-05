@@ -21,6 +21,8 @@ import os
 
 ##############################################################################
 ##############################################################################
+import time
+
 
 def get_result_dir(testsuit_path):
     result_rootpath = os.environ.get('PYTEST_RESULTPATH')
@@ -40,6 +42,7 @@ def get_result_dir(testsuit_path):
 
     if not os.path.exists(result_path):
         os.makedirs(result_path)
+
 
     return result_path
 

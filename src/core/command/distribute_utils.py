@@ -40,6 +40,8 @@ def execute_distribute_test_file(py_test_file, result_rootpath):
                                 shell=False,
                                 env=environ_dic)
 
+        print("proc", proc)
+
         try:
             while proc.poll() is None:
                 line = proc.stdout.readline()
@@ -153,11 +155,11 @@ def check_zdn_network(device, device_ip=""):
 
 
 def query_device_ip(device):
-    output = device.execute_shell_command("getprop ro.hardware")
+    output = device.execute_shell_command("getprop ohos.boot.hardware")
     if output == "":
         return ""
 
-    isemulator = re.findall(r"ranchu", output)
+    isemulator = re.findall(r"read only", output)
     output = device.execute_shell_command("ifconfig")
     if output == "":
         return ""
@@ -172,3 +174,18 @@ def query_device_ip(device):
                   % device.device_sn)
         return ""
     return ipaddress[0]
+
+
+def get_test_case(test_case):
+    major_test_case = []
+    agent_test_case = []
+    for test in test_case:
+        test_case = test.split("\\")[-1]
+        test_agent = test_case.split("Test")
+        if "Agent" in test_agent:
+            agent_test_case.append(test_case)
+        else:
+            major_test_case.append(test_case)
+
+    return major_test_case, agent_test_case
+
