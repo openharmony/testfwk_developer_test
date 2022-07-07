@@ -296,13 +296,14 @@ def show_subsystem_list(product_form):
 
 def show_acts_subsystem_list():
     print("List of currently supported acts subsystem names:")
-    sub_list = ['global','security','useriam','multimedia','appexecfwk','account','communication','notification',
-    'aafwk','miscservices','powermgr','startup','sensor','distributeddatamgr','update','graphic','ace',
-    'storage','distributedhardware','compileruntime','usb','multimodalinput','resourceschedule',
-    'telephony','hiviewdfx','location','settingsdata','barrierfree','customization']
+    sub_list = ['global', 'security', 'useriam', 'multimedia', 'appexecfwk', 'account', 'communication', 'notification',
+    'ability', 'miscservices', 'powermgr', 'startup', 'sensor', 'distributeddatamgr', 'update', 'graphic','arkui',
+    'storage', 'compileruntime', 'usb', 'multimodalinput', 'resourceschedule',
+    'telephony', 'hiviewdfx', 'location', 'barrierfree', 'customization']
     sub_list.sort()
     for index, element in enumerate(sub_list):
         print("    %d. %s" % (index + 1, element.strip()))
+    print("end")
 
 
 # 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
