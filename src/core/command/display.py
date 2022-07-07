@@ -183,19 +183,20 @@ def select_user_input(data_list):
                 sys.exit(0)
         return select_item_value, select_item_index
 
+
 # 选择productform
 def select_productform():
     select_value = "phone"
 
-    # scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
+    # 列表注释 scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
     scan_product_list = scan_support_product()
 
     # 从framework_config.xml里取productform节点的value:ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus
     config_product_list = \
         FrameworkConfigManager().get_framework_config("productform")
 
-    # productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
-    # ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
+    # 列表注释 productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
+    # 列表注释 ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
 
     productform_list = scan_product_list + config_product_list
     if len(productform_list) != 0:
@@ -268,6 +269,7 @@ def show_product_list():
     else:
         print("No category specified.")
 
+
 def show_testtype_list():
     print("List of currently supported test types:")
     testtype_list = FrameworkConfigManager().get_framework_config(
@@ -277,6 +279,7 @@ def show_testtype_list():
             print("    %d. %s" % (index + 1, element))
     else:
         print("No category specified.")
+
 
 # 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取subsystemlist
 def show_subsystem_list(product_form):
@@ -290,6 +293,7 @@ def show_subsystem_list(product_form):
     for index, element in enumerate(subsystem_name_list):
         print("    %d. %s" % (index + 1, element))
 
+
 def show_acts_subsystem_list():
     print("List of currently supported acts subsystem names:")
     sub_list = ['global','security','useriam','multimedia','appexecfwk','account','communication','notification',
@@ -300,11 +304,13 @@ def show_acts_subsystem_list():
     for index, element in enumerate(sub_list):
         print("    %d. %s" % (index + 1, element.strip()))
 
+
 # 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
 def show_partname_list(product_form):
     print("List of currently supported part names:")
     parser = ParsePartsConfig(product_form)
     subsystem_name_list = parser.get_subsystem_name_list()
+
     if len(subsystem_name_list) == 0:
         return
 
@@ -316,6 +322,7 @@ def show_partname_list(product_form):
         part_name_list.sort()
         for index, element in enumerate(part_name_list):
             print("    %d. %s" % (index + 1, element))
+
 
 def display_help_command_info(command):
     if command == ToolCommandType.TOOLCMD_KEY_SHOW:

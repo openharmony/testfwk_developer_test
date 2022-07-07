@@ -49,6 +49,7 @@ def get_file_list(find_path, postfix=""):
                 file_list.append(file_name)
     return file_list
 
+
 # 获取目录下每一个文件，并放到一个列表里
 def get_file_list_by_postfix(path, postfix=""):
     file_list = []
@@ -102,7 +103,7 @@ def get_build_output_path(product_form):
 
 def scan_support_product():
     # scan standard and large system info
-    # product_form_dir = OpenHarmony/productdefine/common/products/
+    # 路径注释 product_form_dir = OpenHarmony/productdefine/common/products/
     product_form_dir = os.path.join(sys.source_code_root_path,
                                     "productdefine",
                                     "common",

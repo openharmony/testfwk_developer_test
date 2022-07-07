@@ -203,7 +203,7 @@ class BuildTestcases(object):
         build_result = False
         acts_build_command = []
         current_path = os.getcwd()
-        # acts_rootpath = ~/OpenHarmony/test/xts/acts
+        # 路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
         os.chdir(self.xts_project_rootpath)
         acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
         acts_build_command.append("system_size=standard")
