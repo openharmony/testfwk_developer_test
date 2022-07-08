@@ -228,29 +228,6 @@ class Run(object):
         LOG.info("testcase_path=%s" % testcase_path)
         return testcase_path
 
-    @classmethod
-    def get_tests_output_path(cls, product_form):
-        testcase_path = UserConfigManager().get_test_case_output_dir()
-        if testcase_path == "":
-            all_product_list = scan_support_product()
-            if product_form in all_product_list:
-                if is_open_source_product(product_form):
-                    testcase_path = os.path.abspath(os.path.join(
-                        get_build_output_path(product_form),
-                        "packages",
-                        "phone",
-                        "tests"))
-                else:
-                    testcase_path = os.path.abspath(os.path.join(
-                        get_build_output_path(product_form),
-                        "packages",
-                        product_form,
-                        "tests"))
-            else:
-                testcase_path = os.path.join(
-                    get_build_output_path(product_form), "test")
-        LOG.info("testcase_path=%s" % testcase_path)
-        return testcase_path
 
     @classmethod
     def get_coverage_outpath(cls, options):
