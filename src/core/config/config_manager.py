@@ -32,6 +32,7 @@ CONFIG_PATH = os.path.join(sys.framework_res_dir, "config")
 
 # framework_config.xml
 class FrameworkConfigManager(object):
+
     def __init__(self, filepath=""):
         if filepath == "":
 
@@ -41,10 +42,10 @@ class FrameworkConfigManager(object):
         else:
             self.filepath = filepath
 
-
-    # 获取framework_config.xml中所有name的value，返回列表
     def get_framework_config(self, target_name):
+        # 获取framework_config.xml中所有name的value，返回列表
         data_list = []
+        
         try:
             if os.path.exists(self.filepath):
 
