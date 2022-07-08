@@ -70,9 +70,9 @@ class ITestDriver:
 
 
 class CppTestDriver(ITestDriver):
-    def __init__(self, device, hdc_or_adb):
+    def __init__(self, device, hdc_tools):
         self.device = device
-        self.hdc_or_adb = hdc_or_adb
+        self.hdc_tools = hdc_tools
 
     def execute(self, suite_file, result_path, background=False):
         file_name = os.path.basename(suite_file)
