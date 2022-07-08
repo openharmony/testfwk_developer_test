@@ -61,31 +61,7 @@ class ITestDriver:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def execute(self, suite_file, push_flag=False):
-        pass
-
-
-##############################################################################
-##############################################################################
-
-
-class DexTestDriver:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def execute(self, suite_file, push_flag=False):
-        pass
-
-
-##############################################################################
-##############################################################################
-
-
-class HapTestDriver:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def execute(self, suite_file, push_flag=False):
+    def execute(self, suite_file, result_path, push_flag=False):
         pass
 
 
@@ -94,9 +70,9 @@ class HapTestDriver:
 
 
 class CppTestDriver(ITestDriver):
-    def __init__(self, device, hdc_tool):
+    def __init__(self, device, hdc_or_adb):
         self.device = device
-        self.hdc_tool = hdc_tool
+        self.hdc_or_adb = hdc_or_adb
 
     def execute(self, suite_file, result_path, background=False):
         file_name = os.path.basename(suite_file)
@@ -109,13 +85,10 @@ class CppTestDriver(ITestDriver):
             file_name)
 
         print("command: %s" % command)
-        sh_file_name, file_path = make_long_command_file(command,
-            long_command_path,
-            file_name)
-        if self.hdc_tool != "hdc":
-            self.device.push_file(file_path, DEVICE_TEST_PATH)
-        else:
-            self.device.push_hdc_file(file_path, DEVICE_TEST_PATH)
+        sh_file_name, file_path = make_long_command_file(command, 
+                                                         long_command_path, 
+                                                         file_name)
+        self.device.push_file(file_path, DEVICE_TEST_PATH)
 
         # push resource files
         resource_manager = ResourceManager()
@@ -131,10 +104,9 @@ class CppTestDriver(ITestDriver):
             sh_command = "sh %s" % (
                 os.path.join(DEVICE_TEST_PATH, sh_file_name))
 
-        if self.hdc_tool != "hdc":
-            return self.device.shell(sh_command)
-        else:
-            return self.device.hdc_shell(sh_command)
+        return self.device.shell(sh_command)
+
 
 ##############################################################################
 ##############################################################################
+

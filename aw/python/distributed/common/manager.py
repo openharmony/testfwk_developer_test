@@ -18,8 +18,7 @@
 
 import os
 
-from distributed.common.devices import DeviceAdapter
-from distributed.common.devices import HDCDeviceAdapter
+from distributed.common.devices import DeviceShell
 
 
 ##############################################################################
@@ -27,7 +26,7 @@ from distributed.common.devices import HDCDeviceAdapter
 
 class DeviceManager:
     def __init__(self, result_path):
-        self.has_hdc_tool = False
+        self.is_hdc = True
         self.phone_device_list = []
         self.ivi_device_list = []
         self.tv_device_list = []
@@ -35,21 +34,14 @@ class DeviceManager:
         self.make_device_list(result_path)
 
     def make_device_adapter(self, device_info_list, device_name):
-        if self.has_hdc_tool:
-            device = HDCDeviceAdapter(device_sn=device_info_list[0],
-                remote_ip=device_info_list[2],
-                repote_port=device_info_list[3],
-                name=device_name)
-        else:
-            device = DeviceAdapter(device_sn=device_info_list[0],
-                remote_ip=device_info_list[2],
-                repote_port=device_info_list[3],
-                name=device_name)
+        device = DeviceShell(self.is_hdc, device_sn=device_info_list[0],
+                             remote_ip=device_info_list[2],
+                             repote_port=device_info_list[3],
+                             name=device_name)
         return device
 
     def make_device_list(self, result_path):
         device_info_list = self.get_device_info_list(result_path)
-
         for item in device_info_list:
             if len(item) != 4:
                 continue
@@ -83,8 +75,8 @@ class DeviceManager:
     def get_device_info_list(result):
         device_info_list = []
         tmp_path = os.path.join(result, "temp")
-        device_info_file_path = os.path.join(tmp_path,
-            "device_info_file.txt")
+        device_info_file_path = os.path.join(tmp_path, 
+                                             "device_info_file.txt")
 
         if os.path.exists(device_info_file_path):
             with open(device_info_file_path, "r") as file_handle:
