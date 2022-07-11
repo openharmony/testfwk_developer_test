@@ -130,7 +130,7 @@ int DistributeTestEnvironment::ConnectAgent(size_t devNo)
     addr.sin_port = htons(serverPort_);
     int connectCount = 0;
     for (connectCount = 0; connectCount < CONNECT_TIME; connectCount++) {  // try connect to agent 3 times.
-        if (!connect(clientSockFd, reinterpret<struct sockaddr *>(&addr), sizeof(addr))) {
+        if (!connect(clientSockFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr))) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));  // delay 10ms
