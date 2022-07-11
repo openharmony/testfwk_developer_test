@@ -45,15 +45,16 @@ CMD_KEY_PRODUCTLIST = "productlist"
 
 # 测试用例类型
 #     1. UT
-#     2. MST
-#     3. ST
-#     4. PERF
-#     5. SEC
-#     6. FUZZ
-#     7. RELI
-#     8. DST
-#     9. BENCHMARK
-#     10. ALL
+#     2. ACTS
+#     3. MST
+#     4. ST
+#     5. PERF
+#     6. SEC
+#     7. FUZZ
+#     8. RELI
+#     9. DST
+#     10. BENCHMARK
+#     11. ALL
 CMD_KEY_TYPELIST = "typelist"
 
 # 子系统名称列表
@@ -61,6 +62,9 @@ CMD_KEY_SUBSYSTEMLIST = "subsystemlist"
 
 # 子系统下的部件名
 CMD_KEY_PARTLIST = "partlist"
+
+# acts子系统名称列表
+CMD_KEY_SUBSYSTEMLIST_ACTS = "actssubsystemlist"
 
 TOOL_VERSION_INFO = """Welcome to DeveloperTest V1.0.0.
 """
@@ -179,19 +183,20 @@ def select_user_input(data_list):
                 sys.exit(0)
         return select_item_value, select_item_index
 
+
 # 选择productform
 def select_productform():
     select_value = "phone"
 
-    # scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
+    # 列表注释 scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
     scan_product_list = scan_support_product()
 
     # 从framework_config.xml里取productform节点的value:ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus
     config_product_list = \
         FrameworkConfigManager().get_framework_config("productform")
 
-    # productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
-    # ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
+    # 列表注释 productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
+    # 列表注释 ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
 
     productform_list = scan_product_list + config_product_list
     if len(productform_list) != 0:
@@ -275,6 +280,7 @@ def show_testtype_list():
     else:
         print("No category specified.")
 
+
 # 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取subsystemlist
 def show_subsystem_list(product_form):
     print("List of currently supported subsystem names:")
@@ -287,11 +293,25 @@ def show_subsystem_list(product_form):
     for index, element in enumerate(subsystem_name_list):
         print("    %d. %s" % (index + 1, element))
 
+
+def show_acts_subsystem_list():
+    print("List of currently supported acts subsystem names:")
+    sub_list = ['global', 'security', 'useriam', 'multimedia', 'appexecfwk', 'account', 'communication', 'notification',
+    'ability', 'miscservices', 'powermgr', 'startup', 'sensor', 'distributeddatamgr', 'update', 'graphic','arkui',
+    'storage', 'compileruntime', 'usb', 'multimodalinput', 'resourceschedule',
+    'telephony', 'hiviewdfx', 'location', 'barrierfree', 'customization']
+    sub_list.sort()
+    for index, element in enumerate(sub_list):
+        print("    %d. %s" % (index + 1, element.strip()))
+    print("end")
+
+
 # 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
 def show_partname_list(product_form):
     print("List of currently supported part names:")
     parser = ParsePartsConfig(product_form)
     subsystem_name_list = parser.get_subsystem_name_list()
+
     if len(subsystem_name_list) == 0:
         return
 
@@ -303,6 +323,7 @@ def show_partname_list(product_form):
         part_name_list.sort()
         for index, element in enumerate(part_name_list):
             print("    %d. %s" % (index + 1, element))
+
 
 def display_help_command_info(command):
     if command == ToolCommandType.TOOLCMD_KEY_SHOW:
@@ -326,6 +347,8 @@ def display_show_command_info(command, product_form="phone"):
         show_subsystem_list(product_form)
     elif command == CMD_KEY_PARTLIST:
         show_partname_list(product_form)
+    elif command == CMD_KEY_SUBSYSTEMLIST_ACTS:
+        show_acts_subsystem_list()
     else:
         print("This command is not support.")
 

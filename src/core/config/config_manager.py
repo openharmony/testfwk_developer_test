@@ -29,8 +29,10 @@ LOG = platform_logger("config_manager")
 # 变量注释 CONFIG_PATH = OpenHarmony/test/developertest/config
 CONFIG_PATH = os.path.join(sys.framework_res_dir, "config")
 
+
 # framework_config.xml
 class FrameworkConfigManager(object):
+
     def __init__(self, filepath=""):
         if filepath == "":
 
@@ -40,9 +42,10 @@ class FrameworkConfigManager(object):
         else:
             self.filepath = filepath
 
-    # 获取framework_config.xml中所有name的value，返回列表
     def get_framework_config(self, target_name):
+        # 获取framework_config.xml中所有name的value，返回列表
         data_list = []
+        
         try:
             if os.path.exists(self.filepath):
 
@@ -124,6 +127,7 @@ class FilterConfigManager(object):
 
     def get_filter_config_path(self):
         return self.filepath
+
 
 # 这里的filepath不存在
 class ResourceConfigManager(object):
@@ -306,6 +310,7 @@ class BuildConfigManager(object):
 
     def get_build_path(self):
         return self.filepath
+
 
 class FuzzerConfigManager(object):
     def __init__(self, config_path=""):

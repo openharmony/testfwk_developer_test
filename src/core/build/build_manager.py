@@ -170,6 +170,7 @@ class BuildManager(object):
         LOG.info("partname_list = %s" % str(param.partname_list))
         LOG.info("testmodule    = %s" % param.testmodule)
         LOG.info("testsuit      = %s" % param.testsuit)
+        LOG.info("testcase      = %s" % param.testcase)
         LOG.info("--------------------------------------------------")
 
         LOG.info("")

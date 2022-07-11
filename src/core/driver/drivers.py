@@ -99,6 +99,8 @@ class DisplayOutputReceiver:
 class GTestConst(object):
     exec_para_filter = "--gtest_filter"
     exec_para_level = "--gtest_testsize"
+    exec_acts_para_filter = "--jstest_filter"
+    exec_acts_para_level = "--jstest_testsize"
 
 
 def get_device_log_file(report_path, serial=None, log_name="device_log"):
@@ -671,12 +673,9 @@ class JSUnitTestDriver(IDriver):
                 timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
         else:
             timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
-        resource_manager.process_preparer_data(resource_data_dic, resource_dir,
-                                               self.config.device)
-
+        resource_manager.process_preparer_data(resource_data_dic, resource_dir,self.config.device)
         main_result = self._install_hap(suite_file)
         result = ResultManager(suite_file, self.config)
-
         if main_result:
             self._execute_hapfile_jsunittest()
             try:
@@ -686,8 +685,7 @@ class JSUnitTestDriver(IDriver):
                 if timeout:
                     actiontime = timeout
                     times = 1
-                device_log_file_open = os.open(device_log_file, os.O_RDONLY,
-                                                   stat.S_IWUSR | stat.S_IRUSR)
+                device_log_file_open = os.open(device_log_file, os.O_RDONLY,stat.S_IWUSR | stat.S_IRUSR)
                 with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
                         as file_read_pipe:
                     for i in range(0, times):
@@ -704,7 +702,6 @@ class JSUnitTestDriver(IDriver):
                                 break
                             if int(time.time()) - start_time > 5:
                                 break
-
             finally:
                 _lock_screen(self.config.device)
                 self._uninstall_hap(self.package_name)
@@ -712,8 +709,7 @@ class JSUnitTestDriver(IDriver):
             self.result = result.get_test_results("Error: install hap failed")
             LOG.error("Error: install hap failed")
 
-        resource_manager.process_cleaner_data(resource_data_dic, resource_dir,
-                                              self.config.device)
+        resource_manager.process_cleaner_data(resource_data_dic, resource_dir,self.config.device)
 
     def generate_console_output(self, device_log_file, request):
         result_message = self.read_device_log(device_log_file)
@@ -808,6 +804,28 @@ class JSUnitTestDriver(IDriver):
         _sleep_according_to_result(return_message)
         return return_message
 
+    @staticmethod
+    def _get_acts_test_para(testcase,
+                       testlevel,
+                       testtype,
+                       target_test_path,
+                       suite_file,
+                       filename):
+        if "actstest" == testtype[0]:
+            test_para = (" --actstest_out_format=json"
+                         " --actstest_out=%s%s.json") % (
+                            target_test_path, filename)
+            return test_para
+
+        if "" != testcase and "" == testlevel:
+            test_para = "%s=%s" % (GTestConst.exec_acts_para_filter, testcase)
+        elif "" == testcase and "" != testlevel:
+            level_para = get_level_para_string(testlevel)
+            test_para = "%s=%s" % (GTestConst.exec_acts_para_level, level_para)
+        else:
+            test_para = ""
+        return test_para
+
     @classmethod
     def _get_json_shell_timeout(cls, json_filepath):
         test_timeout = 300
@@ -824,12 +842,14 @@ class JSUnitTestDriver(IDriver):
                     return test_timeout
         except JSONDecodeError:
             return test_timeout
+        finally:
+            print(" get json shell timeout finally")
+
 
     @staticmethod
     def _get_package_and_ability_name(hap_filepath):
         package_name = ""
         ability_name = ""
-
         if os.path.exists(hap_filepath):
             filename = os.path.basename(hap_filepath)
 
@@ -863,7 +883,6 @@ class JSUnitTestDriver(IDriver):
                 package_name = profile.get("package")
                 if not package_name:
                     continue
-
                 abilities = profile.get("abilities")
                 for abilitie in abilities:
                     abilities_name = abilitie.get("name")
@@ -880,5 +899,4 @@ class JSUnitTestDriver(IDriver):
                 shutil.rmtree(hap_bak_path)
         else:
             print("file %s not exist" % hap_filepath)
-
         return package_name, ability_name

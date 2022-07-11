@@ -203,14 +203,17 @@ class BuildTestcases(object):
         build_result = False
         acts_build_command = []
         current_path = os.getcwd()
-        # acts_rootpath = ~/OpenHarmony/test/xts/acts
+        # 路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
         os.chdir(self.xts_project_rootpath)
         acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
         acts_build_command.append("system_size=standard")
         if len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUBSYSTEM % para.subsystem[0])
-        if para.testsuit != "":
+        if para.testsuit != "" and len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
+        elif para.testsuit != "" and len(para.subsystem) == 0:
+            LOG.error("Please specify subsystem.")
+            return
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
             build_command.extend(acts_build_command)

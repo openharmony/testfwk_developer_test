@@ -189,6 +189,7 @@ class TestCaseManager(object):
                         break
         return is_valid_status
 
+
     @classmethod
     def check_python_test_file(cls, suite_file):
         if suite_file.endswith(".py"):
@@ -196,6 +197,7 @@ class TestCaseManager(object):
             if filename.startswith("test_"):
                 return True
         return False
+
 
     @classmethod
     def check_hap_test_file(cls, hap_file_path):
@@ -221,3 +223,5 @@ class TestCaseManager(object):
             return False
         except JSONDecodeError:
             return False
+        finally:
+            print(" check hap test file finally")
