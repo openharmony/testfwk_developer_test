@@ -18,14 +18,13 @@
 import json
 import os
 import shutil
-import time
 import platform
 import subprocess
 
 ##############################################################################
 ##############################################################################
 
-__all__ = ["DeviceAdapter", "HDCDeviceAdapter"]
+__all__ = ["DeviceShell"]
 
 import zipfile
 
@@ -34,8 +33,6 @@ if platform.system() != 'Windows':
 else:
     QUOTATION_MARKS = "\""
 
-USB_HDC = "HDC"
-USB_TOOLS = "hdc_std"
 HDC_TOOLS = "hdc_std"
 
 
@@ -81,148 +78,28 @@ def get_package_name(hap_filepath):
 
     return package_name
 
-
 ##############################################################################
 ##############################################################################
 
 
-class DeviceAdapter:
-    def __init__(self, remote_ip="", repote_port="", device_sn="", name=""):
+class DeviceShell:
+    def __init__(self, conn_type, remote_ip="", device_sn="", repote_port="", name=""):
+        self.conn_type = conn_type
         self.device_sn = device_sn
         self.name = name
         self.test_path = "/data/test"
-        self.device_para = self.get_device_para(
-            remote_ip,
-            repote_port,
-            device_sn)
-        self.device_hdc_para = self.get_device_hdc_para(
-            device_sn
-        )
-        if len(self.device_para) == 3:
-            self.init_device()
-        if len(self.device_hdc_para) == 1:
-            self.init_device_hdc()
-
-    ###############################################################
-    ###############################################################
-
-    def init_device(self):
-        self.remount()
-        self.shell('rm -rf %s' % self.test_path)
-        self.shell('mkdir -p %s' % self.test_path)
-        self.shell('chmod 777 %s' % self.test_path)
-        self.shell("mount -o rw,remount,rw /%s" % "system")
-
-    def init_device_hdc(self):
-        self.target_mount()
-        self.hdc_shell('rm -rf %s' % self.test_path)
-        self.hdc_shell('mkdir -p %s' % self.test_path)
-        self.hdc_shell('chmod 777 %s' % self.test_path)
-        self.hdc_shell("mount -o rw,remount,rw /%s" % "system")
-
-    def remount(self):
-        command = "%s %s remount" % (USB_TOOLS, self.device_para)
-        self.execute_command(command)
-
-    def target_mount(self):
-        command = "%s %s target mount" % (HDC_TOOLS, self.device_hdc_para)
-        self.execute_command(command)
-
-    def push_file(self, srcpath, despath):
-        command = "%s %s push %s %s" % (
-            USB_TOOLS,
-            self.device_para,
-            srcpath,
-            despath)
-        return self.execute_command(command)
-
-    def push_hdc_file(self,srcpath, despath):
-        command = "%s %s file send %s %s" % (
-            USB_TOOLS, 
-            self.device_hdc_para,  
-            srcpath,
-            despath)
-        return self.execute_command(command)
-
-    def pull_file(self, srcpath, despath):
-        command = "%s %s pull %s %s" % (
-            USB_TOOLS,
-            self.device_para,
-            srcpath,
-            despath)
-        return self.execute_command(command)
-
-    def pull_hdc_file(self, srcpath, despath):
-        command = "%s %s file recv %s %s" % (
-            HDC_TOOLS,
-            self.device_hdc_para,
-            srcpath,
-            despath)
-        return self.execute_command(command)
-
-    def unlock_screen(self):
-        self.shell("svc power stayon true")
-
-    def unlock_device(self):
-        self.shell("input keyevent 82")
-        self.shell("wm dismiss-keyguard")
-
-    def lock_screen(self):
-        self.shell("svc power stayon false")
-
-    def disable_keyguard(self):
-        self.unlock_screen()
-        self.unlock_device()
-
-    def install_hap(self, suite_file):
-        file_name = os.path.basename(suite_file)
-        message = self.shell_with_output("bm install -p %s" % os.path.join(
-            self.test_path, file_name))
-        message = str(message).rstrip()
-        if message != "":
-            print(message)
-        if message == "" or "Success" in message:
-            return_code = True
+        if conn_type:
+            self.device_params = self.get_device_hdc_para(
+                device_sn
+            )
         else:
-            return_code = False
-        time.sleep(1)
-        return return_code
-
-    def uninstall_hap(self, suite_file):
-        package_name = get_package_name(suite_file)
-        result = self.shell("pm uninstall %s" % package_name)
-        time.sleep(1)
-        return result
-
-    def install_app(self, file_path):
-        command = "%s %s install %s" % (
-            USB_TOOLS,
-            self.device_para,
-            file_path)
-        message = self.execute_command(command)
-        message = str(message).rstrip()
-        if message != "":
-            print(message)
-        if message == "" or "Success" in message:
-            return_code = True
-        else:
-            return_code = False
-        time.sleep(1)
-        return return_code
-
-    def uninstall_app(self, package_name):
-        command = "pm uninstall %s" % (package_name)
-        return_code = self.shell_with_output(command)
-        if return_code:
-            time.sleep(1)
-        return return_code
-
-    ###############################################################
-    ###############################################################
+            self.device_params = self.get_device_para(
+                remote_ip, repote_port, device_sn)
+        self.init_device()
 
     @classmethod
     def get_device_para(cls, remote_ip="", remote_port="",
-                          device_sn=""):
+                        device_sn=""):
         if "" == remote_ip or "" == remote_port:
             if "" == device_sn:
                 device_para = ""
@@ -239,149 +116,26 @@ class DeviceAdapter:
     @classmethod
     def get_device_hdc_para(cls, device_sn=""):
         if " " == device_sn:
-            device_hdc_para = ""
+            device_para = ""
         else:
-            device_hdc_para = "-t %s" % device_sn
+            device_para = "-t %s" % device_sn
 
-        return device_hdc_para
+        return device_para
 
-    @classmethod
-    def execute_command(cls, command, print_flag=True, timeout=900):
-        try:
-            if print_flag:
-                print("command: " + command)
-            if subprocess.call(command, shell=True, timeout=timeout) == 0:
-                print("results: successed")
-                return True
-        except Exception as error:
-            print("Exception: %s" % str(error))
-        print("results: failed")
-        return False
-
-    @classmethod
-    def execute_command_with_output(cls, command, print_flag=True):
-        if print_flag:
-            print("command: " + command)
-
-        proc = subprocess.Popen(command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True)
-
-        try:
-            data, _ = proc.communicate()
-            if isinstance(data, bytes):
-                data = data.decode('utf-8', 'ignore')
-        finally:
-            proc.stdout.close()
-            proc.stderr.close()
-        return data
-
-    def shell(self, command=""):
-        return self.execute_command("%s %s shell %s%s%s" % (
-            USB_TOOLS,
-            self.device_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS))
-
-    def hdc_shell(self, command=""):
-        return self.execute_command("%s %s shell %s%s%s" % (
-            USB_HDC,
-            self.device_hdc_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS))
-
-    def execute_shell_command(self, command):
-        return self.shell(command)
-
-    def shell_with_output(self, command=""):
-        return self.execute_command_with_output("%s %s shell %s%s%s" % (
-            USB_TOOLS,
-            self.device_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS))
-
-    def hdc_std_shell_with(self, command=""):
-        return self.execute_command_with_output("%s %s shell %s%s%s" % (
-            USB_TOOLS,
-            self.device_hdc_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS
-        ))
-
-    @classmethod
-    def check_path_legal(cls, path):
-        if path and " " in path:
-            return "\"%s\"" % path
-        return path
-
-    def is_file_exist(self, file_path):
-        file_path = self.check_path_legal(file_path)
-        message = self.shell_with_output("ls %s" % file_path)
-        return False if message == "" else True
-
-
-##############################################################################
-##############################################################################
-
-
-class HDCDeviceAdapter:
-    def __init__(self, remote_ip="", repote_port="", device_sn="", name=""):
-        self.device_sn = device_sn
-        self.name = name
-        self.test_path = "/data/test/"
-        self.device_para = self.get_device_para(
-            remote_ip,
-            repote_port,
-            device_sn)
-        self.device_hdc_para = self.get_device_hdc_para(
-            device_sn
-        )
-        if len(self.device_para) == 3:
-            self.init_device()
-        if len(self.device_hdc_para) == 1:
-            self.init_device_hdc()
-
-    ###############################################################
-    ###############################################################
+    def remount(self):
+        if self.conn_type:
+            remount = "target mount"
+        else:
+            remount = "remount"
+        command = "%s %s %s" % (HDC_TOOLS, self.device_params, remount)
+        self.execute_command(command)
 
     def init_device(self):
         self.remount()
         self.shell('rm -rf %s' % self.test_path)
         self.shell('mkdir -p %s' % self.test_path)
-        self.shell('chmod 777 %s' % self.test_path)
+        self.shell('chmod 777 -R %s' % self.test_path)
         self.shell("mount -o rw,remount,rw /%s" % "system")
-
-    def init_device_hdc(self):
-        self.remount()
-        self.shell('rm -rf %s' % self.test_path)
-        self.shell('mkdir -p %s' % self.test_path)
-        self.shell('chmod 777 %s' % self.test_path)
-        self.shell("mount -o rw,remount,rw /%s" % "system")
-
-    def remount(self):
-        command = "%s %s target mount" % (HDC_TOOLS)
-        self.execute_command(command)
-
-    def push_file(self, srcpath, despath):
-        command = "%s %s file send %s %s" % (
-            HDC_TOOLS,
-            self.device_para,
-            srcpath,
-            despath)
-        return self.execute_command(command)
-
-    def pull_file(self, srcpath, despath):
-        command = "%s %s file recv %s %s" % (
-            HDC_TOOLS,
-            self.device_para,
-            srcpath,
-            despath)
-        return self.execute_command(command)
 
     def unlock_screen(self):
         self.shell("svc power stayon true")
@@ -390,6 +144,32 @@ class HDCDeviceAdapter:
         self.shell("input keyevent 82")
         self.shell("wm dismiss-keyguard")
 
+    def push_file(self, srcpath, despath):
+        if self.conn_type:
+            push_args = "file send"
+        else:
+            push_args = "push"
+        command = "%s %s %s %s %s" % (
+            HDC_TOOLS,
+            self.device_params,
+            push_args,
+            srcpath,
+            despath)
+        return self.execute_command(command)
+
+    def pull_file(self, srcpath, despath):
+        if self.conn_type:
+            pull_args = "file recv"
+        else:
+            pull_args = "pull"
+        command = "%s %s %s %s %s" % (
+            HDC_TOOLS,
+            self.device_params,
+            pull_args,
+            srcpath,
+            despath)
+        return self.execute_command(command)
+
     def lock_screen(self):
         self.shell("svc power stayon false")
 
@@ -397,33 +177,13 @@ class HDCDeviceAdapter:
         self.unlock_screen()
         self.unlock_device()
 
-    ###############################################################
-    ###############################################################
-
-    @classmethod
-    def get_device_para(cls, remote_ip="", remote_port="",
-                          device_sn=""):
-        if "" == remote_ip or "" == remote_port:
-            if "" == device_sn:
-                device_para = ""
-            else:
-                device_para = "-t %s" % device_sn
-        else:
-            if "" == device_sn:
-                device_para = "-s tcp:%s:%s" % (remote_ip, remote_port)
-            else:
-                device_para = "-s tcp:%s:%s -t %s" % (
-                    remote_ip, remote_port, device_sn)
-        return device_para
-
-    @classmethod
-    def get_device_hdc_para(cls, device_sn=""):
-        if " " == device_sn:
-            device_para = ""
-        else:
-            device_para = "-t %s" % device_sn
-
-        return device_para
+    def shell(self, command=""):
+        return self.execute_command("%s %s shell %s%s%s" % (
+            HDC_TOOLS,
+            self.device_params,
+            QUOTATION_MARKS,
+            command,
+            QUOTATION_MARKS))
 
     @classmethod
     def execute_command(cls, command, print_flag=True, timeout=900):
@@ -438,15 +198,23 @@ class HDCDeviceAdapter:
         print("results: failed")
         return False
 
+    def shell_with_output(self, command=""):
+        return self.execute_command_with_output("%s %s shell %s%s%s" % (
+            HDC_TOOLS,
+            self.device_params,
+            QUOTATION_MARKS,
+            command,
+            QUOTATION_MARKS))
+
     @classmethod
     def execute_command_with_output(cls, command, print_flag=True):
         if print_flag:
             print("command: " + command)
 
         proc = subprocess.Popen(command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True)
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                shell=True)
 
         try:
             data, _ = proc.communicate()
@@ -457,43 +225,8 @@ class HDCDeviceAdapter:
             proc.stderr.close()
         return data
 
-    def shell(self, command=""):
-        return self.execute_command("%s %s shell %s%s%s" % (
-            HDC_TOOLS,
-            self.device_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS))
-
-    def shell_with_output(self, command=""):
-        return self.execute_command_with_output("%s %s shell %s%s%s" % (
-            HDC_TOOLS,
-            self.device_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS))
-
-    def hdc_std_shell_with(self, command=""):
-        return self.execute_command_with_output("%s %s shell %s%s%s" % (
-            HDC_TOOLS,
-            self.device_hdc_para,
-            QUOTATION_MARKS,
-            command,
-            QUOTATION_MARKS
-        ))
-
     @classmethod
     def check_path_legal(cls, path):
         if path and " " in path:
             return "\"%s\"" % path
         return path
-
-    def is_file_exist(self, file_path):
-        file_path = self.check_path_legal(file_path)
-        message = self.shell_with_output("ls %s" % file_path)
-        return False if message == "" else True
-
-
-##############################################################################
-##############################################################################
-

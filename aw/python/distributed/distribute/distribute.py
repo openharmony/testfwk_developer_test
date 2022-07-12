@@ -19,7 +19,6 @@
 import os
 import sys
 import re
-import json
 import time
 import platform
 
@@ -52,8 +51,7 @@ sys.path.insert(4, sys.adapter_dir)
 from distributed.common.common import create_empty_result_file
 from distributed.common.common import get_resource_dir
 from distributed.common.drivers import CppTestDriver
-from distributed.common.drivers import DexTestDriver
-from distributed.common.drivers import HapTestDriver
+
 
 DEVICE_INFO_TEMPLATE = "agentlist:%s\nagentport:%s,\ndevicesuuid:%s"
 
@@ -62,17 +60,13 @@ DEVICE_INFO_TEMPLATE = "agentlist:%s\nagentport:%s,\ndevicesuuid:%s"
 ##############################################################################
 
 
-def get_current_driver(device, target_name, hdc_tool):
+def get_current_driver(device, target_name):
     driver = None
     _, suffix_name = os.path.splitext(target_name)
     if suffix_name == "":
-        driver = CppTestDriver(device, hdc_tool)
+        driver = CppTestDriver(device)
     elif suffix_name == ".bin":
-        driver = CppTestDriver(device, hdc_tool)
-    elif suffix_name == ".dex":
-        driver = DexTestDriver(device)
-    elif suffix_name == ".hap":
-        driver = HapTestDriver(device)
+        driver = CppTestDriver(device)
     return driver
 
 
@@ -81,14 +75,14 @@ def get_current_driver(device, target_name, hdc_tool):
 
 
 class Distribute:
-    def __init__(self, suite_dir, major, agent_list, hdc_tool):
+    def __init__(self, suite_dir, major, agent_list, hdc_tools):
         self.suite_dir = suite_dir
         self.major = major
         self.agent_list = agent_list
-        self.hdc_tool = hdc_tool
+        self.hdc_tools = hdc_tools
 
     def exec_agent(self, device, target_name, result_path):
-        driver = get_current_driver(device, target_name, self.hdc_tool)
+        driver = get_current_driver(device, target_name)
         if driver is None:
             print("Error: driver is None.")
             return False
@@ -96,63 +90,46 @@ class Distribute:
         resource_dir = get_resource_dir(self.suite_dir, device.name)
 
         self._make_agent_desc_file(device)
-        if self.hdc_tool != "hdc":
-            device.push_file(os.path.join(self.suite_dir, "agent.desc"),
-                             device.test_path)
-            device.push_file(os.path.join(resource_dir, target_name),
-                             device.test_path)
-        else:
-            device.push_hdc_file(os.path.join(self.suite_dir, "agent.desc"),
-                             device.test_path)
-            device.push_hdc_file(os.path.join(resource_dir, target_name),
-                             device.test_path)
+        device.push_file(os.path.join(self.suite_dir, "agent.desc"),
+                         device.test_path)
+        device.push_file(os.path.join(resource_dir, target_name),
+                         device.test_path)
 
         suite_path = os.path.join(self.suite_dir, target_name)
         driver.execute(suite_path, result_path, background=True)
         return self._check_thread(device, target_name)
 
     def exec_major(self, device, target_name, result_path):
-        driver = get_current_driver(device, target_name, self.hdc_tool)
+        driver = get_current_driver(device, target_name)
         if driver is None:
             print("Error: driver is None.")
             return False
 
         resource_dir = get_resource_dir(self.suite_dir, device.name)
         self._make_major_desc_file()
-        if self.hdc_tool != "hdc":
-            device.push_file(os.path.join(self.suite_dir, "major.desc"),
-                             device.test_path)
-            device.push_file(os.path.join(resource_dir, target_name),
-                             device.test_path)
-        else:
-            device.push_hdc_file(os.path.join(self.suite_dir, "major.desc"),
-                             device.test_path)
-            device.push_hdc_file(os.path.join(resource_dir, target_name),
-                             device.test_path)
+        device.push_file(os.path.join(self.suite_dir, "major.desc"),
+                         device.test_path)
+        device.push_file(os.path.join(resource_dir, target_name),
+                         device.test_path)
 
         suite_path = os.path.join(self.suite_dir, target_name)
         return driver.execute(suite_path, result_path, background=False)
 
-    def pull_result(self, device, source_path, result_save_path):
+    @staticmethod
+    def pull_result(device, source_path, result_save_path):
         _, file_name = os.path.split(source_path)
-        if self.hdc_tool != "hdc":
-            device.pull_file(source_path, result_save_path)
-        else:
-            device.pull_hdc_file(source_path, result_save_path)
+        device.pull_file(source_path, result_save_path)
         if not os.path.exists(os.path.join(result_save_path, file_name)):
             create_empty_result_file(result_save_path, file_name)
-        return
 
-    def _check_thread(self, device, thread_name):
+    @staticmethod
+    def _check_thread(device, thread_name):
         check_command = "ps -A | grep %s" % thread_name
         checksum = 0
-        while checksum < 100:
+        while checksum < 10:
             checksum += 1
             print("check thread:%s %s times" % (thread_name, checksum))
-            if self.hdc_tool != "hdc":
-                output = device.shell_with_output(check_command)
-            else:
-                output = device.hdc_std_shell_with(check_command)
+            output = device.shell_with_output(check_command)
             if output == "":
                 time.sleep(0.1)
             else:
@@ -164,7 +141,7 @@ class Distribute:
         agent_ip_list = ""
         device_uuid_list = ""
 
-        if self.hdc_tool != "hdc":
+        if self.hdc_tools != "hdc":
             if self._query_device_uuid(self.major) != '':
                 device_uuid_list += self._query_device_uuid(self.major) + ","
 
@@ -198,11 +175,10 @@ class Distribute:
             self._write_device_config(config_info, config_agent_file)
 
     def _make_major_desc_file(self):
-
         agent_ip_list = ""
         device_uuid_list = ""
 
-        if self.hdc_tool != "hdc":
+        if self.hdc_tools != "hdc":
             if self._query_device_uuid(self.major) != "NoneTyple":
                 device_uuid_list += self._query_device_uuid(self.major) + ","
 
@@ -230,8 +206,8 @@ class Distribute:
             config_major_file = os.path.join(self.suite_dir, "major.desc")
             self._write_device_config(config_info, config_major_file)
 
-    @classmethod
-    def _query_device_ip(cls, device):
+    @staticmethod
+    def _query_device_ip(device):
         output = device.shell_with_output("getprop ro.hardware")
         if output == "":
             return ""
@@ -252,14 +228,14 @@ class Distribute:
 
         return ipaddress[0]
 
-    @classmethod
-    def _query_device_hdc_ip(cls, device):
-        output = device.hdc_std_shell_with("param get ohos.boot.hardware")
+    @staticmethod
+    def _query_device_hdc_ip(device):
+        output = device.shell_with_output("param get ohos.boot.hardware")
         if output == "":
             return ""
 
         isemulator = re.findall('readonly', str(output))
-        output = device.hdc_std_shell_with("ifconfig")
+        output = device.shell_with_output("ifconfig")
         if output == "":
             return ""
 
@@ -272,8 +248,8 @@ class Distribute:
             return ""
         return ipaddress[0]
 
-    @classmethod
-    def _query_device_uuid(cls, device):
+    @staticmethod
+    def _query_device_uuid(device):
         """
         1. Run the dumpsys DdmpDeviceMonitorService command to query the value
            of dev_nodeid.
@@ -287,18 +263,18 @@ class Distribute:
             return ""
 
         begin = device_info.find("dev_nodeid")
-        if (begin == -1):
+        if begin == -1:
             return ""
 
         end = device_info.find(",", begin)
-        if (end == -1):
+        if end == -1:
             return ""
 
         dev_nodeid_info = device_info[begin:end].replace('"', "")
         return dev_nodeid_info.split(":")[1]
 
-    @classmethod
-    def _query_device_hdc_uuid(cls, device):
+    @staticmethod
+    def _query_device_hdc_uuid(device):
         """
         1. Run the dumpsys DdmpDeviceMonitorService command to query the value
            of dev_nodeid.
@@ -309,12 +285,13 @@ class Distribute:
         if platform.system() == "Windows":
             file_path = os.path.normpath(os.path.join(sys.framework_root_dir, "../SoftBusdumpdeviceInfo"))
         else:
-            linux_file_path = "out/rk3568/communication/dsoftbus_standard/SoftBusdumpdeviceInfo"
-            file_path = os.path.normpath(os.path.join("../../", sys.framework_root_dir, linux_file_path))
+            softbus_file_path = "out/rk3568/communication/dsoftbus_standard/SoftBusdumpdeviceInfo"
+            file_path = os.path.normpath(os.path.join("../../", sys.framework_root_dir, softbus_file_path))
 
-        device.push_hdc_file(file_path, "/data/test")
+        device.push_file(file_path, "/data/test")
+        device.shell_with_output("chmod 777 -R /data/test/")
         chmod_device_file_path = "SoftBusdumpdeviceInfo"
-        device_info = device.hdc_std_shell_with("/data/test/%s" % chmod_device_file_path)
+        device_info = device.shell_with_output("/data/test/%s" % chmod_device_file_path)
 
         if device_info == "":
             return ""
@@ -322,8 +299,8 @@ class Distribute:
         if dev_nodeid_info:
             return str(dev_nodeid_info[0])
 
-    @classmethod
-    def _write_device_config(cls, device_info, file_path):
+    @staticmethod
+    def _write_device_config(device_info, file_path):
         file_dir, file_name = os.path.split(file_path)
         final_file = os.path.join(file_dir, file_name.split('.')[0] + ".desc")
         if os.path.exists(final_file):

@@ -28,47 +28,6 @@ from xdevice import ExecInfo
 LOG = platform_logger("distribute_utils")
 
 
-def execute_distribute_test_file(py_test_file, result_rootpath):
-    if os.path.exists(py_test_file):
-        environ_dic = dict(os.environ)
-        environ_dic["PYTEST_PYTESTPATH"] = sys.pytest_dir
-        environ_dic["PYTEST_RESULTPATH"] = result_rootpath
-
-        proc = subprocess.Popen([sys.executable, py_test_file],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                shell=False,
-                                env=environ_dic)
-
-        print("proc", proc)
-
-        try:
-            while proc.poll() is None:
-                line = proc.stdout.readline()
-                line = line.strip()
-                if isinstance(line, bytes):
-                    line = line.decode('utf-8', 'ignore')
-                if line != "":
-                    LOG.info(line)
-        finally:
-            data = proc.stdout.read()
-            if isinstance(data, bytes):
-                data = data.decode('utf-8', 'ignore')
-            if data != "":
-                LOG.info(data.rstrip("\n"))
-
-            data = proc.stderr.read()
-            if isinstance(data, bytes):
-                data = data.decode('utf-8', 'ignore')
-            if data != "":
-                error_message = data.rstrip("\n")
-                LOG.info(error_message)
-
-            proc.stdout.close()
-            proc.stderr.close()
-    return
-
-
 def make_device_info_file(tmp_path):
     env_manager = EnvironmentManager()
     device_info_file_path = os.path.join(tmp_path,
