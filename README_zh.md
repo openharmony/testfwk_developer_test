@@ -7,6 +7,7 @@ OpenHarmony为开发者提供了一套全面的自测试框架，开发者可根
  - [环境配置](https://gitee.com/openharmony/docs/tree/master/zh-cn/device-dev/subsystems/subsys-testguide-envbuild.md)
  - [源码获取](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/sourcecode-acquire.md)
 
+测试框架依赖于test_xdevice框架，在使用时两个框架放在同级目录，命名为xdevice
 
 ## 测试框架目录简介
 以下是测试框架的目录层级架构，在使用测试框架过程中可在相应目录查找对应组件。
