@@ -351,14 +351,15 @@ class ResultManager(object):
             remote_json_result_file = os.path.join(self.device_testpath,
                 "%s.json" % self.testsuite_name)
 
-        if self.device.is_file_exist(remote_result_file):
-            self.device.pull_file(remote_result_file, result_file_path)
-        elif self.device.is_file_exist(remote_json_result_file):
-            self.device.pull_file(remote_json_result_file,
-                                  result_josn_file_path)
-            result_file_path = result_josn_file_path
-        else:
-            LOG.info("%s not exist", remote_result_file)
+        if self.config.testtype[0] != "fuzztest":
+            if self.device.is_file_exist(remote_result_file):
+                self.device.pull_file(remote_result_file, result_file_path)
+            elif self.device.is_file_exist(remote_json_result_file):
+                self.device.pull_file(remote_json_result_file,
+                                    result_josn_file_path)
+                result_file_path = result_josn_file_path
+            else:
+                LOG.info("%s not exist", remote_result_file)
 
         return result_file_path
 
@@ -404,7 +405,7 @@ class ResultManager(object):
             if not os.path.exists(cxx_cov_path):
                 os.makedirs(cxx_cov_path)
             src_file = os.path.join(DEFAULT_TEST_PATH, target_name)
-            self.device.pull_file(src_file, cxx_cov_path, is_create=True)
+            self.device.pull_file(src_file, cxx_cov_path, is_create=True, timeout=TIME_OUT)
 
 
 ##############################################################################

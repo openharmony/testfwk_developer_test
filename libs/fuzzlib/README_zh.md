@@ -140,6 +140,8 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 
    基于[ohos_fuzztest]配置Fuzz模板，例如：
 
+   需要注意的是fuzz_config_file, 使用gen命令生成的BUILD.GN文件中没有指明，需要写完测试套后加在BUILD.gn中
+
    ```
    ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
      module_out_path = module_output_path
@@ -169,7 +171,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    }
    ```
    **注意：** 
-   - 测试套名称采用大驼峰风格，并且以FuzzTest结尾，测试套前缀与fuzzer目录名相对应。
+   - #### 测试套名称必须采用大驼峰风格，并且必须以FuzzTest结尾，测试套前缀与fuzzer目录名相对应（例如：calculator_fuzzer，只能有一个下划线）。
    - module_out_path为测试套编译输出目录，内容为部件+模块名。
    
 
@@ -237,13 +239,14 @@ run -t FUZZ -ss developertest -tm calculator
 
   1. 归档用例配置文件、语料以及用例可执行文件
 
-     新建目录，如：
+     新建目录，如： 
+     #### 注意：必须是\tests目录
 
      ```
      D:\test\tests
      ```
 
-     用例可执行文件为DTFuzz源文件编译产出文件，以二进制形式存储在out/release/package/phone/tests/fuzztest下。测试用例的配置文件均编译输出在out/release/package/phone/tests/res目录下对应的xxxx_fuzzer目录中。
+     用例可执行文件为DTFuzz源文件编译产出文件，以二进制形式存储在out/release/tests/fuzztest下。测试用例的配置文件均编译输出在out/release/tests/res目录下对应的xxxx_fuzzer目录中。
      将fuzztest目录以及res目录直接拷贝到该路径下即可。
 
      
