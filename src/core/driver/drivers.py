@@ -674,7 +674,7 @@ class JSUnitTestDriver(IDriver):
                 timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
         else:
             timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
-        resource_manager.process_preparer_data(resource_data_dic, resource_dir,self.config.device)
+        resource_manager.process_preparer_data(resource_data_dic, resource_dir, self.config.device)
         main_result = self._install_hap(suite_file)
         result = ResultManager(suite_file, self.config)
         if main_result:
@@ -686,7 +686,7 @@ class JSUnitTestDriver(IDriver):
                 if timeout:
                     actiontime = timeout
                     times = 1
-                device_log_file_open = os.open(device_log_file, os.O_RDONLY,stat.S_IWUSR | stat.S_IRUSR)
+                device_log_file_open = os.open(device_log_file, os.O_RDONLY, stat.S_IWUSR | stat.S_IRUSR)
                 with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
                         as file_read_pipe:
                     for i in range(0, times):
@@ -710,7 +710,7 @@ class JSUnitTestDriver(IDriver):
             self.result = result.get_test_results("Error: install hap failed")
             LOG.error("Error: install hap failed")
 
-        resource_manager.process_cleaner_data(resource_data_dic, resource_dir,self.config.device)
+        resource_manager.process_cleaner_data(resource_data_dic, resource_dir, self.config.device)
 
     def generate_console_output(self, device_log_file, request):
         result_message = self.read_device_log(device_log_file)
