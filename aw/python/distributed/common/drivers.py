@@ -27,7 +27,7 @@ from core.config.resource_manager import ResourceManager
 ##############################################################################
 ##############################################################################
 
-DEVICE_TEST_PATH = "/%s/%s/" % ("data", "test")
+DEVICE_TEST_PATH = "%s/%s/" % ("data", "test")
 
 
 def get_level_para_string(level_string):
