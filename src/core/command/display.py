@@ -297,7 +297,7 @@ def show_subsystem_list(product_form):
 def show_acts_subsystem_list():
     print("List of currently supported acts subsystem names:")
     sub_list = ['global', 'security', 'useriam', 'multimedia', 'appexecfwk', 'account', 'communication', 'notification',
-    'ability', 'miscservices', 'powermgr', 'startup', 'sensor', 'distributeddatamgr', 'update', 'graphic','arkui',
+    'ability', 'miscservices', 'powermgr', 'startup', 'sensor', 'distributeddatamgr', 'update', 'graphic', 'arkui',
     'storage', 'compileruntime', 'usb', 'multimodalinput', 'resourceschedule',
     'telephony', 'hiviewdfx', 'location', 'barrierfree', 'customization']
     sub_list.sort()

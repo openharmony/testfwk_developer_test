@@ -87,7 +87,7 @@ class DeviceShell:
         self.conn_type = conn_type
         self.device_sn = device_sn
         self.name = name
-        self.test_path = "/data/test"
+        self.test_path = "data/test"
         if conn_type:
             self.device_params = self.get_device_hdc_para(
                 device_sn
