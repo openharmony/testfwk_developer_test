@@ -24,41 +24,26 @@ from xdevice import platform_logger
 from core.constants import ConfigFileConst
 
 LOG = platform_logger("config_manager")
-
-# 变量注释 framework_res_dir = OpenHarmony/test/developertest
-# 变量注释 CONFIG_PATH = OpenHarmony/test/developertest/config
 CONFIG_PATH = os.path.join(sys.framework_res_dir, "config")
 
 
-# framework_config.xml
 class FrameworkConfigManager(object):
-
     def __init__(self, filepath=""):
         if filepath == "":
-
-            # 变量注释 filepath = OpenHarmony/test/developertest/config/framework_config.xml
             self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.FRAMECONFIG_FILEPATH))
         else:
             self.filepath = filepath
 
     def get_framework_config(self, target_name):
-        # 获取framework_config.xml中所有name的value，返回列表
         data_list = []
         
         try:
             if os.path.exists(self.filepath):
-
-                # 读取xml文件
                 tree = ET.parse(self.filepath)
-
-                # 获取根节点
                 root = tree.getroot()
-
-                # 获取节点的名字
                 node = root.find(target_name)
 
-                # 遍历 name 节点 获取value 添加到data_list中
                 for sub in node:
                     value = sub.attrib.get("name")
                     if value and value != "":
@@ -67,7 +52,6 @@ class FrameworkConfigManager(object):
             LOG.error(("Parse %s fail!" % self.filepath) + xml_exception.args)
         return data_list
 
-    # 获取framework_config.xml中test_category标签里name、desc、timeout的value，返回字典
     def get_test_category_info(self, target_name="test_category"):
         test_type_timeout_dic = {}
         try:
@@ -87,17 +71,13 @@ class FrameworkConfigManager(object):
             LOG.error(("Parse %s fail!" % self.filepath) + xml_exception.args)
         return test_type_timeout_dic
 
-    # 获取framework_config.xml中all_category标签里name的value，返回列表 如：unittest、moduletest、systemtest、performance
     def get_all_category_info(self, target_name="all_category"):
         return self.get_framework_config(target_name)
 
 
-# filter_config.xml
 class FilterConfigManager(object):
     def __init__(self, filepath=""):
         if filepath == "":
-
-            # 变量注释 filepath = OpenHarmony/test/developertest/config/filter_config.xml
             self.filepath = os.path.abspath(
                 os.path.join(CONFIG_PATH,
                              ConfigFileConst.FILTERCONFIG_FILEPATH))
@@ -129,7 +109,6 @@ class FilterConfigManager(object):
         return self.filepath
 
 
-# 这里的filepath不存在
 class ResourceConfigManager(object):
     def __init__(self, filepath=""):
         if filepath == "":
@@ -165,8 +144,6 @@ class ResourceConfigManager(object):
 class UserConfigManager(object):
     def __init__(self, config_file=""):
         if config_file == "":
-
-            # 变量注释 filepath = OpenHarmony/test/developertest/config/user_config.xml
             self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.USERCONFIG_FILEPATH))
         else:
@@ -286,8 +263,6 @@ class UserConfigManager(object):
 class BuildConfigManager(object):
     def __init__(self, filepath=""):
         if filepath == "":
-
-            # 变量注释 filepath = OpenHarmony/test/developertest/config/build_config.xml
             self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.BUILDCONFIG_FILEPATH))
         else:
@@ -315,8 +290,6 @@ class BuildConfigManager(object):
 class FuzzerConfigManager(object):
     def __init__(self, config_path=""):
         if config_path == "":
-
-            # 变量注释 filepath = OpenHarmony/test/developertest/config/fuzz_config.xml
             self.filepath = self.filepath = os.path.abspath(os.path.join(
                 CONFIG_PATH, ConfigFileConst.FUZZCONFIG_FILEPATH))
         else:

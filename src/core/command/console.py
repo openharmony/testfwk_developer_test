@@ -85,7 +85,6 @@ class Console(object):
         else:
             self.command_parser(" ".join(args[1:]))
 
-    # 命令执行总入口
     def _console(self):
         if platform.system() != 'Windows':
             signal.signal(signal.SIGTSTP, self.handler_ctrl_z)  # ctrl+x linux
@@ -93,11 +92,9 @@ class Console(object):
 
         while True:
             try:
-                # 获取用户命令输入
                 usr_input = input(">>> ")
                 if usr_input == "":
                     continue
-                # 用户输入命令解析
                 self.command_parser(usr_input)
             except SystemExit:
                 LOG.info("Program exit normally!")
@@ -105,7 +102,6 @@ class Console(object):
             except (IOError, EOFError, KeyboardInterrupt) as error:
                 LOG.exception("Input Error: %s" % error)
 
-    # 参数解析方法
     @classmethod
     def argument_parser(cls, para_list):
         """
@@ -117,13 +113,9 @@ class Console(object):
         parser = None
 
         try:
-            # argparse是一个Python模块：命令行选项、参数和子命令解析器
-            # 使用argparse的第一步：创建一个ArgumentParser对象，ArgumentParser对象包含将命令行解析成Python数据类型所需的全部信息
             parser = argparse.ArgumentParser(description="Specify test para.")
             parser.add_argument("action", type=str.lower,
                                 help="Specify action")
-
-            # Developer test general test parameters
             parser.add_argument("-p", "--productform",
                                 action="store",
                                 type=str.lower,
@@ -178,8 +170,6 @@ class Console(object):
                                 default="",
                                 help="Specify test level"
                                 )
-
-            # Developer test extended test parameters
             parser.add_argument("-cov", "--coverage",
                                 action="store_true",
                                 dest="coverage",
@@ -214,10 +204,8 @@ class Console(object):
                                 default="",
                                 help="Specify fuzzer name"
                                 )
-            # 解析部分命令行参数，会返回一个由两个条目构成的元组，其中包含带成员的命名空间（options）和剩余参数字符串的列表（unparsed）
-            (options, unparsed) = parser.parse_known_args(para_list)
 
-            # Set default value
+            (options, unparsed) = parser.parse_known_args(para_list)
             options.target_os_name = "OHOS"
             options.build_variant = "release"
             options.device_sn = ""
@@ -235,14 +223,12 @@ class Console(object):
 
     def command_parser(self, args):
         try:
-            # 将用户输入的指令按空格拆分成字符串数组
             para_list = args.split()
             options, _, valid_param = self.argument_parser(para_list)
             if options is None or not valid_param:
                 LOG.warning("options is None.")
                 return
 
-            # 根据命令行的命令选择不同的方法执行
             command = options.action
             if command == "":
                 LOG.warning("action is empty.")
@@ -297,7 +283,6 @@ class Console(object):
             LOG.error("Wrong gen command.")
         return
 
-    # run命令执行入口
     @classmethod
     def _process_command_run(cls, command, options):
         if command == ToolCommandType.TOOLCMD_KEY_RUN:
