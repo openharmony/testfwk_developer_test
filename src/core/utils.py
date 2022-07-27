@@ -50,7 +50,6 @@ def get_file_list(find_path, postfix=""):
     return file_list
 
 
-# 获取目录下每一个文件，并放到一个列表里
 def get_file_list_by_postfix(path, postfix=""):
     file_list = []
     for dirs in os.walk(path):
@@ -97,13 +96,11 @@ def get_build_output_path(product_form):
     build_output_path = os.path.join(sys.source_code_root_path,
                                      "out",
                                      build_output_name)
-    # 返回编译结果输出目录：~/OpenHarmony/out/rk3568（以rk3568举例）
     return build_output_path
 
 
 def scan_support_product():
     # scan standard and large system info
-    # 路径注释 product_form_dir = OpenHarmony/productdefine/common/products/
     product_form_dir = os.path.join(sys.source_code_root_path,
                                     "productdefine",
                                     "common",

@@ -73,8 +73,6 @@ class BuildTestcases(object):
             return ""
 
         testcase_outpath = ""
-
-        # 路径注释 get_build_output_path = OpenHarmony/out/rk3568/build_configs/platforms_info/toolchain_to_variant.json
         toolchain_filepath = os.path.join(
             get_build_output_path(productform),
             "build_configs",
@@ -102,7 +100,7 @@ class BuildTestcases(object):
             "acts",
             "testcases")
         LOG.info("acts_testcase_out_dir=%s" % acts_testcase_out_dir)
-        # 删除~/OpenHarmony/out/rk3568/suites/acts/testcases目录内容
+
         if os.path.exists(acts_testcase_out_dir):
             shutil.rmtree(acts_testcase_out_dir)
 
@@ -121,14 +119,14 @@ class BuildTestcases(object):
                 "tests")
 
         LOG.info("package_out_dir=%s" % package_out_dir)
-        # 删除~/OpenHarmony/out/rk3568/packages/phone/tests目录内容
+
         if os.path.exists(package_out_dir):
             shutil.rmtree(package_out_dir)
 
         phone_out_dir = os.path.join(
             self.project_rootpath, "out", "release", "tests")
         LOG.info("phone_out_dir=%s" % phone_out_dir)
-        # 删除~/OpenHarmony/out/release/tests目录内容
+
         if os.path.exists(phone_out_dir):
             shutil.rmtree(phone_out_dir)
 
@@ -203,7 +201,6 @@ class BuildTestcases(object):
         build_result = False
         acts_build_command = []
         current_path = os.getcwd()
-        # 路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
         os.chdir(self.xts_project_rootpath)
         acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
         acts_build_command.append("system_size=standard")
@@ -240,7 +237,6 @@ class BuildTestcases(object):
         self._merge_testcase_dir(para.productform)
         return build_result
 
-    # 编译测试用例（编译命令拼接）
     def build_testcases(self, productform, target):
         command = []
         if self.is_build_example:
@@ -255,7 +251,6 @@ class BuildTestcases(object):
         self._merge_testcase_dir(productform)
         return build_result
 
-    # 编译ACTS测试用例
     def build_acts_testcases(self, para):
         self._delete_acts_testcase_dir(para.productform)
         build_result = self._execute_build_acts_command(para)

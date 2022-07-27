@@ -184,19 +184,11 @@ def select_user_input(data_list):
         return select_item_value, select_item_index
 
 
-# 选择productform
 def select_productform():
     select_value = "phone"
-
-    # 列表注释 scan_support_product() = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568]
     scan_product_list = scan_support_product()
-
-    # 从framework_config.xml里取productform节点的value:ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus
     config_product_list = \
         FrameworkConfigManager().get_framework_config("productform")
-
-    # 列表注释 productform_list = [DAYU,Hi3516,ohos_arm64,ohos_sdk,rk3568,
-    # 列表注释 ipcamera_hispark_aries、ipcamera_hispark_taurus、wifiiot_hispark_pegasus]
 
     productform_list = scan_product_list + config_product_list
     if len(productform_list) != 0:
@@ -281,7 +273,6 @@ def show_testtype_list():
         print("No category specified.")
 
 
-# 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取subsystemlist
 def show_subsystem_list(product_form):
     print("List of currently supported subsystem names:")
     parser = ParsePartsConfig(product_form)
@@ -306,7 +297,6 @@ def show_acts_subsystem_list():
     print("end")
 
 
-# 从OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里的subsystem_infos中subsystem_infos下获取partlist
 def show_partname_list(product_form):
     print("List of currently supported part names:")
     parser = ParsePartsConfig(product_form)

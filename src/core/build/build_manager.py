@@ -48,10 +48,6 @@ class BuildManager(object):
                 gn_file.write("  ]\n")
             gn_file.write("}\n")
 
-    # 根据目标编译测试用例
-    # project_root_path 工程根目录
-    # product_form 产品形态，指令第一步选择的产品
-    # build_target 编译目标
     @classmethod
     def _compile_test_cases_by_target(cls, project_root_path, product_form,
                                       build_target):
@@ -64,9 +60,6 @@ class BuildManager(object):
             build_result = False
         return build_result
 
-    # 根据目标编译acts测试用例
-    # project_root_path 工程根目录
-    # para 指令参数
     @classmethod
     def _compile_acts_test_cases(cls, project_root_path, para):
         if BuildTestcases(project_root_path).build_acts_testcases(para):
@@ -87,23 +80,19 @@ class BuildManager(object):
             LOG.info("Test case compilation failed, please modify.")
         return build_result
 
-    # 编译入口
     def _compile_testcases(self, project_root_path, para):
-        # 获取所有支持的产品，3.1Release版本为["DAYU","Hi3516DV300","ohos-arm64","ohos-sdk","rk3568"]
         all_product_list = scan_support_product()
         if para.productform not in all_product_list:
             from core.build.build_lite_manager import BuildLiteManager
             build_lite_manager = BuildLiteManager(project_root_path)
             return build_lite_manager.build_testcases(para)
 
-        # 如果测试集不为空，build_target为测试集
         if para.testsuit != "":
             return self._compile_test_cases_by_target(
                 project_root_path,
                 para.productform,
                 para.testsuit)
 
-        # 如果测试集为空，部件列表为空，模块列表为空，测试类型中含有“ALL”，build_target为"make_test"
         if (len(para.partname_list) == 0 and para.testmodule == "" and
                 "ALL" in para.testtype):
             return self._compile_test_cases_by_target(
@@ -111,14 +100,12 @@ class BuildManager(object):
                 para.productform,
                 "make_test")
 
-        # 如果测试集为空，三个条件（部件列表为空，模块列表为空，测试类型中含有“ALL”）不同时成立
         target_list = SelectTargets(
             project_root_path).filter_build_targets(para)
         if len(target_list) == 0:
             LOG.warning("No build target found.")
             return False
 
-        # 路径拼接 build_cfg_filepath = OpenHarmony/test/developertest/BUILD.gn
         build_cfg_filepath = os.path.join(project_root_path,
                                           "test",
                                           "developertest",
