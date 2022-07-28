@@ -26,11 +26,8 @@ from xdevice import IDriver
 from xdevice import Plugin
 from xdevice import platform_logger
 from xdevice import DeviceLabelType
-from xdevice import ComType
-from xdevice import ParserType
 from xdevice import ShellHandler
 from xdevice import ExecuteTerminate
-from xdevice import LiteDeviceExecuteCommandError
 from xdevice import get_plugin
 from xdevice import JsonParser
 from xdevice import get_config_value
@@ -39,6 +36,10 @@ from xdevice import check_result_report
 from xdevice import get_device_log_file
 from xdevice import get_test_component_version
 from xdevice import ParamError
+from ohos.constants import ParserType
+from ohos.constants import ComType
+from ohos.constants import CKit
+from ohos.exception import LiteDeviceExecuteCommandError
 from core.utils import get_filename_extension
 from core.testkit.kit_lite import DeployKit
 from core.config.resource_manager import ResourceManager
