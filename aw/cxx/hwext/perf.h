@@ -20,7 +20,7 @@
 #include <list>
 #include <map>
 #include <ctime>
-#include "securec.h"
+#include "iosfwd"
 
 #include <gtest/gtest.h>
 

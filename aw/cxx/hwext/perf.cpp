@@ -14,11 +14,21 @@
  */
 
 #include "perf.h"
-
-#include <cstring>
+#include "__config"
+#include "__functional_base"
+#include "gtest/gtest-message.h"
+#include "gtest/gtest-test-part.h"
+#include "gtest/gtest.h"
+#include "istream"
+#include "libxml/globals.h"
+#include "libxml/xmlstring.h"
+#include "list"
+#include "map"
+#include "securec.h"
+#include "stdio.h"
+#include "string"
 #include <sstream>
-#include <cstdio>
-#include <cstdlib>
+#include "type_traits"
 
 #include <libxml/parser.h>
 using namespace std;
