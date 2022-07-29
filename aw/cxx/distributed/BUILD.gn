@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 
 config("distributedtest_config") {
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     ".",
     "utils/",
   ]
@@ -28,14 +28,17 @@ ohos_static_library("distributedtest_lib") {
     "distributed_cfg.cpp",
     "distributed_major.cpp",
   ]
-  deps = [
-    "//third_party/googletest:gtest",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//third_party/googletest:gtest" ]
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "c_utils:utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps = [
+      "hilog:libhilog",
+      "utils_base:utils",
+    ]
   }
   public_configs = [ ":distributedtest_config" ]
 }

@@ -20,7 +20,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
     "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/app_distributeddata/include",
@@ -44,6 +44,7 @@ ohos_distributedtest("DistributeDemo") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -54,7 +55,6 @@ ohos_distributedtest("DistributeDemo") {
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/:distributeddata_inner",
     "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter:distributeddata_adapter",
     "//third_party/googletest:gtest",
-    "//utils/native/base:utils",
   ]
 }
 
@@ -66,6 +66,7 @@ ohos_distributedtest("DistributeDemoAgent") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -76,7 +77,6 @@ ohos_distributedtest("DistributeDemoAgent") {
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/:distributeddata_inner",
     "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter:distributeddata_adapter",
     "//third_party/googletest:gtest",
-    "//utils/native/base:utils",
   ]
 }
 
