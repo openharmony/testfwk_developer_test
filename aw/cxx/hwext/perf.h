@@ -16,12 +16,12 @@
 #ifndef AW_CXX_HWEXT_PERF_H_
 #define AW_CXX_HWEXT_PERF_H_
 
+#include <iosfwd>
+
 #include <string>
 #include <list>
 #include <map>
 #include <ctime>
-#include "securec.h"
-
 #include <gtest/gtest.h>
 
 namespace OHOS {

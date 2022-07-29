@@ -13,13 +13,20 @@
  * limitations under the License.
  */
 
-#include "perf.h"
+#include <perf.h>
+#include <gtest/gtest-message.h>
+#include <gtest/gtest-test-part.h>
+#include <gtest/gtest.h>
+#include <istream>
+#include <libxml/globals.h>
+#include <libxml/xmlstring.h>
+#include <list>
+#include <map>
+#include <securec.h>
+#include <type_traits>
+#include <string>
 
-#include <cstring>
 #include <sstream>
-#include <cstdio>
-#include <cstdlib>
-
 #include <libxml/parser.h>
 using namespace std;
 
