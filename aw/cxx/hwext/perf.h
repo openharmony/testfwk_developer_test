@@ -16,7 +16,7 @@
 #ifndef AW_CXX_HWEXT_PERF_H_
 #define AW_CXX_HWEXT_PERF_H_
 
-#include "iosfwd"
+#include <iosfwd>
 
 #include <string>
 #include <list>
