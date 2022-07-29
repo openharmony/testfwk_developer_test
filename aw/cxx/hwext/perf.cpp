@@ -14,8 +14,6 @@
  */
 
 #include <perf.h>
-#include <__config>
-#include <__functional_base>
 #include <gtest/gtest-message.h>
 #include <gtest/gtest-test-part.h>
 #include <gtest/gtest.h>
@@ -25,7 +23,6 @@
 #include <list>
 #include <map>
 #include <securec.h>
-#include <stdio.h>
 #include <type_traits>
 #include <string>
 
