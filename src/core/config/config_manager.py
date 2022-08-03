@@ -45,7 +45,6 @@ class FrameworkConfigManager(object):
     def get_framework_config(self, target_name):
         # 获取framework_config.xml中所有name的value，返回列表
         data_list = []
-        
         try:
             if os.path.exists(self.filepath):
 
