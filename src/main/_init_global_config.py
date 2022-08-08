@@ -43,12 +43,13 @@ def _init_global_config():
         "src"))
     sys.path.insert(0, sys.xdevice_dir)
 
-    # 变量注释 sys.xdevice_extension_dir = OpenHarmony/xdevice/extension/src
+    # 变量注释 sys.xdevice_ohos_dir = OpenHarmony/xdevice/plugins/ohos/src
     sys.xdevice_extension_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "..",
         "xdevice",
-        "extension",
+        "plugins",
+        "ohos",
         "src"))
     sys.path.insert(1, sys.xdevice_extension_dir)
 
@@ -110,10 +111,15 @@ def _load_internal_plugins():
     _iter_module_plugins([core.driver, benchmark.report.benchmark_reporter])
 
     try:
-        import xdevice_extension._core.environment
-        _iter_module_plugins([xdevice_extension._core.environment])
-        import xdevice_extension._core.driver
-        _iter_module_plugins([xdevice_extension._core.driver])
+        import ohos.environment
+        _iter_module_plugins([ohos.environment])
+        import ohos.testkit
+        _iter_module_plugins([ohos.testkit])
+        import ohos.managers
+        _iter_module_plugins([ohos.managers])
+        import ohos.parser
+        _iter_module_plugins([ohos.parser])
+
     except (ModuleNotFoundError, ImportError):
         pass
 

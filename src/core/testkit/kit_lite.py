@@ -25,16 +25,15 @@ import subprocess
 
 from xdevice import platform_logger
 from xdevice import Plugin
-from xdevice import CKit
-from xdevice import ComType
 from xdevice import ParamError
 from xdevice import LiteDeviceError
 from xdevice import ITestKit
 from xdevice import get_config_value
 from xdevice import get_file_absolute_path
-from xdevice import LiteDeviceConnectError
 from xdevice import DeviceAllocationState
-
+from ohos.constants import ComType
+from ohos.constants import CKit
+from ohos.exception import LiteDeviceConnectError
 
 __all__ = ["DeployKit"]
 LOG = platform_logger("KitLite")

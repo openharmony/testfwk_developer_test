@@ -29,6 +29,7 @@ from json import JSONDecodeError
 
 from xdevice import DeviceTestType
 from xdevice import DeviceLabelType
+from xdevice import CommonParserType
 from xdevice import ExecuteTerminate
 from xdevice import DeviceError
 from xdevice import ShellHandler
@@ -37,8 +38,7 @@ from xdevice import IDriver
 from xdevice import platform_logger
 from xdevice import Plugin
 from xdevice import get_plugin
-from xdevice_extension._core.constants import CommonParserType
-from xdevice_extension._core.environment.dmlib import process_command_ret
+from ohos.environment.dmlib import process_command_ret
 from core.utils import get_decode
 from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
@@ -461,14 +461,14 @@ class CppTestDriver(IDriver):
                 serial)
 
             with open(device_log_file, "a", encoding="UTF-8") as file_pipe:
-                self.config.device.start_catch_device_log(file_pipe)
+                self.config.device.start_catch_device_log(hilog_file_pipe=file_pipe)
                 self._init_gtest()
                 self._run_gtest(suite_file)
         finally:
             self.config.device.stop_catch_device_log()
 
     def _init_gtest(self):
-        self.config.device.hdc_command("target mount")
+        self.config.device.connector_command("target mount")
         self.config.device.execute_shell_command(
             "rm -rf %s" % self.config.target_test_path)
         self.config.device.execute_shell_command(
@@ -562,7 +562,7 @@ class CppTestDriver(IDriver):
             if corpus_dirs:
                 for corpus in corpus_dirs:
                     mkdir_corpus_command = f"shell; mkdir -p {corpus}"
-                    self.config.device.hdc_command(mkdir_corpus_command)
+                    self.config.device.connector_command(mkdir_corpus_command)
 
             # push corpus file
             if corpus_file_list:
@@ -655,7 +655,7 @@ class JSUnitTestDriver(IDriver):
             self.ability_name = ability_name
             self.config.test_hap_out_path = \
                 "/data/data/%s/files/" % self.package_name
-            self.config.device.hdc_command("shell hilog -r")
+            self.config.device.connector_command("shell hilog -r")
 
             hilog = get_device_log_file(
                 request.config.report_path,
@@ -667,7 +667,7 @@ class JSUnitTestDriver(IDriver):
                                  0o755)
 
             with os.fdopen(hilog_open, "a") as hilog_file_pipe:
-                self.config.device.start_catch_device_log(hilog_file_pipe)
+                self.config.device.start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
                 self._init_jsunit_test()
                 self._run_jsunit(suite_file, hilog)
                 hilog_file_pipe.flush()
@@ -676,7 +676,7 @@ class JSUnitTestDriver(IDriver):
             self.config.device.stop_catch_device_log()
 
     def _init_jsunit_test(self):
-        self.config.device.hdc_command("target mount")
+        self.config.device.connector_command("target mount")
         self.config.device.execute_shell_command(
             "rm -rf %s" % self.config.target_test_path)
         self.config.device.execute_shell_command(
@@ -787,7 +787,7 @@ class JSUnitTestDriver(IDriver):
         return return_message
 
     def _install_hap(self, suite_file):
-        message = self.config.device.hdc_command("install %s" % suite_file)
+        message = self.config.device.connector_command("install %s" % suite_file)
         message = str(message).rstrip()
         if message == "" or "success" in message:
             return_code = True

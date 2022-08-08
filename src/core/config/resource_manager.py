@@ -158,7 +158,7 @@ class ResourceManager(object):
             else:
                 command = item["name"] + " " + item["value"]
                 command = command.strip()
-                device.hdc_command(command)
+                device.connector_command(command)
 
     def lite_process_resource_file(self, resource_dir, preparer_list):
         for item in preparer_list:
