@@ -242,7 +242,7 @@ BENCHMARK_MAIN();
    >
    > 因此若一个用例两个参数均指定，理论上用例中的函数实际执行次数为**Repetitions与Iterations的乘积**
 
-   benchmark还支持其他多种参数，具体介绍和使用参考[benchmark](https://gitee.com/openharmony/third_party_benchmark/blob/master/README.md)
+   benchmark还支持其他多种参数，具体介绍和使用参考[benchmark](https://gitee.com/openharmony/third_party_benchmark)
 
 ﻿
 ## 用例编译
