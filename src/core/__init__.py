@@ -16,9 +16,8 @@
 # limitations under the License.
 #
 
-
-from . import _init_global_config
 from core.command.console import Console
+from . import _init_global_config
 
 __all__ = [
     "Console",
