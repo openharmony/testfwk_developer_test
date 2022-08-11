@@ -158,7 +158,7 @@ class BenchmarkReport(object):
 
             mdl_summary_list = self._get_subsystem_cxx_benchmark(sbs_name,
                 module_name, testsuit_name, json_file)
-            self.benchmark_list = mdl_summary_list
+            self.benchmark_list.extend(mdl_summary_list)
 
             if sbs_name in system_summary_dic.keys() \
                 and testsuit_name in system_summary_dic[sbs_name].keys():

@@ -30,7 +30,7 @@ namespace {
     /**
      * @tc.name: BenchmarkTestExample
      * @tc.desc: Testcase for testing 'SimpleExample' function.
-     * @tc.type: FUNC
+     * @tc.type: PERF
      * @tc.require: Issue Number
      */
     size_t SimpleExample()
@@ -56,7 +56,7 @@ namespace {
      * @tc.name: BenchmarkTestVectorOperator
      * @tc.desc: Testcase for testing "AccessVectorElementByOperator"
      *           function.
-     * @tc.type: FUNC
+     * @tc.type: PERF
      * @tc.require: Issue Number
      */
     void AccessVectorElementByOperator()
@@ -88,7 +88,7 @@ namespace {
      * @tc.name: BenchmarkTestVectorAt
      * @tc.desc: Testcase for testing "AccessVectorElementByAt"
      *           function.
-     * @tc.type: FUNC
+     * @tc.type: PERF
      * @tc.require: Issue Number
      */
     void AccessVectorElementByAt()
@@ -115,7 +115,7 @@ namespace {
      * @tc.name: CalculatedAreaTestCase
      * @tc.desc: Define a testcase that accesses a class member
      *           variable.
-     * @tc.type: FUNC
+     * @tc.type: PERF
      * @tc.require: Issue Number
      */
     class BenchmarkDemoTest : public benchmark::Fixture {
@@ -194,7 +194,7 @@ BENCHMARK_MAIN();
    /**
     * @tc.name: BenchmarkTestExample
     * @tc.desc: Testcase for testing 'SimpleExample' function.
-    * @tc.type: FUNC
+    * @tc.type: PERF
     * @tc.require: Issue Number
     */
     size_t SimpleExample()
@@ -211,6 +211,8 @@ BENCHMARK_MAIN();
         }
     }
    ```
+   > **注意：**
+   > 测试用例名称不要过长，否则会造成测试报告无法生成。
 
 5. 向benchmark注册用例
 
