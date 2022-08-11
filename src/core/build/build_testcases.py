@@ -208,7 +208,8 @@ class BuildTestcases(object):
         acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
         acts_build_command.append("system_size=standard")
         if len(para.subsystem) > 0:
-            acts_build_command.append(BUILD_TARGET_SUBSYSTEM % para.subsystem[0])
+            input_subsystem = ",".join(para.subsystem)
+            acts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
         if para.testsuit != "" and len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
         elif para.testsuit != "" and len(para.subsystem) == 0:
