@@ -50,7 +50,7 @@ def get_file_list(find_path, postfix):
     return file_list
 
 
-def get_file_list_by_postfix(path, postfix, filter_jar = ""):
+def get_file_list_by_postfix(path, postfix, filter_jar=""):
     file_list = []
     for dirs in os.walk(path):
         files = get_file_list(find_path=dirs[0], postfix=postfix)
