@@ -43,7 +43,7 @@ def init_global_config():
         "test",
         "developertest")
     if os.path.exists(sys.framework_root_dir) == False :
-        LOG.error("Please execute in the source code.")
+        LOG.error("Please execute in the OpenHarmony source code.")
 
     # 变量注释 sys.xdevice_dir = OpenHarmony/test/xdevice/src
     sys.xdevice_dir = os.path.join(
