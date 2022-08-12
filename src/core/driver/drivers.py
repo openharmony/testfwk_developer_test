@@ -511,7 +511,7 @@ class CppTestDriver(IDriver):
                 test_para)
         else:
             coverage_outpath = self.config.coverage_outpath
-            strip_num = len(coverage_outpath.split(os.sep)) - 1
+            strip_num = len(coverage_outpath.split("/")) - 1
             command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
                 "GCOV_PREFIX_STRIP=%s ./%s %s" % \
                 (self.config.target_test_path,
