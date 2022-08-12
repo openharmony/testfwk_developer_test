@@ -31,13 +31,13 @@ def init_global_config():
     sys.path.insert(0, sys.framework_src_dir)
 
     current_path = os.getcwd()
-    split_dir = current_path.split("/",4)
+    split_dir = current_path.split("/", 4)
     root_dir = "/"+split_dir[1]+"/"+split_dir[2]+"/"+split_dir[3]
     sys.framework_root_dir = os.path.join(
         root_dir,
         "test",
         "developertest")
-    if os.path.exists(sys.framework_root_dir) == False :
+    if not os.path.exists(sys.framework_root_dir):
         LOG.error("Please execute in the source code.")
 
     sys.xdevice_dir = os.path.join(
