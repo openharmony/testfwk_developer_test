@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -142,6 +142,9 @@ class TestCaseManager(object):
                 prefix_name, suffix_name = os.path.splitext(file_name)
                 if suffix_name != ".hap":
                     continue
+                # 如果acts测试指定了-tp，只有部件名与moduleInfo中part一致的HAP包才会加入最终执行的队列
+                if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(acts_suite_file):
+                    continue
                 # 如果acts测试指定了-ts，只有完全匹配的HAP包才会加入最终执行的队列
                 if options.testsuit != "" and options.testsuit != prefix_name:
                     continue
@@ -225,3 +228,19 @@ class TestCaseManager(object):
             return False
         finally:
             print(" check hap test file finally")
+
+    @classmethod
+    def get_part_name_test_file(cls, hap_file_path):
+        if hap_file_path.endswith(".hap"):
+            module_info_file_path = hap_file_path.replace(".hap", ".moduleInfo")
+            if os.path.exists(module_info_file_path):
+                with open(module_info_file_path, 'r') as json_file:
+                    data_dic = json.load(json_file)
+                    if not data_dic:
+                        return False
+                    else:
+                        if "part" in data_dic.keys():
+                            part_name = data_dic["part"]
+                            return part_name
+            else:
+                return "space"

@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #
-# Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -208,7 +208,8 @@ class BuildTestcases(object):
         acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
         acts_build_command.append("system_size=standard")
         if len(para.subsystem) > 0:
-            acts_build_command.append(BUILD_TARGET_SUBSYSTEM % para.subsystem[0])
+            input_subsystem = ",".join(para.subsystem)
+            acts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
         if para.testsuit != "" and len(para.subsystem) > 0:
             acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
         elif para.testsuit != "" and len(para.subsystem) == 0:

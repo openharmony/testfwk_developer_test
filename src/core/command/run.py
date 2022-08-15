@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #
-# Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -78,12 +78,11 @@ class Run(object):
             LOG.error("Build test cases failed.")
             return
 
-        test_case_path = self.get_tests_out_path(options.productform)
-        if not os.path.exists(test_case_path):
-            LOG.error("%s is not exist." % test_case_path)
-            return
+        if "actstest" in options.testtype:
+            test_dict = self.get_acts_test_dict(options)
+        else:
+            test_dict = self.get_test_dict(options)
 
-        test_dict = TestCaseManager().get_test_files(test_case_path, options)
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
             return
@@ -228,6 +227,15 @@ class Run(object):
         LOG.info("testcase_path=%s" % testcase_path)
         return testcase_path
 
+    @classmethod
+    def get_acts_tests_out_path(cls, product_form):
+        acts_testcase_path = os.path.abspath(os.path.join(
+            get_build_output_path(product_form),
+            "suites",
+            "acts",
+            "testcases"))
+        LOG.info("acts_testcase_path=%s" % acts_testcase_path)
+        return acts_testcase_path
 
     @classmethod
     def get_coverage_outpath(cls, options):
@@ -240,5 +248,21 @@ class Run(object):
             if coverage_out_path == "":
                 LOG.error("Coverage test: coverage_outpath is empty.")
         return coverage_out_path
+
+    def get_acts_test_dict(self, options):
+        # 获取测试用例编译结果路径
+        acts_test_case_path = self.get_acts_tests_out_path(options.productform)
+        acts_test_dict = TestCaseManager().get_acts_test_files(acts_test_case_path, options)
+        return acts_test_dict
+
+    def get_test_dict(self, options):
+        # 获取测试用例编译结果路径
+        test_case_path = self.get_tests_out_path(options.productform)
+        if not os.path.exists(test_case_path):
+            LOG.error("%s is not exist." % test_case_path)
+            return
+
+        test_dict = TestCaseManager().get_test_files(test_case_path, options)
+        return test_dict
 
 

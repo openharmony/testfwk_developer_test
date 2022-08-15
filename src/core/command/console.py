@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,8 +20,9 @@ import argparse
 import sys
 import signal
 import platform
-
+from dataclasses import dataclass
 from core.constants import ToolCommandType
+from core.exception import ParamError
 from xdevice import platform_logger
 from xdevice import EnvironmentManager
 from core.command.run import Run
@@ -40,9 +41,8 @@ except ModuleNotFoundError:
 except ImportError:
     print("ImportError: libreadline.so is not exist.")
 
-__all__ = ["Console"]
+__all__ = ["Console", "ConfigConst"]
 LOG = platform_logger("Console")
-
 
 ##############################################################################
 ##############################################################################
@@ -122,7 +122,6 @@ class Console(object):
             parser = argparse.ArgumentParser(description="Specify test para.")
             parser.add_argument("action", type=str.lower,
                                 help="Specify action")
-
             # Developer test general test parameters
             parser.add_argument("-p", "--productform",
                                 action="store",
@@ -163,6 +162,14 @@ class Console(object):
                                 dest="testsuit",
                                 default="",
                                 help="Specify test suit"
+                                )
+            parser.add_argument("-ta", "--testargs",
+                                action="store",
+                                type=str,
+                                nargs='+',
+                                dest=ConfigConst.testargs,
+                                default={},
+                                help="Specify test arguments"
                                 )
             parser.add_argument("-tc", "--testcase",
                                 action="store",
@@ -214,7 +221,9 @@ class Console(object):
                                 default="",
                                 help="Specify fuzzer name"
                                 )
+
             # 解析部分命令行参数，会返回一个由两个条目构成的元组，其中包含带成员的命名空间（options）和剩余参数字符串的列表（unparsed）
+            cls._params_pre_processing(para_list)
             (options, unparsed) = parser.parse_known_args(para_list)
 
             # Set default value
@@ -272,6 +281,37 @@ class Console(object):
                 RuntimeError, SystemError, TypeError, ValueError,
                 UnicodeError) as exception:
             LOG.exception(exception, exc_info=False)
+
+    @classmethod
+    def _params_pre_processing(cls, para_list):
+        if len(para_list) <= 1 or (
+                len(para_list) > 1 and "-" in str(para_list[1])):
+            para_list.insert(1, "empty")
+        for index, param in enumerate(para_list):
+            if param == "--retry":
+                if index + 1 == len(para_list):
+                    para_list.append("retry_previous_command")
+                elif "-" in str(para_list[index + 1]):
+                    para_list.insert(index + 1, "retry_previous_command")
+            elif param == "-->":
+                para_list[index] = "!%s" % param
+
+    @staticmethod
+    def _parse_combination_param(combination_value):
+        # sample: size:xxx1;exclude-annotation:xxx
+        parse_result = {}
+        key_value_pairs = str(combination_value).split(";")
+        for key_value_pair in key_value_pairs:
+            key, value = key_value_pair.split(":", 1)
+            if not value:
+                raise ParamError("'%s' no value" % key)
+            value_list = str(value).split(",")
+            exist_list = parse_result.get(key, [])
+            exist_list.extend(value_list)
+            parse_result[key] = exist_list
+        return parse_result
+
+
 
     @classmethod
     def _process_command_help(cls, para_list):
@@ -349,6 +389,47 @@ class Console(object):
                                                            product_form)
         return build_result
 
+@dataclass
+class ConfigConst(object):
+    action = "action"
+    task = "task"
+    testlist = "testlist"
+    testfile = "testfile"
+    testcase = "testcase"
+    testdict = "testdict"
+    device_sn = "device_sn"
+    report_path = "report_path"
+    resource_path = "resource_path"
+    testcases_path = "testcases_path"
+    testargs = "testargs"
+    pass_through = "pass_through"
+    test_environment = "test_environment"
+    exectype = "exectype"
+    testtype = "testtype"
+    testdriver = "testdriver"
+    retry = "retry"
+    session = "session"
+    dry_run = "dry_run"
+    reboot_per_module = "reboot_per_module"
+    check_device = "check_device"
+    configfile = "config"
+    repeat = "repeat"
+    subsystems = "subsystems"
+    parts = "parts"
+
+    # Runtime Constant
+    history_report_path = "history_report_path"
+    product_info = "product_info"
+    task_state = "task_state"
+    recover_state = "recover_state"
+    need_kit_setup = "need_kit_setup"
+    task_kits = "task_kits"
+    module_kits = "module_kits"
+    spt = "spt"
+    version = "version"
+    component_mapper = "_component_mapper"
+    component_base_kit = "component_base_kit"
+    support_component = "support_component"
 
 ##############################################################################
 ##############################################################################
