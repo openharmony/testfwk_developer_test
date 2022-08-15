@@ -550,13 +550,15 @@ class CppTestDriver(IDriver):
             corpus_file_list = []
 
             for root, _, files in os.walk(corpus_path):
-                if files:
-                    corpus_dir = root.split("corpus")[-1].replace("\\", "/")
-                    if corpus_dir:
-                        corpus_dirs.append(corpus_dir)
-                    for file in files:
-                        corpus_file_list.append(os.path.normcase(
-                            os.path.join(root, file)))
+                if not files:
+                    continue
+                
+                corpus_dir = root.split("corpus")[-1].replace("\\", "/")
+                corpus_dirs.append(corpus_dir)
+
+                for file in files:
+                    corpus_file_list.append(os.path.normcase(
+                        os.path.join(root, file)))
 
             # mkdir corpus files dir
             if corpus_dirs:
