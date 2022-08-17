@@ -159,6 +159,8 @@ class Run(object):
                             DeviceTestType.ctest_lite)
                     else:
                         print("productform is not wifiiot")
+                options.testcases_path = self.get_acts_tests_out_path(options.productform)
+                options.resource_path = self.get_acts_tests_out_path(options.productform)
                 scheduler.exec_command(command, options)
         return
 

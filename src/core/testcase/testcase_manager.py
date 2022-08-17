@@ -36,6 +36,7 @@ TESTFILE_TYPE_DATA_DIC = {
     "PYT": [],
     "CXX": [],
     "BIN": [],
+    "OHJST": [],
     "JST": [],
 }
 FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
@@ -150,9 +151,18 @@ class TestCaseManager(object):
                     continue
                 if not self.check_hap_test_file(acts_suite_file):
                     continue
-                acts_suit_file_dic["JST"].append(acts_suite_file)
+                if not self.get_hap_test_driver(acts_suite_file):
+                    continue
+                if self.get_hap_test_driver(acts_suite_file) == "OHJSUnitTest":
+                    acts_suit_file_dic["OHJST"].append(acts_suite_file)
+                    print(" acts_suit_file_dic['OHJST'] :%s" % acts_suit_file_dic["OHJST"])
+                if self.get_hap_test_driver(acts_suite_file) == "JSUnitTest":
+                    acts_suit_file_dic["JST"].append(acts_suite_file)
+
         else:
             LOG.error("acts %s is not exist." % acts_test_case_path)
+
+        print(" acts_suit_file_dic :%s" % acts_suit_file_dic)
         return acts_suit_file_dic
 
     @classmethod
@@ -228,6 +238,28 @@ class TestCaseManager(object):
             return False
         finally:
             print(" check hap test file finally")
+
+    @classmethod
+    def get_hap_test_driver(cls, hap_file_path):
+        if hap_file_path.endswith(".hap"):
+            json_file_path = hap_file_path.replace(".hap", ".json")
+            if os.path.exists(json_file_path):
+                with open(json_file_path, 'r') as json_file:
+                    data_dic = json.load(json_file)
+                    if not data_dic:
+                        return False
+                    else:
+                        if "driver" in data_dic.keys():
+                            driver_dict = data_dic.get("driver")
+                            if bool(driver_dict):
+                                driver_type = driver_dict.get("type")
+                                return driver_type
+                            else:
+                                LOG.error("%s has not set driver." % hap_file_path)
+            else:
+                return False
+        else:
+            return False
 
     @classmethod
     def get_part_name_test_file(cls, hap_file_path):

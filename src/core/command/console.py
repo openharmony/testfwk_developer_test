@@ -389,6 +389,7 @@ class Console(object):
                                                            product_form)
         return build_result
 
+
 @dataclass
 class ConfigConst(object):
     action = "action"
@@ -430,6 +431,7 @@ class ConfigConst(object):
     component_mapper = "_component_mapper"
     component_base_kit = "component_base_kit"
     support_component = "support_component"
+
 
 ##############################################################################
 ##############################################################################
