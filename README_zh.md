@@ -216,7 +216,7 @@ subsystem  # 子系统
     	    EXPECT_EQ(4, actual);
     	}
     	```
-		> **注意：** @tc.require: 格式必须以AR、SR或issus开头：AR+AR号、SR+SR号或issue+issue号，例如：issueI56WJ7
+		> **注意：** @tc.require: 格式必须以AR/SR或issue开头： 如：issueI56WJ7
 
 	    在编写用例时，我们提供了三种用例模板供您选择。
 	
@@ -376,7 +376,7 @@ subsystem  # 子系统
             expect(info != null).assertEqual(true)
     	 })
     	```
-		> **注意：** @tc.require: 格式必须以AR、SR或issus开头：AR+AR号、SR+SR号或issue+issue号，例如：issueI56WJ7
+		> **注意：** @tc.require: 格式必须以AR/SR或issue开头： 如：issueI56WJ7
 
 **Fuzz测试**
 
@@ -699,6 +699,10 @@ subsystem  # 子系统
     <version>false</version>
     <!-- 是否编译测试用例, 默认为true，若已完成编译，再执行用例之前可修改为false，防止重新编译 -->
     <testcase>true</testcase>
+	<!-- 在编译测试用例的情况下，选择编译target_cpu是64位的还是32位的，默认为空（32bit） -->
+    <parameter>
+       <target_cpu></target_cpu>
+    </parameter>
   </build>
   <environment>
     <!-- 配置远程映射机器的IP及端口，以支持HDC连接的设备 -->
