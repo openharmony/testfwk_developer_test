@@ -133,8 +133,12 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
        return 0;
    }
    ```
+   ### 注意：当data需强制转换为字符串类型时，需要携带size，例如:
+   ```
+   std::string result((const char*) data, size);
+   ```
 
-   
+
 
 2. BUILD.gn编写
 
