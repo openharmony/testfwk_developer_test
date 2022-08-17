@@ -699,7 +699,7 @@ subsystem  # 子系统
     <version>false</version>
     <!-- 是否编译测试用例, 默认为true，若已完成编译，再执行用例之前可修改为false，防止重新编译 -->
     <testcase>true</testcase>
-	<!-- 在编译测试用例的情况下，选择编译target_cpu是64位的还是32位的，默认为空（32bit） -->
+	<!-- 在编译测试用例的情况下，选择编译target_cpu是64位的还是32位的，默认为空（32bit）可以选择: arm64 -->
     <parameter>
        <target_cpu></target_cpu>
     </parameter>
