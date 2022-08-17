@@ -216,6 +216,8 @@ subsystem  # 子系统
     	    EXPECT_EQ(4, actual);
     	}
     	```
+		> **注意：** @tc.require: 格式必须以AR、SR或issus开头：AR+AR号、SR+SR号或issue+issue号，例如：issueI56WJ7
+
 	    在编写用例时，我们提供了三种用例模板供您选择。
 	
 	    |      类型 |    描述 |
@@ -374,6 +376,7 @@ subsystem  # 子系统
             expect(info != null).assertEqual(true)
     	 })
     	```
+		> **注意：** @tc.require: 格式必须以AR、SR或issus开头：AR+AR号、SR+SR号或issue+issue号，例如：issueI56WJ7
 
 **Fuzz测试**
 
