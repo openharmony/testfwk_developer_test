@@ -153,7 +153,6 @@ class TestCaseManager(object):
                     continue
                 if self.get_hap_test_driver(acts_suite_file) == "OHJSUnitTest":
                     acts_suit_file_dic["OHJST"].append(acts_suite_file)
-                    print("acts_suit_file_dic[‘OHJST’] ：%s " % acts_suit_file_dic["OHJST"])
                 if self.get_hap_test_driver(acts_suite_file) == "JSUnitTest":
                     acts_suit_file_dic["JST"].append(acts_suite_file)
         else:
@@ -197,7 +196,6 @@ class TestCaseManager(object):
                         break
         return is_valid_status
 
-
     @classmethod
     def check_python_test_file(cls, suite_file):
         if suite_file.endswith(".py"):
@@ -205,7 +203,6 @@ class TestCaseManager(object):
             if filename.startswith("test_"):
                 return True
         return False
-
 
     @classmethod
     def check_hap_test_file(cls, hap_file_path):
