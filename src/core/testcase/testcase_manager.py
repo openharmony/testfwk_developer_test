@@ -155,14 +155,10 @@ class TestCaseManager(object):
                     continue
                 if self.get_hap_test_driver(acts_suite_file) == "OHJSUnitTest":
                     acts_suit_file_dic["OHJST"].append(acts_suite_file)
-                    print(" acts_suit_file_dic['OHJST'] :%s" % acts_suit_file_dic["OHJST"])
                 if self.get_hap_test_driver(acts_suite_file) == "JSUnitTest":
                     acts_suit_file_dic["JST"].append(acts_suite_file)
-
         else:
             LOG.error("acts %s is not exist." % acts_test_case_path)
-
-        print(" acts_suit_file_dic :%s" % acts_suit_file_dic)
         return acts_suit_file_dic
 
     @classmethod
