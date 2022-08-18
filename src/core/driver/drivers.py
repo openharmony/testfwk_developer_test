@@ -606,7 +606,7 @@ class CppTestDriver(IDriver):
 ##############################################################################
 ##############################################################################
 
-@Plugin(type=Plugin.DRIVER, id=DeviceTestType.jsunit_test)
+#@Plugin(type=Plugin.DRIVER, id=DeviceTestType.jsunit_test)
 class JSUnitTestDriver(IDriver):
     """
     JSUnitTestDriver is a Test that runs a native test package on given device.

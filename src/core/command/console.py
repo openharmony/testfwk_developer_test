@@ -312,7 +312,6 @@ class Console(object):
         return parse_result
 
 
-
     @classmethod
     def _process_command_help(cls, para_list):
         if para_list[0] == ToolCommandType.TOOLCMD_KEY_HELP:
@@ -336,6 +335,7 @@ class Console(object):
         else:
             LOG.error("Wrong gen command.")
         return
+
 
     # run命令执行入口
     @classmethod
