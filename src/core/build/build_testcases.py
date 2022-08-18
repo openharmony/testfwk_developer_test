@@ -260,7 +260,6 @@ class BuildTestcases(object):
             command.append("--target-cpu")
             command.append(target_cpu)
         command.append("--ccache")
-        # command.append(BUILD_TARGET_PLATFORM % productform)
         self._delete_testcase_dir(productform)
         build_result = self._execute_build_command(productform, command)
         self._merge_testcase_dir(productform)
