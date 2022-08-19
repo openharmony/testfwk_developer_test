@@ -288,10 +288,10 @@ class Distribute:
             softbus_file_path = "out/rk3568/communication/dsoftbus_standard/SoftBusdumpdeviceInfo"
             file_path = os.path.normpath(os.path.join("../../", sys.framework_root_dir, softbus_file_path))
 
-        device.push_file(file_path, "/data/test")
-        device.shell_with_output("chmod 777 -R /data/test/")
+        device.push_file(file_path, "data/test")
+        device.shell_with_output("chmod 777 -R data/test/")
         chmod_device_file_path = "SoftBusdumpdeviceInfo"
-        device_info = device.shell_with_output("/data/test/%s" % chmod_device_file_path)
+        device_info = device.shell_with_output("data/test/%s" % chmod_device_file_path)
 
         if device_info == "":
             return ""
