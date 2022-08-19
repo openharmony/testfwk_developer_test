@@ -336,8 +336,6 @@ class Console(object):
             LOG.error("Wrong gen command.")
         return
 
-
-    # run命令执行入口
     @classmethod
     def _process_command_run(cls, command, options):
         if command == ToolCommandType.TOOLCMD_KEY_RUN:
