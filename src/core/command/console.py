@@ -29,6 +29,7 @@ from core.command.run import Run
 from core.command.gen import Gen
 from core.command.display import display_help_info
 from core.command.display import display_show_info
+from core.command.display import display_version_info
 from core.command.display import show_wizard_mode
 from core.config.config_manager import UserConfigManager
 from core.utils import is_lite_product
@@ -275,6 +276,8 @@ class Console(object):
                 self._process_command_quit(command)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_LIST):
                 self._process_command_device(command)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_VERSION):
+                self._process_command_version(command)
             else:
                 print("The %s command is not supported." % command)
         except (AttributeError, IOError, IndexError, ImportError, NameError,
@@ -311,6 +314,11 @@ class Console(object):
             parse_result[key] = exist_list
         return parse_result
 
+
+    @classmethod
+    def _process_command_version(cls, para_list):
+        display_version_info(para_list)
+        return
 
 
     @classmethod

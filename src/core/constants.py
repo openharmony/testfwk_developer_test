@@ -47,6 +47,7 @@ class ToolCommandType(object):
     TOOLCMD_KEY_QUIT = "quit"
     TOOLCMD_KEY_LIST = "list"
     TOOLCMD_KEY_GEN = "gen"
+    TOOLCMD_KEY_VERSION = "version"
 
     @property
     def run_command(self):
