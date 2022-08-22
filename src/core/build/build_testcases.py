@@ -22,6 +22,7 @@ import json
 import shutil
 import subprocess
 import platform
+
 from xdevice import platform_logger
 from core.utils import get_build_output_path
 from core.utils import scan_support_product
@@ -210,9 +211,7 @@ class BuildTestcases(object):
         if len(para.subsystem) > 0:
             input_subsystem = ",".join(para.subsystem)
             acts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
-        if para.testsuit != "" and len(para.subsystem) > 0:
-            acts_build_command.append(BUILD_TARGET_SUITE % para.testsuit)
-        elif para.testsuit != "" and len(para.subsystem) == 0:
+        if para.testsuit != "" and len(para.subsystem) == 0:
             LOG.error("Please specify subsystem.")
             return
         if os.path.exists(BUILD_FILEPATH):

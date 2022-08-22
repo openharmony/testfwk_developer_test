@@ -345,7 +345,6 @@ class Console(object):
             LOG.error("Wrong gen command.")
         return
 
-    # run命令执行入口
     @classmethod
     def _process_command_run(cls, command, options):
         if command == ToolCommandType.TOOLCMD_KEY_RUN:
@@ -397,6 +396,7 @@ class Console(object):
                                                            product_form)
         return build_result
 
+
 @dataclass
 class ConfigConst(object):
     action = "action"
@@ -438,6 +438,7 @@ class ConfigConst(object):
     component_mapper = "_component_mapper"
     component_base_kit = "component_base_kit"
     support_component = "support_component"
+
 
 ##############################################################################
 ##############################################################################
