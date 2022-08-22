@@ -1,19 +1,19 @@
-# 测试子系统
-OpenHarmony为开发者提供了一套全面的自测试框架，开发者可根据测试需求开发相关测试用例，开发阶段提前发现缺陷，大幅提高代码质量。
+# 开发自测试执行框架
+OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-developertest，开发者可根据测试需求开发相关测试用例，开发阶段提前发现缺陷，大幅提高代码质量。
 
-本文从基础环境构建，用例开发，编译以及执行等方面介绍OpenHarmony测试框架如何运行和使用。
+本文从基础环境构建，用例开发，编译以及执行等方面介绍OpenHarmony开发自测试执行框架如何运行和使用。
 ## 基础环境构建
-测试框架依赖于python运行环境,python版本为3.8.X,在使用测试框架之前可参阅以下方式进行配置。
+开发自测试框架依赖于python运行环境,python版本为3.8.X,在使用测试框架之前可参阅以下方式进行配置。
  - [环境配置](https://gitee.com/openharmony/docs/tree/master/zh-cn/device-dev/subsystems/subsys-testguide-envbuild.md)
  - [源码获取](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/sourcecode-acquire.md)
 
-测试框架依赖于test_xdevice框架，在使用时两个框架放在同级目录，命名为xdevice
+开发自测试框架依赖于测试调度框架test_xdevice，在使用时两个框架放在同级目录，命名为xdevice
 
-## 测试框架目录简介
-以下是测试框架的目录层级架构，在使用测试框架过程中可在相应目录查找对应组件。
+## 开发自测试框架目录简介
+以下是开发自测试框架的目录层级架构，在使用开发自测试框架过程中可在相应目录查找对应组件。
 ```
 test  # 测试子系统
-├── developertest  # 开发者测试组件
+├── developertest  # 开发者自测试框架
 │   ├── aw  # 测试框架的静态库
 │   ├── config  # 测试框架配置
 │   │   │ ...
@@ -27,9 +27,13 @@ test  # 测试子系统
 │   └── start.sh  # 开发者测试入口（Linux）
 └── xdevice  # 测试框架依赖组件
 ```
-## 测试用例编写
-###  测试用例目录规划
+## 功能特性
+
+### 测试用例
+
+####  测试用例目录规划
 使用测试框架过程中，可根据以下层级关系规划测试用例目录。
+
 ```
 subsystem  # 子系统
 ├── partA  # 部件A
@@ -61,7 +65,7 @@ subsystem  # 子系统
 ```
 > **注意：** 测试用例根据不同设备形态差异分为通用用例和非通用用例，建议将通用用例存放在common目录下，非通用用例存放在相应设备形态目录下。
 
-###  测试用例编写
+####  测试用例编写
 本测试框架支持多种类型测试，针对不同测试类型提供了不同的用例编写模板以供参考。
 
 **TDD测试（C++）**
@@ -134,7 +138,7 @@ subsystem  # 子系统
     {
         // step 1:调用函数获取结果
         int actual = Sub(4，0)；
-
+    
         // Step 2:使用断言比较预期与实际结果
         EXPECT_EQ(4, actual);
     }
@@ -160,7 +164,7 @@ subsystem  # 子系统
     2. 引用测试框架头文件和命名空间
 	    ```
     	#include <gtest/gtest.h>
-    
+    	
     	using namespace testing::ext;
     	```
     3. 添加被测试类的头文件
@@ -176,22 +180,22 @@ subsystem  # 子系统
     	    void SetUp();
     	    void TearDown();
     	};
-    
+        
     	void CalculatorSubTest::SetUpTestCase(void)
     	{
     	    // input testsuit setup step，setup invoked before all testcases
     	}
-    
+        
     	void CalculatorSubTest::TearDownTestCase(void)
     	{
     	    // input testsuit teardown step，teardown invoked after all testcases
     	}
-    
+        
     	void CalculatorSubTest::SetUp(void)
     	{
     	    // input testcase setup step，setup invoked before each testcases
     	}
-    
+        
     	void CalculatorSubTest::TearDown(void)
     	{
     	    // input testcase teardown step，teardown invoked after each testcases
@@ -211,11 +215,13 @@ subsystem  # 子系统
     	{
     	    //step 1:调用函数获取结果
     	    int actual = Sub(4，0)；
-
+        
     	    //Step 2:使用断言比较预期与实际结果
     	    EXPECT_EQ(4, actual);
     	}
     	```
+		> **注意：** @tc.require: 格式必须以AR/SR或issue开头： 如：issueI56WJ7
+
 	    在编写用例时，我们提供了三种用例模板供您选择。
 	
 	    |      类型 |    描述 |
@@ -305,7 +311,7 @@ subsystem  # 子系统
         it("appInfoTest001", 0, function () {
             //step 1:调用函数获取结果
             var info = app.getInfo()
-
+	
             //Step 2:使用断言比较预期与实际结果
             expect(info != null).assertEqual(true)
         })
@@ -332,7 +338,7 @@ subsystem  # 子系统
     2. 导入被测api和jsunit测试库
 	    ```
     	import app from '@system.app'
-    
+    	
     	import {describe, beforeAll, beforeEach, afterEach, afterAll, it, expect} from 'deccjsunit/index'
     	```
     3. 定义测试套（测试类）
@@ -369,11 +375,12 @@ subsystem  # 子系统
     	 it("appInfoTest001", 0, function () {
     	    //step 1:调用函数获取结果
             var info = app.getInfo()
-
+		
             //Step 2:使用断言比较预期与实际结果
             expect(info != null).assertEqual(true)
     	 })
     	```
+		> **注意：** @tc.require: 格式必须以AR/SR或issue开头： 如：issueI56WJ7
 
 **Fuzz测试**
 
@@ -385,13 +392,15 @@ subsystem  # 子系统
 [Benchmark用例编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/benchmark/README_zh.md)
 
 
-### 测试用例编译文件编写
+#### 测试用例编译文件编写
 根据测试用例目录规划，当执行某一用例时，测试框架会根据编译文件逐层查找，最终找到所需用例进行编译。下面通过不同示例来讲解gn文件如何编写。
 
-#### TDD测试
+**TDD测试**
+
 针对不同语言，下面提供不同的编译模板以供参考。
 
 - **C++用例编译配置示例**
+    
     ```
     # Copyright (c) 2021 XXXX Device Co., Ltd.
     
@@ -426,13 +435,13 @@ subsystem  # 子系统
     }
     ```
     详细内容如下：
-
-    1. 添加文件头注释信息
-	    ```
+    
+	1. 添加文件头注释信息
+        ```
     	# Copyright (c) 2021 XXXX Device Co., Ltd.
     	```
-    2. 导入编译模板文件
-	    ```
+	2. 导入编译模板文件
+        ```
     	import("//build/test.gni")
     	```
     3. 指定文件输出路径
@@ -472,8 +481,8 @@ subsystem  # 子系统
     	  deps = [ "//third_party/googletest:gtest_main" ]
     	}
     	```
-
-	    > **说明：根据测试类型的不同，在具体编写过程中可选择不同的测试类型：**
+	
+        > **说明：根据测试类型的不同，在具体编写过程中可选择不同的测试类型：**
     	> - ohos_unittest：单元测试
     	> - ohos_moduletest：模块测试
     	> - ohos_systemtest：系统测试
@@ -481,7 +490,7 @@ subsystem  # 子系统
     	> - ohos_securitytest：安全测试
     	> - ohos_reliabilitytest：可靠性测试
     	> - ohos_distributedtest：分布式测试
-
+    
     7. 对目标测试用例文件进行条件分组
     
     	```
@@ -625,16 +634,17 @@ subsystem  # 子系统
     	```
     	> **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
 
-#### Fuzz测试
+**Fuzz测试**
 
 [Fuzz编译文件编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/fuzzlib/README_zh.md)
 
-#### Benchmark测试
+**Benchmark测试**
 
 [Benchmark编译文件编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/benchmark/README_zh.md)
       
-#### 编译入口配置文件ohos.build
-    
+
+**编译入口配置文件ohos.build**
+
 当完成用例编译配置文件编写后，需要进一步编写部件编译配置文件，以关联到具体的测试用例。
 ```
 "partA": {
@@ -655,7 +665,7 @@ subsystem  # 子系统
 ```
 > **说明：** test_list中配置的是对应模块的测试用例。
 
-### 测试用例资源配置
+#### 测试用例资源配置
 测试依赖资源主要包括测试用例在执行过程中需要的图片文件，视频文件、第三方库等对外的文件资源。
 
 依赖资源文件配置步骤如下：
@@ -683,10 +693,10 @@ subsystem  # 子系统
 	>- target_name: 测试套的名称，定义在测试目录的BUILD.gn中。preparer: 表示该测试套执行前执行的动作。
 	>- src="res": 表示测试资源位于test目录下的resource目录下，src="out"：表示位于out/release/$(部件)目录下。
 
-## 测试用例执行
+### 测试用例执行
 在执行测试用例之前，针对用例使用设备的不同，需要对相应配置进行修改，修改完成即可执行测试用例。
 
-### user_config.xml配置
+#### user_config.xml配置
 ```
 <user_config>
   <build>
@@ -696,6 +706,10 @@ subsystem  # 子系统
     <version>false</version>
     <!-- 是否编译测试用例, 默认为true，若已完成编译，再执行用例之前可修改为false，防止重新编译 -->
     <testcase>true</testcase>
+	<!-- 在编译测试用例的情况下，选择编译target_cpu是64位的还是32位的，默认为空（32bit）可以选择: arm64 -->
+    <parameter>
+       <target_cpu></target_cpu>
+    </parameter>
   </build>
   <environment>
     <!-- 配置远程映射机器的IP及端口，以支持HDC连接的设备 -->
@@ -734,8 +748,8 @@ subsystem  # 子系统
 ```
 >**说明：** 在执行测试用例之前，若使用HDC连接设备，用例仅需配置设备IP和端口号即可，其余信息均默认不修改。
 
-### Windows环境执行
-#### 测试用例编译
+#### Windows环境执行
+##### 测试用例编译
 
 由于Windows环境下无法实现用例编译，因此执行用例前需要在Linux环境下进行用例编译，用例编译命令：
 ```
@@ -747,12 +761,13 @@ subsystem  # 子系统
 
 编译完成后，测试用例将自动保存在out/ohos-arm-release/packages/phone/tests目录下。
 
-#### 搭建执行环境
+##### 搭建执行环境
 1. 在Windows环境创建测试框架目录Test，并在此目录下创建testcase目录
 
 2. 从Linux环境拷贝测试框架developertest和xdevice到创建的Test目录下，拷贝编译好的测试用例到testcase目录下
+	
 	>**说明：** 将测试框架及测试用例从Linux环境移植到Windows环境，以便后续执行。
-
+	
 3. 修改user_config.xml
 	```
 	<build>
@@ -766,7 +781,7 @@ subsystem  # 子系统
 	```
 	>**说明：** `<testcase>`标签表示是否需要编译用例；`<dir>`标签表示测试用例查找路径。
 
-#### 执行用例
+##### 执行用例
 1. 启动测试框架
 	```
 	start.bat
@@ -792,8 +807,8 @@ subsystem  # 子系统
 	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
 	-h : 帮助命令。
 	```
-### Linux环境执行
-#### 远程端口映射
+#### Linux环境执行
+##### 远程端口映射
 为了在Linux远程服务器以及Linux虚拟机两种环境下执行测试用例，需要对端口进行远程映射，以实现与设备的数据通路连接。具体操作如下：
 1. HDC Server指令：
 	```
@@ -808,7 +823,7 @@ subsystem  # 子系统
 	```
 	>**说明：** 此处IP填写设备侧IP地址。
 
-#### 执行用例
+##### 执行用例
 1. 启动测试框架
 	```
 	./start.sh
@@ -835,10 +850,10 @@ subsystem  # 子系统
 	-h : 帮助命令。
 	```
 
-## 测试报告日志
+### 测试报告日志
 当执行完测试指令，控制台会自动生成测试结果，若需要详细测试报告您可在相应的数据文档中进行查找。
 
-### 测试结果
+#### 测试结果
 测试结果输出根路径如下：
 ```
 test/developertest/reports/xxxx_xx_xx_xx_xx_xx
@@ -853,22 +868,23 @@ test/developertest/reports/xxxx_xx_xx_xx_xx_xx
 | summary_report.html | 测试报告汇总 |
 | details_report.html | 测试报告详情 |
 
-### 测试框架日志
+#### 测试框架日志
 ```
 reports/platform_log_xxxx_xx_xx_xx_xx_xx.log
 ```
 
-### 最新测试报告
+#### 最新测试报告
 ```
 reports/latest
 ```
 
-## 涉及仓
+### 涉及仓
 
 [test\_xdevice](https://gitee.com/openharmony/test_xdevice/blob/master/README_zh.md)
 
+## 发布版本说明
 
-
+当前发布版本号为3.2.1.0。
 
 
 

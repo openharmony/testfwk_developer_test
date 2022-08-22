@@ -21,6 +21,10 @@
     <version>false</version>
     <!-- whether compile test case, default false -->
     <testcase>true</testcase>
+    <!-- whether compile test cpu, default null -->
+    <parameter>
+      <target_cpu></target_cpu>
+    </parameter>
   </build>
   <environment>
     <!-- reserved field, configure devices that support HDC connection -->

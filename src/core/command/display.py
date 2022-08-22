@@ -66,7 +66,7 @@ CMD_KEY_PARTLIST = "partlist"
 # acts子系统名称列表
 CMD_KEY_SUBSYSTEMLIST_ACTS = "actssubsystemlist"
 
-TOOL_VERSION_INFO = """Welcome to DeveloperTest V1.0.0.
+TOOL_VERSION_INFO = """Welcome to DeveloperTest V3.2.1.0
 """
 
 HLEP_COMMAND_INFOMATION = """use help [follow command] for more information:
@@ -247,6 +247,10 @@ def display_show_info(para_list, productform):
         display_show_command_info(para_list[1], productform)
     else:
         print(SUPPORT_COMMAND_SHOW)
+
+
+def display_version_info(para_list):
+    print(TOOL_VERSION_INFO)
 
 
 #############################################################################
