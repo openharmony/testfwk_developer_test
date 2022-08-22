@@ -22,7 +22,6 @@ import json
 import shutil
 import subprocess
 import platform
-import time
 
 from xdevice import platform_logger
 from core.utils import get_build_output_path
@@ -259,7 +258,6 @@ class BuildTestcases(object):
     # 编译ACTS测试用例
     def build_acts_testcases(self, para):
         self._delete_acts_testcase_dir(para.productform)
-        time.sleep(5)
         build_result = self._execute_build_acts_command(para)
         return build_result
 
