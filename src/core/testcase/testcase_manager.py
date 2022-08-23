@@ -255,8 +255,17 @@ class TestCaseManager(object):
                     return data_dic
 
     @classmethod
+    def get_hap_part_json(cls, hap_file_path):
+        if hap_file_path.endswith(".hap"):
+            json_file_path = hap_file_path.replace(".hap", ".moduleInfo")
+            if os.path.exists(json_file_path):
+                with open(json_file_path, 'r') as json_file:
+                    data_dic = json.load(json_file)
+                    return data_dic
+
+    @classmethod
     def get_part_name_test_file(cls, hap_file_path):
-        data_dic = cls.get_hap_json(hap_file_path)
+        data_dic = cls.get_hap_part_json(hap_file_path)
         if not data_dic:
             return False
         else:
