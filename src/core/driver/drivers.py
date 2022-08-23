@@ -553,8 +553,9 @@ class CppTestDriver(IDriver):
                 if not files:
                     continue
                 
-                corpus_dir = root.split("corpus")[-1].replace("\\", "/")
-                corpus_dirs.append(corpus_dir)
+                corpus_dir = root.split("corpus")[-1]
+                if corpus_dir != "":
+                    corpus_dirs.append(corpus_dir)
 
                 for file in files:
                     corpus_file_list.append(os.path.normcase(
