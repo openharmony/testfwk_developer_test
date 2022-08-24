@@ -389,6 +389,7 @@ class Console(object):
                                                            product_form)
         return build_result
 
+
 @dataclass
 class ConfigConst(object):
     action = "action"
