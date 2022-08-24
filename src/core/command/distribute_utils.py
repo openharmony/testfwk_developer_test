@@ -33,28 +33,42 @@ def make_device_info_file(tmp_path):
     device_info_file_path = os.path.join(tmp_path,
                                          "device_info_file.txt")
     with open(device_info_file_path, "w") as file_handle:
-        if env_manager.managers is not None:
-            for device in list(env_manager.managers.values())[1].devices_list:
-                if device.test_device_state.value == "ONLINE":
-                    status = device.label if device.label else 'None'
-                    LOG.info("%s,%s" % (device.device_sn, status))
-                    file_handle.write("%s,%s,%s,%s\n" % (
-                        device.device_sn,
-                        device.label if device.label else 'None',
-                        device.host,
-                        device.port))
+        if not env_manager.managers:
             return
-        if env_manager.manager_lite is not None:
-            for device in env_manager.manager_lite.devices_list:
-                if device.test_device_state.value == "ONLINE":
-                    status = device.label if device.label else 'None'
-                    LOG.info("%s,%s" % (device.device_sn, status))
-                    file_handle.write("%s,%s%s,%s\n" % (
-                        device.device_sn,
-                        device.label if device.label else 'None',
-                        device.host,
-                        device.port))
-    return
+        if list(env_manager.managers.values())[0].devices_list:
+            for device in list(env_manager.managers.values())[0].devices_list:
+                get_device_info(device, file_handle)
+        else:
+            for device in list(env_manager.managers.values())[1].devices_list:
+                get_device_info(device, file_handle)
+        
+        # if env_manager.manager_lite is not None:
+        #     for device in env_manager.manager_lite.devices_list:
+        #         if device.test_device_state.value == "ONLINE":
+        #             status = device.label if device.label else 'None'
+        #             LOG.info("%s,%s" % (device.device_sn, status))
+        #             file_handle.write("%s,%s%s,%s\n" % (
+        #                 device.device_sn,
+        #                 device.label if device.label else 'None',
+        #                 device.host,
+        #                 device.port))
+
+
+def get_device_info(device, file_handle):
+    """
+    
+    :param device: 
+    :param file_handle: 
+    :return: 
+    """
+    if device.test_device_state.value == "ONLINE":
+        status = device.label if device.label else 'None'
+        LOG.info("%s,%s" % (device.device_sn, status))
+        file_handle.write("%s,%s,%s,%s\n" % (
+            device.device_sn,
+            device.label if device.label else 'None',
+            device.host,
+            device.port))
 
 
 def make_reports(result_rootpath, start_time):
@@ -75,7 +89,9 @@ def make_reports(result_rootpath, start_time):
 
 def check_ditributetest_environment():
     env_manager = EnvironmentManager()
-    devices_list = list(env_manager.managers.values())[1].devices_list
+    devices_list = list(env_manager.managers.values())[0].devices_list
+    if not devices_list:
+        devices_list = list(env_manager.managers.values())[1].devices_list
     evn_status = True
     if len(devices_list) == 0:
         LOG.error("no devices online")
