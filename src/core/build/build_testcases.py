@@ -214,6 +214,9 @@ class BuildTestcases(object):
         if para.testsuit != "" and len(para.subsystem) == 0:
             LOG.error("Please specify subsystem.")
             return
+        target_cpu = self.build_parameter_dic.get("target_cpu")
+        if target_cpu == "arm64":
+            acts_build_command.append("target_arch=" + target_cpu)
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
             build_command.extend(acts_build_command)
