@@ -60,13 +60,13 @@ DEVICE_INFO_TEMPLATE = "agentlist:%s\nagentport:%s,\ndevicesuuid:%s"
 ##############################################################################
 
 
-def get_current_driver(device, target_name):
+def get_current_driver(device, target_name, hdc_tools):
     driver = None
     _, suffix_name = os.path.splitext(target_name)
     if suffix_name == "":
-        driver = CppTestDriver(device)
+        driver = CppTestDriver(device, hdc_tools)
     elif suffix_name == ".bin":
-        driver = CppTestDriver(device)
+        driver = CppTestDriver(device, hdc_tools)
     return driver
 
 
@@ -82,7 +82,7 @@ class Distribute:
         self.hdc_tools = hdc_tools
 
     def exec_agent(self, device, target_name, result_path):
-        driver = get_current_driver(device, target_name)
+        driver = get_current_driver(device, target_name, self.hdc_tools)
         if driver is None:
             print("Error: driver is None.")
             return False
@@ -100,7 +100,7 @@ class Distribute:
         return self._check_thread(device, target_name)
 
     def exec_major(self, device, target_name, result_path):
-        driver = get_current_driver(device, target_name)
+        driver = get_current_driver(device, target_name, self.hdc_tools)
         if driver is None:
             print("Error: driver is None.")
             return False
@@ -158,15 +158,15 @@ class Distribute:
             config_agent_file = os.path.join(self.suite_dir, "agent.desc")
             self._write_device_config(config_info, config_agent_file)
         else:
-            if self._query_device_hdc_uuid(self.major):
-                device_uuid_list += self._query_device_hdc_uuid(self.major) + ","
+            if self._query_device_agent_uuid(self.major):
+                device_uuid_list += self._query_device_agent_uuid(self.major) + ","
 
             if self._query_device_hdc_ip(device):
                 agent_ip_list += self._query_device_hdc_ip(device) + ","
 
             for agent in self.agent_list:
-                if self._query_device_hdc_uuid(agent):
-                    device_uuid_list += self._query_device_hdc_uuid(agent) + ","
+                if self._query_device_agent_uuid(agent):
+                    device_uuid_list += self._query_device_agent_uuid(agent) + ","
 
             config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
                                                   device_uuid_list)
@@ -193,13 +193,13 @@ class Distribute:
             config_major_file = os.path.join(self.suite_dir, "major.desc")
             self._write_device_config(config_info, config_major_file)
         else:
-            if self._query_device_hdc_uuid(self.major):
-                device_uuid_list += self._query_device_hdc_uuid(self.major) + ","
+            if self._query_device_major_uuid(self.major):
+                device_uuid_list += self._query_device_major_uuid(self.major) + ","
 
             for agent in self.agent_list:
-                if self._query_device_hdc_uuid(agent):
+                if self._query_device_major_uuid(agent):
                     agent_ip_list += self._query_device_hdc_ip(agent) + ","
-                    device_uuid_list += self._query_device_hdc_uuid(agent) + ","
+                    device_uuid_list += self._query_device_major_uuid(agent) + ","
             config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
                                                   device_uuid_list)
 
@@ -274,24 +274,22 @@ class Distribute:
         return dev_nodeid_info.split(":")[1]
 
     @staticmethod
-    def _query_device_hdc_uuid(device):
-        """
-        1. Run the dumpsys DdmpDeviceMonitorService command to query the value
-           of dev_nodeid.
-        2. The dump information reported by the soft bus. Local device info,
-           should be placed first.
-        Note: The dump information may not comply with the JSON format.
-        """
-        if platform.system() == "Windows":
-            file_path = os.path.normpath(os.path.join(sys.framework_root_dir, "../SoftBusdumpdeviceInfo"))
-        else:
-            softbus_file_path = "out/rk3568/communication/dsoftbus_standard/SoftBusdumpdeviceInfo"
-            file_path = os.path.normpath(os.path.join("../../", sys.framework_root_dir, softbus_file_path))
+    def _query_device_major_uuid(device):
+        device_sn = device.device_sn
+        command = "hdc_std -t %s shell hidumper -s 4700 -a 'buscenter -l local_device_info'" % device_sn
+        device_info = device.execute_command_with_output(command)
 
-        device.push_file(file_path, "data/test")
-        device.shell_with_output("chmod 777 -R data/test/")
-        chmod_device_file_path = "SoftBusdumpdeviceInfo"
-        device_info = device.shell_with_output("data/test/%s" % chmod_device_file_path)
+        if device_info == "":
+            return ""
+        dev_nodeid_info = re.findall(r"Uuid = (.*?\r\n)", device_info)
+        if dev_nodeid_info:
+            return str(dev_nodeid_info[0])
+
+    @staticmethod
+    def _query_device_agent_uuid(device):
+        device_sn = device.device_sn
+        command = "hdc_std -t %s shell hidumper -s 4700 -a 'buscenter -l remote_device_info'" % device_sn
+        device_info = device.execute_command_with_output(command)
 
         if device_info == "":
             return ""
