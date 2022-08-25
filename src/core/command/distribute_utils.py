@@ -41,17 +41,6 @@ def make_device_info_file(tmp_path):
         else:
             for device in list(env_manager.managers.values())[1].devices_list:
                 get_device_info(device, file_handle)
-        
-        # if env_manager.manager_lite is not None:
-        #     for device in env_manager.manager_lite.devices_list:
-        #         if device.test_device_state.value == "ONLINE":
-        #             status = device.label if device.label else 'None'
-        #             LOG.info("%s,%s" % (device.device_sn, status))
-        #             file_handle.write("%s,%s%s,%s\n" % (
-        #                 device.device_sn,
-        #                 device.label if device.label else 'None',
-        #                 device.host,
-        #                 device.port))
 
 
 def get_device_info(device, file_handle):
