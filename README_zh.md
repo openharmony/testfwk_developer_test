@@ -132,7 +132,7 @@ subsystem  # 子系统
      * @tc.name: integer_sub_001
      * @tc.desc: Verify the sub function.
      * @tc.type: FUNC
-     * @tc.require: Issue Number
+     * @tc.require: issueNumber
      */
     HWTEST_F(CalculatorSubTest, integer_sub_001, TestSize.Level1)
     {
@@ -209,7 +209,7 @@ subsystem  # 子系统
     	 * @tc.name: integer_sub_001
     	 * @tc.desc: Verify the sub function.
     	 * @tc.type: FUNC
-    	 * @tc.require: Issue Number
+    	 * @tc.require: issueNumber
     	 */
     	HWTEST_F(CalculatorSubTest, integer_sub_001, TestSize.Level1)
     	{
@@ -306,7 +306,7 @@ subsystem  # 子系统
          * @tc.name:appInfoTest001
          * @tc.desc:verify app info is not null
          * @tc.type: FUNC
-         * @tc.require: Issue Number
+         * @tc.require: issueNumber
          */
         it("appInfoTest001", 0, function () {
             //step 1:调用函数获取结果
@@ -370,7 +370,7 @@ subsystem  # 子系统
     	 * @tc.name:appInfoTest001
     	 * @tc.desc:verify app info is not null
     	 * @tc.type: FUNC
-    	 * @tc.require: Issue Number
+    	 * @tc.require: issueNumber
     	 */
     	 it("appInfoTest001", 0, function () {
     	    //step 1:调用函数获取结果
