@@ -225,7 +225,7 @@ class Run(object):
                         "tests"))
             else:
                 testcase_path = os.path.join(
-                    get_build_output_path(product_form), "test")
+                    get_build_output_path(product_form), "tests")
         LOG.info("testcase_path=%s" % testcase_path)
         return testcase_path
 
