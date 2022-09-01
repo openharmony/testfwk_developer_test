@@ -106,10 +106,6 @@ def _iter_module_plugins(packages):
 
 
 def _load_internal_plugins():
-    import core.driver
-    import benchmark.report.benchmark_reporter
-    _iter_module_plugins([core.driver, benchmark.report.benchmark_reporter])
-
     try:
         import ohos.environment
         _iter_module_plugins([ohos.environment])
@@ -119,6 +115,12 @@ def _load_internal_plugins():
         _iter_module_plugins([ohos.managers])
         import ohos.parser
         _iter_module_plugins([ohos.parser])
+        import ohos.drivers
+        _iter_module_plugins([ohos.drivers])
+
+        import core.driver
+        import benchmark.report.benchmark_reporter
+        _iter_module_plugins([core.driver, benchmark.report.benchmark_reporter])
 
     except (ModuleNotFoundError, ImportError):
         pass
@@ -128,6 +130,7 @@ def _load_internal_plugins():
         _iter_module_plugins([script.report])
     except (ModuleNotFoundError, ImportError):
         pass
+
 
 _init_global_config()
 del _init_global_config

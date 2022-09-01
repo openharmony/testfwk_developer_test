@@ -19,7 +19,7 @@
 import os
 from xdevice import platform_logger
 from core.utils import scan_support_product
-from core.config.config_manager import UserConfigManager
+from core.config.config_manager import UserConfigManager, FrameworkConfigManager
 from core.build.select_targets import SelectTargets
 from core.build.pretreat_targets import PretreatTargets
 from core.build.build_testcases import BuildTestcases
@@ -91,6 +91,9 @@ class BuildManager(object):
     def _compile_testcases(self, project_root_path, para):
         # 获取所有支持的产品，3.1Release版本为["DAYU","Hi3516DV300","ohos-arm64","ohos-sdk","rk3568"]
         all_product_list = scan_support_product()
+        product_list = FrameworkConfigManager().get_framework_config("productform")
+        if para.productform in product_list and para.productform.find("wifiiot") == -1:
+            all_product_list.append(para.productform)
         if para.productform not in all_product_list:
             from core.build.build_lite_manager import BuildLiteManager
             build_lite_manager = BuildLiteManager(project_root_path)

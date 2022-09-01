@@ -21,7 +21,7 @@ import os
 import platform
 import time
 import json
-from core.config.config_manager import UserConfigManager
+from core.config.config_manager import UserConfigManager, FrameworkConfigManager
 
 
 def get_filename_extension(file):
@@ -78,12 +78,15 @@ def get_build_output_path(product_form):
         return ""
 
     standard_large_system_list = scan_support_product()
+    product_list = FrameworkConfigManager().get_framework_config("productform")
     if product_form in standard_large_system_list:
         device_name = parse_device_name(product_form)
         if device_name is not None:
             build_output_name = device_name
         else:
             return ""
+    elif product_form in product_list and (product_form not in standard_large_system_list):
+        build_output_name = product_form
     else:
         board_info_list = product_form.split("_")
         if len(board_info_list) < 3:
@@ -193,4 +196,8 @@ def is_lite_product(product_form, code_root_path):
     if code_root_path is None or code_root_path == "":
         return True if len(product_form.split("_")) >= 3 else False
     else:
-        return True if product_form not in scan_support_product() else False
+        product_list = FrameworkConfigManager().get_framework_config("productform")
+        if (product_form in scan_support_product() or product_form in product_list) and product_form.find("wifiiot") == -1:
+            return False
+        else:
+            return True

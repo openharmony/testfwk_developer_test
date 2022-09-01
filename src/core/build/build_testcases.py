@@ -251,10 +251,10 @@ class BuildTestcases(object):
             command.append("build_example=true")
         command.append("--build-target")
         command.append(target)
-        command.append("--gn-args")
         target_cpu = self.build_parameter_dic.get("target_cpu")
         if target_cpu == "arm64":
             if productform == "m40":
+                command.append("--gn-args")
                 command.append("use_musl=false")
                 command.append("--gn-args")
                 command.append("use_custom_libcxx=true")
