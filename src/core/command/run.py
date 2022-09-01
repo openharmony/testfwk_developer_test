@@ -78,7 +78,7 @@ class Run(object):
             LOG.error("Build test cases failed.")
             return
 
-        if "actstest" in options.testtype and len(options.testtype) == 1:
+        if "actstest" in options.testtype:
             test_dict = self.get_acts_test_dict(options)
             options.testcases_path = self.get_acts_tests_out_path(options.productform)
             options.resource_path = self.get_acts_tests_out_path(options.productform)
