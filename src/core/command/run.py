@@ -257,7 +257,6 @@ class Run(object):
                         result = result.replace(">","")
                         cmd_record["result"] = result
                         break
-            #判断历史记录最大长度
             if len(self.history_cmd_list) >= 10:
                 del self.history_cmd_list[0]
             self.history_cmd_list.append(cmd_record)
