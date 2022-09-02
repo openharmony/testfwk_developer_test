@@ -400,17 +400,17 @@ class ResultManager(object):
             "coverage",
             "data",
             "cxx",
-            self.testsuite_name))
+            self.testsuite_name + '_' + self.config.testtype[0]))
 
         if self.is_exist_target_in_device(DEFAULT_TEST_PATH, target_name):
             if not os.path.exists(cxx_cov_path):
                 os.makedirs(cxx_cov_path)
             self.config.device.execute_shell_command(
-                "cd %s; tar -cvf %s.tar %s" % (DEFAULT_TEST_PATH, target_name, target_name))
-            src_file_tar = os.path.join(DEFAULT_TEST_PATH, "%s.tar" % target_name)
+                "cd %s; tar -czf %s.tar.gz %s" % (DEFAULT_TEST_PATH, target_name, target_name))
+            src_file_tar = os.path.join(DEFAULT_TEST_PATH, "%s.tar.gz" % target_name)
             self.device.pull_file(src_file_tar, cxx_cov_path, is_create=True, timeout=TIME_OUT)
-            subprocess.Popen("tar -xvf %s -C %s" % (os.path.join(cxx_cov_path, "%s.tar" % target_name), cxx_cov_path),
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+            subprocess.Popen("tar zxf %s -C %s" % (os.path.join(cxx_cov_path, "%s.tar.gz" % target_name), cxx_cov_path),
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 
 ##############################################################################
