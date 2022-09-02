@@ -43,7 +43,7 @@ def _init_global_config():
         "src"))
     sys.path.insert(0, sys.xdevice_dir)
 
-    # 变量注释 sys.xdevice_ohos_dir = OpenHarmony/xdevice/plugins/ohos/src
+    # 变量注释 sys.xdevice_extension_dir = OpenHarmony/xdevice/plugins/ohos/src
     sys.xdevice_extension_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "..",
