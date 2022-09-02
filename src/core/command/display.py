@@ -103,10 +103,10 @@ usage: run [-p PRODUCTFORM]
            [-ts TESTSUIT]
            [-tc TESTCASE]
            [-tl TESTLEVEL]
-           [-repeat REPEATCNT]
+           [-repeat NUMBER]
            [-thl]
            [-thr HISCOMMAND-INDEX]
-		   [-retry]
+           [-retry]
 
 optional arguments:
   -p PRODUCTFORM, --productform PRODUCTFORM
@@ -122,7 +122,7 @@ optional arguments:
   -tc TESTCASE, --testcase TESTCASE
                         Specify test case
   -tl TESTLEVEL, --testlevel TESTLEVEL
-  -repeat REPEATCNT, --repeat REPEATCNT
+  -repeat NUMBER, --repeat NUMBER
   -hl, --hisotrylist
   -rh INDEX, --runhistory INDEX
   -retry
@@ -144,7 +144,7 @@ AAFwkBaseTest.object_test_001
     ...
     run -hl
     run -rh 1
-	run -retry
+    run -retry
     run -t ACTS -ss arkui,ability -ts ActsAceEtsTest;ActsAceEtsStTest;ActsApiTest
 """
 

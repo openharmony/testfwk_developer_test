@@ -113,7 +113,7 @@ class Run(object):
         #重新运行历史里的一条命令
         if options.runhistory > 0:
             #如果记录大于10则认为非法
-            if options.runhistory > 10:
+            if options.runhistory > 10 or options.runhistory > len(self.history_cmd_list):
                 print("input history command[%d] out of range:", options.runhistory)
                 return
             cmd_record = self.history_cmd_list[options.runhistory-1]

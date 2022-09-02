@@ -187,13 +187,13 @@ class Console(object):
                                 action='store_true',
                                 dest="historylist",
                                 default=False,
-                                help="Show latest 10 run commands"
+                                help="Show last 10 excuted commands except -hl,-rh,-retry"
                                 )
             parser.add_argument("-rh", "--runhistory",
                                 type=int,
                                 dest="runhistory",
                                 default=0,
-                                help="Run history command by id"
+                                help="Run history command by history command id"
                                 )
             parser.add_argument("-tp", "--testpart",
                                 nargs='*',
