@@ -167,7 +167,7 @@ class Console(object):
                                 default=[],
                                 help="Specify test subsystem"
                                 )
-            parser.add_argument("-retry", "--retry",
+            parser.add_argument("--retry",
                                 action="store_true",
                                 dest="retry",
                                 default=False,
@@ -177,7 +177,7 @@ class Console(object):
                                 action="store_true",
                                 dest="dry_run",
                                 help="show retry test case list")
-            parser.add_argument("-repeat", "--repeat",
+            parser.add_argument("--repeat",
                                 type=int,
                                 dest="repeat",
                                 default=0,
