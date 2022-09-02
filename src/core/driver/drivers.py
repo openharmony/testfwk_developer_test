@@ -404,8 +404,10 @@ class ResultManager(object):
         if self.is_exist_target_in_device(DEFAULT_TEST_PATH, target_name):
             if not os.path.exists(cxx_cov_path):
                 os.makedirs(cxx_cov_path)
-            src_file = os.path.join(DEFAULT_TEST_PATH, target_name)
-            self.device.pull_file(src_file, cxx_cov_path, is_create=True, timeout=TIME_OUT)
+            self.config.device.execute_shell_command(
+                "cd %s; tar -cvf %s.tar %s" % (DEFAULT_TEST_PATH, target_name, target_name))
+            src_file_tar = os.path.join(DEFAULT_TEST_PATH, "%s.tar" % target_name)
+            self.device.pull_file(src_file_tar, cxx_cov_path, is_create=True, timeout=TIME_OUT)
 
 
 ##############################################################################
