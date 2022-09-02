@@ -20,6 +20,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import time
 import platform
 import zipfile
@@ -408,6 +409,8 @@ class ResultManager(object):
                 "cd %s; tar -cvf %s.tar %s" % (DEFAULT_TEST_PATH, target_name, target_name))
             src_file_tar = os.path.join(DEFAULT_TEST_PATH, "%s.tar" % target_name)
             self.device.pull_file(src_file_tar, cxx_cov_path, is_create=True, timeout=TIME_OUT)
+            subprocess.Popen("tar -xvf %s -C %s" % (os.path.join(cxx_cov_path, "%s.tar" % target_name), cxx_cov_path),
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 
 ##############################################################################
