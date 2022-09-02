@@ -16,9 +16,12 @@
 # limitations under the License.
 #
 
+from pydoc import classname
 import time
 import os
 import sys
+import datetime
+import xml.etree.ElementTree as ElementTree
 
 from core.constants import SchedulerType
 from xdevice import Plugin
@@ -35,11 +38,19 @@ from core.command.distribute_execute import DbinderTest
 from core.testcase.testcase_manager import TestCaseManager
 from core.config.config_manager import UserConfigManager
 from core.config.parse_parts_config import ParsePartsConfig
+from core.config.resource_manager import ResourceManager
 
 LOG = platform_logger("Run")
 
 
 class Run(object):
+
+    history_cmd_list = []
+    
+    @classmethod
+    def get_history(self):
+        return self.history_cmd_list
+
     def process_command_run(self, command, options):
         para = Parameter()
         test_type_list = para.get_testtype_list(options.testtype)
@@ -66,12 +77,85 @@ class Run(object):
         LOG.info("testsuit      = %s" % options.testsuit)
         LOG.info("testcase      = %s" % options.testcase)
         LOG.info("testlevel     = %s" % options.testlevel)
+        LOG.info("testargs     = %s" % options.testargs)
+        LOG.info("repeat     = %s" % options.repeat)
+        LOG.info("retry         = %s" % options.retry)
+        LOG.info("historylist   = %s" % options.historylist)
+        LOG.info("runhistory   = %s" % options.runhistory)
         LOG.info("partname_list = %s" % str(options.partname_list))
         LOG.info("------------------------------------")
         LOG.info("")
 
         if not para.check_run_parameter(options):
             LOG.error("Input parameter is incorrect.")
+            return
+      
+        current_time = datetime.datetime.now()
+        #记录命令运行历史
+        need_record_history = False
+        cmd_record = {
+            "time" : str(current_time),
+            "raw_cmd" : options.current_raw_cmd,
+            "result" : "unknown",
+            "command": command,
+            "options": options
+        }
+        if not ("-thl" in options.current_raw_cmd or "-thr" in options.current_raw_cmd):
+            need_record_history = True
+
+        #打印历史记录
+        if options.historylist:
+            print("The latest command history is: %d" % len(self.history_cmd_list))
+            for index in range(0, len(self.history_cmd_list)):
+                cmd_record = self.history_cmd_list[index]
+                print("%d. [%s]-[%s]::[%s]" % (index+1, cmd_record["time"], cmd_record["raw_cmd"], cmd_record["result"]))
+            return
+        #重新运行历史里的一条命令
+        if options.runhistory > 0:
+            #如果记录大于10则认为非法
+            if options.runhistory > 10:
+                print("input history command[%d] out of range:", options.runhistory)
+                return
+            cmd_record = self.history_cmd_list[options.runhistory-1]
+            print("run history command:", cmd_record["raw_cmd"])
+            need_record_history = False
+            command = cmd_record["command"]
+            options = cmd_record["options"]
+
+        if options.retry:
+            if len(self.history_cmd_list) <= 0:
+                LOG.info("No history command exsit")
+                return
+            history_cmd = self.history_cmd_list[-1]
+            command = history_cmd["command"]
+            options = history_cmd["options"]
+            latest_report_path = os.path.join(
+                sys.framework_root_dir, "reports/latest/summary_report.xml")
+            tree = ElementTree.parse(latest_report_path)
+            root = tree.getroot()
+            has_failed_case = 0
+            test_targets = {}
+            fail_list = []
+            for child in root:
+                print(child.tag, ":", child.attrib)
+                for grand in child:
+                    print(grand.tag, ":", grand.attrib)
+                    if grand.attrib["result"] == 'false':
+                        fail_case = grand.attrib["classname"] + "#" + grand.attrib["name"]
+                        fail_list.append(fail_case)
+                        has_failed_case += 1
+            test_targets["class"] = fail_list
+            setattr(options, "testargs", test_targets)
+            print("retry option:", options)
+            if has_failed_case > 0:
+                if not self._build_test_cases(options):
+                    LOG.error("Build test cases failed.")
+                    return
+                scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
+                                    plugin_id=SchedulerType.SCHEDULER)[0]
+                scheduler.exec_command(command, options)
+            else:
+                LOG.info("No testcase to retry")
             return
 
         if not self._build_test_cases(options):
@@ -162,6 +246,22 @@ class Run(object):
                     else:
                         print("productform is not wifiiot")
                 scheduler.exec_command(command, options)
+        if need_record_history:
+            #读文件获取运行结果
+            latest_report_path = os.path.join(sys.framework_root_dir, "reports/latest/summary_report.xml")
+            with open(latest_report_path) as report_file:
+                for report_line in report_file:
+                    if "testsuites name=\"summary_report\"" in report_line:
+                        result = report_line.replace("\n","")
+                        result = result.replace("<testsuites name=\"summary_report\" ","")
+                        result = result.replace(">","")
+                        cmd_record["result"] = result
+                        break
+            #判断历史记录最大长度
+            if len(self.history_cmd_list) >= 10:
+                del self.history_cmd_list[0]
+            self.history_cmd_list.append(cmd_record)
+        print("-------------run end: ", self.history_cmd_list)
         return
 
     ##############################################################

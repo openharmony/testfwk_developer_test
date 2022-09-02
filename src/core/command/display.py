@@ -103,6 +103,10 @@ usage: run [-p PRODUCTFORM]
            [-ts TESTSUIT]
            [-tc TESTCASE]
            [-tl TESTLEVEL]
+           [-repeat REPEATCNT]
+           [-thl]
+           [-thr HISCOMMAND-INDEX]
+		   [-retry]
 
 optional arguments:
   -p PRODUCTFORM, --productform PRODUCTFORM
@@ -118,6 +122,10 @@ optional arguments:
   -tc TESTCASE, --testcase TESTCASE
                         Specify test case
   -tl TESTLEVEL, --testlevel TESTLEVEL
+  -repeat REPEATCNT, --repeat REPEATCNT
+  -hl, --hisotrylist
+  -rh INDEX, --runhistory INDEX
+  -retry
 
 Examples:
     run -t UT
@@ -129,10 +137,15 @@ Examples:
 AAFwkBaseTest.*
     run -t UT -ss aafwk -tm base_test -ts base_test -tc \
 AAFwkBaseTest.object_test_001
+    run -t UT -ss aafwk -tm base_test -repeat 3
     run -t MST
     ...
     run -t ALL
     ...
+    run -hl
+    run -rh 1
+	run -retry
+    run -t ACTS -ss arkui,ability -ts ActsAceEtsTest;ActsAceEtsStTest;ActsApiTest
 """
 
 LIST_INFOMATION = "list\n" + """
