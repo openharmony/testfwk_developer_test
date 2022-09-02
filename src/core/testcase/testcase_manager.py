@@ -147,8 +147,15 @@ class TestCaseManager(object):
                 if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(acts_suite_file):
                     continue
                 # 如果acts测试指定了-ts，只有完全匹配的HAP包才会加入最终执行的队列
-                if options.testsuit != "" and options.testsuit != prefix_name:
-                    continue
+                if options.testsuit != "":
+                    testsuit_list = options.testsuit.split(";")
+                    is_match = False
+                    for suite_item in testsuit_list:
+                        if suite_item == prefix_name:
+                            is_match = True
+                            break
+                    if not is_match:
+                        continue
                 if not self.check_hap_test_file(acts_suite_file):
                     continue
                 if self.get_hap_test_driver(acts_suite_file) == "OHJSUnitTest":

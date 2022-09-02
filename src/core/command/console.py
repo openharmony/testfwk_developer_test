@@ -25,6 +25,7 @@ from core.constants import ToolCommandType
 from core.exception import ParamError
 from xdevice import platform_logger
 from xdevice import EnvironmentManager
+from xdevice._core.utils import SplicingAction
 from core.command.run import Run
 from core.command.gen import Gen
 from core.command.display import display_help_info
@@ -105,6 +106,28 @@ class Console(object):
                 return
             except (IOError, EOFError, KeyboardInterrupt) as error:
                 LOG.exception("Input Error: %s" % error)
+    
+    @staticmethod
+    def _parse_combination_param(combination_value):
+        # sample: size:xxx1;exclude-annotation:xxx
+        parse_result = {}
+        key_value_pairs = str(combination_value).split(";")
+        for key_value_pair in key_value_pairs:
+            key, value = key_value_pair.split(":", 1)
+            if not value:
+                raise ParamError("'%s' no value" % key)
+            value_list = str(value).split(",")
+            exist_list = parse_result.get(key, [])
+            exist_list.extend(value_list)
+            parse_result[key] = exist_list
+        return parse_result
+        
+    @classmethod
+    def _params_post_processing(self, options):
+        # params post-processing
+        if options.testargs:
+            test_args = self._parse_combination_param(options.testargs)
+            setattr(options, ConfigConst.testargs, test_args)
 
     # 参数解析方法
     @classmethod
@@ -144,6 +167,34 @@ class Console(object):
                                 default=[],
                                 help="Specify test subsystem"
                                 )
+            parser.add_argument("--retry",
+                                action="store_true",
+                                dest="retry",
+                                default=False,
+                                help="Specify retry command"
+                                )
+            parser.add_argument("--dryrun",
+                                action="store_true",
+                                dest="dry_run",
+                                help="show retry test case list")
+            parser.add_argument("--repeat",
+                                type=int,
+                                dest="repeat",
+                                default=0,
+                                help="Specify number of times that a test is executed"
+                                )
+            parser.add_argument("-hl", "--historylist",
+                                action='store_true',
+                                dest="historylist",
+                                default=False,
+                                help="Show last 10 excuted commands except -hl,-rh,-retry"
+                                )
+            parser.add_argument("-rh", "--runhistory",
+                                type=int,
+                                dest="runhistory",
+                                default=0,
+                                help="Run history command by history command id"
+                                )
             parser.add_argument("-tp", "--testpart",
                                 nargs='*',
                                 dest="testpart",
@@ -165,7 +216,7 @@ class Console(object):
                                 help="Specify test suit"
                                 )
             parser.add_argument("-ta", "--testargs",
-                                action="store",
+                                action=SplicingAction,
                                 type=str,
                                 nargs='+',
                                 dest=ConfigConst.testargs,
@@ -226,6 +277,7 @@ class Console(object):
             # 解析部分命令行参数，会返回一个由两个条目构成的元组，其中包含带成员的命名空间（options）和剩余参数字符串的列表（unparsed）
             cls._params_pre_processing(para_list)
             (options, unparsed) = parser.parse_known_args(para_list)
+            cls._params_post_processing(options)
 
             # Set default value
             options.target_os_name = "OHOS"
@@ -271,6 +323,8 @@ class Console(object):
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_GEN):
                 self._process_command_gen(command, options)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
+                # 保存原始控制命令
+                options.current_raw_cmd = args
                 self._process_command_run(command, options)
             elif command.startswith(ToolCommandType.TOOLCMD_KEY_QUIT):
                 self._process_command_quit(command)
