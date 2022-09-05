@@ -38,7 +38,8 @@ class ParsePartsConfig(object):
         # 获取user_config.xml文件中的配置的<test_cases>（编译好的测试用例地址）
         testcase_dir = manager.get_test_cases_dir()
 
-        # 如果没有在developtertest/config/user_config里配置test_cases路径，就到OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里查找
+        # 如果没有在developtertest/config/user_config里配置test_cases路径，
+        # 就到OpenHarmony/out/rk3568/build_configs/infos_for_testfwk.json里查找
         if testcase_dir == "":
             if sys.source_code_root_path != "":
                 config_filepath = os.path.join(

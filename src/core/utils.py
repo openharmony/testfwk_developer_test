@@ -131,12 +131,12 @@ def parse_device_name(product_form):
                                     "productdefine", "common", "products",
                                     "{}.json".format(product_form))
     if not os.path.exists(device_json_file):
-        return None
+        return
 
     with open(device_json_file, 'r') as json_file:
         json_info = json.load(json_file)
     if not json_info:
-        return None
+        return
     device_name = json_info.get('product_device')
     return device_name
 
@@ -197,7 +197,8 @@ def is_lite_product(product_form, code_root_path):
         return True if len(product_form.split("_")) >= 3 else False
     else:
         product_list = FrameworkConfigManager().get_framework_config("productform")
-        if (product_form in scan_support_product() or product_form in product_list) and product_form.find("wifiiot") == -1:
+        if (product_form in scan_support_product() or product_form in product_list)
+         and product_form.find("wifiiot") == -1:
             return False
         else:
             return True
