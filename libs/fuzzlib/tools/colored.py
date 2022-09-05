@@ -83,7 +83,7 @@ class Colored(object):
                 "run.log"
             )
             with open(run_log, 'ab') as f:
-                f.write(msg+"\n")
+                f.write(msg + "\n")
 
 
     def color_str(self, color, s, tag=None):
