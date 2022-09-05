@@ -66,7 +66,7 @@ class TestCaseManager(object):
                 test_type,
                 options)
             for key, value in suit_file_dic.items():
-                suit_file_dic[key] = value + temp_dic[key]
+                suit_file_dic[key] = value + temp_dic.get(key)
         return suit_file_dic
 
     def get_test_file_data_by_test_type(self, test_case_path,
@@ -118,17 +118,17 @@ class TestCaseManager(object):
                     continue
 
                 if suffix_name == ".dex":
-                    suite_file_dictionary["DEX"].append(suite_file)
+                    suite_file_dictionary.get("DEX").append(suite_file)
                 elif suffix_name == ".hap":
-                    suite_file_dictionary["JST"].append(suite_file)
+                    suite_file_dictionary.get("JST").append(suite_file)
                 elif suffix_name == ".py":
                     if not self.check_python_test_file(suite_file):
                         continue
-                    suite_file_dictionary["PYT"].append(suite_file)
+                    suite_file_dictionary.get("PYT").append(suite_file)
                 elif suffix_name == "":
-                    suite_file_dictionary["CXX"].append(suite_file)
+                    suite_file_dictionary.get("CXX").append(suite_file)
                 elif suffix_name == ".bin":
-                    suite_file_dictionary["BIN"].append(suite_file)
+                    suite_file_dictionary.get("BIN").append(suite_file)
 
         return suite_file_dictionary
 
@@ -159,9 +159,9 @@ class TestCaseManager(object):
                 if not self.check_hap_test_file(acts_suite_file):
                     continue
                 if self.get_hap_test_driver(acts_suite_file) == "OHJSUnitTest":
-                    acts_suit_file_dic["OHJST"].append(acts_suite_file)
+                    acts_suit_file_dic.get("OHJST").append(acts_suite_file)
                 if self.get_hap_test_driver(acts_suite_file) == "JSUnitTest":
-                    acts_suit_file_dic["JST"].append(acts_suite_file)
+                    acts_suit_file_dic.get("JST").append(acts_suite_file)
         else:
             LOG.error("acts %s is not exist." % acts_test_case_path)
         return acts_suit_file_dic

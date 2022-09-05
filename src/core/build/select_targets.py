@@ -108,7 +108,8 @@ class SelectTargets(object):
     def _get_target_list_by_type(self, productform, typelist):
         target_list = []
         # 获取所有部件编译输出信息列表：[{“部件名1”：[~/OpenHarmony/out/rk3568/module_list_files/部件名1]}]
-        # 或者{“部件名1”：[~/OpenHarmony/out/rk3568/module_list_files/部件名1，~/OpenHarmony/out/rk3568/编译目录build_out_dir/module_list_files/部件名1]}
+        # 或者{“部件名1”：[~/OpenHarmony/out/rk3568/module_list_files/部件名1，
+        # ~/OpenHarmony/out/rk3568/编译目录build_out_dir/module_list_files/部件名1]}
         part_path_dic = self._get_part_path_data(productform)
         for item in part_path_dic:
             part_path_list = part_path_dic.get(item)
