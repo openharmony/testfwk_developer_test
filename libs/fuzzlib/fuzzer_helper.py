@@ -27,6 +27,8 @@ import pipes
 import traceback
 import time
 import copy
+import shutil
+from pprint import pprint
 
 from tools.colored import Colored
 from tools.templates import GN_ENTRY_TEMPLATE
@@ -34,8 +36,6 @@ from tools.templates import PROJECT_GN_TEMPLATE
 from tools.templates import PROJECT_DEMO_TEMPLATE
 from tools.templates import PROJECT_HEADER_TEMPLATE
 from tools.templates import PROJECT_XML_TEMPLATE
-import shutil
-from pprint import pprint
 from tools.run_result import RunResult
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -93,7 +93,7 @@ def _get_fuzzer_yaml_config(fuzzer_name):
         fuzzer_name,
         "project.yaml")
     if not os.path.exists(project_yaml_path):
-        return None
+        return
     #log run stdout to fuzzlog dir
     with open(project_yaml_path) as filehandle:
         yaml_config = yaml.safe_load(filehandle)
@@ -198,8 +198,8 @@ def make(args,  stdout=None):
             ret = subprocess.check_call(build_script, cwd=SOURCE_ROOT_DIR)
         return ret
     except subprocess.CalledProcessError:
-        print("*"*50)
-        print("*"*50)
+        print("*" * 50)
+        print("*" * 50)
         print(
             'fuzzers {} build failed.'.format(args.project_name),
             file=sys.stdout

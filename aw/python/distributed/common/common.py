@@ -61,7 +61,7 @@ def get_resource_dir(phone_res_dir, device_type_name):
     pos = phone_res_dir.find(os.sep + "tests" + os.sep)
     if pos != -1:
         prefix_path = phone_res_dir[:pos]
-        suffix_path = phone_res_dir[pos+1:]
+        suffix_path = phone_res_dir[pos + 1:]
         prefix_path = os.path.abspath(os.path.dirname(prefix_path))
         current_dir = os.path.join(prefix_path, product_form_name,
             suffix_path)

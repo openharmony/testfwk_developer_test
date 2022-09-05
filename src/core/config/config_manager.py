@@ -239,12 +239,12 @@ class UserConfigManager(object):
 
                 node = root.find(target_name)
                 if not node:
-                    return None
+                    return
 
                 if sub_target != "":
                     node = node.find(sub_target)
                 if not node:
-                    return None
+                    return
 
                 for sub in node:
                     if sub.text is None:
