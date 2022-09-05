@@ -81,7 +81,7 @@ class LiteUnitTest(IDriver):
 
     def __check_failed__(self, msg):
         self.log.error("check failed {}".format(msg))
-        return None
+        return
 
     def __check_environment__(self, device_options):
         pass
@@ -278,7 +278,7 @@ class LiteUnitTest(IDriver):
             "ls /%s" % \
             UserConfigManager().get_user_config("NFS").get("board_dir")
         start_time = time.time()
-        while time.time()-start_time < timeout:
+        while time.time() - start_time < timeout:
             result, _, _ = self.lite_device.execute_command_with_timeout(
                 command=ls_command, case_type=DeviceTestType.cpp_test_lite,
                 timeout=5, receiver=None)
@@ -292,14 +292,14 @@ class LiteUnitTest(IDriver):
         show help info.
         """
         self.log.info("this is test driver for cpp test")
-        return None
+        return
 
     def show_driver_info(self):
         """
         show driver info.
         """
         self.log.info("this is test driver for cpp test")
-        return None
+        return
 
     def __result__(self):
         pass

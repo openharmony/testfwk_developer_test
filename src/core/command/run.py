@@ -108,7 +108,8 @@ class Run(object):
             print("The latest command history is: %d" % len(self.history_cmd_list))
             for index in range(0, len(self.history_cmd_list)):
                 cmd_record = self.history_cmd_list[index]
-                print("%d. [%s]-[%s]::[%s]" % (index+1, cmd_record["time"], cmd_record["raw_cmd"], cmd_record["result"]))
+                print("%d. [%s]-[%s]::[%s]" % (index+1, cmd_record["time"], 
+                      cmd_record["raw_cmd"], cmd_record["result"]))
             return
         #重新运行历史里的一条命令
         if options.runhistory > 0:
@@ -116,7 +117,7 @@ class Run(object):
             if options.runhistory > 10 or options.runhistory > len(self.history_cmd_list):
                 print("input history command[%d] out of range:", options.runhistory)
                 return
-            cmd_record = self.history_cmd_list[options.runhistory-1]
+            cmd_record = self.history_cmd_list[options.runhistory - 1]
             print("run history command:", cmd_record["raw_cmd"])
             need_record_history = False
             command = cmd_record["command"]
@@ -252,9 +253,9 @@ class Run(object):
             with open(latest_report_path) as report_file:
                 for report_line in report_file:
                     if "testsuites name=\"summary_report\"" in report_line:
-                        result = report_line.replace("\n","")
-                        result = result.replace("<testsuites name=\"summary_report\" ","")
-                        result = result.replace(">","")
+                        result = report_line.replace("\n", "")
+                        result = result.replace("<testsuites name=\"summary_report\" ", "")
+                        result = result.replace(">", "")
                         cmd_record["result"] = result
                         break
             if len(self.history_cmd_list) >= 10:
