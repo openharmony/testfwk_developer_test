@@ -66,7 +66,7 @@ CMD_KEY_PARTLIST = "partlist"
 # acts子系统名称列表
 CMD_KEY_SUBSYSTEMLIST_ACTS = "actssubsystemlist"
 
-TOOL_VERSION_INFO = """Welcome to DeveloperTest V3.2.1.0
+TOOL_VERSION_INFO = """Welcome to DeveloperTest V3.2.2.0
 """
 
 HLEP_COMMAND_INFOMATION = """use help [follow command] for more information:
