@@ -197,8 +197,8 @@ def is_lite_product(product_form, code_root_path):
         return True if len(product_form.split("_")) >= 3 else False
     else:
         product_list = FrameworkConfigManager().get_framework_config("productform")
-        if (product_form in scan_support_product() or product_form in product_list)
-         and product_form.find("wifiiot") == -1:
+        if (product_form in scan_support_product() or product_form in product_list) \
+                and product_form.find("wifiiot") == -1:
             return False
         else:
             return True
