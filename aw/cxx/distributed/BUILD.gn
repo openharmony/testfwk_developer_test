@@ -36,8 +36,8 @@ ohos_static_library("distributedtest_lib") {
     ]
   } else {
     external_deps = [
+      "c_utils:utils",
       "hilog:libhilog",
-      "utils_base:utils",
     ]
   }
   public_configs = [ ":distributedtest_config" ]
