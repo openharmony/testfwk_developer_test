@@ -104,7 +104,7 @@ ohos_js_unittest("%(suite_name)s") {
     ":%(suite_name)s_resources",
   ]
 
-  certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
+  certificate_profile = "//test/testfwk/developer_test/signature/openharmony_sx.p7b"
   hap_name = "%(suite_name)s"
 }
 ohos_js_assets("%(suite_name)s_js_assets") {

@@ -13,5 +13,5 @@
 
 source_set("calc_multi_demo") {
   sources = [ "calc_multi.c" ]
-  include_dirs = [ "//test/developertest/example/c_demo/include" ]
+  include_dirs = [ "//test/testfwk/developer_test/example/c_demo/include" ]
 }
