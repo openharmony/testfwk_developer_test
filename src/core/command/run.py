@@ -100,7 +100,8 @@ class Run(object):
             "command": command,
             "options": options
         }
-        if not ("-thl" in options.current_raw_cmd or "-thr" in options.current_raw_cmd):
+        if not ("-hl" in options.current_raw_cmd or "-rh" in options.current_raw_cmd \
+            or "--retry" in options.current_raw_cmd):
             need_record_history = True
 
         #打印历史记录
