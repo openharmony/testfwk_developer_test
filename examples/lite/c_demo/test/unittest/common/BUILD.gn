@@ -17,7 +17,8 @@ unittest("CalcMultiTest") {
   include_dirs = [ "//test/testfwk/developer_test/example/c_demo/include" ]
   sources = [ "calc_multi_test.c" ]
   configs = []
-  deps = [ "//test/testfwk/developer_test/example/c_demo/source:calc_multi_demo" ]
+  deps =
+      [ "//test/testfwk/developer_test/example/c_demo/source:calc_multi_demo" ]
 }
 
 ###############################################################################
