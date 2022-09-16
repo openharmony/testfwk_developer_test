@@ -37,7 +37,7 @@ def get_level_para_string(level_string):
         if not item.isdigit():
             continue
         item = item.strip(" ")
-        level_para_string += ("Level%s," % item)
+        level_para_string = (f"{level_para_string}Level{item},")
     level_para_string = level_para_string.strip(",")
     return level_para_string
 
