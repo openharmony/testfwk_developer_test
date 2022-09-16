@@ -109,7 +109,7 @@ class Run(object):
             print("The latest command history is: %d" % len(self.history_cmd_list))
             for index in range(0, len(self.history_cmd_list)):
                 cmd_record = self.history_cmd_list[index]
-                print("%d. [%s]-[%s]::[%s]" % (index+1, cmd_record["time"], 
+                print("%d. [%s] - [%s]::[%s]" % (index + 1, cmd_record["time"], 
                       cmd_record["raw_cmd"], cmd_record["result"]))
             return
         #重新运行历史里的一条命令
