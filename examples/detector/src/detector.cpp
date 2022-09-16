@@ -26,6 +26,7 @@ namespace DetectorTest {
     const int START_INDEX = 3;
 }
 
+namespace{
 bool IsPrime(int n)
 {
     if (n <= 1) {
@@ -55,4 +56,5 @@ bool FileExist(const char* fileName)
     }
     struct stat myStat;
     return (!stat(fileName, &myStat));
+}
 }
