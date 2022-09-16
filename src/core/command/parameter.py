@@ -49,7 +49,7 @@ class Parameter(object):
         if check_flag:
             for item in level_list:
                 item = item.strip(" ")
-                test_level_string += (item + ",")
+                test_level_string = f"{test_level_string}{item},"
             test_level_string = test_level_string.strip(",")
         return test_level_string
 
