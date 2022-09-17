@@ -414,7 +414,7 @@ class ResultManager(object):
             if platform.system() == "Windows":
                 os.remove("%s" % os.path.join(cxx_cov_path, "%s.tar.gz" % target_name))
             else:
-                os.system("rm -rf %s" % os.path.join(cxx_cov_path, "%s.tar.gz" % target_name))
+                subprocess.Popen("rm -rf %s" % os.path.join(cxx_cov_path, "%s.tar.gz" % target_name), shell=True)
 
 
 ##############################################################################
