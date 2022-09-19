@@ -122,7 +122,7 @@ def get_level_para_string(level_string):
         if not item.isdigit():
             continue
         item = item.strip(" ")
-        level_para_string += ("Level%s," % item)
+        level_para_string = f"{level_para_string}Level{item},"
     level_para_string = level_para_string.strip(",")
     return level_para_string
 
@@ -409,7 +409,8 @@ class ResultManager(object):
                 "cd %s; tar -czf %s.tar.gz %s" % (DEFAULT_TEST_PATH, target_name, target_name))
             src_file_tar = os.path.join(DEFAULT_TEST_PATH, "%s.tar.gz" % target_name)
             self.device.pull_file(src_file_tar, cxx_cov_path, is_create=True, timeout=TIME_OUT)
-            result = os.popen("tar -zxf %s -C %s" % (os.path.join(cxx_cov_path, "%s.tar.gz" % target_name), cxx_cov_path))
+            result = os.popen("tar -zxf %s -C %s" % (
+                     os.path.join(cxx_cov_path, "%s.tar.gz" % target_name), cxx_cov_path))
             result.close()
             if platform.system() == "Windows":
                 os.remove("%s" % os.path.join(cxx_cov_path, "%s.tar.gz" % target_name))
@@ -792,7 +793,7 @@ class JSUnitTestDriver(IDriver):
         _unlock_device(self.config.device)
 
         try:
-            return_message = self.start_hap_activity()
+            return_message = self.start_hap_execute()
         except (ExecuteTerminate, DeviceError) as exception:
             return_message = str(exception.args)
 
@@ -813,7 +814,7 @@ class JSUnitTestDriver(IDriver):
         _sleep_according_to_result(return_code)
         return return_code
 
-    def start_hap_activity(self):
+    def start_hap_execute(self):
         try:
             command = "aa start -d 123 -a %s.MainAbility -b %s" \
                       % (self.package_name, self.package_name)
