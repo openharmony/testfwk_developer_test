@@ -26,7 +26,7 @@ config("module_private_config") {
     "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/app_distributeddata/include",
     "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/distributeddata/include",
     "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/app/include",
-    "//test/developertest/aw/distributed",
+    "//test/testfwk/developer_test/aw/distributed",
   ]
 
   # link library
@@ -39,7 +39,7 @@ config("module_private_config") {
 ohos_distributedtest("DistributeDemo") {
   module_out_path = module_output_path
 
-  sources = [ "//test/developertest/examples/distributedb/test/distributedtest/common/distribute_demo.cpp" ]
+  sources = [ "//test/testfwk/developer_test/examples/distributedb/test/distributedtest/common/distribute_demo.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -61,7 +61,7 @@ ohos_distributedtest("DistributeDemo") {
 ohos_distributedtest("DistributeDemoAgent") {
   module_out_path = module_output_path
 
-  sources = [ "//test/developertest/examples/distributedb/test/distributedtest/common/distribute_demo_agent.cpp" ]
+  sources = [ "//test/testfwk/developer_test/examples/distributedb/test/distributedtest/common/distribute_demo_agent.cpp" ]
 
   configs = [ ":module_private_config" ]
 

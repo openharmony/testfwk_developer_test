@@ -33,7 +33,7 @@ ohos_performancetest("SpentTimeTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//test/developertest/aw/cxx/hwext:performance_test_static",
+    "//test/testfwk/developer_test/aw/cxx/hwext:performance_test_static",
     "//third_party/googletest:gtest_main",
   ]
 }

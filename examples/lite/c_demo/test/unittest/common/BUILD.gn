@@ -14,10 +14,11 @@
 import("//build/lite/config/test.gni")
 
 unittest("CalcMultiTest") {
-  include_dirs = [ "//test/developertest/example/c_demo/include" ]
+  include_dirs = [ "//test/testfwk/developer_test/example/c_demo/include" ]
   sources = [ "calc_multi_test.c" ]
   configs = []
-  deps = [ "//test/developertest/example/c_demo/source:calc_multi_demo" ]
+  deps =
+      [ "//test/testfwk/developer_test/example/c_demo/source:calc_multi_demo" ]
 }
 
 ###############################################################################

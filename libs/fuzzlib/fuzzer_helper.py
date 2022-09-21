@@ -48,7 +48,7 @@ SOURCE_OUT_DIR = os.path.join(SOURCE_ROOT_DIR, "out")
 
 TDD_BUILD_GN_PATH = os.path.join(
     SOURCE_ROOT_DIR,
-    "test/developertest/BUILD.gn"
+    "test/testfwk/developer_test/BUILD.gn"
     )
 ###project name must end with _fuzzer. eg. my_fuzzer,extrator_fuzzer.
 VALID_PROJECT_NAME_REGEX = re.compile(r'^[a-zA-Z0-9_-]+(_fuzzer)+$')

@@ -31,7 +31,7 @@ ohos_unittest("DetectorDependTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//test/developertest/examples/detector:detector",
+    "//test/testfwk/developer_test/examples/detector:detector",
     "//third_party/googletest:gtest_main",
   ]
 }
