@@ -409,13 +409,15 @@ class ResultManager(object):
                 "cd %s; tar -czf %s.tar.gz %s" % (DEFAULT_TEST_PATH, target_name, target_name))
             src_file_tar = os.path.join(DEFAULT_TEST_PATH, "%s.tar.gz" % target_name)
             self.device.pull_file(src_file_tar, cxx_cov_path, is_create=True, timeout=TIME_OUT)
-            result = os.popen("tar -zxf %s -C %s" % (
-                     os.path.join(cxx_cov_path, "%s.tar.gz" % target_name), cxx_cov_path))
-            result.close()
+            tar_path = os.path.join(cxx_cov_path, "%s.tar.gz" % target_name)
             if platform.system() == "Windows":
-                os.remove("%s" % os.path.join(cxx_cov_path, "%s.tar.gz" % target_name))
+                subprocess.Popen("tar -zxf %s -C %s" % (tar_path, cxx_cov_path), shell=True)
+                os.remove(tar_path)
             else:
-                os.system("rm -rf %s" % os.path.join(cxx_cov_path, "%s.tar.gz" % target_name))
+                subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" %
+                                 (tar_path, cxx_cov_path), shell=True)
+                subprocess.Popen("rm -rf %s" % tar_path, shell=True)
+
 
 
 ##############################################################################
