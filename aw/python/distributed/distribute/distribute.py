@@ -81,7 +81,7 @@ class Distribute:
         self.agent_list = agent_list
         self.hdc_tools = hdc_tools
 
-    def exec_agent(self, device, target_name, result_path):
+    def exec_agent(self, device, target_name, result_path, options):
         driver = get_current_driver(device, target_name, self.hdc_tools)
         if driver is None:
             print("Error: driver is None.")
@@ -96,10 +96,10 @@ class Distribute:
                          device.test_path)
 
         suite_path = os.path.join(self.suite_dir, target_name)
-        driver.execute(suite_path, result_path, background=True)
+        driver.execute(suite_path, result_path, options, background=True)
         return self._check_thread(device, target_name)
 
-    def exec_major(self, device, target_name, result_path):
+    def exec_major(self, device, target_name, result_path, options):
         driver = get_current_driver(device, target_name, self.hdc_tools)
         if driver is None:
             print("Error: driver is None.")
@@ -113,7 +113,7 @@ class Distribute:
                          device.test_path)
 
         suite_path = os.path.join(self.suite_dir, target_name)
-        return driver.execute(suite_path, result_path, background=False)
+        return driver.execute(suite_path, result_path, options, background=False)
 
     @staticmethod
     def pull_result(device, source_path, result_save_path):
