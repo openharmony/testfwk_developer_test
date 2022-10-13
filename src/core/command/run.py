@@ -206,25 +206,16 @@ class Run(object):
             Scheduler.start_task_log(log_path)
             make_device_info_file(tmp_path)
 
-            major_test = output_test[0]
-            agent_test = output_test[1]
-
-            suits_dir = os.path.dirname(test_dict["CXX"][0])
-
-            for major in major_test:
-                major_target_name = major
-                major_lift = major.split("Test")
-                for agent in agent_test:
-                    agent_lift = agent.split("Test")
-                    if major_lift[0] == agent_lift[0]:
-                        agent_target_name = agent
-                        manager = DbinderTest(result_rootpath, suits_dir)
-                        manager.setUp()
-                        manager.test_distribute(major_target_name, agent_target_name)
-                        manager.tearDown()
+            for case in output_test:
+                agent_target_name = case["agent_target_name"]
+                major_target_name = case["major_target_name"]
+                manager = DbinderTest(result_rootpath, case["suits_dir"])
+                manager.setUp()
+                manager.test_distribute(major_target_name, agent_target_name, options)
+                manager.tearDown()
 
             make_reports(result_rootpath, start_time)
-            Scheduler.stop_task_log()
+            Scheduler.stop_task_logcat()
         else:
             options.testdict = test_dict
             options.target_outpath = self.get_target_out_path(

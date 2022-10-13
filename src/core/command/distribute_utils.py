@@ -108,9 +108,6 @@ def check_zdn_network(device, device_ip=""):
     output = device.execute_shell_command(command)
     if "" == output:
         return False
-    iserror = re.findall(r"error", output)
-    if 0 != len(iserror):
-        return False
     packet_lose = re.findall(r"\d+%", output)
     LOG.info("packet lose=%s " % packet_lose[0])
     if "0%" == packet_lose[0]:
@@ -141,15 +138,14 @@ def query_device_ip(device):
 
 
 def get_test_case(test_case):
-    major_test_case = []
-    agent_test_case = []
+    result = {}
     for test in test_case:
-        test_case = test.split("\\")[-1]
-        test_agent = test_case.split("Test")
-        if "Agent" in test_agent:
-            agent_test_case.append(test_case)
+        case_dir, file_name = os.path.split(test)
+        if not result.get(case_dir):
+            result[case_dir] = {"suits_dir": case_dir}
+        if file_name.endswith("Test"):
+            result[case_dir]["major_target_name"] = file_name
         else:
-            major_test_case.append(test_case)
-
-    return major_test_case, agent_test_case
+            result[case_dir]["agent_target_name"] = file_name
+    return list(result.values())
 
