@@ -276,7 +276,7 @@ class Distribute:
     @staticmethod
     def _query_device_major_uuid(device):
         device_sn = device.device_sn
-        command = "hdc_std -t %s shell hidumper -s 4700 -a 'buscenter -l local_device_info'" % device_sn
+        command = "hdc -t %s shell hidumper -s 4700 -a 'buscenter -l local_device_info'" % device_sn
         device_info = device.execute_command_with_output(command)
 
         if device_info == "":
@@ -288,7 +288,7 @@ class Distribute:
     @staticmethod
     def _query_device_agent_uuid(device):
         device_sn = device.device_sn
-        command = "hdc_std -t %s shell hidumper -s 4700 -a 'buscenter -l remote_device_info'" % device_sn
+        command = "hdc -t %s shell hidumper -s 4700 -a 'buscenter -l remote_device_info'" % device_sn
         device_info = device.execute_command_with_output(command)
 
         if device_info == "":

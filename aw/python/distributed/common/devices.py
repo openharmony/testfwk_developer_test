@@ -33,7 +33,7 @@ if platform.system() != 'Windows':
 else:
     QUOTATION_MARKS = "\""
 
-HDC_TOOLS = "hdc_std"
+HDC_TOOLS = "hdc"
 
 
 ##############################################################################
