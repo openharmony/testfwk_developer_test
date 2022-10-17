@@ -291,7 +291,9 @@ class ResultManager(object):
             LOG.info("create fuzz test report")
             _create_fuzz_result_file(filepath, self.testsuite_name,
                                      error_message)
-            return filepath
+            if not self.is_coverage:
+                self._obtain_fuzz_corpus()
+
         if not os.path.exists(filepath):
             _create_empty_result_file(filepath, self.testsuite_name,
                                       error_message)
@@ -302,6 +304,13 @@ class ResultManager(object):
             self.obtain_coverage_data()
 
         return filepath
+
+    def _obtain_fuzz_corpus(self):
+        command = f"cd /data/test/; tar czf {self.testsuite_name}_corpus.tar.gz corpus;"
+        self.config.device.execute_shell_command(command)
+        result_save_path = get_result_savepath(self.testsuite_path, self.result_rootpath)
+        LOG.info(f"fuzz_dir = {result_save_path}")
+        self.device.pull_file(f"/data/test/{self.testsuite_name}_corpus.tar.gz", result_save_path)
 
     def _obtain_benchmark_result(self):
         benchmark_root_dir = os.path.abspath(
@@ -524,14 +533,20 @@ class CppTestDriver(IDriver):
                 test_para)
         else:
             coverage_outpath = self.config.coverage_outpath
-            strip_num = len(coverage_outpath.split("/")) - 1
-            command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
-                "GCOV_PREFIX_STRIP=%s ./%s %s" % \
-                (self.config.target_test_path,
-                 filename,
-                 str(strip_num),
-                 filename,
-                 test_para)
+            strip_num = len(coverage_outpath.strip("/").split("/"))
+            if "fuzztest" == self.config.testtype[0]:
+			    self._push_corpus_cov_if_exist(suite_file)
+                command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
+                            rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
+                            GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
+            else:
+                command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
+                    "GCOV_PREFIX_STRIP=%s ./%s %s" % \
+                    (self.config.target_test_path,
+                     filename,
+                     str(strip_num),
+                     filename,
+                     test_para)
 
         result = ResultManager(suite_file, self.config)
         result.set_is_coverage(is_coverage_test)
@@ -553,6 +568,27 @@ class CppTestDriver(IDriver):
             resource_dir,
             self.config.device)
 
+    @staticmethod
+    def _alter_init(name):
+        lines = list()
+        with open(name, "r") as f:
+            for line in f:
+                line_strip = line.strip()
+                if not line_strip:
+                    continue
+                else:
+                    line_strip[0] != "#" and line_strip[0] != "/" and line_strip[0] != "*":
+                    lines.append(line_strip)
+        with open(name, "w") as f:
+            f.writelines(lines)
+
+
+    def _push_corpus_cov_if_exist(self, suite_file):
+        cov_file = suite_file + "_corpus.tar.gz"
+        LOG.info("corpus_cov file :%s" % str(cov_file))
+        self.config.device.push_file(cov_file, os.path.join(self.config.target_test_path))
+
+
     def _push_corpus_if_exist(self, suite_file):
         if "fuzztest" == self.config.testtype[0]:
             corpus_path = os.path.join(get_fuzzer_path(suite_file), "corpus")
@@ -571,8 +607,10 @@ class CppTestDriver(IDriver):
                     corpus_dirs.append(corpus_dir)
 
                 for file in files:
-                    corpus_file_list.append(os.path.normcase(
-                        os.path.join(root, file)))
+                    cp_file = os.path.normcase(os.path.join(root, file))
+                    corpus_file_list.append(cp_file)
+                    if file == "init":
+                        _alter_init(cp_file)
 
             # mkdir corpus files dir
             if corpus_dirs:
@@ -586,8 +624,8 @@ class CppTestDriver(IDriver):
                     self.config.device.push_file(corpus_file,
                         os.path.join(self.config.target_test_path, "corpus"))
 
-    @staticmethod
-    def _get_test_para(testcase,
+    def _get_test_para(self,
+                       testcase,
                        testlevel,
                        testtype,
                        target_test_path,
@@ -611,9 +649,16 @@ class CppTestDriver(IDriver):
             cfg_list = FuzzerConfigManager(os.path.join(get_fuzzer_path(
                 suite_file), "project.xml")).get_fuzzer_config("fuzztest")
             LOG.info("config list :%s" % str(cfg_list))
-            test_para += "corpus -max_len=" + cfg_list[0] + \
-                         " -max_total_time=" + cfg_list[1] + \
-                         " -rss_limit_mb=" + cfg_list[2]
+            if self.config.coverage:
+                test_para += "corpus -runs=0" + \
+                             " -max_len=" + cfg_list[0] + \
+                             " -max_total_time=" + cfg_list[1] + \
+                             " -rss_limit_mb=" + cfg_list[2]
+            else:
+                test_para += "corpus -max_len=" + cfg_list[0] + \
+                             " -max_total_time=" + cfg_list[1] + \
+                             " -rss_limit_mb=" + cfg_list[2]
+
         return test_para
 
 
