@@ -306,11 +306,11 @@ class ResultManager(object):
         return filepath
 
     def _obtain_fuzz_corpus(self):
-        command = f"cd /data/test/; tar czf {self.testsuite_name}_corpus.tar.gz corpus;"
+        command = f"cd {DEFAULT_TEST_PATH}; tar czf {self.testsuite_name}_corpus.tar.gz corpus;"
         self.config.device.execute_shell_command(command)
         result_save_path = get_result_savepath(self.testsuite_path, self.result_rootpath)
         LOG.info(f"fuzz_dir = {result_save_path}")
-        self.device.pull_file(f"/data/test/{self.testsuite_name}_corpus.tar.gz", result_save_path)
+        self.device.pull_file(f"{DEFAULT_TEST_PATH}/{self.testsuite_name}_corpus.tar.gz", result_save_path)
 
     def _obtain_benchmark_result(self):
         benchmark_root_dir = os.path.abspath(
