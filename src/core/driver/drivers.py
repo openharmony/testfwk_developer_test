@@ -45,7 +45,6 @@ from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
 from core.config.config_manager import FuzzerConfigManager
 
-
 __all__ = [
     "CppTestDriver",
     "JSUnitTestDriver",
@@ -203,6 +202,7 @@ def _sleep_according_to_result(result):
     if result:
         time.sleep(1)
 
+
 def _create_fuzz_crash_file(filepath, filename):
     if not os.path.exists(filepath):
         with open(filepath, "w", encoding='utf-8') as file_desc:
@@ -228,6 +228,7 @@ def _create_fuzz_crash_file(filepath, filename):
             file_desc.write('</testsuites>\n')
     return
 
+
 def _create_fuzz_pass_file(filepath, filename):
     if not os.path.exists(filepath):
         with open(filepath, "w", encoding='utf-8') as file_desc:
@@ -248,6 +249,7 @@ def _create_fuzz_pass_file(filepath, filename):
             file_desc.write('</testsuites>\n')
     return
 
+
 def _create_fuzz_result_file(filepath, filename, error_message):
     error_message = str(error_message)
     error_message = error_message.replace("\"", "")
@@ -265,6 +267,8 @@ def _create_fuzz_result_file(filepath, filename, error_message):
         LOG.error("FUZZ TEST UNAVAILABLE")
         _create_empty_result_file(filepath, filename, error_message)
     return
+
+
 ##############################################################################
 ##############################################################################
 
@@ -325,9 +329,9 @@ class ResultManager(object):
 
         LOG.info("benchmark_dir = %s" % benchmark_dir)
         self.device.pull_file(os.path.join(self.device_testpath,
-            "%s.json" % self.testsuite_name), benchmark_dir)
+                                           "%s.json" % self.testsuite_name), benchmark_dir)
         if not os.path.exists(os.path.join(benchmark_dir,
-            "%s.json" % self.testsuite_name)):
+                                           "%s.json" % self.testsuite_name)):
             os.rmdir(benchmark_dir)
         return benchmark_dir
 
@@ -343,30 +347,30 @@ class ResultManager(object):
 
     def obtain_test_result_file(self):
         result_save_path = get_result_savepath(self.testsuite_path,
-            self.result_rootpath)
+                                               self.result_rootpath)
         result_file_path = os.path.join(result_save_path,
-            "%s.xml" % self.testsuite_name)
+                                        "%s.xml" % self.testsuite_name)
 
         result_josn_file_path = os.path.join(result_save_path,
-            "%s.json" % self.testsuite_name)
+                                             "%s.json" % self.testsuite_name)
 
         if self.testsuite_path.endswith('.hap'):
             remote_result_file = os.path.join(self.device_testpath,
-                "testcase_result.xml")
+                                              "testcase_result.xml")
             remote_json_result_file = os.path.join(self.device_testpath,
-                "%s.json" % self.testsuite_name)
+                                                   "%s.json" % self.testsuite_name)
         else:
             remote_result_file = os.path.join(self.device_testpath,
-                "%s.xml" % self.testsuite_name)
+                                              "%s.xml" % self.testsuite_name)
             remote_json_result_file = os.path.join(self.device_testpath,
-                "%s.json" % self.testsuite_name)
+                                                   "%s.json" % self.testsuite_name)
 
         if self.config.testtype[0] != "fuzztest":
             if self.device.is_file_exist(remote_result_file):
                 self.device.pull_file(remote_result_file, result_file_path)
             elif self.device.is_file_exist(remote_json_result_file):
                 self.device.pull_file(remote_json_result_file,
-                                    result_josn_file_path)
+                                      result_josn_file_path)
                 result_file_path = result_josn_file_path
             else:
                 LOG.info("%s not exist", remote_result_file)
@@ -375,12 +379,12 @@ class ResultManager(object):
 
     def make_empty_result_file(self, error_message=""):
         result_savepath = get_result_savepath(self.testsuite_path,
-            self.result_rootpath)
+                                              self.result_rootpath)
         result_filepath = os.path.join(result_savepath, "%s.xml" %
-            self.testsuite_name)
+                                       self.testsuite_name)
         if not os.path.exists(result_filepath):
             _create_empty_result_file(result_filepath,
-                self.testsuite_name, error_message)
+                                      self.testsuite_name, error_message)
 
     def is_exist_target_in_device(self, path, target):
         if platform.system() == "Windows":
@@ -427,7 +431,6 @@ class ResultManager(object):
                 subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" %
                                  (tar_path, cxx_cov_path), shell=True)
                 subprocess.Popen("rm -rf %s" % tar_path, shell=True)
-
 
 
 ##############################################################################
@@ -500,7 +503,7 @@ class CppTestDriver(IDriver):
         if "fuzztest" == self.config.testtype[0]:
             self.config.device.execute_shell_command(
                 "mkdir -p %s" % os.path.join(self.config.target_test_path,
-                "corpus"))
+                                             "corpus"))
 
     def _run_gtest(self, suite_file):
         from xdevice import Variables
@@ -535,18 +538,18 @@ class CppTestDriver(IDriver):
             coverage_outpath = self.config.coverage_outpath
             strip_num = len(coverage_outpath.strip("/").split("/"))
             if "fuzztest" == self.config.testtype[0]:
-			    self._push_corpus_cov_if_exist(suite_file)
+                self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
-                            rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
-                            GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
+                                rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
+                                GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
             else:
                 command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
-                    "GCOV_PREFIX_STRIP=%s ./%s %s" % \
-                    (self.config.target_test_path,
-                     filename,
-                     str(strip_num),
-                     filename,
-                     test_para)
+                          "GCOV_PREFIX_STRIP=%s ./%s %s" % \
+                          (self.config.target_test_path,
+                           filename,
+                           str(strip_num),
+                           filename,
+                           test_para)
 
         result = ResultManager(suite_file, self.config)
         result.set_is_coverage(is_coverage_test)
@@ -565,8 +568,8 @@ class CppTestDriver(IDriver):
 
         self.result = result.get_test_results(return_message)
         resource_manager.process_cleaner_data(resource_data_dic,
-            resource_dir,
-            self.config.device)
+                                              resource_dir,
+                                              self.config.device)
 
     @staticmethod
     def _alter_init(name):
@@ -576,12 +579,10 @@ class CppTestDriver(IDriver):
                 line_strip = line.strip()
                 if not line_strip:
                     continue
-                else:
-                    line_strip[0] != "#" and line_strip[0] != "/" and line_strip[0] != "*":
+                if line_strip[0] != "#" and line_strip[0] != "/" and line_strip[0] != "*":
                     lines.append(line_strip)
         with open(name, "w") as f:
             f.writelines(lines)
-
 
     def _push_corpus_cov_if_exist(self, suite_file):
         cov_file = suite_file + "_corpus.tar.gz"
@@ -601,7 +602,7 @@ class CppTestDriver(IDriver):
             for root, _, files in os.walk(corpus_path):
                 if not files:
                     continue
-                
+
                 corpus_dir = root.split("corpus")[-1]
                 if corpus_dir != "":
                     corpus_dirs.append(corpus_dir)
@@ -610,7 +611,7 @@ class CppTestDriver(IDriver):
                     cp_file = os.path.normcase(os.path.join(root, file))
                     corpus_file_list.append(cp_file)
                     if file == "init":
-                        _alter_init(cp_file)
+                        self._alter_init(cp_file)
 
             # mkdir corpus files dir
             if corpus_dirs:
@@ -622,7 +623,8 @@ class CppTestDriver(IDriver):
             if corpus_file_list:
                 for corpus_file in corpus_file_list:
                     self.config.device.push_file(corpus_file,
-                        os.path.join(self.config.target_test_path, "corpus"))
+                                                 os.path.join(self.config.target_test_path, "corpus"))
+
 
     def _get_test_para(self,
                        testcase,
@@ -892,11 +894,11 @@ class JSUnitTestDriver(IDriver):
 
     @staticmethod
     def _get_acts_test_para(testcase,
-                       testlevel,
-                       testtype,
-                       target_test_path,
-                       suite_file,
-                       filename):
+                            testlevel,
+                            testtype,
+                            target_test_path,
+                            suite_file,
+                            filename):
         if "actstest" == testtype[0]:
             test_para = (" --actstest_out_format=json"
                          " --actstest_out=%s%s.json") % (
@@ -931,7 +933,6 @@ class JSUnitTestDriver(IDriver):
         finally:
             print(" get json shell timeout finally")
 
-
     @staticmethod
     def _get_package_and_ability_name(hap_filepath):
         package_name = ""
@@ -939,7 +940,7 @@ class JSUnitTestDriver(IDriver):
         if os.path.exists(hap_filepath):
             filename = os.path.basename(hap_filepath)
 
-            #unzip the hap file
+            # unzip the hap file
             hap_bak_path = os.path.abspath(os.path.join(
                 os.path.dirname(hap_filepath),
                 "%s.bak" % filename))
@@ -950,7 +951,7 @@ class JSUnitTestDriver(IDriver):
                 print(error)
             zf_desc.close()
 
-            #verify config.json file
+            # verify config.json file
             app_profile_path = os.path.join(hap_bak_path, "config.json")
             if not os.path.exists(app_profile_path):
                 print("file %s not exist" % app_profile_path)
@@ -960,7 +961,7 @@ class JSUnitTestDriver(IDriver):
                 print("%s is a folder, and not a file" % app_profile_path)
                 return package_name, ability_name
 
-            #get package_name and ability_name value
+            # get package_name and ability_name value
             load_dict = {}
             with open(app_profile_path, 'r') as load_f:
                 load_dict = json.load(load_f)
@@ -974,13 +975,13 @@ class JSUnitTestDriver(IDriver):
                     abilities_name = abilitie.get("name")
                     if abilities_name.startswith("."):
                         ability_name = package_name + abilities_name[
-                                       abilities_name.find("."):]
+                                                      abilities_name.find("."):]
                     else:
                         ability_name = abilities_name
                     break
                 break
 
-            #delete hap_bak_path
+            # delete hap_bak_path
             if os.path.exists(hap_bak_path):
                 shutil.rmtree(hap_bak_path)
         else:
