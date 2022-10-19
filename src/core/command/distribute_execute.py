@@ -52,7 +52,7 @@ class DbinderTest(unittest.TestCase):
         distribute.exec_major(self.major, major_target_name, self.result_path, options)
 
         result = os.path.join(self.result_path, 'result',
-                              self.suits_dir.split("distributedtest\\")[1])
+                              self.suits_dir.split("distributedtest")[1].strip(os.sep))
         source_path = "%s/%s.xml" % (self.major.test_path, major_target_name)
         if not os.path.exists(result):
             os.makedirs(result)

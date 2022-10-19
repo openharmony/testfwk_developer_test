@@ -65,7 +65,7 @@ def is_exist_target_in_device(device, path, target):
 
 
 def receive_coverage_data(device, result_path, suite_file, file_name):
-    file_dir = suite_file.split("distributedtest\\")[1].split("\\")[0]
+    file_dir = suite_file.split("distributedtest")[1].strip(os.sep).split(os.sep)[0]
     target_name = "obj"
     cxx_cov_path = os.path.abspath(os.path.join(
         result_path,
@@ -116,7 +116,7 @@ class CppTestDriver(ITestDriver):
 
     def execute(self, suite_file, result_path, options, background=False):
         case_dir, file_name = os.path.split(suite_file)
-        dst_dir = case_dir.split("distributedtest\\")[1]
+        dst_dir = case_dir.split("distributedtest")[1].strip(os.sep)
         os.makedirs(os.path.join(result_path, "temp", dst_dir), exist_ok=True)
 
         long_command_path = tempfile.mkdtemp(
