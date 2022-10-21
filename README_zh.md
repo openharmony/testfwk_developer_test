@@ -7,7 +7,7 @@ OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-develope
  - [环境配置](https://gitee.com/openharmony/docs/tree/master/zh-cn/device-dev/subsystems/subsys-testguide-envbuild.md)
  - [源码获取](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/sourcecode-acquire.md)
 
-开发自测试框架依赖于测试调度框架test_xdevice，在使用时两个框架放在同级目录，命名为xdevice
+开发自测试框架依赖于测试调度框架testfwk_xdevice，在使用时两个框架放在同级目录
 
 ## 开发自测试框架目录简介
 以下是开发自测试框架的目录层级架构，在使用开发自测试框架过程中可在相应目录查找对应组件。
@@ -745,7 +745,9 @@ subsystem  # 子系统
     <board_dir></board_dir>
   </NFS>
 </user_config>
+
 ```
+
 >**说明：** 在执行测试用例之前，若使用HDC连接设备，用例仅需配置设备IP和端口号即可，其余信息均默认不修改。
 
 #### Windows环境执行
@@ -794,32 +796,43 @@ subsystem  # 子系统
 
 3. 执行测试用例
 
-    当选择完产品形态，可参考如下指令执行测试用例。
+    当选择完产品形态，可参考如下指令执行TDD测试用例。
 	```
+	run -t UT
+	run -t UT -tp PartName
+	run -t UT -tp PartName -tm TestModuleName
+	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
+	run -t UT -ts CalculatorSubTest
 	run -t UT -ts CalculatorSubTest -tc interger_sub_00l
+	run -t UT -cov coverage
 	```
+
+	
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
 	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
+	-cov [COVERAGE]: 覆盖率执行参数
 	-h : 帮助命令。
 	```
+
+	
 #### Linux环境执行
 ##### 远程端口映射
 为了在Linux远程服务器以及Linux虚拟机两种环境下执行测试用例，需要对端口进行远程映射，以实现与设备的数据通路连接。具体操作如下：
 1. HDC Server指令：
 	```
-	hdc_std kill
-	hdc_std -m -s 0.0.0.0:8710
+	hdc kill
+	hdc -m -s 0.0.0.0:8710
 	```
 	>**说明：** IP和端口号为默认值。
 
 2. HDC Client指令：
 	```
-	hdc_std -s xx.xx.xx.xx:8710 list targets
+	hdc -s xx.xx.xx.xx:8710 list targets
 	```
 	>**说明：** 此处IP填写设备侧IP地址。
 
@@ -832,22 +845,79 @@ subsystem  # 子系统
 
     进入测试框架，系统会自动提示您选择产品形态，请根据实际的开发板进行选择。
 
-	如需手动添加，请在config/framework_config.xml的\<productform\>标签内增加产品项。
+	若需要自测试框架编译测试用例，且没有找到需要的产品形态需手动添加，请在config/framework_config.xml的\<productform\>标签内增加产品项。
+
+	```
+	<framework_config>
+	 <productform>
+	  <option name="ipcamera_hispark_aries" />
+	  <option name="ipcamera_hispark_taurus" />
+	  <option name="wifiiot_hispark_pegasus" />
+	  <option name="" />
+	 </productform>
+	</framework_config>
+
+	```
 
 3. 执行测试用例
 
+    1）TDD命令
+
     测试框架在执行用例时会根据指令找到所需用例，自动实现用例编译，执行过程，完成自动化测试。
 	```
+	run -t UT
+	run -t UT -tp PartName
+	run -t UT -tp PartName -tm TestModuleName
+	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
+	run -t UT -ts CalculatorSubTest
 	run -t UT -ts CalculatorSubTest -tc interger_sub_00l
+	run -t -cov coverage
 	```
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK，ACTS等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
 	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
+	-cov [COVERAGE]: 覆盖率执行参数。
 	-h : 帮助命令。
+	```
+
+	在linux下可以使用help命令查看有哪些产品形态、测试类型、支持的子系统、部件
+	```
+	查看帮助命令：help
+	查看show命令：help show
+	查看支持的设备形态：   show productlist
+	查看支持的测试类型：   show typelist
+	查看支持的测试子系统： show subsystemlist
+	查看支持的测试部件：   show partlist
+	```
+	2)ACTS命令
+
+	当选择完产品形态，可以参考如下执行执行ACTS测试用例
+	```
+	run -t ACTS
+	run -t ACTS -ss arkui
+	run -t ACTS -ss arkui, modulemanager
+	run -t ACTS -ss arkui -ts ActsAceEtsTest 
+	run -t ACTS -ss arkui -ts ActsAceEtsTest, ActsAceEtsResultTest
+	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001
+	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001 --repeat 2
+	run -hl
+	run -rh 1
+	run --retry
+	```
+	执行命令参数说明,与TDD有所不同：
+	```
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
+	-ss [SUBSYSTEM]: 指定子系统，可单独使用，且可以执行多个子系统，用逗号隔开。
+	-ts [TESTSUITE]: 指定测试套，可独立使用，且可以执行多个测试套，用逗号隔开。
+	-ta [TESTARGS]: 指定测试类测试方法，需结合-ts指定上级测试套使用。
+	--repeat : 支持设置用例执行次数。
+	-hl [HISTORYLIST]: 显示最近10条测试用例，超过10条，只显示最近10条。
+	-rh [RUNHISTORY]: 执行历史记录的第几条记录运行
+	--retry：检查上次运行结果，如果有失败用例则重复测试
 	```
 
 ### 测试报告日志
