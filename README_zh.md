@@ -900,7 +900,8 @@ subsystem  # 子系统
 	run -t ACTS
 	run -t ACTS -ss arkui
 	run -t ACTS -ss arkui, modulemanager
-	run -t ACTS -ss arkui -ts ActsAceEtsTest 
+	run -t ACTS -ss arkui -ts ActsAceEtsTest
+	run -t ACTS -ss arkui -tp ActsPartName 
 	run -t ACTS -ss arkui -ts ActsAceEtsTest, ActsAceEtsResultTest
 	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001
 	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001 --repeat 2
@@ -912,6 +913,7 @@ subsystem  # 子系统
 	```
 	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
 	-ss [SUBSYSTEM]: 指定子系统，可单独使用，且可以执行多个子系统，用逗号隔开。
+	-tp [TESTPART]: 指定部件，可独立使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用，且可以执行多个测试套，用逗号隔开。
 	-ta [TESTARGS]: 指定测试类测试方法，需结合-ts指定上级测试套使用。
 	--repeat : 支持设置用例执行次数。
