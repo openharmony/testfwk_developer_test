@@ -144,8 +144,8 @@ def get_test_case(test_case):
         if not result.get(case_dir):
             result[case_dir] = {"suits_dir": case_dir}
         if file_name.endswith("Test"):
-            result[case_dir]["major_target_name"] = file_name
+            result.get(case_dir)["major_target_name"] = file_name
         else:
-            result[case_dir]["agent_target_name"] = file_name
+            result.get(case_dir)["agent_target_name"] = file_name
     return list(result.values())
 
