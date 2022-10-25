@@ -26,7 +26,7 @@ namespace DetectorTest {
     const int START_INDEX = 3;
 }
 
-namespace{
+namespace {
 bool IsPrime(int n)
 {
     if (n <= 1) {
