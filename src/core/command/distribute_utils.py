@@ -141,11 +141,14 @@ def get_test_case(test_case):
     result = {}
     for test in test_case:
         case_dir, file_name = os.path.split(test)
-        if not result.get(case_dir):
-            result[case_dir] = {"suits_dir": case_dir}
-        if file_name.endswith("Test"):
-            result[case_dir]["major_target_name"] = file_name
+        if case_dir not in result:
+            sub_data = {"suits_dir": case_dir}
+            result[case_dir] = sub_data
         else:
-            result[case_dir]["agent_target_name"] = file_name
+            sub_data = result.get(case_dir)
+        if file_name.endswith("Test"):
+            sub_data["major_target_name"] = file_name
+        else:
+            sub_data["agent_target_name"] = file_name
     return list(result.values())
 
