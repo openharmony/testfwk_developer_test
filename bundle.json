@@ -4,6 +4,9 @@
     "description": "developertest",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
+    "segment": {
+        "destPath": "test/testfwk/developer_test"
+    },
     "scripts": {},  
     "repository": "",
     "dirs": {},
