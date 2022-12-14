@@ -753,14 +753,7 @@ class JSUnitTestDriver(IDriver):
 
         resource_manager = ResourceManager()
         resource_data_dic, resource_dir = resource_manager.get_resource_data_dic(suite_file)
-        if suffix_name == ".hap":
-            json_file_path = suite_file.replace(".hap", ".json")
-            if os.path.exists(json_file_path):
-                timeout = self._get_json_shell_timeout(json_file_path)
-            else:
-                timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
-        else:
-            timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
+        timeout = ResourceManager.get_nodeattrib_data(resource_data_dic)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir, self.config.device)
         main_result = self._install_hap(suite_file)
         result = ResultManager(suite_file, self.config)
