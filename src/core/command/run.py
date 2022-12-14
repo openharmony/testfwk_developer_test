@@ -226,11 +226,11 @@ class Run(object):
             if scheduler is None:
                 LOG.error("Can not find the scheduler plugin.")
             else:
+                options.testcases_path = self.get_tests_out_path(options.productform)
+                options.resource_path = os.path.abspath(os.path.join(
+                    sys.framework_root_dir, "..", "resource"))
                 if is_lite_product(options.productform,
                                    sys.source_code_root_path):
-                    options.testcases_path = options.target_outpath
-                    options.resource_path = os.path.abspath(os.path.join(
-                        sys.framework_root_dir, "..", "resource"))
                     if options.productform.find("wifiiot") != -1:
                         scheduler.update_test_type_in_source(".bin",
                             DeviceTestType.ctest_lite)
