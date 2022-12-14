@@ -168,6 +168,10 @@ class Run(object):
             test_dict = self.get_acts_test_dict(options)
             options.testcases_path = self.get_acts_tests_out_path(options.productform)
             options.resource_path = self.get_acts_tests_out_path(options.productform)
+        elif "hatstest" in options.testtype:
+            test_dict = self.get_hats_test_dict(options)
+            options.testcases_path = self.get_hats_tests_out_path(options.productform)
+            options.resource_path = self.get_hats_tests_out_path(options.productform)
         else:
             test_dict = self.get_test_dict(options)
 
@@ -332,6 +336,18 @@ class Run(object):
         return acts_testcase_path
 
     @classmethod
+    def get_hats_tests_out_path(cls, product_form):
+        hats_testcase_path = UserConfigManager().get_test_cases_dir()
+        if hats_testcase_path == "":
+            hats_testcase_path = os.path.abspath(os.path.join(
+                get_build_output_path(product_form),
+                "suites",
+                "hats",
+                "testcases"))
+        LOG.info("hats_testcase_path=%s" % hats_testcase_path)
+        return hats_testcase_path
+
+    @classmethod
     def get_coverage_outpath(cls, options):
         coverage_out_path = ""
         if options.coverage:
@@ -348,6 +364,12 @@ class Run(object):
         acts_test_case_path = self.get_acts_tests_out_path(options.productform)
         acts_test_dict = TestCaseManager().get_acts_test_files(acts_test_case_path, options)
         return acts_test_dict
+
+    def get_hats_test_dict(self, options):
+        # 获取HATS测试用例编译结果路径
+        hats_test_case_path = self.get_hats_tests_out_path(options.productform)
+        hats_test_dict = TestCaseManager().get_hats_test_files(hats_test_case_path, options)
+        return hats_test_dict
 
     def get_test_dict(self, options):
         # 获取测试用例编译结果路径

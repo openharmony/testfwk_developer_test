@@ -526,7 +526,6 @@ class CppTestDriver(IDriver):
             resource_manager.get_resource_data_dic(suite_file)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir,
                                                self.config.device)
-
         # execute testcase
         if not self.config.coverage:
             command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s" % (
@@ -589,7 +588,6 @@ class CppTestDriver(IDriver):
         LOG.info("corpus_cov file :%s" % str(cov_file))
         self.config.device.push_file(cov_file, os.path.join(self.config.target_test_path))
 
-
     def _push_corpus_if_exist(self, suite_file):
         if "fuzztest" == self.config.testtype[0]:
             corpus_path = os.path.join(get_fuzzer_path(suite_file), "corpus")
@@ -624,7 +622,6 @@ class CppTestDriver(IDriver):
                 for corpus_file in corpus_file_list:
                     self.config.device.push_file(corpus_file,
                                                  os.path.join(self.config.target_test_path, "corpus"))
-
 
     def _get_test_para(self,
                        testcase,
@@ -913,6 +910,28 @@ class JSUnitTestDriver(IDriver):
         else:
             test_para = ""
         return test_para
+
+    @staticmethod
+    def _get_hats_test_para(testcase,
+                            testlevel,
+                            testtype,
+                            target_test_path,
+                            suite_file,
+                            filename):
+        if "hatstest" == testtype[0]:
+            test_hats_para = (" --hatstest_out_format=json"
+                         " --hatstest_out=%s%s.json") % (
+                            target_test_path, filename)
+            return test_hats_para
+
+        if "" != testcase and "" == testlevel:
+            test_hats_para = "%s=%s" % (GTestConst.exec_para_filter, testcase)
+        elif "" == testcase and "" != testlevel:
+            level_para = get_level_para_string(testlevel)
+            test_hats_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
+        else:
+            test_hats_para = ""
+        return test_hats_para
 
     @classmethod
     def _get_json_shell_timeout(cls, json_filepath):

@@ -26,6 +26,9 @@
     <option name="ACTS"
             desc="actstest"
             timeout="300" />
+    <option name="HATS"
+            desc="hatstest"
+            timeout="300" />
     <option name="MST"
             desc="moduletest"
             timeout="300" />
@@ -56,6 +59,7 @@
   <all_category>
     <option name="unittest" />
     <option name="actstest" />
+    <option name="hatstest" />
     <option name="moduletest" />
     <option name="systemtest" />
     <option name="performance" />
