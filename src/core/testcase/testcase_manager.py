@@ -38,6 +38,7 @@ TESTFILE_TYPE_DATA_DIC = {
     "BIN": [],
     "OHJST": [],
     "JST": [],
+    "LTPPosix": []
 }
 FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
 
@@ -165,6 +166,39 @@ class TestCaseManager(object):
         else:
             LOG.error("acts %s is not exist." % acts_test_case_path)
         return acts_suit_file_dic
+
+    def check_hats_config_match(self, options, prefix_name, hats_suite_file):
+        # 如果hats测试指定了-tp，只有部件名与moduleInfo中part一致的CXX文件才会加入最终执行的队列
+        if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(hats_suite_file):
+            return False
+        # 如果hats测试指定了-ts，只有完全匹配的CXX才会加入最终执行的队列
+        if options.testsuit != "":
+            testsuit_list = options.testsuit.split(";")
+            for suite_item in testsuit_list:
+                if suite_item == prefix_name:
+                    return True
+            return False
+        return True
+
+    def get_hats_test_files(self, hats_test_case_path, options):
+        LOG.info("hats test case path: " + hats_test_case_path)
+        hats_suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
+        if not os.path.exists(hats_test_case_path):
+            LOG.error("hats %s is not exist." % hats_test_case_path)
+            return hats_suit_file_dic
+        # 获取hats测试用例输出目录下面的所有文件路径列表
+        hats_suite_file_list = get_file_list_by_postfix(hats_test_case_path)
+        for hats_suite_file in hats_suite_file_list:
+            file_name = os.path.basename(hats_suite_file)
+            prefix_name, suffix_name = os.path.splitext(file_name)
+            if not self.check_hats_config_match(options, prefix_name, hats_suite_file):
+                continue
+            if suffix_name == "":
+                if file_name == "HatsOpenPosixTest":
+                    hats_suit_file_dic.get("LTPPosix").append(hats_suite_file)
+                else:
+                    hats_suit_file_dic.get("CXX").append(hats_suite_file)
+        return hats_suit_file_dic
 
     @classmethod
     def get_valid_suite_file(cls, test_case_out_path, suite_file, options):
