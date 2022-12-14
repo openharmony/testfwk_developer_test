@@ -484,6 +484,8 @@ subsystem  # 子系统
 	
         > **说明：根据测试类型的不同，在具体编写过程中可选择不同的测试类型：**
     	> - ohos_unittest：单元测试
+    	> - ohos_js_unittest: FA模型js用例单元测试
+		> - ohos_js_stage_unittest: stage模型ets用例单元测试
     	> - ohos_moduletest：模块测试
     	> - ohos_systemtest：系统测试
     	> - ohos_performancetest：性能测试
@@ -501,7 +503,7 @@ subsystem  # 子系统
     	```
     	> **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
     
-- **JavaScript用例编译配置示例**
+- ** FA模型JavaScript用例编译配置示例**
 
     ```
     # Copyright (C) 2021 XXXX Device Co., Ltd.
@@ -633,6 +635,48 @@ subsystem  # 子系统
     	}
     	```
     	> **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
+
+- ** stage模型ets用例编译配置示例**
+
+    ```
+    # Copyright (C) 2022 XXXX Device Co., Ltd.
+    
+    import("//build/test.gni")
+
+    want_output_path = "developertest/stage_test"
+    
+    ohos_js_stage_unittest("ActsBundleMgrStageEtsTest") {
+      hap_profile = "entry/src/main/module.json"
+      deps = [
+        ":actbmsstageetstest_js_assets",
+        ":actbmsstageetstest_resources",
+      ]
+      ets2abc = true
+      certificate_profile = "signature/openharmony_sx.p7b"
+      hap_name = "ActsBundleMgrStageEtsTest"
+      subsystem_name = "developertest"
+      part_name = "stage_test"  // 部件名称
+      module_out_path = want_output_path   // 必须定义输出路径
+    }
+    ohos_app_scope("actbmsstageetstest_app_profile") {
+      app_profile = "AppScope/app.json"
+      sources = [ "AppScope/resources" ]
+    }
+    ohos_js_assets("actbmsstageetstest_js_assets") {
+      source_dir = "entry/src/main/ets"
+    }
+    ohos_resources("actbmsstageetstest_resources") {
+      sources = [ "entry/src/main/resources" ]
+      deps = [ ":actbmsstageetstest_app_profile" ]
+      hap_profile = "entry/src/main/module.json"
+    }
+    group("unittest") {
+      testonly = true
+      deps = []
+      deps += [ ":ActsBundleMgrStageEtsTest" ]
+    }
+    ```
+    > **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
 
 **Fuzz测试**
 
