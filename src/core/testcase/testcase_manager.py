@@ -120,7 +120,26 @@ class TestCaseManager(object):
                 if suffix_name == ".dex":
                     suite_file_dictionary.get("DEX").append(suite_file)
                 elif suffix_name == ".hap":
-                    suite_file_dictionary.get("JST").append(suite_file)
+                    if self.get_hap_test_driver(suite_file) == "OHJSUnitTest":
+                        # 如果stage测试指定了-tp，只有部件名与moduleInfo中part一致的HAP包才会加入最终执行的队列
+                        if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(
+                                suite_file):
+                            continue
+                        # 如果stage测试指定了-ts，只有完全匹配的HAP包才会加入最终执行的队列
+                        if options.testsuit != "":
+                            testsuit_list = options.testsuit.split(";")
+                            is_match = False
+                            for suite_item in testsuit_list:
+                                if suite_item == prefix_name:
+                                    is_match = True
+                                    break
+                            if not is_match:
+                                continue
+                        if not self.check_hap_test_file(suite_file):
+                            continue
+                        suite_file_dictionary.get("OHJST").append(suite_file)
+                    if self.get_hap_test_driver(suite_file) == "JSUnitTest":
+                        suite_file_dictionary.get("JST").append(suite_file)
                 elif suffix_name == ".py":
                     if not self.check_python_test_file(suite_file):
                         continue
@@ -225,11 +244,11 @@ class TestCaseManager(object):
                             if "kits" in data_dic.keys():
                                 kits_list = data_dic.get("kits")
                                 if len(kits_list) > 0:
-                                    kits_dict = kits_list[0]
-                                    if "test-file-name" in kits_dict.keys():
-                                        return True
-                                    else:
-                                        return False
+                                    for kits_dict in kits_list:
+                                        if "test-file-name" not in kits_dict.keys():
+                                            continue
+                                        else:
+                                            return True
                                 else:
                                     return False
             return False
