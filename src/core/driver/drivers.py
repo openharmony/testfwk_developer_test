@@ -927,6 +927,8 @@ class JSUnitTestDriver(IDriver):
                         driver_dict = data_dic.get("driver")
                         if driver_dict and "test-timeout" in driver_dict.keys():
                             test_timeout = int(driver_dict["shell-timeout"]) / 1000
+                        else:
+                            return
                     return test_timeout
         except JSONDecodeError:
             return test_timeout
