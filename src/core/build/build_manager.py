@@ -77,6 +77,19 @@ class BuildManager(object):
             build_result = False
         return build_result
 
+    # 根据目标编译hats测试用例
+    # project_root_path 工程根目录
+    # para 指令参数
+    @classmethod
+    def _compile_hats_test_cases(cls, project_root_path, para):
+        if BuildTestcases(project_root_path).build_hats_testcases(para):
+            LOG.info("Hats test case compilation successed.")
+            build_result = True
+        else:
+            LOG.info("Hats test compilation failed, please modify.")
+            build_result = False
+        return build_result
+
     @classmethod
     def _compile_fuzz_test_case(cls, project_root_path, para):
         build_result = BuildTestcases(
@@ -166,7 +179,7 @@ class BuildManager(object):
         if not os.path.exists(project_root_path):
             LOG.error("%s is not exists." % project_root_path)
             return False
-
+        
         LOG.info("--------------------------------------------------")
         LOG.info("Building parameter:")
         LOG.info("productform   = %s" % param.productform)
@@ -184,10 +197,14 @@ class BuildManager(object):
         LOG.info("")
 
         build_acts_result = True
+        build_hats_result = True
         build_result = True
         if "actstest" in param.testtype:
             LOG.info("**********************Start build acts testcases****************************")
             build_acts_result = self._compile_acts_test_cases(project_root_path, param)
+        elif "hatstest" in param.testtype:
+            LOG.info("**********************Start build hats testcases****************************")
+            build_hats_result = self._compile_hats_test_cases(project_root_path, param)
         else:
             LOG.info("**********************Start build subsystem testcases****************************")
             build_result = self._compile_testcases(project_root_path, param)
@@ -198,7 +215,7 @@ class BuildManager(object):
         LOG.info("**************************************************")
         LOG.info("")
 
-        return build_result and build_acts_result
+        return build_result and build_acts_result and build_hats_result
 
 
 ##############################################################################
