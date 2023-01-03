@@ -46,15 +46,16 @@ CMD_KEY_PRODUCTLIST = "productlist"
 # 测试用例类型
 #     1. UT
 #     2. ACTS
-#     3. MST
-#     4. ST
-#     5. PERF
-#     6. SEC
-#     7. FUZZ
-#     8. RELI
-#     9. DST
-#     10. BENCHMARK
-#     11. ALL
+#     3. HATS
+#     4. MST
+#     5. ST
+#     6. PERF
+#     7. SEC
+#     8. FUZZ
+#     9. RELI
+#     10. DST
+#     11. BENCHMARK
+#     12. ALL
 CMD_KEY_TYPELIST = "typelist"
 
 # 子系统名称列表
@@ -66,29 +67,32 @@ CMD_KEY_PARTLIST = "partlist"
 # acts子系统名称列表
 CMD_KEY_SUBSYSTEMLIST_ACTS = "actssubsystemlist"
 
+# hats子系统名称列表
+CMD_KEY_SUBSYSTEMLIST_HATS = "hatssubsystemlist"
+
 TOOL_VERSION_INFO = """Welcome to DeveloperTest V3.2.2.0
 """
 
 HLEP_COMMAND_INFOMATION = """use help [follow command] for more information:
     """ + \
-    "show: " + """Display a list of supported show command.
+                          "show: " + """Display a list of supported show command.
     """ + \
-    "run:  " + """Display a list of supported run command.
+                          "run:  " + """Display a list of supported run command.
     """ + \
-    "list: " + """Display a list of supported device.
+                          "list: " + """Display a list of supported device.
     """ + \
-    "quit: " + """Exit the test framework application.
+                          "quit: " + """Exit the test framework application.
 """
 
 SUPPORT_COMMAND_SHOW = """use show [follow command] for more information:
     """ + \
-    "productlist" + """
+                       "productlist" + """
     """ + \
-    "typelist" + """
+                       "typelist" + """
     """ + \
-    "subsystemlist" + """
+                       "subsystemlist" + """
     """ + \
-    "partlist" + """
+                       "partlist" + """
 """
 
 RUNCASES_INFOMATION = """run:
@@ -314,9 +318,37 @@ def show_subsystem_list(product_form):
 def show_acts_subsystem_list():
     print("List of currently supported acts subsystem names:")
     sub_list = ['global', 'security', 'useriam', 'multimedia', 'appexecfwk', 'account', 'communication', 'notification',
-    'ability', 'miscservices', 'powermgr', 'startup', 'sensor', 'distributeddatamgr', 'update', 'graphic', 'arkui',
-    'storage', 'compileruntime', 'usb', 'multimodalinput', 'resourceschedule',
-    'telephony', 'hiviewdfx', 'location', 'barrierfree', 'customization']
+                'ability', 'miscservices', 'powermgr', 'startup', 'sensor', 'distributeddatamgr', 'update', 'graphic',
+                'arkui',
+                'storage', 'compileruntime', 'usb', 'multimodalinput', 'resourceschedule',
+                'telephony', 'hiviewdfx', 'location', 'barrierfree', 'customization']
+    sub_list.sort()
+    for index, element in enumerate(sub_list):
+        print("    %d. %s" % (index + 1, element.strip()))
+
+
+KEY = '"${HATS_ROOT}/'
+
+
+def get_hats_subsystem(path):
+    ret = []
+    with open(path) as file_desc:
+        all_lines = file_desc.readlines()
+        for line in all_lines:
+            line_t = line.strip()
+            if line_t.startswith(KEY):
+                ret.append(line_t[len(KEY):line_t.find(':')])
+    return ret
+
+
+def show_hats_subsystem_list():
+    print("List of currently supported hats subsystem names:")
+    path = os.path.join(sys.source_code_root_path,
+                        "test",
+                        "xts",
+                        "hats",
+                        "test_packages.gni")
+    sub_list = get_hats_subsystem(path)
     sub_list.sort()
     for index, element in enumerate(sub_list):
         print("    %d. %s" % (index + 1, element.strip()))
@@ -366,9 +398,10 @@ def display_show_command_info(command, product_form="phone"):
         show_partname_list(product_form)
     elif command == CMD_KEY_SUBSYSTEMLIST_ACTS:
         show_acts_subsystem_list()
+    elif command == CMD_KEY_SUBSYSTEMLIST_HATS:
+        show_hats_subsystem_list()
     else:
         print("This command is not support.")
-
 
 #############################################################################
 #############################################################################
