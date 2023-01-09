@@ -996,7 +996,7 @@ reports/latest
 
 ### 涉及仓
 
-[test\_xdevice](https://gitee.com/openharmony/test_xdevice/blob/master/README_zh.md)
+[test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice)
 
 ## 发布版本说明
 
