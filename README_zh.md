@@ -4,7 +4,7 @@ OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-develope
 本文从基础环境构建，用例开发，编译以及执行等方面介绍OpenHarmony开发自测试执行框架如何运行和使用。
 ## 基础环境构建
 开发自测试框架依赖于python运行环境,python版本为3.8.X,在使用测试框架之前可参阅以下方式进行配置。
- - [环境配置](https://gitee.com/openharmony/docs/tree/master/zh-cn/device-dev/subsystems/subsys-testguide-envbuild.md)
+ - [环境配置](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/device-test/developer_test.md)
  - [源码获取](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/sourcecode-acquire.md)
 
 开发自测试框架依赖于测试调度框架testfwk_xdevice，在使用时两个框架放在同级目录
