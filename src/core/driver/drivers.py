@@ -444,9 +444,6 @@ class CppTestDriver(IDriver):
     # test driver config
     config = None
     result = ""
-    # log
-    hilog = None
-    hilog_proc = None
 
     def __check_environment__(self, device_options):
         if len(device_options) == 1 and device_options[0].label is None:
@@ -482,21 +479,16 @@ class CppTestDriver(IDriver):
                 result.make_empty_result_file(
                     "No test device is found. ")
                 return
+            self.config.device.set_device_report_path(request.config.report_path)
+            self.config.device.device_log_collector.start_hilog_task()
+            self._init_gtest()
+            self._run_gtest(suite_file)
 
-            serial = request.config.device.__get_serial__()
-            self.hilog = get_device_log_file(
-                request.config.report_path,
-                serial)
-
-            with open(self.hilog, "a", encoding="UTF-8") as file_pipe:
-                self.config.device.device_log_collector.add_log_address(None, self.hilog)
-                _, self.hilog_proc = self.config.device.device_log_collector.\
-                    start_catch_device_log(hilog_file_pipe=file_pipe)
-                self._init_gtest()
-                self._run_gtest(suite_file)
         finally:
-            self.config.device.device_log_collector.remove_log_address(None, self.hilog)
-            self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
+            serial = "{}_{}".format(str(request.config.device.__get_serial__()), time.time_ns())
+            log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
+                ":", "_"))
+            self.config.device.device_log_collector.stop_hilog_task(log_tar_file_name)
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
