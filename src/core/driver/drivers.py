@@ -444,6 +444,9 @@ class CppTestDriver(IDriver):
     # test driver config
     config = None
     result = ""
+    # log
+    hilog = None
+    hilog_proc = None
 
     def __check_environment__(self, device_options):
         if len(device_options) == 1 and device_options[0].label is None:
@@ -481,16 +484,19 @@ class CppTestDriver(IDriver):
                 return
 
             serial = request.config.device.__get_serial__()
-            device_log_file = get_device_log_file(
+            self.hilog = get_device_log_file(
                 request.config.report_path,
                 serial)
 
-            with open(device_log_file, "a", encoding="UTF-8") as file_pipe:
-                self.config.device.start_catch_device_log(hilog_file_pipe=file_pipe)
+            with open(self.hilog, "a", encoding="UTF-8") as file_pipe:
+                self.config.device.device_log_collector.add_log_address(None, self.hilog)
+                _, self.hilog_proc = self.config.device.device_log_collector.\
+                    start_catch_device_log(hilog_file_pipe=file_pipe)
                 self._init_gtest()
                 self._run_gtest(suite_file)
         finally:
-            self.config.device.stop_catch_device_log()
+            self.config.device.device_log_collector.remove_log_address(None, self.hilog)
+            self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
@@ -676,6 +682,9 @@ class JSUnitTestDriver(IDriver):
         self.start_time = None
         self.ability_name = ""
         self.package_name = ""
+        # log
+        self.hilog = None
+        self.hilog_proc = None
 
     def __check_environment__(self, device_options):
         pass
@@ -717,23 +726,26 @@ class JSUnitTestDriver(IDriver):
                 "/data/data/%s/files/" % self.package_name
             self.config.device.connector_command("shell hilog -r")
 
-            hilog = get_device_log_file(
+            self.hilog = get_device_log_file(
                 request.config.report_path,
                 request.config.device.__get_serial__() + "_" + request.
                 get_module_name(),
                 "device_hilog")
 
-            hilog_open = os.open(hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+            hilog_open = os.open(self.hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
                                  0o755)
 
             with os.fdopen(hilog_open, "a") as hilog_file_pipe:
-                self.config.device.start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
+                self.config.device.device_log_collector.add_log_address(None, self.hilog)
+                _, self.hilog_proc = self.config.device.device_log_collector.\
+                    start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
                 self._init_jsunit_test()
-                self._run_jsunit(suite_file, hilog)
+                self._run_jsunit(suite_file, self.hilog)
                 hilog_file_pipe.flush()
-                self.generate_console_output(hilog, request)
+                self.generate_console_output(self.hilog, request)
         finally:
-            self.config.device.stop_catch_device_log()
+            self.config.device.device_log_collector.remove_log_address(None, self.hilog)
+            self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
 
     def _init_jsunit_test(self):
         self.config.device.connector_command("target mount")
