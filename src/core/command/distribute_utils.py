@@ -128,7 +128,7 @@ def query_device_ip(device):
     if 0 != len(isemulator):
         ipaddress = re.findall(r"\b10\.0\.2\.[0-9]{1,3}\b", output)
     else:
-        ip_template = r"\b192\.168\.(?:[0-9]{1,3}\.)[0-9]{1,3}\b"
+        ip_template = r"\b1[0-9]{1,2}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b"
         ipaddress = re.findall(ip_template, output)
     if len(ipaddress) == 0:
         LOG.error("get device_%s ip fail,please check the net"
