@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+import random
 from pydoc import classname
 import time
 import os
@@ -174,6 +175,9 @@ class Run(object):
             options.resource_path = self.get_hats_tests_out_path(options.productform)
         else:
             test_dict = self.get_test_dict(options)
+        
+        for key in test_dict:
+            random.shuffle(test_dict[key])
 
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
