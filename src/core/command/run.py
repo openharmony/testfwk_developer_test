@@ -354,7 +354,7 @@ class Run(object):
         xts_test_case_path = self.get_xts_tests_out_path(options.productform, options.testtype)
         if not os.path.exists(xts_test_case_path):
             LOG.error("%s is not exist." % xts_test_case_path)
-            return
+            return None
         xts_test_dict = TestCaseManager().get_xts_test_files(xts_test_case_path, options)
         return xts_test_dict
 
