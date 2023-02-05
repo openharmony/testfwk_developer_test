@@ -165,7 +165,7 @@ class Run(object):
             LOG.error("Build test cases failed.")
             return
 
-        if "acts" or "hats" or "hits" in options.testtype:
+        if "acts" in options.testtype or "hats" in options.testtype or "hits" in options.testtype:
             test_dict = self.get_xts_test_dict(options)
             options.testcases_path = self.get_xts_tests_out_path(options.productform, options.testtype)
             options.resource_path = self.get_xts_tests_out_path(options.productform, options.testtype)
@@ -327,11 +327,13 @@ class Run(object):
 
     @classmethod
     def get_xts_tests_out_path(cls, product_form, testtype):
-        xts_testcase_path = os.path.abspath(os.path.join(
-            get_build_output_path(product_form),
-            "suites",
-            testtype[0],
-            "testcases"))
+        xts_testcase_path = UserConfigManager().get_test_cases_dir()
+        if xts_testcase_path == "":
+            xts_testcase_path = os.path.abspath(os.path.join(
+                get_build_output_path(product_form),
+                "suites",
+                testtype[0],
+                "testcases"))
         LOG.info("xts_testcase_path=%s" % xts_testcase_path)
         return xts_testcase_path
 
