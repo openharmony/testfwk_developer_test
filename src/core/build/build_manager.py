@@ -64,29 +64,16 @@ class BuildManager(object):
             build_result = False
         return build_result
 
-    # 根据目标编译acts测试用例
+    # 根据目标编译xts测试用例
     # project_root_path 工程根目录
     # para 指令参数
     @classmethod
-    def _compile_acts_test_cases(cls, project_root_path, para):
-        if BuildTestcases(project_root_path).build_acts_testcases(para):
-            LOG.info("Acts test case compilation successed.")
+    def _compile_xts_test_cases(cls, project_root_path, para):
+        if BuildTestcases(project_root_path).build_xts_testcases(para):
+            LOG.info("XTS test case compilation successed.")
             build_result = True
         else:
-            LOG.info("Acts test compilation failed, please modify.")
-            build_result = False
-        return build_result
-
-    # 根据目标编译hats测试用例
-    # project_root_path 工程根目录
-    # para 指令参数
-    @classmethod
-    def _compile_hats_test_cases(cls, project_root_path, para):
-        if BuildTestcases(project_root_path).build_hats_testcases(para):
-            LOG.info("Hats test case compilation successed.")
-            build_result = True
-        else:
-            LOG.info("Hats test compilation failed, please modify.")
+            LOG.info("XTS test compilation failed, please modify.")
             build_result = False
         return build_result
 
@@ -196,15 +183,11 @@ class BuildManager(object):
         LOG.info("**************************************************")
         LOG.info("")
 
-        build_acts_result = True
-        build_hats_result = True
+        build_xts_result = True
         build_result = True
-        if "actstest" in param.testtype:
-            LOG.info("**********************Start build acts testcases****************************")
-            build_acts_result = self._compile_acts_test_cases(project_root_path, param)
-        elif "hatstest" in param.testtype:
-            LOG.info("**********************Start build hats testcases****************************")
-            build_hats_result = self._compile_hats_test_cases(project_root_path, param)
+        if "acts" or "hats" or "hits" in param.testtype:
+            LOG.info("**********************Start build xts testcases****************************")
+            build_xts_result = self._compile_xts_test_cases(project_root_path, param)
         else:
             LOG.info("**********************Start build subsystem testcases****************************")
             build_result = self._compile_testcases(project_root_path, param)
@@ -215,7 +198,7 @@ class BuildManager(object):
         LOG.info("**************************************************")
         LOG.info("")
 
-        return build_result and build_acts_result and build_hats_result
+        return build_result and build_xts_result 
 
 
 ##############################################################################
