@@ -185,7 +185,7 @@ class BuildManager(object):
 
         build_xts_result = True
         build_result = True
-        if "acts" or "hats" or "hits" in param.testtype:
+        if "acts" in param.testtype or "hats" in param.testtype or "hits" in param.testtype:
             LOG.info("**********************Start build xts testcases****************************")
             build_xts_result = self._compile_xts_test_cases(project_root_path, param)
         else:
