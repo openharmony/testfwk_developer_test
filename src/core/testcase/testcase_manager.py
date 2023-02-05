@@ -152,45 +152,11 @@ class TestCaseManager(object):
 
         return suite_file_dictionary
 
-    def get_acts_test_files(self, acts_test_case_path, options):
-        LOG.info("acts test case path: " + acts_test_case_path)
-        acts_suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
-        if os.path.exists(acts_test_case_path):
-            # 获取acts测试用例输出目录下面的所有文件路径列表
-            acts_suite_file_list = get_file_list_by_postfix(acts_test_case_path)
-            for acts_suite_file in acts_suite_file_list:
-                file_name = os.path.basename(acts_suite_file)
-                prefix_name, suffix_name = os.path.splitext(file_name)
-                if suffix_name != ".hap":
-                    continue
-                # 如果acts测试指定了-tp，只有部件名与moduleInfo中part一致的HAP包才会加入最终执行的队列
-                if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(acts_suite_file):
-                    continue
-                # 如果acts测试指定了-ts，只有完全匹配的HAP包才会加入最终执行的队列
-                if options.testsuit != "":
-                    testsuit_list = options.testsuit.split(";")
-                    is_match = False
-                    for suite_item in testsuit_list:
-                        if suite_item == prefix_name:
-                            is_match = True
-                            break
-                    if not is_match:
-                        continue
-                if not self.check_hap_test_file(acts_suite_file):
-                    continue
-                if self.get_hap_test_driver(acts_suite_file) == "OHJSUnitTest":
-                    acts_suit_file_dic.get("OHJST").append(acts_suite_file)
-                if self.get_hap_test_driver(acts_suite_file) == "JSUnitTest":
-                    acts_suit_file_dic.get("JST").append(acts_suite_file)
-        else:
-            LOG.error("acts %s is not exist." % acts_test_case_path)
-        return acts_suit_file_dic
-
-    def check_hats_config_match(self, options, prefix_name, hats_suite_file):
-        # 如果hats测试指定了-tp，只有部件名与moduleInfo中part一致的CXX文件才会加入最终执行的队列
-        if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(hats_suite_file):
+    def check_xts_config_match(self, options, prefix_name, xts_suite_file):
+        # 如果xts测试指定了-tp，只有部件名与moduleInfo中part一致的文件才会加入最终执行的队列
+        if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(xts_suite_file):
             return False
-        # 如果hats测试指定了-ts，只有完全匹配的CXX才会加入最终执行的队列
+        # 如果xts测试指定了-ts，只有完全匹配的文件才会加入最终执行的队列
         if options.testsuit != "":
             testsuit_list = options.testsuit.split(";")
             for suite_item in testsuit_list:
@@ -199,25 +165,30 @@ class TestCaseManager(object):
             return False
         return True
 
-    def get_hats_test_files(self, hats_test_case_path, options):
-        LOG.info("hats test case path: " + hats_test_case_path)
-        hats_suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
-        if not os.path.exists(hats_test_case_path):
-            LOG.error("hats %s is not exist." % hats_test_case_path)
-            return hats_suit_file_dic
-        # 获取hats测试用例输出目录下面的所有文件路径列表
-        hats_suite_file_list = get_file_list_by_postfix(hats_test_case_path)
-        for hats_suite_file in hats_suite_file_list:
-            file_name = os.path.basename(hats_suite_file)
+    def get_xts_test_files(self, xts_test_case_path, options):
+        LOG.info("xts test case path: " + xts_test_case_path)
+        xts_suit_file_dic = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
+        if not os.path.exists(xts_test_case_path):
+            LOG.error("xts %s is not exist." % xts_test_case_path)
+            return xts_suit_file_dic
+        # 获取XTS测试用例输出目录下面的所有文件路径列表
+        xts_suite_file_list = get_file_list_by_postfix(xts_test_case_path)
+        for xts_suite_file in xts_suite_file_list:
+            file_name = os.path.basename(xts_suite_file)
             prefix_name, suffix_name = os.path.splitext(file_name)
-            if not self.check_hats_config_match(options, prefix_name, hats_suite_file):
+            if not self.check_xts_config_match(options, prefix_name, xts_suite_file):
                 continue
             if suffix_name == "":
                 if file_name == "HatsOpenPosixTest":
-                    hats_suit_file_dic.get("LTPPosix").append(hats_suite_file)
+                    xts_suit_file_dic.get("LTPPosix").append(xts_suite_file)
                 else:
-                    hats_suit_file_dic.get("CXX").append(hats_suite_file)
-        return hats_suit_file_dic
+                    xts_suit_file_dic.get("CXX").append(xts_suite_file)
+            elif suffix_name == ".hap":
+                if self.get_hap_test_driver(xts_suite_file) == "OHJSUnitTest":
+                    xts_suit_file_dic.get("OHJST").append(xts_suite_file)
+                if self.get_hap_test_driver(xts_suite_file) == "JSUnitTest":
+                    xts_suit_file_dic.get("JST").append(xts_suite_file)
+        return xts_suit_file_dic
 
     @classmethod
     def get_valid_suite_file(cls, test_case_out_path, suite_file, options):
