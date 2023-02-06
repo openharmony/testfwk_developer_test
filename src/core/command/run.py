@@ -165,14 +165,10 @@ class Run(object):
             LOG.error("Build test cases failed.")
             return
 
-        if "actstest" in options.testtype:
-            test_dict = self.get_acts_test_dict(options)
-            options.testcases_path = self.get_acts_tests_out_path(options.productform)
-            options.resource_path = self.get_acts_tests_out_path(options.productform)
-        elif "hatstest" in options.testtype:
-            test_dict = self.get_hats_test_dict(options)
-            options.testcases_path = self.get_hats_tests_out_path(options.productform)
-            options.resource_path = self.get_hats_tests_out_path(options.productform)
+        if "acts" in options.testtype or "hats" in options.testtype or "hits" in options.testtype:
+            test_dict = self.get_xts_test_dict(options)
+            options.testcases_path = self.get_xts_tests_out_path(options.productform, options.testtype)
+            options.resource_path = self.get_xts_tests_out_path(options.productform, options.testtype)
         else:
             test_dict = self.get_test_dict(options)
         
@@ -330,26 +326,16 @@ class Run(object):
         return testcase_path
 
     @classmethod
-    def get_acts_tests_out_path(cls, product_form):
-        acts_testcase_path = os.path.abspath(os.path.join(
-            get_build_output_path(product_form),
-            "suites",
-            "acts",
-            "testcases"))
-        LOG.info("acts_testcase_path=%s" % acts_testcase_path)
-        return acts_testcase_path
-
-    @classmethod
-    def get_hats_tests_out_path(cls, product_form):
-        hats_testcase_path = UserConfigManager().get_test_cases_dir()
-        if hats_testcase_path == "":
-            hats_testcase_path = os.path.abspath(os.path.join(
+    def get_xts_tests_out_path(cls, product_form, testtype):
+        xts_testcase_path = UserConfigManager().get_test_cases_dir()
+        if xts_testcase_path == "":
+            xts_testcase_path = os.path.abspath(os.path.join(
                 get_build_output_path(product_form),
                 "suites",
-                "hats",
+                testtype[0],
                 "testcases"))
-        LOG.info("hats_testcase_path=%s" % hats_testcase_path)
-        return hats_testcase_path
+        LOG.info("xts_testcase_path=%s" % xts_testcase_path)
+        return xts_testcase_path
 
     @classmethod
     def get_coverage_outpath(cls, options):
@@ -363,17 +349,14 @@ class Run(object):
                 LOG.error("Coverage test: coverage_outpath is empty.")
         return coverage_out_path
 
-    def get_acts_test_dict(self, options):
-        # 获取测试用例编译结果路径
-        acts_test_case_path = self.get_acts_tests_out_path(options.productform)
-        acts_test_dict = TestCaseManager().get_acts_test_files(acts_test_case_path, options)
-        return acts_test_dict
-
-    def get_hats_test_dict(self, options):
-        # 获取HATS测试用例编译结果路径
-        hats_test_case_path = self.get_hats_tests_out_path(options.productform)
-        hats_test_dict = TestCaseManager().get_hats_test_files(hats_test_case_path, options)
-        return hats_test_dict
+    def get_xts_test_dict(self, options):
+        # 获取XTS测试用例编译结果路径
+        xts_test_case_path = self.get_xts_tests_out_path(options.productform, options.testtype)
+        if not os.path.exists(xts_test_case_path):
+            LOG.error("%s is not exist." % xts_test_case_path)
+            return None
+        xts_test_dict = TestCaseManager().get_xts_test_files(xts_test_case_path, options)
+        return xts_test_dict
 
     def get_test_dict(self, options):
         # 获取测试用例编译结果路径

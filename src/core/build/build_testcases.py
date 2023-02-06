@@ -44,14 +44,6 @@ LOG = platform_logger("BuildTestcases")
 class BuildTestcases(object):
     def __init__(self, project_rootpath):
         self.project_rootpath = project_rootpath
-        self.xts_project_rootpath = os.path.join(sys.source_code_root_path,
-                                                 "test",
-                                                 "xts",
-                                                 "acts")
-        self._xts_project_rootpath = os.path.join(sys.source_code_root_path,
-                                                  "test",
-                                                  "xts",
-                                                  "hats")
         user_manager = UserConfigManager()
         self.is_build_example = user_manager.get_user_config_flag(
             "build", "example")
@@ -100,27 +92,16 @@ class BuildTestcases(object):
         return testcase_outpath
 
     @classmethod
-    def _delete_acts_testcase_dir(cls, productform):
-        acts_testcase_out_dir = os.path.join(
-            get_build_output_path(productform),
+    def _delete_xts_testcase_dir(cls, para):
+        xts_testcase_out_dir = os.path.join(
+            get_build_output_path(para.productform),
             "suites",
-            "acts",
+            para.testtype[0],
             "testcases")
-        LOG.info("acts_testcase_out_dir=%s" % acts_testcase_out_dir)
-        # 删除~/OpenHarmony/out/rk3568/suites/acts/testcases目录内容
-        if os.path.exists(acts_testcase_out_dir):
-            shutil.rmtree(acts_testcase_out_dir)
-
-    def _delete_hats_testcase_dir(cls, productform):
-        hats_testcase_out_dir = os.path.join(
-            get_build_output_path(productform),
-            "suites",
-            "hats",
-            "testcases")
-        LOG.info("hats_testcase_out_dir=%s" % hats_testcase_out_dir)
-        # 删除~/OpenHarmony/out/rk3568/suites/hats/testcases目录内容
-        if os.path.exists(hats_testcase_out_dir):
-            shutil.rmtree(hats_testcase_out_dir)
+        LOG.info("xts_testcase_out_dir=%s" % xts_testcase_out_dir)
+        # 删除~/OpenHarmony/out/rk3568/suites/xts/testcases目录内容
+        if os.path.exists(xts_testcase_out_dir):
+            shutil.rmtree(xts_testcase_out_dir)
 
     def _delete_testcase_dir(self, productform):
         if is_open_source_product(productform):
@@ -215,66 +196,38 @@ class BuildTestcases(object):
         os.chdir(current_path)
         return build_result
 
-    def _execute_build_acts_command(self, para):
+    def _execute_build_xts_command(self, para):
         build_result = False
-        acts_build_command = []
+        xts_build_command = []
         current_path = os.getcwd()
-        # 路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
-        os.chdir(self.xts_project_rootpath)
-        acts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
-        acts_build_command.append("system_size=standard")
+        # eg.路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
+        xts_project_rootpath = os.path.join(sys.source_code_root_path,
+                                                 "test",
+                                                 "xts",
+                                                 para.testtype[0])
+        os.chdir(xts_project_rootpath)
+        xts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
+        xts_build_command.append("system_size=standard")
         if len(para.subsystem) > 0:
             input_subsystem = ",".join(para.subsystem)
-            acts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
+            xts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
         if para.testsuit != "" and len(para.subsystem) == 0:
             LOG.error("Please specify subsystem.")
             return
         target_cpu = self.build_parameter_dic.get("target_cpu")
         if target_cpu == "arm64":
-            acts_build_command.append("target_arch=" + target_cpu)
+            xts_build_command.append("target_arch=" + target_cpu)
+            xts_build_command.append("use_musl=true")
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
-            build_command.extend(acts_build_command)
-            LOG.info("build_acts_command: %s" % str(build_command))
+            build_command.extend(xts_build_command)
+            LOG.info("build_xts_command: %s" % str(build_command))
             if subprocess.call(build_command) == 0:
                 build_result = True
             else:
                 build_result = False
         else:
-            LOG.warning("Build Acts Testcase Error: The %s is not exist" % BUILD_FILEPATH)
-
-        os.chdir(current_path)
-        return build_result
-
-    def _execute_build_hats_command(self, para):
-        build_result = False
-        hats_build_command = []
-        current_path = os.getcwd()
-        # 路径 hats_rootpath = ~/OpenHarmony/test/xts/hats
-        os.chdir(self._xts_project_rootpath)
-        hats_build_command.append(BUILD_PRODUCT_NAME % para.productform)
-        hats_build_command.append("system_size=standard")
-        if len(para.subsystem) > 0:
-            input_subsystem = ",".join(para.subsystem)
-            hats_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
-        if para.testsuit != "" and len(para.subsystem) == 0:
-            LOG.error("Please specify subsystem.")
-            return build_result
-        target_cpu = self.build_parameter_dic.get("target_cpu")
-        if target_cpu == "arm64":
-            hats_build_command.append("target_arch=" + target_cpu)
-            if para.productform == "m40":
-                hats_build_command.append("use_musl=true")
-        if os.path.exists(BUILD_FILEPATH):
-            build_command = [BUILD_FILEPATH]
-            build_command.extend(hats_build_command)
-            LOG.info("build_hats_command: %s" % str(build_command))
-            if subprocess.call(build_command) == 0:
-                build_result = True
-            else:
-                build_result = False
-        else:
-            LOG.warning("Build Hats Testcase Error: The %s is not exist" % BUILD_FILEPATH)
+            LOG.warning("Build XTS Testcase Error: The %s is not exist" % BUILD_FILEPATH)
 
         os.chdir(current_path)
         return build_result
@@ -316,16 +269,10 @@ class BuildTestcases(object):
         self._merge_testcase_dir(productform)
         return build_result
 
-    # 编译ACTS测试用例
-    def build_acts_testcases(self, para):
-        self._delete_acts_testcase_dir(para.productform)
-        build_result = self._execute_build_acts_command(para)
-        return build_result
-
-    # 编译HATS测试用例
-    def build_hats_testcases(self, para):
-        self._delete_hats_testcase_dir(para.productform)
-        build_result = self._execute_build_hats_command(para)
+    # 编译XTS测试用例
+    def build_xts_testcases(self, para):
+        self._delete_xts_testcase_dir(para)
+        build_result = self._execute_build_xts_command(para)
         return build_result
 
     def build_gn_file(self, productform):
