@@ -227,6 +227,7 @@ class Run(object):
 
             scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
                                    plugin_id=SchedulerType.SCHEDULER)[0]
+            scheduler.update_test_type_in_source("OHRust", DeviceTestType.oh_rust_test)
             if scheduler is None:
                 LOG.error("Can not find the scheduler plugin.")
             else:

@@ -38,7 +38,8 @@ TESTFILE_TYPE_DATA_DIC = {
     "BIN": [],
     "OHJST": [],
     "JST": [],
-    "LTPPosix": []
+    "LTPPosix": [],
+    "OHRust": []
 }
 FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
 
@@ -146,7 +147,10 @@ class TestCaseManager(object):
                         continue
                     suite_file_dictionary.get("PYT").append(suite_file)
                 elif suffix_name == "":
-                    suite_file_dictionary.get("CXX").append(suite_file)
+                    if file_name.find("rust") != -1:
+                        suite_file_dictionary.get("OHRust").append(suite_file)
+                    else:
+                        suite_file_dictionary.get("CXX").append(suite_file)
                 elif suffix_name == ".bin":
                     suite_file_dictionary.get("BIN").append(suite_file)
 
