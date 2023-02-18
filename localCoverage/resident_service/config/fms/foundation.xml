@@ -25,7 +25,7 @@
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
-        <boophase>CoreStartPhase</boophase>
+        <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>4606</name>
@@ -35,7 +35,7 @@
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
-        <boophase>CoreStartPhase</boophase>
+        <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>4607</name>
@@ -45,7 +45,7 @@
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
-        <boophase>CoreStartPhase</boophase>
+        <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>3299</name>
@@ -105,7 +105,7 @@
     </systemability>
     <systemability>
         <name>180</name>
-        <libpath>/system/lib64/libabiliyms.z.so</libpath>
+        <libpath>/system/lib64/libabilityms.z.so</libpath>
 
 
         <run-on-create>true</run-on-create>

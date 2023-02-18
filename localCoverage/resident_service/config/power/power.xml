@@ -7,7 +7,7 @@
         <libpath>libdisplaymgrservice.z.so</libpath>
         <libpath>libpowermgrservice.z.so</libpath>
         <libpath>libthermalservice.z.so</libpath>
-        <libpath>libbatrterystats_service.z.so</libpath>
+        <libpath>libbatterystats_service.z.so</libpath>
 
     </loadlibs>
 
@@ -15,35 +15,35 @@
         <name>3302</name>
         <libpath>libbatteryservice.z.so</libpath>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
     <systemability>
         <name>3308</name>
         <libpath>libdisplaymgrservice.z.so</libpath>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
     <systemability>
         <name>3301</name>
         <libpath>libpowermgrservice.z.so</libpath>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
     <systemability>
         <name>3303</name>
         <libpath>libthermalservice.z.so</libpath>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
     <systemability>
         <name>3304</name>
         <libpath>libbatrterystats_service.z.so</libpath>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
 

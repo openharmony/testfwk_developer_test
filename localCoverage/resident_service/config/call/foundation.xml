@@ -18,13 +18,13 @@
     </loadlibs>
     <systemability>
         <name>401</name>
-        <libpath>/system/lib64/libfms.z.so</libpath>
+        <libpath>/system/lib64/libbms.z.so</libpath>
         <depend>1301</depend>
         <depend-time-out>60000</depend-time-out>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
-        <boophase>CoreStartPhase</boophase>
+        <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>4606</name>
@@ -34,7 +34,7 @@
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
-        <boophase>CoreStartPhase</boophase>
+        <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>4607</name>
@@ -44,7 +44,7 @@
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
-        <boophase>CoreStartPhase</boophase>
+        <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>3299</name>
@@ -84,13 +84,6 @@
     <systemability>
         <name>3301</name>
         <libpath>libpowermgrservice.z.so</libpath>
-        <run-on-create>true</run-on-create>
-        <distributed>false</distributed>
-        <dump-level>1</dump-level>
-    </systemability>
-    <systemability>
-        <name>4005</name>
-        <libpath>libtel_call_manager.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>

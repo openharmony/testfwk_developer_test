@@ -13,17 +13,17 @@
 
 
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
         <bootphase>CoreStartPhase</bootphase>
     </systemability>
     <systemability>
         <name>4607</name>
-        <libpath>libwms.z.so</libpath>
+        <libpath>libdms.z.so</libpath>
 
 
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
         <bootphase>CoreStartPhase</bootphase>
     </systemability>

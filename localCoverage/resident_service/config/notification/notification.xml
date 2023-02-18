@@ -13,7 +13,7 @@
 
 
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
     <systemability>
@@ -23,7 +23,7 @@
         <depend>3299</depend>
         <depend-time-out>5000</depend-time-out>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
 

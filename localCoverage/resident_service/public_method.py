@@ -36,7 +36,7 @@ def get_config_ip(filepath):
                     data_dic[sub.tag] = sub.text if sub.text else ""
                 ip_config = data_dic.get("ip", "")
     except ET.ParseError as xml_exception:
-        print("occurs exception:{}".format(xml_exception.agrs))
+        print("occurs exception:{}".format(xml_exception.args))
 
     return ip_config
 
@@ -59,14 +59,14 @@ def get_sn_list(command):
 
 def get_all_part_service():
     current_path = os.getcwd()
-    developer_path = current_path.split("/test/testfwk/developer_test")[0]
+    developer_path = current_path.split("/developer_test/src")[0]
     system_part_service_path = os.path.join(
         developer_path, "developer_test/localCoverage/resident_service/system_part_service.json")
     if os.path.exists(system_part_service_path):
         with open(system_part_service_path, "r") as system_text:
             system_text_json = json.load(system_text)
             system_info_dict = system_text_json["system_info_dict"]
-            services_component_dict = system_text_json["service_component_dict"]
+            services_component_dict = system_text_json["services_component_dict"]
             component_gcda_dict = system_text_json["component_gcda_dict"]
             return system_info_dict, services_component_dict, component_gcda_dict
     else:
@@ -74,7 +74,7 @@ def get_all_part_service():
 
 
 def get_system_dict_to_server_name(server_name: str, system_info_dict):
-    for system, server_list in system_info_dict.ites():
+    for system, server_list in system_info_dict.items():
         if server_name in server_list:
             system_info_dict_after = {
                 system: [server_name]
@@ -121,7 +121,7 @@ def get_server_dict(command):
                 component_gcda_dict_after = {
                     server_name: component_gcda_dict.get(server_name)
                 }
-    elif " ss " in command:
+    elif " -ss " in command:
         system_name = command.split(" -ss ")[-1].split(" ")[0]
         server_list = system_info_dict.get(system_name)
         system_info_dict_after = {

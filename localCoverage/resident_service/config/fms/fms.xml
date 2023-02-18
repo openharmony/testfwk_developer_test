@@ -12,7 +12,7 @@
         <libpath>/system/lib64/libfms.z.so</libpath>
 
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
     </systemability>
 
