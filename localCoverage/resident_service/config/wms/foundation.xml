@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info>
+    <process>foundation</process>
+    <loadlibs>
+        <libpath>/system/lib64/libcesfwk_services.z.so</libpath>
+        <libpath>libans.z.so</libpath>
+        <libpath>libbatteryservice.z.so</libpath>
+        <libpath>libdisplaymgrservice.z.so</libpath>
+        <libpath>libpowermgrservice.z.so</libpath>
+        <libpath>libtel_call_manager.z.so</libpath>
+        <libpath>libtel_state_registry.z.so</libpath>
+        <libpath>/system/lib64/libabilityms.z.so</libpath>
+        <libpath>/system/lib64/libdataobsms.z.so</libpath>
+        <libpath>/system/lib64/libupms.z.so</libpath>
+        <libpath>/system/lib64/libappms.z.so</libpath>
+        <libpath>/system/lib64/libfms.z.so</libpath>
+        <libpath>/system/lib64/libbms.z.so</libpath>
+
+    </loadlibs>
+
+     <systemability>
+        <name>401</name>
+        <libpath>/system/lib64/libbms.z.so</libpath>
+        <depend>1301</depend>
+        <depend-time-out>60000</depend-time-out>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+        <boophase>CoreStartPhase</boophase>
+    </systemability>
+    <systemability>
+        <name>4606</name>
+        <libpath>libwms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+        <boophase>CoreStartPhase</boophase>
+    </systemability>
+    <systemability>
+        <name>3299</name>
+        <libpath>/system/lib64/libcesfwk_services.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3203</name>
+        <libpath>libans.z.so</libpath>
+        <depend>1301</depend>
+        <depend>3299</depend>
+        <depend-time-out>5000</depend-time-out>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3302</name>
+        <libpath>libbatteryservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3308</name>
+        <libpath>libdisplaymgrservice.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3301</name>
+        <libpath>libpowermgrservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>4005</name>
+        <libpath>libtel_call_manager.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>4009</name>
+        <libpath>libtel_state_registry.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>180</name>
+        <libpath>/system/lib64/libabiliyms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>182</name>
+        <libpath>/system/lib64/libdataobsms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>183</name>
+        <libpath>/system/lib64/libupms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>501</name>
+        <libpath>/system/lib64/libappms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>403</name>
+        <libpath>/system/lib64/libfms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+</info>

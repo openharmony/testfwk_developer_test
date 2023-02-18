@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info>
+    <process>foundation</process>
+    <loadlibs>
+
+        <libpath>/system/lib64/libabliltyms.z.so</libpath>
+        <libpath>/system/lib64/libdataobsms.z.so</libpath>
+        <libpath>/system/lib64/libupms.z.so</libpath>
+        <libpath>/system/lib64/libappms.z.so</libpath>
+
+    </loadlibs>
+
+    <systemability>
+        <name>180</name>
+        <libpath>/system/lib64/libabilityms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>182</name>
+        <libpath>/system/lib64/libdataobsms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>183</name>
+        <libpath>/system/lib64/libupms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>501</name>
+        <libpath>/system/lib64/libappms.z.so</libpath>
+
+
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+
+</info>

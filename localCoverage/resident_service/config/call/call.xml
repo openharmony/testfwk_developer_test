@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info>
+    <process>foundation</process>
+    <loadlibs>
+
+        <libpath>libtel_call_manager.z.so</libpath>
+
+    </loadlibs>
+
+    <systemability>
+        <name>4005</name>
+        <libpath>libtel_call_manager.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <demp-level>1</demp-level>
+    </systemability>
+
+</info>
