@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info>
+    <process>foundation</process>
+    <loadlibs>
+
+        <libpath>libbatteryservice.z.so</libpath>
+        <libpath>libdisplaymgrservice.z.so</libpath>
+        <libpath>libpowermgrservice.z.so</libpath>
+        <libpath>libthermalservice.z.so</libpath>
+        <libpath>libbatrterystats_service.z.so</libpath>
+
+    </loadlibs>
+
+    <systemability>
+        <name>3302</name>
+        <libpath>libbatteryservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributeed>false</distributeed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3308</name>
+        <libpath>libdisplaymgrservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributeed>false</distributeed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3301</name>
+        <libpath>libpowermgrservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributeed>false</distributeed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3303</name>
+        <libpath>libthermalservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributeed>false</distributeed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
+        <name>3304</name>
+        <libpath>libbatrterystats_service.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributeed>false</distributeed>
+        <dump-level>1</dump-level>
+    </systemability>
+
+</info>
