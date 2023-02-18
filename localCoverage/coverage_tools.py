@@ -170,5 +170,13 @@ if __name__ == '__main__':
     else:
         print("subsystem or part without!")
 
+    # 源代码还原
+    after_locv_branch_path = os.path.join(
+        root_path, "test/testfwk/developer_test/localCoverage/restore_comment/after_locv_branch.py")
+    subprocess.run("python3 %s " % after_locv_branch_path, shell=True)
+    restore_source_code_path = os.path.join(
+        root_path, "test/testfwk/developer_test/localCoverage/restore_comment/restore_source_code.py")
+    subprocess.run("python3 %s" % restore_source_code_path, shell=True)
+
 
 

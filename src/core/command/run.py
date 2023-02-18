@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
-
+import platform
 #
 # Copyright (c) 2020-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
 #
 
 import random
+import subprocess
 from pydoc import classname
 import time
 import os
@@ -53,6 +54,15 @@ class Run(object):
         return self.history_cmd_list
 
     def process_command_run(self, command, options):
+        current_raw_cmd = ",".join(list(map(str, options.current_raw_cmd.split(" "))))
+        if options.coverage and platform.system() != "Windows":
+            init_gcov_path = os.path.join(sys.framework_root_dir, "localCoverage/resident_service/init_gcov.py")
+            if os.path.exists(init_gcov_path):
+                subprocess.run("python3 %s command_str=%s" % (
+                    init_gcov_path, current_raw_cmd),shell=True)
+            else:
+                print(f"{init_gcov_path} not exists.")
+
         para = Parameter()
         test_type_list = para.get_testtype_list(options.testtype)
         if len(test_type_list) == 0:
@@ -178,6 +188,11 @@ class Run(object):
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
             return
+        if options.coverage and platform.system() != "Windows":
+            coverage_path = os.path.join(sys.framework_root_dir, "reports/coverage.py")
+            if os.path.exists(coverage_path):
+                coverage_process = subprocess.Popen("rm -rf %s" % coverage_path, shell=True)
+                coverage_process.communicate()
 
         if ("distributedtest" in options.testtype and
                 len(options.testtype) == 1):
@@ -259,6 +274,23 @@ class Run(object):
                 del self.history_cmd_list[0]
             self.history_cmd_list.append(cmd_record)
         print("-------------run end: ", self.history_cmd_list)
+        if options.coverage and platform.system() != "Windows":
+            pull_service_gcov_path = os.path.join(
+                sys.framework_root_dir, "localCoverage/resident_service/pull_service_gcda.py")
+            if os.path.exists(pull_service_gcov_path):
+                subprocess.run("python3 %s command_str=%s" % (
+                    get_build_output_path, current_raw_cmd), shell=True)
+            else:
+                print(f"{pull_service_gcov_path} not exists.")
+
+            cov_main_file_path = os.path.join(sys.framework_root_dir, "localCoverage/coverage_tools.py")
+            testpart = ",".join(list(map(str, options.partname_list)))
+            subsystem = ",".join(list(map(str, options.subsystem)))
+            if os.path.exists(cov_main_file_path):
+                subprocess.run("python3 %s testpart=%s subsystem=%s" % (
+                    cov_main_file_path, testpart, subsystem), shell=True)
+            else:
+                print(f"{cov_main_file_path} not exists.")
         return
 
     ##############################################################
