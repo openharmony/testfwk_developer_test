@@ -12,7 +12,7 @@
         <libpath>libtel_call_manager.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
-        <demp-level>1</demp-level>
+        <dump-level>1</dump-level>
     </systemability>
 
 </info>

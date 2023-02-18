@@ -60,6 +60,7 @@
         <name>3203</name>
         <libpath>libans.z.so</libpath>
         <depend>1301</depend>
+        <depend>3299</depend>
         <depend-time-out>5000</depend-time-out>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
@@ -82,6 +83,13 @@
         <dump-level>1</dump-level>
     </systemability>
     <systemability>
+        <name>3301</name>
+        <libpath>libpowermgrservice.z.so</libpath>
+        <run-on-create>true</run-on-create>
+        <distributed>false</distributed>
+        <dump-level>1</dump-level>
+    </systemability>
+    <systemability>
         <name>4005</name>
         <libpath>libtel_call_manager.z.so</libpath>
         <run-on-create>true</run-on-create>
@@ -97,7 +105,7 @@
     </systemability>
 
     <systemability>
-        <name>404</name>
+        <name>403</name>
         <libpath>/system/lib64/libfms.z.so</libpath>
 
 

@@ -62,8 +62,8 @@ def modify_init_file(developer_path, device_sn, device_ip):
     else:
         print("init.cfg file not exists")
         return
-    print(hdc_str + "shell mount -o rw,remount / > /dev/null 2&1")
-    subprocess.Popen(hdc_str + "shell mount -o rw,remount / > /dev/null 2&1",
+    print(hdc_str + "shell mount -o rw,remount / > /dev/null 2>&1")
+    subprocess.Popen(hdc_str + "shell mount -o rw,remount / > /dev/null 2>&1",
                      shell=True).communicate()
     print(hdc_str + "file send %s %s" % (cfg_file_path, "/etc/"))
     subprocess.Popen(hdc_str + "file send %s %s" % (cfg_file_path, "/etc/"),
@@ -171,9 +171,9 @@ def split_foundation_services(developer_path, device_sn, device_ip,
                     process_xml_path, "/system/profile/"), shell=True).communicate()
 
                 process_cfg_path = os.path.join(config_path, process_str, process_str + ".cfg")
-                print(hdc_str + "file send %s %s" % (process_cfg_path, "/system/init/"))
+                print(hdc_str + "file send %s %s" % (process_cfg_path, "/etc/init/"))
                 subprocess.Popen(hdc_str + "file send %s %s" % (
-                    process_cfg_path, "/system/init/"), shell=True).communicate()
+                    process_cfg_path, "/etc/init/"), shell=True).communicate()
     if flag:
         print(hdc_str + "shell reboot")
         subprocess.Popen(hdc_str + "shell reboot", shell=True).communicate()
@@ -185,10 +185,10 @@ def split_foundation_services(developer_path, device_sn, device_ip,
 
     subprocess.Popen(hdc_str + "shell mount -o rw,remount /",
                      shell=True).communicate()
-    subprocess.Popen(hdc_str + 'shell "rm -rf %s"' % ("/data/gcov" + home_path),
+    subprocess.Popen(hdc_str + 'shell "rm -fr %s"' % ("/data/gcov" + home_path),
                      shell=True).communicate()
     subprocess.Popen(hdc_str + 'shell "chmod 777 /data/gcov - R"', shell=True).communicate()
-    subprocess.Popen(hdc_str + "shell mount -o rw,remount /", shell=True).communicate()
+    subprocess.Popen(hdc_str + "shell getenforce", shell=True).communicate()
     return
 
 

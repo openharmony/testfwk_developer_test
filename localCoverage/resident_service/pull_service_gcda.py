@@ -33,9 +33,9 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
     print(hdc_str + "shell chmod 777 /data/gcov -R")
     subprocess.Popen(hdc_str + "shell chmod 777 /data/gcov -R", shell=True).communicate()
     subprocess.Popen(hdc_str + "shell mount -o rw,remount /", shell=True).communicate()
-    locah_sh_path = os.path.join(resident_service_path, "resources", "gcov_flush.sh")
-    print(hdc_str + "file send %s %s" % (locah_sh_path, "/data/"))
-    subprocess.Popen(hdc_str + "file send %s %s" % (locah_sh_path, "/data/"),
+    local_sh_path = os.path.join(resident_service_path, "resources", "gcov_flush.sh")
+    print(hdc_str + "file send %s %s" % (local_sh_path, "/data/"))
+    subprocess.Popen(hdc_str + "file send %s %s" % (local_sh_path, "/data/"),
                      shell=True).communicate()
     subprocess.Popen(hdc_str + "shell chmod 777 /data/gcov_flush.sh",
                      shell=True).communicate()
@@ -49,7 +49,7 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
 
 
 def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
-                  developer_path, services_str):
+                  developertest_path, services_str):
     hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     home_path = '/'.join(root_path.split("/")[:3])
@@ -66,7 +66,7 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
 
         obj_gcda_path = component_gcda_path.split("baltimore")[-1].strip("/")
         local_gcda_path = os.path.dirname(
-            os.path.join(developer_path, "reports/coverage/data/cxx",
+            os.path.join(developertest_path, "reports/coverage/data/cxx",
                          services_str + "_service", obj_gcda_path))
 
         if not os.path.exists(local_gcda_path):

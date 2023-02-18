@@ -5,15 +5,15 @@
     "multimedia": ["media_service", "av_session"],
     "resourceschedule": ["device_usage_st", "resource_schedu", "bgtaskmgr_servi"],
     "account": ["accountmgr"],
-    "telephone": ["telephone|riladapter_host"],
+    "telephony": ["telephony|riladapter_host"],
     "communication": ["netmanager", "samgr"],
-    "deviceprofile": ["distribuatedsche"],
+    "deviceprofile": ["distributedsche"],
     "bundlemanager": ["bms"],
-    "distributeddatamgr": ["pastedboard_serv"],
-    "filemanagement": ["com.ohos.medialibrary.medialibrarydata.entry:FileExtensionablity", "com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility"],
+    "distributeddatamgr": ["pasteboard_serv"],
+    "filemanagement": ["com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAblity", "com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility"],
     "miscservices": ["inputmethod_ser"],
     "hdf": [
-      "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|daudio_host"
+      "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host"
     ],
     "notification": ["ans"],
     "graphic": ["render_service"],
@@ -30,22 +30,22 @@
     "power_mgr": ["power"],
     "data_share": ["com.ohos.medialibrary.medialibrarydata"],
     "dinput": ["dinput"],
-    "dsoftbus": ["dsoftbus_service"]
+    "dsoftbus": ["dsoftbus_server"]
   },
   "services_component_dict": {
     "wms": ["window_manager"],
     "bms": ["bundle_framework"],
-    "power": ["battery_manager", "battery_statistics", "display_manager", "thermal_manager"],
-    "huks_service": ["huks_service"],
+    "power": ["battery_manager", "battery_statistics", "display_manager", "power_manager", "thermal_manager"],
+    "huks_service": ["huks_standard"],
     "dlp_permission": ["dlp_permission_service"],
     "media_service": ["multimedia_player_framework"],
     "device_usage_st": ["device_usage_statistics"],
     "accountmgr": ["os_account"],
     "av_session": ["multimedia_av_session"],
     "accesstoken_ser|privacy_service|token_sync_ser": ["access_token"],
-    "telephone|raladapter_host": [
+    "telephony|riladapter_host": [
       "call_manager", "cellular_call", "cellular_data", "core_service","data_storage",
-      "ril_adapter", "state_register", "ims", "sms_mms"
+      "ril_adapter", "state_registry", "ims", "sms_mms"
     ],
     "netmanager": ["netmanager_base", "netmanager_ext", "netstack"],
     "samgr": ["samgr"],
@@ -53,10 +53,10 @@
     "resource_schedu": ["efficiency_manager"],
     "bgtaskmgr_servi": ["background_task_mgr"],
     "pasteboard_serv": ["pasteboard"],
-    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionablity|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["filemanagement"],
+    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAblity|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["filemanagement"],
     "com.ohos.medialibrary.medialibrarydata": ["data_share"],
     "inputmethod_ser": ["imf"],
-    "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|daudio_host": [
+    "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host": [
       "drivers_peripheral_battery", "drivers_peripheral_motion", "drivers_peripheral_sensor",
       "drivers_peripheral_thermal", "hdf", "hdf_core", "hidl_adapter","drivers_peripheral_input",
       "drivers_peripheral_power"
@@ -70,12 +70,12 @@
     "msdp": ["algorithm", "geofence", "movement", "timeline", "spatialawareness_manager_native", "msdp"],
     "screenlock_serv": ["screenlock"],
     "dlp_credential_service_sa": ["dlp_credential_service"],
-    "wallpaper": ["theme", "wallpaper_mgr"],
-    "hilogd|hidumper_service": ["hiviewfdx"],
-    "dinput": ["distributed_input_sourcemanager_test", "distribute_input_sourcetrans_test"],
+    "wallpaper_servi": ["theme", "wallpaper_mgr"],
+    "hilogd|hidumper_service": ["hiviewdfx"],
+    "dinput": ["distributed_input_sourcemanager_test", "distributed_input_sourcetrans_test"],
     "softbus_server": [
-      "BusCenterHeartbeatSdkTest", "BusCenterMetaModeSdkTest", "BusCenterSdkTest",
-      "BusCenterServerTest", "ClientBusCenterMgrTest", "ClientBusMangerTest, SetDataChangeTest"
+      "BusCenterHeartbeatSdkTest", "BusCenterMetaNodeSdkTest", "BusCenterSdkTest",
+      "BusCenterServerTest", "ClientBusCenterMgrTest", "ClientBusMangerTest", "SetDataChangeTest"
     ]
   },
   "component_gcda_dict": {
@@ -84,10 +84,10 @@
     "dlp_permission": ["out/baltimore/obj/base/security/dlp_permission_service"],
     "media_service": ["out/baltimore/obj/foundation/multimedia/player_framework"],
     "device_usage_st": ["out/baltimore/obj/foundation/resourceschedule"],
-    "accountmgr": ["out/baltimore/obj/base/os_account"],
+    "accountmgr": ["out/baltimore/obj/base/account/os_account"],
     "av_session": ["out/baltimore/obj/foundation/multimedia/av_session"],
     "accesstoken_ser|privacy_service|token_sync_ser": ["out/baltimore/obj/base/security/access_token"],
-    "telephone|riladaper_host": ["out/baltimore/obj/base/telephone"],
+    "telephony|riladapter_host": ["out/baltimore/obj/base/telephony"],
     "netmanager": ["out/baltimore/obj/foundation/communication"],
     "samgr": ["out/baltimore/obj/foundation/systemabilitymgr"],
     "distributedsche": ["out/baltimore/obj/foundation/ability/dmsfwk", "out/baltimore/obj/foundation/deviceprofile"],
@@ -95,9 +95,9 @@
     "bgtaskmgr_servi": ["out/baltimore/obj/foundation/resourceschedule/background_task_mgr"],
     "bms": ["out/baltimore/obj/foundation/bundlemanager/bundle_framework"],
     "pasteboard_serv": ["out/baltimore/obj/foundation/distributeddatamgr"],
-    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionablity|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["out/baltimore/obj/foundation/multimedia", "out/baltimore/obj/foundation/filemanagement"],
+    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAblity|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["out/baltimore/obj/foundation/multimedia", "out/baltimore/obj/foundation/filemanagement"],
     "inputmethod_ser": ["out/baltimore/obj/base/inputmethod/imf"],
-    "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|daudio_host": [
+    "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host": [
       "out/baltimore/obj/drivers"
     ],
     "ans": ["out/baltimore/obj/base/notification/distributed_notification_service"],
@@ -113,7 +113,7 @@
     "hilogd|hidumper_service": ["out/baltimore/obj/base/hiviewdfx"],
     "power": ["out/baltimore/obj/base/powermgr"],
     "com.ohos.medialibrary.medialibrarydata": ["out/baltimore/obj/foundation/distributeddatamgr/data_share"],
-    "dinput": ["out/baltimore/obj/foundation/distributedhardware/distribute_input"],
+    "dinput": ["out/baltimore/obj/foundation/distributedhardware/distributed_input"],
     "softbus_server": ["out/baltimore/obj/foundation/communication/dsoftbus"]
   }
 }

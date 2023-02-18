@@ -12,7 +12,7 @@
         <depend>1301</depend>
         <depend-time-out>60000</depend-time-out>
         <run-on-create>true</run-on-create>
-        <distributeed>false</distributeed>
+        <distributed>false</distributed>
         <dump-level>1</dump-level>
         <bootphase>CoreStartPhase</bootphase>
     </systemability>

@@ -99,7 +99,7 @@ def rewrite_source_file(source_path_list: list):
     print("[**********  End Rewrite Source File **********]")
 
 
-def add_locv(subsystem_config_path):
+def add_lcov(subsystem_config_path):
     try:
         with open(subsystem_config_path, "r", encoding="utf-8", errors="ignore") as fp:
             data_dict = json.load(fp)
@@ -161,4 +161,4 @@ if __name__ == '__main__':
     get_part_config_json(part_name_list, all_system_info_path, part_info_path)
 
     # 执行修改
-    add_locv(part_info_path)
+    add_lcov(part_info_path)
