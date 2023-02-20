@@ -407,13 +407,15 @@ class ResultManager(object):
             "exec"))
 
         target_name = "obj"
+        tests_path = self.config.testcases_path
+        test_type = self.testsuite_path.split(tests_path)[1].strip(os.sep).split(os.sep)[0]
         cxx_cov_path = os.path.abspath(os.path.join(
             self.result_rootpath,
             "..",
             "coverage",
             "data",
             "cxx",
-            self.testsuite_name + '_' + self.config.testtype[0]))
+            self.testsuite_name + '_' + test_type))
 
         if self.is_exist_target_in_device(DEFAULT_TEST_PATH, target_name):
             if not os.path.exists(cxx_cov_path):
@@ -429,8 +431,8 @@ class ResultManager(object):
                 os.remove(tar_path)
             else:
                 subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" %
-                                 (tar_path, cxx_cov_path), shell=True)
-                subprocess.Popen("rm -rf %s" % tar_path, shell=True)
+                                 (tar_path, cxx_cov_path), shell=True).communicate()
+                subprocess.Popen("rm -rf %s" % tar_path, shell=True).communicate()
 
 
 ##############################################################################
