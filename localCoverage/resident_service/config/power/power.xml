@@ -41,7 +41,7 @@
     </systemability>
     <systemability>
         <name>3304</name>
-        <libpath>libbatrterystats_service.z.so</libpath>
+        <libpath>libbatterystats_service.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>

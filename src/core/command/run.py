@@ -189,7 +189,7 @@ class Run(object):
             LOG.error("The test file list is empty.")
             return
         if options.coverage and platform.system() != "Windows":
-            coverage_path = os.path.join(sys.framework_root_dir, "reports/coverage.py")
+            coverage_path = os.path.join(sys.framework_root_dir, "reports/coverage")
             if os.path.exists(coverage_path):
                 coverage_process = subprocess.Popen("rm -rf %s" % coverage_path, shell=True)
                 coverage_process.communicate()
@@ -279,7 +279,7 @@ class Run(object):
                 sys.framework_root_dir, "localCoverage/resident_service/pull_service_gcda.py")
             if os.path.exists(pull_service_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (
-                    get_build_output_path, current_raw_cmd), shell=True)
+                    pull_service_gcov_path, current_raw_cmd), shell=True)
             else:
                 print(f"{pull_service_gcov_path} not exists.")
 

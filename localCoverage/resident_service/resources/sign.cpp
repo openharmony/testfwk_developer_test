@@ -26,7 +26,7 @@ void ctor()
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     for (i = 0; i < sizeof (sigs)/ sizeof (sigs[0]); ++i){
-        if (sigaction(sigs[i], &sa, NULL == -1)){
+        if (sigaction(sigs[i], &sa, NULL) == -1){
             cout << "Could not set signal handler" << endl;
         }
     }

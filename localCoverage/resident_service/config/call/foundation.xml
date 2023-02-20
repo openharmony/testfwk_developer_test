@@ -97,7 +97,7 @@
     </systemability>
     <systemability>
         <name>180</name>
-        <libpath>/system/lib64/libabiliyms.z.so</libpath>
+        <libpath>/system/lib64/libabilityms.z.so</libpath>
 
 
         <run-on-create>true</run-on-create>
