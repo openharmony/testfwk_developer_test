@@ -40,8 +40,6 @@
     <systemability>
         <name>4607</name>
         <libpath>libwms.z.so</libpath>
-        <depend>1301</depend>
-        <depend-time-out>60000</depend-time-out>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
