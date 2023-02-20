@@ -112,7 +112,7 @@ def get_subsystem_name(test_part_list):
             subsystem_list = []
             for part in test_part_list:
                 for key in subsystem_info.keys():
-                    if part in subsystem_info.keys() and key not in subsystem_list:
+                    if part in subsystem_info.get(key) and key not in subsystem_list:
                         subsystem_list.append(key)
             subsystem_str = ','.join(list(map(str, subsystem_list)))
             return subsystem_str
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
     # 源代码还原
     after_lcov_branch_path = os.path.join(
-        root_path, "test/testfwk/developer_test/localCoverage/restore_comment/after_locv_branch.py")
+        root_path, "test/testfwk/developer_test/localCoverage/restore_comment/after_lcov_branch.py")
     subprocess.run("python3 %s " % after_lcov_branch_path, shell=True)
     restore_source_code_path = os.path.join(
         root_path, "test/testfwk/developer_test/localCoverage/restore_comment/restore_source_code.py")

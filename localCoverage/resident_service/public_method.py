@@ -116,11 +116,11 @@ def get_server_dict(command):
                 }
                 server_name = server
                 break
-            if server_name:
-                system_info_dict_after = get_system_dict_to_server_name(server_name, system_info_dict)
-                component_gcda_dict_after = {
-                    server_name: component_gcda_dict.get(server_name)
-                }
+        if server_name:
+            system_info_dict_after = get_system_dict_to_server_name(server_name, system_info_dict)
+            component_gcda_dict_after = {
+                server_name: component_gcda_dict.get(server_name)
+            }
     elif " -ss " in command:
         system_name = command.split(" -ss ")[-1].split(" ")[0]
         server_list = system_info_dict.get(system_name)

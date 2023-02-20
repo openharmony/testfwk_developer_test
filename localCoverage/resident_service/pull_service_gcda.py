@@ -98,10 +98,10 @@ def get_service_list(device_ip, device_sn, system_info_dict, services_component_
                 return
     if len(service_list) > 0:
         for process_str in service_list:
-            service_list = process_str.split("|")
-            for service_str in service_list:
+            services_list = process_str.split("|")
+            for services_str in services_list:
                 attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
-                           developer_path, resident_service_path, service_str)
+                           developer_path, resident_service_path, services_str)
     return
 
 
