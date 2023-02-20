@@ -10,7 +10,7 @@
     "deviceprofile": ["distributedsche"],
     "bundlemanager": ["bms"],
     "distributeddatamgr": ["pasteboard_serv"],
-    "filemanagement": ["com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAblity", "com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility"],
+    "filemanagement": ["com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAbility", "com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility"],
     "miscservices": ["inputmethod_ser"],
     "hdf": [
       "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host"
@@ -30,7 +30,7 @@
     "power_mgr": ["power"],
     "data_share": ["com.ohos.medialibrary.medialibrarydata"],
     "dinput": ["dinput"],
-    "dsoftbus": ["dsoftbus_server"]
+    "dsoftbus": ["softbus_server"]
   },
   "services_component_dict": {
     "wms": ["window_manager"],
@@ -53,7 +53,7 @@
     "resource_schedu": ["efficiency_manager"],
     "bgtaskmgr_servi": ["background_task_mgr"],
     "pasteboard_serv": ["pasteboard"],
-    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAblity|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["filemanagement"],
+    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAbility|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["filemanagement"],
     "com.ohos.medialibrary.medialibrarydata": ["data_share"],
     "inputmethod_ser": ["imf"],
     "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host": [
@@ -95,7 +95,7 @@
     "bgtaskmgr_servi": ["out/baltimore/obj/foundation/resourceschedule/background_task_mgr"],
     "bms": ["out/baltimore/obj/foundation/bundlemanager/bundle_framework"],
     "pasteboard_serv": ["out/baltimore/obj/foundation/distributeddatamgr"],
-    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAblity|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["out/baltimore/obj/foundation/multimedia", "out/baltimore/obj/foundation/filemanagement"],
+    "com.ohos.medialibrary.medialibrarydata.entry:FileExtensionAbility|com.ohos.UserFile.ExternalFileManager.entry:FileExtensionAbility": ["out/baltimore/obj/foundation/multimedia", "out/baltimore/obj/foundation/filemanagement"],
     "inputmethod_ser": ["out/baltimore/obj/base/inputmethod/imf"],
     "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host": [
       "out/baltimore/obj/drivers"

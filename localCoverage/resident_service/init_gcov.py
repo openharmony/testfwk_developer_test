@@ -30,7 +30,7 @@ def modify_init_file(developer_path, device_sn, device_ip):
     """
     hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
     recv_path = os.path.join(developer_path, "localCoverage/resident_service/resources")
-    print()
+    print(hdc_str + "file recv /etc/init.cfg %s" % recv_path)
     subprocess.Popen(hdc_str + "file recv /etc/init.cfg %s" % recv_path,
                      shell=True).communicate()
     recv_restores_path = os.path.join(recv_path, "restores_environment")
@@ -95,7 +95,7 @@ def modify_faultloggerd_file(developer_path, device_sn, device_ip):
                          shell=True).communicate()
         subprocess.Popen(hdc_str + "file send %s %s" % (so_path, "/system/lib64/"),
                          shell=True).communicate()
-        subprocess.Popen(hdc_str + "shell sed -i 's/enforcing/permissive/g' /system/etc.selinux/config",
+        subprocess.Popen(hdc_str + "shell sed -i 's/enforcing/permissive/g' /system/etc/selinux/config",
                          shell=True).communicate()
 
     recv_path = os.path.join(developer_path, "localCoverage/resident_service/resources")
@@ -178,7 +178,7 @@ def split_foundation_services(developer_path, device_sn, device_ip,
         print(hdc_str + "shell reboot")
         subprocess.Popen(hdc_str + "shell reboot", shell=True).communicate()
         while True:
-            after_sn_list = get_sn_list("hdc -s" + device_ip + ":8710 list targets")
+            after_sn_list = get_sn_list("hdc -s %s:8710 list targets" % device_ip)
             time.sleep(10)
             if device_sn in after_sn_list:
                 break

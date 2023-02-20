@@ -141,8 +141,8 @@ def get_gcno_files(cov_path, dir_name):
     gcda_list = get_files_from_dir(dir_name, ".gcda")
     for file_name in gcda_list:
         gcno_name = os.path.splitext(file_name)[0] + ".gcno"
-        gcno_path = os.path.join(os.path.join(CODEPATH, OUTPUT),
-                                 gcda_strip_path, gcno_name)
+        gcno_path = os.path.join(
+            os.path.join(CODEPATH, OUTPUT), gcda_strip_path, gcno_name)
         if os.path.exists(gcno_path):
             if os.path.exists(gcno_path):
                 shutil.copy(gcno_path, dir_name)
@@ -157,12 +157,12 @@ def get_module_gcno_files(cov_path, dir_name):
 
 def gen_subsystem_trace_info(subsystem, data_dir, test_dir):
     src_dir = os.path.join(CODEPATH, OUTPUT)
-    single_info_path = os.path.join(CODEPATH, REPORT_PATH,
-                                    "single_test", test_dir)
+    single_info_path = os.path.join(
+        CODEPATH, REPORT_PATH, "single_test", test_dir)
     if not os.path.exists(single_info_path):
         os.makedirs(single_info_path)
-    output_name = os.path.join(CODEPATH, single_info_path,
-                               subsystem +"_output.info")
+    output_name = os.path.join(
+        CODEPATH, single_info_path, subsystem +"_output.info")
     if not os.path.exists(src_dir):
         print("Sours path %s not exist!", src_dir)
         return
@@ -255,9 +255,8 @@ def merge_info(report_dir):
     for subsystem in subsystem_name_list:
         trace_file_name = os.path.join(report_dir, subsystem)
         trace_file_list.append(trace_file_name)
-    cmd = "lcov -a {} -o {}".format(" -a ".join(trace_file_list),
-                                    os.path.join(
-                                        report_dir, "ohos_codeCoverage.info"))
+    cmd = "lcov -a {} -o {}".format(
+        " -a ".join(trace_file_list), os.path.join(report_dir, "ohos_codeCoverage.info"))
     execute_command(cmd)
 
 

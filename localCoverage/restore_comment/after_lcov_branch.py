@@ -60,7 +60,7 @@ def recover_source_file(cpp_arr_list, keys):
             with open(path.split(".")[0] + "_bk.html", "w") as write_fp:
                 for line in code_lines:
                     if key in line:
-                        write_fp.write(line.strip("\n").strip("\n\r").replace("//LCOV_EXCL_BR_LINE", ""))
+                        write_fp.write(line.strip("\n").strip("\n\r").replace(" //LCOV_EXCL_BR_LINE", ""))
                         write_fp.write("\n")
                     else:
                         write_fp.write(line)
@@ -77,4 +77,4 @@ if __name__ == '__main__':
     html_path = os.path.join(
         root_path, "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
     cpp_arr_list = get_file_list_by_postfix(html_path, ".html")
-    recover_source_file(cpp_arr_list, keys=["//LCOV_EXCL_BR_LINE"])
+    recover_source_file(cpp_arr_list, keys=[" //LCOV_EXCL_BR_LINE"])
