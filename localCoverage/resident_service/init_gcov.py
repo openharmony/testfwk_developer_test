@@ -28,7 +28,7 @@ def modify_init_file(developer_path, device_sn, device_ip):
     """
     /etc/init.cfg文件添加cmds
     """
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
     recv_path = os.path.join(developer_path, "localCoverage/resident_service/resources")
     print(hdc_str + "file recv /etc/init.cfg %s" % recv_path)
     subprocess.Popen(hdc_str + "file recv /etc/init.cfg %s" % recv_path,
@@ -76,7 +76,7 @@ def modify_init_file(developer_path, device_sn, device_ip):
 
 
 def modify_faultloggerd_file(developer_path, device_sn, device_ip):
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
     so_path = os.path.join(
         developer_path, "localCoverage/resident_service/resources/libgcov_dump_sign.z.so")
     _, system_lib = subprocess.getstatusoutput(
@@ -142,7 +142,7 @@ def split_foundation_services(developer_path, device_sn, device_ip,
         resident_service_path, "resources", "restores_environment")
     xml_restores_path = os.path.join(restores_path, "foundation.xml")
 
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
     if not os.path.exists(xml_restores_path):
         print(hdc_str + "file recv /system/profile/foundation.xml %s" % restores_path)
         subprocess.Popen(hdc_str + "file recv /system/profile/foundation.xml %s" % restores_path,
