@@ -29,7 +29,7 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
     1. 在设备里ps -ef | grep SERVICE 获取进程号
     2. kill - '信号' pid
     """
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
     print(hdc_str + "shell chmod 777 /data/gcov -R")
     subprocess.Popen(hdc_str + "shell chmod 777 /data/gcov -R", shell=True).communicate()
     subprocess.Popen(hdc_str + "shell mount -o rw,remount /", shell=True).communicate()
@@ -50,7 +50,7 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
 
 def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
                   developertest_path, services_str):
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     home_path = '/'.join(root_path.split("/")[:3])
     gcda_path = "/data/gcov" + root_path
