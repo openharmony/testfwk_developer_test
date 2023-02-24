@@ -526,11 +526,20 @@ class CppTestDriver(IDriver):
                                                self.config.device)
         # execute testcase
         if not self.config.coverage:
-            command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s" % (
-                self.config.target_test_path,
-                filename,
-                filename,
-                test_para)
+            if self.config.random == "random":
+                seed = random.randint(1, 100)
+                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s --gtest_shuffle --gtest_random_seed=%d" % (
+                    self.config.target_test_path,
+                    filename,
+                    filename,
+                    test_para,
+                    seed)
+            else:
+                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s" % (
+                    self.config.target_test_path,
+                    filename,
+                    filename,
+                    test_para)
         else:
             coverage_outpath = self.config.coverage_outpath
             strip_num = len(coverage_outpath.strip("/").split("/"))
