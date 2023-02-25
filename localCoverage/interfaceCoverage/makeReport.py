@@ -19,8 +19,8 @@
 
 import sys
 import datetime
+from importlib import reload
 reload(sys)
-sys.setdefaultencoding("utf-8")
 
 
 g_html_head = """
@@ -79,7 +79,7 @@ g_html_ended = """
 
 
 def sort_by_field_element(elem):
-    return int(elem[3][:-1])   #@######value是浮点数，如1.0，那么需要先转float再转int
+    return int(float(elem[3][:-1]))   # @######value是浮点数，如1.0，那么需要先转float再转int
 
 
 def sort_by_field_element_data(elem):

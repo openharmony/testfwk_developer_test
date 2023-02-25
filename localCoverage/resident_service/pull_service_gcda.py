@@ -19,8 +19,9 @@ import os
 import subprocess
 import sys
 
-
 from public_method import get_server_dict, get_config_ip, get_sn_list
+sys.path.append("..")
+from localCoverage.coverage_tools import generate_product_name
 
 
 def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
@@ -34,6 +35,7 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
     subprocess.Popen(hdc_str + "shell chmod 777 /data/gcov -R", shell=True).communicate()
     subprocess.Popen(hdc_str + "shell mount -o rw,remount /", shell=True).communicate()
     local_sh_path = os.path.join(resident_service_path, "resources", "gcov_flush.sh")
+    subprocess.Popen("dos2unix %s" % local_sh_path, shell=True).communicate()
     print(hdc_str + "file send %s %s" % (local_sh_path, "/data/"))
     subprocess.Popen(hdc_str + "file send %s %s" % (local_sh_path, "/data/"),
                      shell=True).communicate()
@@ -56,7 +58,7 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
     gcda_path = "/data/gcov" + root_path
 
     for component_gcda_path in component_gcda_dict[process_str]:
-        gcov_root = os.path.join(gcda_path, component_gcda_path)
+        gcov_root = os.path.join(gcda_path, 'out', product_name, component_gcda_path)
         gcda_file_name = os.path.basename(gcov_root)
         gcda_file_path = os.path.dirname(gcov_root)
         print(hdc_str + "shell 'cd %s; tar -czf %s.tar.gz %s'" % (
@@ -64,10 +66,9 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
         subprocess.Popen(hdc_str + "shell 'cd %s; tar -czf %s.tar.gz %s'" % (
             gcda_file_path, gcda_file_name, gcda_file_name), shell=True).communicate()
 
-        obj_gcda_path = component_gcda_path.split("baltimore")[-1].strip("/")
         local_gcda_path = os.path.dirname(
             os.path.join(developertest_path, "reports/coverage/data/cxx",
-                         services_str + "_service", obj_gcda_path))
+                         services_str + "_service", component_gcda_path))
 
         if not os.path.exists(local_gcda_path):
             os.makedirs(local_gcda_path)
@@ -109,11 +110,12 @@ if __name__ == '__main__':
     command_args = sys.argv[1]
     command_str = command_args.split("command_str=")[1].replace(",", " ")
     current_path = os.getcwd()
-    developer_path = os.path.join(
-        current_path.split("/developer_test/src")[0], "developer_test")
+    root_path = current_path.split("/test/testfwk/developer_test")[0]
+    developer_path = os.path.join(root_path, "test/testfwk/developer_test")
     resident_service_path = os.path.join(
         developer_path, "localCoverage/resident_service")
     config_path = os.path.join(resident_service_path, "config")
+    product_name = generate_product_name(root_path)
 
     # 获取子系统部件与服务的关系
     system_info_dict, services_component_dict, component_gcda_dict = get_server_dict(command_str)

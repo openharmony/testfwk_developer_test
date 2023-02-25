@@ -20,6 +20,10 @@
 import os
 import json
 import subprocess
+import sys
+
+sys.path.append("..")
+from localCoverage.coverage_tools import generate_product_name
 
 
 def genPartsInfoJSON(folder_list, output_json_path):
@@ -53,13 +57,13 @@ def getPartsJson(path):
 if __name__ == "__main__":
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
+    product_name = generate_product_name(root_path)
     part_info_path = os.path.join(
-        root_path, "out/baltimore/innerkits/ohos-arm64"
+        root_path, "out", product_name, "innerkits/ohos-arm64"
     )
     output_json_path = os.path.join(
-        root_path, "out/baltimore/packages/phone/innerkits/ohos-arm64"
+        root_path, "out", product_name, "packages/phone/innerkits/ohos-arm64"
     )
     subprocess.Popen("mkdir -p " + output_json_path, shell=True)
     folder_list = getPartsJson(part_info_path)
     genPartsInfoJSON(folder_list, output_json_path)
-

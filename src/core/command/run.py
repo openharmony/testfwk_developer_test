@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
-import platform
+
 #
 # Copyright (c) 2020-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@ import platform
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import platform
 import random
 import subprocess
 from pydoc import classname
@@ -278,8 +278,7 @@ class Run(object):
             pull_service_gcov_path = os.path.join(
                 sys.framework_root_dir, "localCoverage/resident_service/pull_service_gcda.py")
             if os.path.exists(pull_service_gcov_path):
-                subprocess.run("python3 %s command_str=%s" % (
-                    pull_service_gcov_path, current_raw_cmd), shell=True)
+                subprocess.run("python3 %s command_str=%s" % (pull_service_gcov_path, current_raw_cmd), shell=True)
             else:
                 print(f"{pull_service_gcov_path} not exists.")
 
@@ -287,8 +286,7 @@ class Run(object):
             testpart = ",".join(list(map(str, options.partname_list)))
             subsystem = ",".join(list(map(str, options.subsystem)))
             if os.path.exists(cov_main_file_path):
-                subprocess.run("python3 %s testpart=%s subsystem=%s" % (
-                    cov_main_file_path, testpart, subsystem), shell=True)
+                subprocess.run("python3 %s testpart=%s subsystem=%s" % (cov_main_file_path, testpart, subsystem), shell=True)
             else:
                 print(f"{cov_main_file_path} not exists.")
         return

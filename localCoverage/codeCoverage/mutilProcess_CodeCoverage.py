@@ -22,8 +22,10 @@ import shutil
 import shlex
 import subprocess
 import multiprocessing
+import sys
 from multiprocessing import Process
-
+sys.path.append("..")
+from localCoverage.coverage_tools import generate_product_name
 
 # 根代码目录
 root_path = os.getcwd()
@@ -37,7 +39,7 @@ REPORT_PATH = "test/testfwk/developer_test/localCoverage/codeCoverage/results/co
 # llvm-gcov.sh
 LLVM_GCOV = "test/testfwk/developer_test/localCoverage/codeCoverage/llvm-gcov.sh"
 # 编译生成的out路径
-OUTPUT = "out/baltimore"
+OUTPUT = "out/{}".format(generate_product_name(CODEPATH))
 # 屏蔽列表
 FILTEROUT_DIRS = ["unittest", "third_party", "test"]
 # 测试套划分步长
@@ -187,10 +189,9 @@ def gen_subsystem_trace_info(subsystem, data_dir, test_dir, lcovrc_path):
         print(f"Sours path {src_dir} not exists!")
         return
 
-    cmd = "lcov -c -b {} -d {} --gcov-tool {} --config-file {} -o {} --ignore-errors" \
-          "source,gcov".format(src_dir, data_dir, os.path.join(
-        CODEPATH, LLVM_GCOV), lcovrc_path, output_name)
-    print("single_test**##father_pid:%s##child_pid:%s cmd:%s config file:%s"%(
+    cmd = "lcov -c -b {} -d {} --gcov-tool {} --config-file {} -o {} --ignore-errors source,gcov".format(
+        src_dir, data_dir, os.path.join(CODEPATH, LLVM_GCOV), lcovrc_path, output_name)
+    print("single_test**##father_pid:%s##child_pid:%s cmd:%s config file:%s" % (
         os.getpid(), os.getppid(), cmd, lcovrc_path
     ))
     execute_command(cmd)
@@ -335,9 +336,8 @@ def gen_html(cov_path):
         print(f"Error: the trace file {tracefile} not exists!")
         return
 
-    cmd = "genhtml --branch-coverage --demangle-cpp -o {} -p {} --ignore-errors " \
-          "source {}".format(os.path.join(CODEPATH, REPORT_PATH, "html"),
-                             CODEPATH, tracefile)
+    cmd = "genhtml --branch-coverage --demangle-cpp -o {} -p {} --ignore-errors source {}".format(
+        os.path.join(CODEPATH, REPORT_PATH, "html"), CODEPATH, tracefile)
     execute_command(cmd)
 
 
@@ -353,7 +353,7 @@ if __name__ == '__main__':
     Tag = False
     process_list = []
     for i in range(len(caseLst)):
-        lcovrc_path = LCOVRC_SET + "/" + "lcovrc_cov" + str(i)
+        lcovrc_path = LCOVRC_SET + "/" + "lcovrc_cov_" + str(i)
         print(lcovrc_path)
         if os.path.exists(lcovrc_path):
             print(lcovrc_path + "@" * 20 + "yes")
@@ -382,24 +382,3 @@ if __name__ == '__main__':
     merge_all_test_subsystem_info(subsystem_list=get_subsystem_name_list())
     merge_all_subsystem_info()
     gen_final_report(os.path.join(CODEPATH, COVERAGE_GCDA_RESULTS))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -59,9 +59,10 @@ def get_sn_list(command):
 
 def get_all_part_service():
     current_path = os.getcwd()
-    developer_path = current_path.split("/developer_test/src")[0]
+    root_path = current_path.split("/test/testfwk/developer_test")[0]
+    developer_path = os.path.join(root_path, "test/testfwk/developer_test")
     system_part_service_path = os.path.join(
-        developer_path, "developer_test/localCoverage/resident_service/system_part_service.json")
+        developer_path, "localCoverage/resident_service/system_part_service.json")
     if os.path.exists(system_part_service_path):
         with open(system_part_service_path, "r") as system_text:
             system_text_json = json.load(system_text)

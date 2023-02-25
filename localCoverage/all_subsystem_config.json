@@ -1084,8 +1084,8 @@
       "foundation/ability/dmsfwk_lite"
     ]
   },
-  "window": {
-    "name": "window",
+  "window_manager": {
+    "name": "window_manager",
     "path": [
       "foundation/window/window_manager"
     ]

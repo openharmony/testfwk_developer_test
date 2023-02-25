@@ -28,18 +28,21 @@ if __name__ == '__main__':
         root_path = current_path.split("/test/testfwk/developer_test")[0]
         subsystem_config_path = os.path.join(
             root_path, "test/testfwk/developer_test/localCoverage/restore_comment/part_config.json")
-        with open(subsystem_config_path, "r", encoding="utf-8", errors="ignore") as fp:
-            data_dict = json.load(fp)
-        for key, value in data_dict.items():
-            if "path" in value.keys():
-                for path_str in value["path"]:
-                    file_path = os.path.join(root_path, path_str)
-                    if os.path.exists(file_path):
-                        if os.path.exists(file_path + "_primal"):
-                            subprocess.Popen("rm -rf %s" % file_path, shell=True).communicate()
-                            subprocess.Popen("mv %s %s" % (
-                                file_path + "_primal", file_path), shell=True).communicate()
-                    else:
-                        print("The directory does not exist.", file_path)
+        if not os.path.exists(subsystem_config_path):
+            print("part_config.json not exist.")
+        else:
+            with open(subsystem_config_path, "r", encoding="utf-8", errors="ignore") as fp:
+                data_dict = json.load(fp)
+            for key, value in data_dict.items():
+                if "path" in value.keys():
+                    for path_str in value["path"]:
+                        file_path = os.path.join(root_path, path_str)
+                        if os.path.exists(file_path):
+                            if os.path.exists(file_path + "_primal"):
+                                subprocess.Popen("rm -rf %s" % file_path, shell=True).communicate()
+                                subprocess.Popen("mv %s %s" % (
+                                    file_path + "_primal", file_path), shell=True).communicate()
+                        else:
+                            print("The directory does not exist.", file_path)
     except:
         print(traceback.format_exc())
