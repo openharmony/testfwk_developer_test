@@ -25,19 +25,21 @@ import subprocess
 import CppHeaderParser
 import get_innerkits_json
 import makeReport
+sys.path.append("..")
+from localCoverage.coverage_tools import generate_product_name
 
 
 root_path = os.getcwd()
 CODEPATH = root_path.split("/test/testfwk/developer_test")[0]
-PATH_INFO_PATH = "out/baltimore/innerkits/ohos-arm64"
-OUTPUT_JSON_PATH = "out/baltimore/packages/phone/innerkits/ohos-arm64"
-KIT_MODULES_INFO = "out/baltimore/packages/phone/innerkits/ohos-arm64/kits_modules_info.json"
+product_name = generate_product_name(CODEPATH)
+PATH_INFO_PATH = "out/{}/innerkits/ohos-arm64".format(product_name)
+OUTPUT_JSON_PATH = "out/{}/packages/phone/innerkits/ohos-arm64".format(product_name)
+KIT_MODULES_INFO = "out/{}/packages/phone/innerkits/ohos-arm64/kits_modules_info.json".format(product_name)
 SUB_SYSTEM_INFO_PATH = os.path.join(
     CODEPATH, "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx")
 OUTPUT_REPORT_PATH = os.path.join(
     CODEPATH, "test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits"
 )
-
 
 filter_file_name_list = [
     "appexecfwk/libjnikit/include/jni.h",
@@ -54,7 +56,7 @@ def create_coverage_result_outpath(filepath):
 def get_subsystem_part_list(project_rootpath):
     subsystme_part_dict = {}
     subsystem_part_config_filepath = os.path.join(
-        project_rootpath, "out/baltimore/build_configs", "infos_for_testfwk.json")
+        project_rootpath, "out", product_name, "build_configs/infos_for_testfwk.json")
     print(subsystem_part_config_filepath)
     if os.path.exists(subsystem_part_config_filepath):
         try:
@@ -65,7 +67,7 @@ def get_subsystem_part_list(project_rootpath):
         if not data:
             print("subsystem_part config file error.")
         else:
-            subsystme_part_dict= data.get("phone", "").get("subsystem_infos", "")
+            subsystme_part_dict = data.get("phone", "").get("subsystem_infos", "")
         return subsystme_part_dict
     else:
         print("subsystem_part_config_filepath not exists.")
@@ -139,7 +141,7 @@ def get_pubilc_func_list_from_headfile(cxx_header_filepath):
                     continue
                 if class_name == func_name:
                     destructor = func["destructor"]
-                    if destructor == True:
+                    if destructor:
                         func_name = "~" + func_name
                     func_returntype = ""
                 debug = func["debug"].replace("KVSTORE_API", "")
@@ -156,7 +158,7 @@ def get_pubilc_func_list_from_headfile(cxx_header_filepath):
                 if debug.startswith("virtual"):
                     continue
                 template = func["template"]
-                if template != False:
+                if template:
                     continue
                 param_type_list = [t["type"] for t in func["parameters"]]
                 pubilc_func_list.append((cxx_header_filepath, class_name,
@@ -169,7 +171,7 @@ def get_pubilc_func_list_from_headfile(cxx_header_filepath):
             if func_name.isupper():
                 continue
             template = func["template"]
-            if template != False:
+            if template:
                 continue
             debug = func["debug"].replace("KVSTORE_API", "")
             debug = debug.replace(" ", "")
@@ -194,7 +196,7 @@ def get_sdk_interface_func_list(part_name):
     if sub_path == "":
         return interface_func_list
 
-    sdk_path = os.path.join(CODEPATH, "out", "baltimore", sub_path)
+    sdk_path = os.path.join(CODEPATH, "out", product_name, sub_path)
     if os.path.exists(sdk_path):
         file_list = get_file_list_by_postfix(sdk_path, ".h")
         for file in file_list:
@@ -303,7 +305,6 @@ def get_covered_result_data(public_interface_func_list, covered_func_list, subsy
     coverage_result_list = []
     for item in public_interface_func_list:
         data_list = list(item)
-        file_path = data_list[0]
         class_name = data_list[1]
         func_name = data_list[2]
         para_list = data_list[3]
@@ -320,7 +321,6 @@ def get_covered_result_data(public_interface_func_list, covered_func_list, subsy
         fun_string = fun_string.strip()
         fun_string = filter_para_sub_string(fun_string)
 
-        find_string = ""
         if class_name != "":
             find_string = "::" + class_name + "::" + func_name + "("
         else:
@@ -442,7 +442,7 @@ def make_interface_coverage_result():
     subsystem_part_dict = get_subsystem_part_list(CODEPATH)
     for subsystem_name in subsystem_name_list:
         coverage_result_list = get_interface_coverage_result_list(
-            subsystem_name,subsystem_part_dict)
+            subsystem_name, subsystem_part_dict)
         interface_data_list.append([subsystem_name, coverage_result_list])
     make_coverage_result_file(interface_data_list, OUTPUT_REPORT_PATH,
                               "Inner Interface")

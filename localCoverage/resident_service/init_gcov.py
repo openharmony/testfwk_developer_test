@@ -185,9 +185,6 @@ def split_foundation_services(developer_path, device_sn, device_ip,
 
     subprocess.Popen(hdc_str + "shell mount -o rw,remount /",
                      shell=True).communicate()
-    subprocess.Popen(hdc_str + 'shell "rm -fr %s"' % ("/data/gcov" + home_path),
-                     shell=True).communicate()
-    subprocess.Popen(hdc_str + 'shell "chmod 777 /data/gcov - R"', shell=True).communicate()
     subprocess.Popen(hdc_str + "shell getenforce", shell=True).communicate()
     return
 
@@ -227,8 +224,7 @@ if __name__ == '__main__':
     command_str = command_args.split("command_str=")[1].replace(",", " ")
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
-    developer_path = os.path.join(
-        current_path.split("/developer_test/src")[0], "developer_test")
+    developer_path = os.path.join(root_path, "test/testfwk/developer_test")
     home_path = '/'.join(root_path.split("/")[:3])
 
     # 获取user_config中的device ip

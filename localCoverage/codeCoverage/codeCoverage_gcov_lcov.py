@@ -22,7 +22,9 @@ import json
 import shutil
 import shlex
 import subprocess
-
+import sys
+sys.path.append("..")
+from localCoverage.coverage_tools import generate_product_name
 
 # 代码根目录
 root_path = os.getcwd()
@@ -36,7 +38,7 @@ REPORT_PATH = "test/localCoverage/codeCoverage/results/coverage/reports/cxx"
 # llvm-gcov.sh
 LLVM_GCOV = "test/localCoverage/codeCoverage/llvm-gcov.sh"
 # 编译生成的out路径
-OUTPUT = "out/baltimore"
+OUTPUT = "out/{}".format(generate_product_name(CODEPATH))
 # 屏蔽列表
 FILTEROUT_DIRS = ["unittest", "third_party", "test"]
 
@@ -166,9 +168,8 @@ def gen_subsystem_trace_info(subsystem, data_dir, test_dir):
     if not os.path.exists(src_dir):
         print("Sours path %s not exist!", src_dir)
         return
-    cmd = "lcov -c -b {} -d  {} --gcov-tool {} -o {} --ignore-errors source,gcov" \
-        .format(src_dir, data_dir, os.path.join(
-        CODEPATH, LLVM_GCOV), output_name)
+    cmd = "lcov -c -b {} -d  {} --gcov-tool {} -o {} --ignore-errors source,gcov".format(
+        src_dir, data_dir, os.path.join(CODEPATH, LLVM_GCOV), output_name)
     print("single_test**" + cmd)
     execute_command(cmd)
 
@@ -270,8 +271,8 @@ def gen_html(cov_path):
     if not os.path.exists(tracefile):
         print("Error: the trace file %s not exist", tracefile)
         return
-    cmd = "genhtml --branch-coverage --demangle-cpp -o {} -p {} --ignore-errors source {}"\
-        .format(os.path.join(CODEPATH, REPORT_PATH, "html"), CODEPATH, tracefile)
+    cmd = "genhtml --branch-coverage --demangle-cpp -o {} -p {} --ignore-errors source {}".format(
+        os.path.join(CODEPATH, REPORT_PATH, "html"), CODEPATH, tracefile)
     execute_command(cmd)
 
 
