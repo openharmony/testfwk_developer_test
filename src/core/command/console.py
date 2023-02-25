@@ -273,6 +273,14 @@ class Console(object):
                                 default="",
                                 help="Specify fuzzer name"
                                 )
+            parser.add_argument("-ra", "--random",
+                                action="store",
+                                type=str,
+                                dest="random",
+                                default="",
+                                help="Specify random name",
+                                choices=["random"]
+                                )
 
             # 解析部分命令行参数，会返回一个由两个条目构成的元组，其中包含带成员的命名空间（options）和剩余参数字符串的列表（unparsed）
             cls._params_pre_processing(para_list)
