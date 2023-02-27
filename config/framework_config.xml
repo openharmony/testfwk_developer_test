@@ -15,6 +15,7 @@
 -->
 <framework_config>
   <productform>
+    <option name="rk3568" />
     <option name="ipcamera_hispark_aries" />
     <option name="ipcamera_hispark_taurus" />
     <option name="wifiiot_hispark_pegasus" />

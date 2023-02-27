@@ -17,8 +17,6 @@
     ],
     "notification": ["ans"],
     "graphic": ["render_service"],
-
-
     "location": ["locationhub"],
     "time_service": ["time_service"],
     "sensors": ["sensors"],
