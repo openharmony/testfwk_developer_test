@@ -28,9 +28,7 @@ if __name__ == '__main__':
         root_path = current_path.split("/test/testfwk/developer_test")[0]
         subsystem_config_path = os.path.join(
             root_path, "test/testfwk/developer_test/localCoverage/restore_comment/part_config.json")
-        if not os.path.exists(subsystem_config_path):
-            print("part_config.json not exist.")
-        else:
+        if os.path.exists(subsystem_config_path):
             with open(subsystem_config_path, "r", encoding="utf-8", errors="ignore") as fp:
                 data_dict = json.load(fp)
             for key, value in data_dict.items():
