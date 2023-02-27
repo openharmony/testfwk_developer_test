@@ -540,7 +540,7 @@ class CppTestDriver(IDriver):
                 strip_num = len(coverage_outpath.strip("/").split("/"))
             else:
                 root_path = (sys.framework_root_dir.split("test/testfwk/developer_test")[0])
-                strip_num = root_path.strip("/").split("/")
+                strip_num = len(root_path.strip("/").split("/")) + 2
             if "fuzztest" == self.config.testtype[0]:
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
