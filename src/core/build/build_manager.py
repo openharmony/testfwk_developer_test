@@ -24,6 +24,7 @@ from core.build.select_targets import SelectTargets
 from core.build.pretreat_targets import PretreatTargets
 from core.build.build_testcases import BuildTestcases
 from core.command.gen import Gen
+from core.command.run import Run
 
 LOG = platform_logger("BuildManager")
 
@@ -64,6 +65,31 @@ class BuildManager(object):
             build_result = False
         return build_result
 
+    # 根据json生成部件间依赖关系
+    # para 指令参数
+    # 编译代码生成中间文件，只执行gn阶段，并打开check_deps属性
+
+    @classmethod
+    def _compile_deps_files(cls, project_root_path, para):
+        build_deps_files_result = False
+        if BuildTestcases(project_root_path).build_deps_files(para.productform):
+            LOG.info("Deps files compilation successed.")
+            build_deps_files_result = True
+        else:
+            LOG.info("Deps files compilation failed, please modify.")
+        return build_deps_files_result
+
+    # 运行脚本，生成part_deps_info.json部件间依赖关系文件
+    @classmethod
+    def _compile_part_deps(cls, project_root_path, para):
+        build_part_deps_result = False
+        if BuildTestcases(project_root_path).build_part_deps(para):
+            LOG.info("Part deps info compilation successed.")
+            build_part_deps_result = True
+        else:
+            LOG.info("Part deps info compilation failed, please modify.")
+        return build_part_deps_result
+
     # 根据目标编译xts测试用例
     # project_root_path 工程根目录
     # para 指令参数
@@ -99,12 +125,28 @@ class BuildManager(object):
             build_lite_manager = BuildLiteManager(project_root_path)
             return build_lite_manager.build_testcases(para)
 
+        # 如果测试集不为空或测试部件不为空，build_target为测试集或测试部件
         # 如果测试集不为空，build_target为测试集
         if para.testsuit != "":
             return self._compile_test_cases_by_target(
                 project_root_path,
                 para.productform,
                 para.testsuit)
+        if para.partname_list != "":
+            if "partdeps" == para.partdeps:
+                LOG.info("External deps part build.")
+                external_deps_part_list = Run.get_part_deps_list(para.productform, para.testpart)
+                external_deps_part_list.append(para.testpart[0])
+                return self._compile_test_cases_by_target(
+                    project_root_path,
+                    para.productform,
+                    external_deps_part_list)
+            else:
+                LOG.info("Multi testpart build.")
+                return self._compile_test_cases_by_target(
+                    project_root_path,
+                    para.productform,
+                    para.partname_list)
 
         # 如果测试集为空，部件列表为空，模块列表为空，测试类型中含有“ALL”，build_target为"make_test"
         if (len(para.partname_list) == 0 and para.testmodule == "" and
@@ -185,6 +227,12 @@ class BuildManager(object):
 
         build_xts_result = True
         build_result = True
+        if "partdeps" == param.partdeps:
+            LOG.info("**********************Start prebuild testcases****************************")
+            build_deps_files_result = self._compile_deps_files(project_root_path, param)
+            if build_deps_files_result:
+                self._compile_part_deps(project_root_path, param)
+                
         if "acts" in param.testtype or "hats" in param.testtype or "hits" in param.testtype:
             LOG.info("**********************Start build xts testcases****************************")
             build_xts_result = self._compile_xts_test_cases(project_root_path, param)
