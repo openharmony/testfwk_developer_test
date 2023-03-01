@@ -224,8 +224,12 @@ class TestCaseManager(object):
 
         if testsuit != "":
             short_name, _ = os.path.splitext(os.path.basename(suite_file))
-            return short_name.startswith(testsuit) or \
-                testsuit.startswith(short_name)
+            testsuit_list = testsuit.split(',')
+            for test in testsuit_list:
+                if short_name.startswith(test) or \
+                        testsuit.startswith(short_name):
+                    return True
+            return False
 
         is_valid_status = False
         suitfile_subpath = suite_file.replace(test_case_out_path, "")
