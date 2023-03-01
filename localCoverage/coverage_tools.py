@@ -86,6 +86,7 @@ def execute_code_cov_tools(developer_path):
         developer_path, "localCoverage/codeCoverage/llvm-gcov.sh"
     )
     subprocess.Popen("dos2unix %s" % llvm_gcov_path, shell=True).communicate()
+    subprocess.Popen("chmod 777 %s" % llvm_gcov_path, shell=True).communicate()
     tools_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/mutilProcess_CodeCoverage.py"
     )

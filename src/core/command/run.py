@@ -286,7 +286,8 @@ class Run(object):
             testpart = ",".join(list(map(str, options.partname_list)))
             subsystem = ",".join(list(map(str, options.subsystem)))
             if os.path.exists(cov_main_file_path):
-                subprocess.run("python3 %s testpart=%s subsystem=%s" % (cov_main_file_path, testpart, subsystem), shell=True)
+                subprocess.run("python3 %s testpart=%s subsystem=%s" % (
+                    cov_main_file_path, testpart, subsystem), shell=True)
             else:
                 print(f"{cov_main_file_path} not exists.")
         return

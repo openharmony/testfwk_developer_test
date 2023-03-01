@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 #
 # Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,6 @@
 
 SERVER_NAME=$1
 
-ip_addrs=`pgrep -f $SERVER_NAME`
+ip_addrs=$(pgrep -f $SERVER_NAME)
 echo $ip_addrs
-kill -SIGUSR2 $ip_addrs
+kill -SIGTTIN $ip_addrs

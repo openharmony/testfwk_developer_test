@@ -39,8 +39,6 @@ REPORT_PATH = "test/localCoverage/codeCoverage/results/coverage/reports/cxx"
 LLVM_GCOV = "test/localCoverage/codeCoverage/llvm-gcov.sh"
 # 编译生成的out路径
 OUTPUT = "out/{}".format(generate_product_name(CODEPATH))
-# 屏蔽列表
-FILTEROUT_DIRS = ["unittest", "third_party", "test"]
 
 
 def call(cmd_list, is_show_cmd=False, out=None, err=None):
@@ -62,7 +60,7 @@ def execute_command(command, printflag=False):
         with open("coverage.log", 'a') as fd:
             call(cmd_list, printflag, fd, fd)
     except IOError as err:
-        print("Error: Exception occur in open: %s", err.message)
+        print("Error: Exception occur in open  err")
 
 
 def get_subsystem_config_info():
@@ -110,9 +108,11 @@ def get_subsystem_rootpath(subsystem_name):
 
 
 def is_filterout_dir(ignore_prefix, check_path):
-    for dir in FILTEROUT_DIRS:
+    # 屏蔽列表
+    filter_out_list = ["unittest", "third_party", "test"]
+    for item in filter_out_list:
         check_list = check_path[len(ignore_prefix):].split("/")
-        if dir in check_list:
+        if item in check_list:
             return True
     return False
 
@@ -142,7 +142,7 @@ def get_gcno_files(cov_path, dir_name):
     gcda_strip_path = dir_name[len(cov_path) + 1:]
     gcda_list = get_files_from_dir(dir_name, ".gcda")
     for file_name in gcda_list:
-        gcno_name = os.path.splitext(file_name)[0] + ".gcno"
+        gcno_name = f"{os.path.splitext(file_name)[0]}.gcno"
         gcno_path = os.path.join(
             os.path.join(CODEPATH, OUTPUT), gcda_strip_path, gcno_name)
         if os.path.exists(gcno_path):
@@ -164,23 +164,23 @@ def gen_subsystem_trace_info(subsystem, data_dir, test_dir):
     if not os.path.exists(single_info_path):
         os.makedirs(single_info_path)
     output_name = os.path.join(
-        CODEPATH, single_info_path, subsystem +"_output.info")
+        CODEPATH, single_info_path, f"{subsystem}_output.info")
     if not os.path.exists(src_dir):
         print("Sours path %s not exist!", src_dir)
         return
     cmd = "lcov -c -b {} -d  {} --gcov-tool {} -o {} --ignore-errors source,gcov".format(
         src_dir, data_dir, os.path.join(CODEPATH, LLVM_GCOV), output_name)
-    print("single_test**" + cmd)
+    print(f"single_test**{cmd}")
     execute_command(cmd)
 
 
 def cut_info(subsystem, test_dir):
     trace_file = os.path.join(
         CODEPATH, REPORT_PATH, "single_test",
-        test_dir, subsystem + "_output.info")
+        test_dir, f"{subsystem}_output.info")
     output_name = os.path.join(
         CODEPATH, REPORT_PATH, "single_test",
-        test_dir, subsystem + "_strip.info")
+        test_dir, f"{subsystem}_strip.info")
     remove = r"'*/unittest/*' '*/third_party/*' 'sdk/android-arm64/*'"
     if not os.path.exists(trace_file):
         print("Error: trace file %s not exisit!", trace_file)
@@ -202,7 +202,7 @@ def gen_info(cov_path, test_dir, subsystem_list):
         cut_info(subsystem, test_dir)
 
 
-def gen_all_test_info(subsystem_list=[]):
+def gen_all_test_info(subsystem_list):
     cov_path = os.path.join(CODEPATH, COVERAGE_GCDA_RESULTS)
     single_test_dir_list = []
     for root, dirs, files in os.walk(cov_path):
@@ -217,7 +217,7 @@ def gen_all_test_info(subsystem_list=[]):
 def merge_subsystem_info_from_all_test(subsystem):
     single_test_info_path = os.path.join(CODEPATH, REPORT_PATH, "single_test")
     subsystem_info_list = []
-    subsystem_info_name = subsystem + "_strip.info"
+    subsystem_info_name = f"{subsystem}_strip.info"
     for root, dirs, files in os.walk(single_test_info_path):
         if subsystem_info_name in files:
             subsystem_info_path_tmp = os.path.join(
