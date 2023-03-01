@@ -40,12 +40,10 @@ REPORT_PATH = "test/testfwk/developer_test/localCoverage/codeCoverage/results/co
 LLVM_GCOV = "test/testfwk/developer_test/localCoverage/codeCoverage/llvm-gcov.sh"
 # 编译生成的out路径
 OUTPUT = "out/{}".format(generate_product_name(CODEPATH))
-# 屏蔽列表
-FILTEROUT_DIRS = ["unittest", "third_party", "test"]
 # 测试套划分步长
 STEP_SIZE = 10
 # lcovrc配置文件集合
-LCOVRC_SET = CODEPATH + "/test/testfwk/developer_test/localCoverage/codeCoverage/coverage_rc"
+LCOVRC_SET = f"{CODEPATH}/test/testfwk/developer_test/localCoverage/codeCoverage/coverage_rc"
 
 
 def call(cmd_list, is_show_cmd=False, out=None, err=None):
@@ -126,9 +124,10 @@ def get_subsystem_rootpath(subsystem_name):
 
 
 def is_filterout_dir(ignore_prefix, check_path):
-    for dir in FILTEROUT_DIRS:
+    filter_out_list = ["unittest", "third_party", "test"]
+    for item in filter_out_list:
         check_list = check_path[len(ignore_prefix):].split("/")
-        if dir in check_list:
+        if item in check_list:
             return True
 
     return False
@@ -160,7 +159,7 @@ def get_gcno_files(cov_path, dir_name):
     gcda_strip_path = dir_name[len(cov_path) + 1:]
     gcda_list = get_files_from_dir(dir_name, ".gcda")
     for file_name in gcda_list:
-        gcno_name = os.path.splitext(file_name)[0] + ".gcno"
+        gcno_name = f"{os.path.splitext(file_name)[0]}.gcno"
         gcno_path = os.path.join(
             os.path.join(CODEPATH, OUTPUT), gcda_strip_path, gcno_name
         )
@@ -183,7 +182,7 @@ def gen_subsystem_trace_info(subsystem, data_dir, test_dir, lcovrc_path):
     if not os.path.exists(single_info_path):
         os.makedirs(single_info_path)
     output_name = os.path.join(
-        CODEPATH, single_info_path, subsystem + "_output.info"
+        CODEPATH, single_info_path, f"{subsystem}_output.info"
     )
     if not os.path.exists(src_dir):
         print(f"Sours path {src_dir} not exists!")
@@ -200,11 +199,11 @@ def gen_subsystem_trace_info(subsystem, data_dir, test_dir, lcovrc_path):
 def cut_info(subsystem, test_dir):
     trace_file = os.path.join(
         CODEPATH, REPORT_PATH, "single_test",
-        test_dir, subsystem + "_output.info"
+        test_dir,  f"{subsystem}_output.info"
     )
     output_name = os.path.join(
         CODEPATH, REPORT_PATH, "single_test",
-        test_dir, subsystem + "_strip.info"
+        test_dir, f"{subsystem}_strip.info"
     )
 
     remove = r"'*/third_party/*' 'sdk/android-arm64/*'"
@@ -235,24 +234,24 @@ def gen_info(cov_path, test_dir, subsystem_list, lcovrc_path):
 
             # generate coverage info for each subsystem
             gen_subsystem_trace_info(
-                subsystem + "#" + subsys_path.replace("/", "_") + "#" + str(loop),
+                f"{subsystem}#{subsys_path.replace('/', '_')}#{ str(loop)}",
                 subsystem_data_abspath, test_dir, lcovrc_path
             )
 
             # remove some type which useless
-            cut_info(subsystem + "#" + subsys_path.replace("/", "_") + "#" + str(loop), test_dir)
+            cut_info(f"{subsystem}#{subsys_path.replace('/', '_')}#{str(loop)}", test_dir)
 
         loop += 1
 
 
-def generate_coverage_info(single_test_dir_list, lcovrc_path, subsystem_list=[]):
+def generate_coverage_info(single_test_dir_list, lcovrc_path, subsystem_list):
     cov_path = os.path.join(CODEPATH, COVERAGE_GCDA_RESULTS)
     for index, cur_test_dir in enumerate(single_test_dir_list):
         cur_test_abs_dir = os.path.join(cov_path, cur_test_dir)
         gen_info(cur_test_abs_dir, cur_test_dir, subsystem_list, lcovrc_path)
 
 
-def gen_all_test_info(subsystem_list=[]):
+def gen_all_test_info(subsystem_list):
     cov_path = os.path.join(CODEPATH, COVERAGE_GCDA_RESULTS)
     print(os.getpid(), os.getppid())
     single_test_dir_list = []
@@ -268,14 +267,14 @@ def merge_subsystem_info_from_all_test(subsystem):
         CODEPATH, REPORT_PATH, "single_test"
     )
     subsystem_info_list = []
-    subsystem_info_name = subsystem + "_strip.info"
+    subsystem_info_name = f"{subsystem}_strip.info"
     for root, dirs, files in os.walk(single_test_info_path):
         for file in files:
             if file.startswith(subsystem) and file.endswith("_strip.info"):
                 subsystem_info_path_tmp = os.path.join(
                     single_test_info_path, root, file
                 )
-                print("##" + subsystem_info_path_tmp)
+                print(f"##{subsystem_info_path_tmp}")
                 subsystem_info_list.append(subsystem_info_path_tmp)
 
     if len(subsystem_info_list) == 0:
@@ -353,10 +352,10 @@ if __name__ == '__main__':
     Tag = False
     process_list = []
     for i in range(len(caseLst)):
-        lcovrc_path = LCOVRC_SET + "/" + "lcovrc_cov_" + str(i)
+        lcovrc_path = f"{LCOVRC_SET}/lcovrc_cov_{str(i)}"
         print(lcovrc_path)
         if os.path.exists(lcovrc_path):
-            print(lcovrc_path + "@" * 20 + "yes")
+            print(f"{lcovrc_path}{'@' * 20}yes")
         else:
             raise Exception("mutilProcess have error -rc path not existed. "
                             "please fix add run")

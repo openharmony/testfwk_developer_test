@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # coding=utf-8
 
 #
@@ -28,17 +29,17 @@ def modify_init_file(developer_path, device_sn, device_ip):
     """
     /etc/init.cfg文件添加cmds
     """
-    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
     recv_path = os.path.join(developer_path, "localCoverage/resident_service/resources")
-    print(hdc_str + "file recv /etc/init.cfg %s" % recv_path)
-    subprocess.Popen(hdc_str + "file recv /etc/init.cfg %s" % recv_path,
+    print("%s file recv /etc/init.cfg %s" % (hdc_str, recv_path))
+    subprocess.Popen("%s file recv /etc/init.cfg %s" % (hdc_str, recv_path),
                      shell=True).communicate()
     recv_restores_path = os.path.join(recv_path, "restores_environment")
     if not os.path.exists(recv_restores_path):
         os.mkdir(recv_restores_path)
     recv_restores_name = os.path.join(recv_restores_path, "init.cfg")
     if not os.path.exists(recv_restores_name):
-        subprocess.Popen(hdc_str + "file recv /etc/init.cfg %s" % recv_restores_path,
+        subprocess.Popen("%s file recv /etc/init.cfg %s" % (hdc_str, recv_restores_path),
                          shell=True).communicate()
     else:
         print("INFO: file exit", recv_restores_name)
@@ -62,45 +63,35 @@ def modify_init_file(developer_path, device_sn, device_ip):
     else:
         print("init.cfg file not exists")
         return
-    print(hdc_str + "shell mount -o rw,remount / > /dev/null 2>&1")
-    subprocess.Popen(hdc_str + "shell mount -o rw,remount / > /dev/null 2>&1",
+    print("%s shell mount -o rw,remount / > /dev/null 2>&1" % hdc_str)
+    subprocess.Popen("%s shell mount -o rw,remount / > /dev/null 2>&1" % hdc_str,
                      shell=True).communicate()
-    print(hdc_str + "file send %s %s" % (cfg_file_path, "/etc/"))
-    subprocess.Popen(hdc_str + "file send %s %s" % (cfg_file_path, "/etc/"),
+    print("%s file send %s %s" % (hdc_str, cfg_file_path, "/etc/"))
+    subprocess.Popen("%s file send %s %s" % (hdc_str, cfg_file_path, "/etc/"),
                      shell=True).communicate()
-    subprocess.Popen(hdc_str + "shell param set persist.appspawn.client.timeout 120 > /dev/null 2>&1",
+    subprocess.Popen("%s shell param set persist.appspawn.client.timeout 120 > /dev/null 2>&1" % hdc_str,
                      shell=True).communicate()
-    print(hdc_str + "shell reboot")
-    subprocess.Popen(hdc_str + "shell reboot > /dev/null 2>&1", shell=True).communicate()
+    print("%s shell reboot" % hdc_str)
+    subprocess.Popen("%s shell reboot > /dev/null 2>&1" % hdc_str,
+                     shell=True).communicate()
     return
 
 
 def modify_faultloggerd_file(developer_path, device_sn, device_ip):
-    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
-    so_path = os.path.join(
-        developer_path, "localCoverage/resident_service/resources/libgcov_dump_sign.z.so")
-    _, system_lib = subprocess.getstatusoutput(
-        hdc_str + "shell find /system/lib -name libgcov_dump_sign.z.so")
-    _, system_lib64 = subprocess.getstatusoutput(
-        hdc_str + "shell find /system/lib64 -name libgcov_dump_sign.z.so")
-    _, enforce = subprocess.getstatusoutput(hdc_str + "shell getenforce")
+    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    _, enforce = subprocess.getstatusoutput("%s shell getenforce" % hdc_str)
     if_reboot = False
-    if not system_lib or not system_lib64 or enforce != "Permissive":
+    if enforce != "Permissive":
         if_reboot = True
-        print(hdc_str + "shell mount -o rw,remount /")
-        subprocess.Popen(hdc_str + "shell mount -o rw,remount /",
+        print("%s shell mount -o rw,remount /" % hdc_str)
+        subprocess.Popen("%s shell mount -o rw,remount /" % hdc_str,
                          shell=True).communicate()
-        print(hdc_str + "file send %s %s" % (so_path, "/system/lib/"))
-        subprocess.Popen(hdc_str + "file send %s %s" % (so_path, "/system/lib/"),
-                         shell=True).communicate()
-        subprocess.Popen(hdc_str + "file send %s %s" % (so_path, "/system/lib64/"),
-                         shell=True).communicate()
-        subprocess.Popen(hdc_str + "shell sed -i 's/enforcing/permissive/g' /system/etc/selinux/config",
+        subprocess.Popen("%s shell sed -i 's/enforcing/permissive/g' /system/etc/selinux/config" % hdc_str,
                          shell=True).communicate()
 
     recv_path = os.path.join(developer_path, "localCoverage/resident_service/resources")
-    print(hdc_str + "file recv /system/etc/init/faultloggerd.cfg %s" % recv_path)
-    subprocess.Popen(hdc_str + "file recv /system/etc/init/faultloggerd.cfg %s" % recv_path,
+    print("%s file recv /system/etc/init/faultloggerd.cfg %s" % (hdc_str, recv_path))
+    subprocess.Popen("%s file recv /system/etc/init/faultloggerd.cfg %s" % (hdc_str, recv_path),
                      shell=True).communicate()
 
     cfg_file_path = os.path.join(recv_path, "faultloggerd.cfg")
@@ -118,14 +109,14 @@ def modify_faultloggerd_file(developer_path, device_sn, device_ip):
             json_str = json.dumps(json_data, indent=4)
             with open(cfg_file_path, "w") as json_file:
                 json_file.write(json_str)
-            print(hdc_str + "file send %s %s" % (cfg_file_path, "/system/etc/init/"))
-            subprocess.Popen(hdc_str + "file send %s %s" % (cfg_file_path, "/system/etc/init/"),
+            print("%s file send %s %s" % (hdc_str, cfg_file_path, "/system/etc/init/"))
+            subprocess.Popen("%s file send %s %s" % (hdc_str, cfg_file_path, "/system/etc/init/"),
                              shell=True).communicate()
     else:
         print("faultloggerd.cfg file not exists.")
     if if_reboot:
-        print(hdc_str + "shell reboot")
-        subprocess.Popen(hdc_str + "shell reboot", shell=True).communicate()
+        print("%s shell reboot" % hdc_str)
+        subprocess.Popen("%s shell reboot" % hdc_str, shell=True).communicate()
 
 
 def split_foundation_services(developer_path, device_sn, device_ip,
@@ -142,10 +133,10 @@ def split_foundation_services(developer_path, device_sn, device_ip,
         resident_service_path, "resources", "restores_environment")
     xml_restores_path = os.path.join(restores_path, "foundation.xml")
 
-    hdc_str = "hdc -s %s:8710 -t %s " % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
     if not os.path.exists(xml_restores_path):
-        print(hdc_str + "file recv /system/profile/foundation.xml %s" % restores_path)
-        subprocess.Popen(hdc_str + "file recv /system/profile/foundation.xml %s" % restores_path,
+        print("%s file recv /system/profile/foundation.xml %s" % (hdc_str, restores_path))
+        subprocess.Popen("%s file recv /system/profile/foundation.xml %s" % (hdc_str, restores_path),
                          shell=True).communicate()
 
     # 推送xml数据
@@ -153,39 +144,39 @@ def split_foundation_services(developer_path, device_sn, device_ip,
     for key, value_list in system_info_dict.items():
         for process_str in value_list:
             foundation_xml_path = os.path.join(config_path, process_str, "foundation.xml")
-            print(hdc_str + "shell mount -o rw,remount /")
-            subprocess.Popen(hdc_str + "shell mount -o rw,remount /",
+            print("%s shell mount -o rw,remount /" % hdc_str)
+            subprocess.Popen("%s shell mount -o rw,remount /" % hdc_str,
                              shell=True).communicate()
             if os.path.exists(foundation_xml_path):
                 flag = True
-                subprocess.Popen(hdc_str + "shell rm -rf /lost+found", shell=True).communicate()
-                subprocess.Popen(hdc_str + "shell rm -rf /log", shell=True).communicate()
-                subprocess.Popen(hdc_str + "shell rm -rf %s" % home_path, shell=True).communicate()
-                print(hdc_str + "file send %s %s" % (foundation_xml_path, "/system/profile/"))
-                subprocess.Popen(hdc_str + "file send %s %s" % (
-                    foundation_xml_path, "/system/profile/"), shell=True).communicate()
+                subprocess.Popen("%s shell rm -rf /lost+found" % hdc_str, shell=True).communicate()
+                subprocess.Popen("%s shell rm -rf /log" % hdc_str, shell=True).communicate()
+                subprocess.Popen("%s shell rm -rf %s" % (hdc_str, home_path), shell=True).communicate()
+                print("%s file send %s %s" % (hdc_str, foundation_xml_path, "/system/profile/"))
+                subprocess.Popen("%s file send %s %s" % (
+                    hdc_str, foundation_xml_path, "/system/profile/"), shell=True).communicate()
 
-                process_xml_path = os.path.join(config_path, process_str, process_str + ".xml")
-                print(hdc_str + "file send %s %s" % (process_xml_path, "/system/profile/"))
-                subprocess.Popen(hdc_str + "file send %s %s" % (
-                    process_xml_path, "/system/profile/"), shell=True).communicate()
+                process_xml_path = os.path.join(config_path, process_str, f"{process_str}.xml")
+                print("%s file send %s %s" % (hdc_str, process_xml_path, "/system/profile/"))
+                subprocess.Popen("%s file send %s %s" % (
+                    hdc_str, process_xml_path, "/system/profile/"), shell=True).communicate()
 
-                process_cfg_path = os.path.join(config_path, process_str, process_str + ".cfg")
-                print(hdc_str + "file send %s %s" % (process_cfg_path, "/etc/init/"))
-                subprocess.Popen(hdc_str + "file send %s %s" % (
-                    process_cfg_path, "/etc/init/"), shell=True).communicate()
+                process_cfg_path = os.path.join(config_path, process_str, f"{process_str}.cfg")
+                print("%s file send %s %s" % (hdc_str, process_cfg_path, "/etc/init/"))
+                subprocess.Popen("%s file send %s %s" % (
+                    hdc_str, process_cfg_path, "/etc/init/"), shell=True).communicate()
     if flag:
-        print(hdc_str + "shell reboot")
-        subprocess.Popen(hdc_str + "shell reboot", shell=True).communicate()
+        print("%s shell reboot" % hdc_str)
+        subprocess.Popen("%s shell reboot" % hdc_str, shell=True).communicate()
         while True:
             after_sn_list = get_sn_list("hdc -s %s:8710 list targets" % device_ip)
             time.sleep(10)
             if device_sn in after_sn_list:
                 break
 
-    subprocess.Popen(hdc_str + "shell mount -o rw,remount /",
+    subprocess.Popen("%s shell mount -o rw,remount /" % hdc_str,
                      shell=True).communicate()
-    subprocess.Popen(hdc_str + "shell getenforce", shell=True).communicate()
+    subprocess.Popen("%s shell getenforce" % hdc_str, shell=True).communicate()
     return
 
 
@@ -229,7 +220,7 @@ if __name__ == '__main__':
 
     # 获取user_config中的device ip
     device_ip = get_config_ip(os.path.join(developer_path, "config/user_config.xml"))
-    device_sn_list = get_sn_list("hdc -s %s" % device_ip + ":8710 list targets")
+    device_sn_list = get_sn_list("hdc -s %s:8710 list targets" % device_ip)
 
     # 修改设备init.cfg文件
     modify_init_cfg(developer_path, device_ip, device_sn_list)

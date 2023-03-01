@@ -26,14 +26,14 @@ sys.path.append("..")
 from localCoverage.coverage_tools import generate_product_name
 
 
-def genPartsInfoJSON(folder_list, output_json_path):
+def gen_parts_info_json(folder_list, output_json_path):
     """
     根据部件信息,生成字典至json文件中
     """
     if len(folder_list) != 0:
         data_dict = {}
         for folder_str in folder_list:
-            data_dict[folder_str] = "innerkits/ohos-arm64/" + folder_str
+            data_dict[folder_str] = f"innerkits/ohos-arm64/{folder_str}"
         output_json_path = os.path.join(output_json_path, "kits_modules_info.json")
         json_str = json.dumps(data_dict, indent=2)
         with open(output_json_path, "w") as json_file:
@@ -42,7 +42,7 @@ def genPartsInfoJSON(folder_list, output_json_path):
         print("Failed to obtain component information")
 
 
-def getPartsJson(path):
+def get_parts_list(path):
     """
     #获取out/ohos-arm-release/innerkits/ohos-arm内部接口文件夹名称列表
     """
@@ -64,6 +64,6 @@ if __name__ == "__main__":
     output_json_path = os.path.join(
         root_path, "out", product_name, "packages/phone/innerkits/ohos-arm64"
     )
-    subprocess.Popen("mkdir -p " + output_json_path, shell=True)
-    folder_list = getPartsJson(part_info_path)
-    genPartsInfoJSON(folder_list, output_json_path)
+    subprocess.Popen("mkdir -p %s" % output_json_path, shell=True)
+    folder_list = get_parts_list(part_info_path)
+    gen_parts_info_json(folder_list, output_json_path)

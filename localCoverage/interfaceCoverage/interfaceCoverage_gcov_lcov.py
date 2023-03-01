@@ -62,8 +62,8 @@ def get_subsystem_part_list(project_rootpath):
         try:
             with open(subsystem_part_config_filepath, 'r') as f:
                 data = json.load(f)
-        except IOError as err_msg:
-            print("Error for open subsystem config file: ", err_msg)
+        except IOError:
+            print("Error for open subsystem config file: ")
         if not data:
             print("subsystem_part config file error.")
         else:
@@ -83,8 +83,8 @@ def load_json_data():
             if not json_data_dic:
                 print("Loadind file \"%s\" error" % json_file_path)
                 return {}
-        except(IOError, ValueError) as err_msg:
-            print("Error for load_json_data: \"%s\"" % json_file_path, err_msg)
+        except(IOError, ValueError):
+            print("Error for load_json_data: \"%s\"" % json_file_path)
     else:
         print("Info: \"%s\" not exist." % json_file_path)
     return json_data_dic
@@ -142,7 +142,7 @@ def get_pubilc_func_list_from_headfile(cxx_header_filepath):
                 if class_name == func_name:
                     destructor = func["destructor"]
                     if destructor:
-                        func_name = "~" + func_name
+                        func_name = f"~{func_name}"
                     func_returntype = ""
                 debug = func["debug"].replace("KVSTORE_API", "")
                 debug = debug.replace(" ", "")
@@ -185,8 +185,8 @@ def get_pubilc_func_list_from_headfile(cxx_header_filepath):
                 (cxx_header_filepath, "", func_name, param_type_list,
                  func_returntype)
             )
-    except CppHeaderParser.CppParseError as e:
-        print(e)
+    except CppHeaderParser.CppParseError:
+        print("error")
     return pubilc_func_list
 
 
@@ -225,7 +225,7 @@ def get_function_info_string(func_string):
 
 def get_covered_function_list(subsystem_name):
     covered_function_list = []
-    file_name = subsystem_name + "_strip.info"
+    file_name = f"{subsystem_name}_strip.info"
     file_path = os.path.join(SUB_SYSTEM_INFO_PATH, file_name)
     if os.path.exists(file_path):
         with open(file_path, "r") as fd:
@@ -317,12 +317,12 @@ def get_covered_result_data(public_interface_func_list, covered_func_list, subsy
             para_string += curr_para
             if index < len(para_list)-1:
                 para_string += ", "
-        fun_string = return_val + " " + func_name + "(" + para_string.strip().strip(",") + ")"
+        fun_string = f"{return_val}' '{func_name}({para_string.strip().strip(',')})"
         fun_string = fun_string.strip()
         fun_string = filter_para_sub_string(fun_string)
 
         if class_name != "":
-            find_string = "::" + class_name + "::" + func_name + "("
+            find_string = f"::{class_name}::{func_name}("
         else:
             find_string = func_name
         func_info_list = []
@@ -352,7 +352,7 @@ def get_covered_result_data(public_interface_func_list, covered_func_list, subsy
     return coverage_result_list
 
 
-def get_interface_coverage_result_list(subsystem_name,subsystem_part_dict):
+def get_interface_coverage_result_list(subsystem_name, subsystem_part_dict):
     part_list = subsystem_part_dict.get(subsystem_name, [])
     public_interface_func_list = []
     for part_str in part_list:
@@ -451,9 +451,9 @@ def make_interface_coverage_result():
 if __name__ == "__main__":
     system_args = sys.argv[1]
     system_name_list = system_args.split(",")
-    get_innerkits_json.genPartsInfoJSON(
-        get_innerkits_json.getPartsJson(os.path.join(CODEPATH,PATH_INFO_PATH)),
-        os.path.join(CODEPATH,OUTPUT_JSON_PATH)
+    get_innerkits_json.gen_parts_info_json(
+        get_innerkits_json.get_parts_list(os.path.join(CODEPATH, PATH_INFO_PATH)),
+        os.path.join(CODEPATH, OUTPUT_JSON_PATH)
     )
     if len(system_name_list) > 0:
         make_interface_coverage_result()

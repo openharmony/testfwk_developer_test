@@ -36,11 +36,11 @@ if __name__ == '__main__':
                     for path_str in value["path"]:
                         file_path = os.path.join(root_path, path_str)
                         if os.path.exists(file_path):
-                            if os.path.exists(file_path + "_primal"):
+                            if os.path.exists(f"{file_path}_primal"):
                                 subprocess.Popen("rm -rf %s" % file_path, shell=True).communicate()
                                 subprocess.Popen("mv %s %s" % (
-                                    file_path + "_primal", file_path), shell=True).communicate()
+                                    f"{file_path}_primal", file_path), shell=True).communicate()
                         else:
                             print("The directory does not exist.", file_path)
     except:
-        print(traceback.format_exc())
+        print("restore source code Error")

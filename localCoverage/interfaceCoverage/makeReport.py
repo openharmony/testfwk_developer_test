@@ -91,8 +91,8 @@ def create_html_start(reportpath):
         with open(reportpath, "w") as report:
             report.write(g_html_head)
             report.write(g_html_body_start)
-    except(IOError, ValueError) as err_msg:
-        print("Error for create html start: ", err_msg)
+    except(IOError, ValueError):
+        print("Error for create html start ",)
 
 
 def create_title(reportpath, title_name, summary_list):
@@ -127,8 +127,8 @@ def create_title(reportpath, title_name, summary_list):
     try:
         with open(reportpath, "a") as report:
             report.write(report_title)
-    except(IOError, ValueError) as err_msg:
-        print("Error for create html title: ", err_msg)
+    except(IOError, ValueError):
+        print("Error for create html title")
 
 
 def create_summary(reportpath, summary_list):
@@ -168,8 +168,8 @@ def create_summary(reportpath, summary_list):
                 content = table_line % (item[0], str(item[1]), str(item[2]), item[3])
                 report.write(content)
             report.write(table_ended)
-    except(IOError, ValueError) as err_msg:
-        print("Error for create html summary: ", err_msg)
+    except(IOError, ValueError):
+        print("Error for create html summary")
 
 
 def create_table_test(reportpath, subsystem_name, datalist, total_count, covered_count):
@@ -230,8 +230,8 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
             coverage = table_summary % (total_count, covered_count, coverage)
             report.write(coverage)
             report.write(table_ended)
-    except(IOError, ValueError) as err_msg:
-        print("Error for create html table test: ", err_msg)
+    except(IOError, ValueError):
+        print("Error for create html table test")
 
 
 def create_html_ended(reportpath):
@@ -239,5 +239,5 @@ def create_html_ended(reportpath):
         with open(reportpath, "a") as report:
             report.write(g_html_body_ended)
             report.write(g_html_ended)
-    except(IOError, ValueError) as err_msg:
-        print("Error for create html end: ", err_msg)
+    except(IOError, ValueError):
+        print("Error for create html end",)

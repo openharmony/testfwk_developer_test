@@ -18,7 +18,6 @@
 
 import os
 import subprocess
-import traceback
 import json
 
 
@@ -79,7 +78,7 @@ def rewrite_source_file(source_path_list: list):
         with open(path, "r", encoding="utf-8", errors="ignore") as read_fp:
             code_lines = read_fp.readlines()
         source_dir, suffix_name = os.path.splitext(path)
-        with open(source_dir + f"_bk.{suffix_name}", "w",
+        with open(f"{source_dir}_bk.{suffix_name}", "w",
                   encoding="utf-8", errors="ignore") as write_fp:
 
             for line in code_lines:
@@ -94,7 +93,7 @@ def rewrite_source_file(source_path_list: list):
                     break
 
             os.remove(path)
-            subprocess.Popen("mv %s %s" % (source_dir + f"_bk.{suffix_name}", path),
+            subprocess.Popen("mv %s %s" % (f"{source_dir}_bk.{suffix_name}", path),
                              shell=True).communicate()
     print("[**********  End Rewrite Source File **********]")
 
@@ -109,13 +108,13 @@ def add_lcov(subsystem_config_path):
                     file_path = os.path.join(root_path, path_str)
                     if os.path.exists(file_path):
                         subprocess.Popen("cp -r %s %s" % (
-                            file_path, file_path + "_primal"), shell=True).communicate()
+                            file_path, f"{file_path}_primal"), shell=True).communicate()
                         source_file_path = get_source_file_list(file_path)
                         rewrite_source_file(source_file_path)
                     else:
                         print("The directory does not exist.", file_path)
     except:
-        print(traceback.format_exc())
+        print("add LCOV_EXCL_BR_LINE Error")
 
 
 def get_part_config_json(part_name_list, all_system_info_path, part_info_path):
@@ -154,9 +153,11 @@ if __name__ == '__main__':
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     all_system_info_path = os.path.join(
-        root_path, "test/testfwk/developer_test/localCoverage/all_subsystem_config.json")
+        root_path,
+        "test/testfwk/developer_test/localCoverage/all_subsystem_config.json")
     part_info_path = os.path.join(
-        root_path, "test/testfwk/developer_test/localCoverage/restore_comment/part_config.json")
+        root_path,
+        "test/testfwk/developer_test/localCoverage/restore_comment/part_config.json")
 
     # 获取要修改的源代码的部件信息
     get_part_config_json(part_name_list, all_system_info_path, part_info_path)
