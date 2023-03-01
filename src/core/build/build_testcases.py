@@ -45,6 +45,11 @@ class BuildTestcases(object):
     def __init__(self, project_rootpath):
         self.project_rootpath = project_rootpath
         user_manager = UserConfigManager()
+        self.part_deps_path = os.path.join(sys.source_code_root_path,
+                                           "build",
+                                           "tools",
+                                           "module_dependence",
+                                           "part_deps.py")
         self.is_build_example = user_manager.get_user_config_flag(
             "build", "example")
         self.build_parameter_dic = user_manager.get_user_config(
@@ -196,6 +201,54 @@ class BuildTestcases(object):
         os.chdir(current_path)
         return build_result
 
+    def _execute_build_deps_files_command(self, productform, command):
+        build_deps_files_result = False
+        current_path = os.getcwd()
+        os.chdir(self.project_rootpath)
+
+        command.append("--product-name")
+        command.append(productform)
+
+        if os.path.exists(BUILD_FILEPATH):
+            build_deps_files_command = [BUILD_FILEPATH]
+            build_deps_files_command.extend(command)
+            LOG.info("build_deps_files_command: %s" % str(build_deps_files_command))
+            if subprocess.call(build_deps_files_command) == 0:
+                build_deps_files_result = True
+            else:
+                build_deps_files_result = False
+        else:
+            LOG.warning("Build Deps Files Error: The %s is not exist" % BUILD_FILEPATH)
+
+        os.chdir(current_path)
+        return build_deps_files_result
+
+    def _execute_build_part_deps_command(self, para):
+        build_part_deps_result = False
+        build_part_deps_command = []
+        current_path = os.getcwd()
+        #路径 deps_files_path = ~/OpenHarmony/out/baltimore/deps_files
+        os.chdir(self.project_rootpath)
+        deps_files_path = os.path.abspath(os.path.join(
+            get_build_output_path(para.productform),
+            "deps_files"))
+        LOG.info("deps_files_path: %s" % deps_files_path)
+        build_part_deps_command.append(self.part_deps_path)
+        build_part_deps_command.append("--deps-files-path")
+
+        if os.path.exists(deps_files_path):
+            build_part_deps_command.append(deps_files_path)
+            LOG.info("build_part_deps_command: %s" % str(build_part_deps_command))
+            if subprocess.call(build_part_deps_command) == 0:
+                build_part_deps_result = True
+            else:
+                build_part_deps_result = False
+        else:
+            LOG.warning("Build Part Deps Info Error: The %s is not exist" % deps_files_path)
+
+        os.chdir(current_path)
+        return build_part_deps_result
+
     def _execute_build_xts_command(self, para):
         build_result = False
         xts_build_command = []
@@ -250,8 +303,14 @@ class BuildTestcases(object):
         if self.is_build_example:
             command.append("--gn-args")
             command.append("build_example=true")
-        command.append("--build-target")
-        command.append(target)
+        if isinstance(target, list):
+            for test in target:
+                command.append("--build-target")
+                command.append(test + "_test")
+        elif isinstance(target, str):
+            for test in target.split(','):
+                command.append("--build-target")
+                command.append(test)
         target_cpu = self.build_parameter_dic.get("target_cpu")
         if target_cpu == "arm64":
             if productform == "m40":
@@ -275,6 +334,26 @@ class BuildTestcases(object):
         build_result = self._execute_build_xts_command(para)
         return build_result
 
+    def build_deps_files(self, productform):
+        command = []
+        command.append("--ccache")
+        command.append("--gn-args")
+        command.append("pycache_enable=true")
+        command.append("--gn-args")
+        command.append("check_deps=true")
+        command.append("--build-only-gn")
+        target_cpu = self.build_parameter_dic.get("target_cpu")
+        if target_cpu == "arm64":
+            if productform == "m40":
+                command.append("--target-cpu")
+                command.append(target_cpu)
+        return self._execute_build_deps_files_command(productform, command)
+
+    #部件间依赖关系预处理，生成part_deps_info.json
+    def build_part_deps(self, para):
+        build_part_deps_result = self._execute_build_part_deps_command(para)
+        return build_part_deps_result
+        
     def build_gn_file(self, productform):
         command = []
         if self.is_build_example:

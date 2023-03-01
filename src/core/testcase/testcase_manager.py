@@ -156,6 +156,25 @@ class TestCaseManager(object):
 
         return suite_file_dictionary
 
+    def get_part_deps_files(self, external_deps_path, testpart):
+        LOG.info("external_deps_path:" + external_deps_path)
+        if os.path.exists(external_deps_path):
+            with open(external_deps_path, 'r') as json_file:
+                data_dic = json.load(json_file)
+                if not data_dic:
+                    LOG.error("data_dic is empty.")
+                    return []
+                test_part = testpart[0]
+                if test_part in data_dic.keys():
+                    external_deps_part_list = data_dic.get(test_part)
+                    LOG.info("external_deps_part_list = %s" % external_deps_part_list)
+                    return external_deps_part_list
+                else:
+                    LOG.error("%s is not in part deps info json." % test_part)
+        else:
+            LOG.error("Part deps info %s is not exist." % external_deps_path)
+        return []
+        
     def check_xts_config_match(self, options, prefix_name, xts_suite_file):
         # 如果xts测试指定了-tp，只有部件名与moduleInfo中part一致的文件才会加入最终执行的队列
         if options.testpart != [] and options.testpart[0] != self.get_part_name_test_file(xts_suite_file):
