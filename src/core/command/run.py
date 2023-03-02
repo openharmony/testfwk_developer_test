@@ -84,6 +84,7 @@ class Run(object):
         LOG.info("historylist   = %s" % options.historylist)
         LOG.info("runhistory   = %s" % options.runhistory)
         LOG.info("partname_list = %s" % str(options.partname_list))
+        LOG.info("partdeps = %s" % options.partdeps)
         LOG.info("------------------------------------")
         LOG.info("")
 
@@ -164,6 +165,11 @@ class Run(object):
         if not self._build_test_cases(options):
             LOG.error("Build test cases failed.")
             return
+
+        if "partdeps" == options.partdeps:
+            self.get_part_deps_list(options.productform, options.testpart)
+            options.testcases_path = self.get_external_deps_out_path(options.productform)
+            LOG.info("partdeps = %s" % options.partdeps)
 
         if "acts" in options.testtype or "hats" in options.testtype or "hits" in options.testtype:
             test_dict = self.get_xts_test_dict(options)
@@ -339,6 +345,15 @@ class Run(object):
         return xts_testcase_path
 
     @classmethod
+    def get_external_deps_out_path(cls, product_form):
+        external_deps_path = os.path.abspath(os.path.join(
+            get_build_output_path(product_form),
+            "part_deps_info",
+            "part_deps_info.json"))
+        LOG.info("external_deps_path=%s" % external_deps_path)
+        return external_deps_path
+
+    @classmethod
     def get_coverage_outpath(cls, options):
         coverage_out_path = ""
         if options.coverage:
@@ -350,6 +365,13 @@ class Run(object):
                 LOG.error("Coverage test: coverage_outpath is empty.")
         return coverage_out_path
 
+    @classmethod
+    def get_part_deps_list(cls, productform, testpart):
+        #获取预处理部件间依赖的编译结果路径
+        external_deps_path = cls.get_external_deps_out_path(productform)
+        external_deps_path_list = TestCaseManager().get_part_deps_files(external_deps_path, testpart)
+        return external_deps_path_list
+        
     def get_xts_test_dict(self, options):
         # 获取XTS测试用例编译结果路径
         xts_test_case_path = self.get_xts_tests_out_path(options.productform, options.testtype)
