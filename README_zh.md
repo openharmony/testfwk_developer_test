@@ -395,7 +395,8 @@ subsystem  # 子系统
 			EXPECT_EQ(ret, 6);
 		}
 
-		// SET_THREAD_NUM(THREAD_NUM);用例中函数设置线程数量，同一测试套中可动态设置不同的线程数量。
+		// SET_THREAD_NUM(THREAD_NUM);用例中函数设置线程数量。
+		// 同一测试套中可动态设置不同的线程数量。
 		// 未调用SET_THREAD_NUM()时，默认线程数10个。		
     	HWTEST_F(AAFwkBaseObjectTest, Factorial_test_001, TestSize.Level1)
     	{
@@ -410,8 +411,9 @@ subsystem  # 子系统
 		* @tc.name: Query
 		* @tc.desc: test Query function and iid == g_IID_IWeakReferenceSource.
 		*
-		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)宏的作用是创建一个多线程测试用例，宏定义的内部可调用需要被测试的函数。
-		// THREAD_NUM可设置用例执行的线程数量，宏定义会创建指定数量的线程并执行被测函数。
+		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)
+		// HWMTEST_F会创建指定数量的线程并执行被测函数。
+		// THREAD_NUM可设置用例执行的线程数量。
     	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
     	{
 			printf("Factorial_test_002 BEGIN\n");
