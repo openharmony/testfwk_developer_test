@@ -230,20 +230,7 @@ subsystem  # 子系统
 
 - 多线程用例示例
     ```
-    /*
-     * Copyright (c) 2021 XXXX Device Co., Ltd.
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
+    // 测试用例文件头注释信息及用例注释同单线程用例示例。
     
     #include "base_object.h"
     #include <gtest/gtest.h>
@@ -275,22 +262,17 @@ subsystem  # 子系统
 	void AAFwkBaseObjectTest::TearDown(void)
 	{}
 
-	/**
-	* @tc.number: Factorial_test_001
-	* @tc.name: Query
-	* @tc.desc: test Query function and iid == g_IID_IWeakReferenceSource.
-	*/
-
 	// Step 1:待测函数，返回阶乘结果
 	int factorial(int n)
 	{
 		int result = 1;
-		for (int i = 1; i <= n; i++){
+		for (int i = 1; i <= n; i++) {
 			result *= 1;
 		}
 		printf("Factorial Function Result : %d\n", n, result);
 		return result;
 	} 
+
 	// Step 2:使用断言比较预期与实际结果
 	void factorial_test()
 	{
@@ -303,6 +285,7 @@ subsystem  # 子系统
 		printf("running thread...: %ld\n", thread_id); // 输出当前线程的id
 		EXPECT_EQ(ret, 6);
 	}
+
 	HWTEST_F(AAFwkBaseObjectTest, Factorial_test_001, TestSize.Level1)
 	{
 		SET_THREAD_NUM(4);
@@ -311,39 +294,22 @@ subsystem  # 子系统
 		printf("Factorial_test_001 END\n");
 	}
 
-	/**
-	* @tc.number: Factorial_test_002
-	* @tc.name: Query
-	* @tc.desc: test Query function and iid == g_IID_IWeakReferenceSource.
-	*/
 	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
 	{
 		printf("Factorial_test_002 BEGIN\n");
 		factorial_test();
 		printf("Factorial_test_002 END\n");
 	}
+
 	}  // namespace AAFwk
 	}  // namespace OHOS
 
     ```
     详细内容介绍：
     1. 添加测试用例文件头注释信息
-	    ```
-    	/*
-    	 * Copyright (c) 2021 XXXX Device Co., Ltd.
-    	 * Licensed under the Apache License, Version 2.0 (the "License");
-    	 * you may not use this file except in compliance with the License.
-    	 * You may obtain a copy of the License at
-    	 *
-    	 *     http://www.apache.org/licenses/LICENSE-2.0
-    	 *
-    	 * Unless required by applicable law or agreed to in writing, software
-    	 * distributed under the License is distributed on an "AS IS" BASIS,
-    	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    	 * See the License for the specific language governing permissions and
-    	 * limitations under the License.
-    	 */
-    	```
+
+		> **注意：** 与单线程用例标准一致。
+
     2. 引用测试框架头文件和命名空间
 	    ```
     	#include <gtest/gtest.h>
@@ -364,18 +330,13 @@ subsystem  # 子系统
 	    > **注意：** 与单线程用例标准一致。
 
     5. 测试用例实现，包含用例注释和逻辑实现
-	    ```
-		/**
-		* @tc.number: Factorial_test_001
-		* @tc.name: Query
-		* @tc.desc: test Query function and iid == g_IID_IWeakReferenceSource.
-		*/
 
+	    ```
 		// Step 1:待测函数，返回阶乘结果
 		int factorial(int n)
 		{
 			int result = 1;
-			for (int i = 1; i <= n; i++){
+			for (int i = 1; i <= n; i++) {
 				result *= 1;
 			}
 			printf("Factorial Function Result : %d\n", n, result);
@@ -395,6 +356,8 @@ subsystem  # 子系统
 			EXPECT_EQ(ret, 6);
 		}
 
+		// GTEST_RUN_TASK(TestFunction);创建并执行函数。
+		// GTEST_RUN_TASK会启动TestFunction任务的多线程执行。 
 		// SET_THREAD_NUM(THREAD_NUM);用例中函数设置线程数量。
 		// 同一测试套中可动态设置不同的线程数量。
 		// 未调用SET_THREAD_NUM()时，默认线程数10个。		
@@ -406,11 +369,6 @@ subsystem  # 子系统
 			printf("Factorial_test_001 END\n");
     	}
 
-		/**
-		* @tc.number: Factorial_test_002
-		* @tc.name: Query
-		* @tc.desc: test Query function and iid == g_IID_IWeakReferenceSource.
-		*
 		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)
 		// HWMTEST_F会创建指定数量的线程并执行被测函数。
 		// THREAD_NUM可设置用例执行的线程数量。
@@ -421,7 +379,8 @@ subsystem  # 子系统
 			printf("Factorial_test_002 END\n");
     	}
     	```
-
+		> **注意：** 用例注释与单线程用例标准一致。
+		
 	    在编写用例时，我们提供了四种用例模板供您选择。
 	
 	    |      类型 |    描述 |
