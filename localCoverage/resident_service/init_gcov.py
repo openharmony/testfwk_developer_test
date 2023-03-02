@@ -103,7 +103,7 @@ def modify_faultloggerd_file(developer_path, device_sn, device_ip):
             json_data["jobs"].insert(0, {
                 "name": "pre-init",
                 "cmds": [
-                    "export LD_PRELOAD libgcov_dump_sign.z.so"
+                    "export LD_PRELOAD libcoverage_signal_handler.z.so"
                 ]
             })
             json_str = json.dumps(json_data, indent=4)
