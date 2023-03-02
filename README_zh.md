@@ -349,7 +349,6 @@ subsystem  # 子系统
     	}
 
 		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)
-		// HWMTEST_F新增一个线程数量入参。
 		// THREAD_NUM可设置用例执行的线程数量。
 		// HWMTEST_F会创建指定数量的线程并执行被测函数。
     	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
