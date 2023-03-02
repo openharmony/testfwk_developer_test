@@ -242,25 +242,7 @@ subsystem  # 子系统
 
 	namespace OHOS {
 	namespace AAFwk {
-	class AAFwkBaseObjectTest : public testing::Test {
-	public:
-		static void SetUpTestCase(void);
-		static void TearDownTestCase(void);
-		void SetUp();
-		void TearDown();
-	};
-
-	void AAFwkBaseObjectTest::SetUpTestCase(void)
-	{}
-
-	void AAFwkBaseObjectTest::TearDownTestCase(void)
-	{}
-
-	void AAFwkBaseObjectTest::SetUp(void)
-	{}
-
-	void AAFwkBaseObjectTest::TearDown(void)
-	{}
+    class AAFwkBaseObjectTest : public testing::Test {......}
 
 	// Step 1:待测函数，返回阶乘结果
 	int factorial(int n)
@@ -356,6 +338,7 @@ subsystem  # 子系统
 			EXPECT_EQ(ret, 6);
 		}
 
+		// GTEST_RUN_TASK(TestFunction)多线程启动函数，参数为自定义函数。
 		// 未调用SET_THREAD_NUM()时，默认线程数10个。		
     	HWTEST_F(AAFwkBaseObjectTest, Factorial_test_001, TestSize.Level1)
     	{
@@ -366,8 +349,9 @@ subsystem  # 子系统
     	}
 
 		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)
-		// HWMTEST_F会创建指定数量的线程并执行被测函数。
+		// HWMTEST_F新增一个线程数量入参。
 		// THREAD_NUM可设置用例执行的线程数量。
+		// HWMTEST_F会创建指定数量的线程并执行被测函数。
     	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
     	{
 			printf("Factorial_test_002 BEGIN\n");
