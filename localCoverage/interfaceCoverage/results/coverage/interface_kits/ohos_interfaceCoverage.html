@@ -1,0 +1,1127 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>接口覆盖率邮件模板</title>
+    <style type="text/css">
+        table.reference, table.tecspec {
+            border-collapse: collapse;
+            width: 95%;
+            margin-bottom: 4px;
+            margin-top: 4px;
+            text-align: center;
+        }
+        table.reference tr:nth-child(even) {
+            background-color: #fff;
+        }
+        table.reference tr:nth-child(odd) {
+            background-color: #f6f4f0;
+        }
+        table.reference th {
+            color: #fff;
+            background-color: #14b8c7;
+            border: 1px solid #555;
+            font-size: 18px;
+            padding: 3px;
+            vertical-align: top;
+        }
+        table.reference td {
+            line-height: 1.5em;
+            min-width: 24px;
+            border: 1px solid #d4d4d4;
+            padding: 5px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            vertical-align: top;
+        }
+        .article-body h3 {
+            font-size: 1.8em;
+            margin: 2px 0;
+            line-height: 1.8em;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h2 style="text-align: center;font-family: 微软雅黑">Inner Interface coverage report (2022-08-23)</h2>
+    
+    <div><table align="center"><tbody>
+      <tr>
+          <th><img src="test.png"></th>
+          <th align='left'>
+          <h4 style="font-family: 微软雅黑;">Summary Report</h4>
+          <h4 style="font-family: 微软雅黑;">接口总数147,已覆盖0,未覆盖147</h4>
+      </tr>
+   </tbody>
+   </table>
+   </div>
+    
+        <h4 style="text-align: left;font-family: 微软雅黑;margin-left: 3%;">Summary</h4>
+        <div><table class="reference" align="center"><tbody>
+            <tr>
+                <th style="width:20%;">SubsystemName</th>
+                <th style="width:20%;">TotalCount</th>
+                <th style="width:20%;">CoveredCount</th>
+                <th style="width:20%;">Coverage</th>
+            </tr>
+            <tr class=normal>
+                <td>account</td>
+                <td>147</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr class=normal>
+                <td>Summary</td>
+                <td>147</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        </tbody></table></div>
+        <h4 style="text-align: left;font-family: 微软雅黑;margin-left: 3%;">
+    account details:</h4>
+    </h4><div><table class="reference" align="center"><tbody>
+        <tr>
+            <th>SubsystemName</th>
+            <th>ClassName</th>
+            <th>InterfaceName</th>
+            <th>IsCovered</th>
+        </tr>
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>OsAccountSubscribeInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>OsAccountSubscribeInfo(OS_ACCOUNT_SUBSCRIBE_TYPE &, std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>~OsAccountSubscribeInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>ErrCode GetOsAccountSubscribeType(OS_ACCOUNT_SUBSCRIBE_TYPE &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>ErrCode SetOsAccountSubscribeType(const OS_ACCOUNT_SUBSCRIBE_TYPE &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>ErrCode GetName(std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>ErrCode SetName(const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>bool Marshalling(Parcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscribeInfo</font></td>
+            <td><font>OsAccountSubscribeInfo * Unmarshalling(Parcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscriber</font></td>
+            <td><font>OsAccountSubscriber()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscriber</font></td>
+            <td><font>OsAccountSubscriber(const OsAccountSubscribeInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscriber</font></td>
+            <td><font>~OsAccountSubscriber()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountSubscriber</font></td>
+            <td><font>ErrCode GetSubscribeInfo(OsAccountSubscribeInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode CreateOsAccount(const std::string &, const OsAccountType &, OsAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode CreateOsAccountForDomain(const OsAccountType &, const DomainAccountInfo &, OsAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode RemoveOsAccount(const int)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsOsAccountExists(const int, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsOsAccountActived(const int, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsOsAccountConstraintEnable(const int, const std::string &, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsOsAccountVerified(const int, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetCreatedOsAccountsCount(unsigned int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountLocalIdFromProcess(int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsMainOsAccount(bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountLocalIdFromUid(const int, int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetBundleIdFromUid(const int, int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountLocalIdFromDomain(const DomainAccountInfo &, int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode QueryMaxOsAccountNumber(int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountAllConstraints(const int, std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode QueryAllCreatedOsAccounts(std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode QueryCurrentOsAccount(OsAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode QueryOsAccountById(const int, OsAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountTypeFromProcess(OsAccountType &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountProfilePhoto(const int, std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsMultiOsAccountEnable(bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetOsAccountName(const int, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetOsAccountConstraints(const int, const std::vector &, const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetOsAccountProfilePhoto(const int, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetDistributedVirtualDeviceId(std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode ActivateOsAccount(const int)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode StartOsAccount(const int)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode StopOsAccount(const int)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountLocalIdBySerialNumber(const int64_t, int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetSerialNumberByOsAccountLocalId(const int &, int64_t &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SubscribeOsAccount(const std::shared_ptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode UnsubscribeOsAccount(const std::shared_ptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>OS_ACCOUNT_SWITCH_MOD GetOsAccountSwitchMod()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsCurrentOsAccountVerified(bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode IsOsAccountCompleted(const int, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetCurrentOsAccountIsVerified(const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetOsAccountIsVerified(const int, const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetCreatedOsAccountNumFromDatabase(const std::string &, int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetSerialNumberFromDatabase(const std::string &, int64_t &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetMaxAllowCreateIdFromDatabase(const std::string &, int &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountFromDatabase(const std::string &, const int, OsAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode GetOsAccountListFromDatabase(const std::string &, std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode QueryActiveOsAccountIds(std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode QueryOsAccountConstraintSourceTypes(const int32_t, const std::string, std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetGlobalOsAccountConstraints(const std::vector &, const bool, const int32_t, const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountManager</font></td>
+            <td><font>ErrCode SetSpecificOsAccountConstraints(const std::vector &, const bool, const int32_t, const int32_t, const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DomainAccountInfo</font></td>
+            <td><font>DomainAccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DomainAccountInfo</font></td>
+            <td><font>DomainAccountInfo(const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DomainAccountInfo</font></td>
+            <td><font>void Clear()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>OsAccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>OsAccountInfo(int, const std::string, OsAccountType, int64_t)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>OsAccountInfo(int, std::string, OsAccountType, std::vector, bool, std::string, int64_t, int64_t, int64_t, bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>int GetLocalId()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetLocalId(int)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>std::string GetLocalName()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetLocalName(const std::string)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>OsAccountType GetType()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetType(OsAccountType)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>std::vector GetConstraints()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetConstraints(const std::vector)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool GetIsVerified()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetIsVerified(bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>std::string GetPhoto()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetPhoto(const std::string)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>int64_t GetCreateTime()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetCreateTime(const int64_t)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>int64_t GetLastLoginTime()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetLastLoginTime(const int64_t)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>Json ToJson()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void FromJson(const Json &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool Marshalling(Parcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool ReadFromParcel(Parcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>std::string ToString()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>std::string GetPrimeKey()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>OsAccountInfo * Unmarshalling(Parcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>int64_t GetSerialNumber()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetSerialNumber(const int64_t)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool GetIsActived()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetIsActived(const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool GetIsCreateCompleted()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetIsCreateCompleted(const bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool SetDomainInfo(const DomainAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void GetDomainInfo(DomainAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>bool GetToBeRemoved()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OsAccountInfo</font></td>
+            <td><font>void SetToBeRemoved(bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OhosAccountKits</font></td>
+            <td><font>OhosAccountKits & GetInstance()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>DeviceAccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>DeviceAccountInfo(const std::int32_t, const DeviceAccountType, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>DeviceAccountInfo(const std::int32_t, const DeviceAccountType, const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>~DeviceAccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>bool operator==(const DeviceAccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>std::int32_t WriteDataToParcel(MessageParcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>DeviceAccountInfo</font></td>
+            <td><font>void ReadDataFromParcel(MessageParcel &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OhosAccountInfo</font></td>
+            <td><font>OhosAccountInfo(const std::string &, const std::string &, std::int32_t)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OhosAccountInfo</font></td>
+            <td><font>OhosAccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>OhosAccountInfo</font></td>
+            <td><font>~OhosAccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AccountInfo</font></td>
+            <td><font>AccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AccountInfo</font></td>
+            <td><font>AccountInfo(const std::string &, const std::string &, const std::int32_t &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AccountInfo</font></td>
+            <td><font>bool operator==(const AccountInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AccountInfo</font></td>
+            <td><font>void clear(std::int32_t)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AccountInfo</font></td>
+            <td><font>~AccountInfo()</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode AddAccount(const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode AddAccountImplicitly(const std::string &, const std::string &, const AAFwk::Want &, const sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode DeleteAccount(const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAccountExtraInfo(const std::string &, std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetAccountExtraInfo(const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode EnableAppAccess(const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode DisableAppAccess(const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode CheckAppAccountSyncEnable(const std::string &, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetAppAccountSyncEnable(const std::string &, const bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAssociatedData(const std::string &, const std::string &, std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetAssociatedData(const std::string &, const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAccountCredential(const std::string &, const std::string &, std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetAccountCredential(const std::string &, const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode Authenticate(const std::string &, const std::string &, const std::string &, const AAFwk::Want &, const sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetOAuthToken(const std::string &, const std::string &, const std::string &, std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetOAuthToken(const std::string &, const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode DeleteOAuthToken(const std::string &, const std::string &, const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetOAuthTokenVisibility(const std::string &, const std::string &, const std::string &, bool)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode CheckOAuthTokenVisibility(const std::string &, const std::string &, const std::string &, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAuthenticatorInfo(const std::string &, AuthenticatorInfo &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAllOAuthTokens(const std::string &, const std::string &, std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetOAuthList(const std::string &, const std::string &, std::set &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAuthenticatorCallback(const std::string &, sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAllAccounts(const std::string &, std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode GetAllAccessibleAccounts(std::vector &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode CheckAppAccess(const std::string &, const std::string &, bool &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode DeleteAccountCredential(const std::string &, const std::string &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SelectAccountsByOptions(const SelectAccountsOptions &, const sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode VerifyCredential(const std::string &, const std::string &, const VerifyCredentialOptions &, const sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode CheckAccountLabels(const std::string &, const std::string &, const std::vector &, const sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SetAuthenticatorProperties(const std::string &, const SetPropertiesOptions &, const sptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode SubscribeAppAccount(const std::shared_ptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+        <tr class=normal>
+            <td><font=>account</font></td>
+            <td><font>AppAccountManager</font></td>
+            <td><font>ErrCode UnsubscribeAppAccount(const std::shared_ptr &)</font></td>
+            <td><font color="red">N</font></td>
+        </tr>
+    
+                <tr class='normal' align="center">
+                    <td colspan="4" >TotalCount: 147, CoveredCount:0, Coverage: 0.0%</td>
+                </tr>
+            </tbody></table></div>
+    
+</body>
+</html>
