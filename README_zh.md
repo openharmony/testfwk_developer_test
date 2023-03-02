@@ -267,9 +267,9 @@ subsystem  # 子系统
 	{
 		int result = 1;
 		for (int i = 1; i <= n; i++) {
-			result *= 1;
+			result *= i;
 		}
-		printf("Factorial Function Result : %d\n", n, result);
+		printf("Factorial Function Result : %d! = %d\n", n, result);
 		return result;
 	} 
 
@@ -337,9 +337,9 @@ subsystem  # 子系统
 		{
 			int result = 1;
 			for (int i = 1; i <= n; i++) {
-				result *= 1;
+				result *= i;
 			}
-			printf("Factorial Function Result : %d\n", n, result);
+			printf("Factorial Function Result : %d! = %d\n", n, result);
 			return result;
 		} 
 	
@@ -356,16 +356,12 @@ subsystem  # 子系统
 			EXPECT_EQ(ret, 6);
 		}
 
-		// GTEST_RUN_TASK(TestFunction);创建并执行函数。
-		// GTEST_RUN_TASK会启动TestFunction任务的多线程执行。 
-		// SET_THREAD_NUM(THREAD_NUM);用例中函数设置线程数量。
-		// 同一测试套中可动态设置不同的线程数量。
 		// 未调用SET_THREAD_NUM()时，默认线程数10个。		
     	HWTEST_F(AAFwkBaseObjectTest, Factorial_test_001, TestSize.Level1)
     	{
-			SET_THREAD_NUM(4);
+			SET_THREAD_NUM(4); // 设置线程数量，同一测试套中可动态设置线程数。
 			printf("Factorial_test_001 BEGIN\n");
-			GTEST_RUN_TASK(factorial_test);
+			GTEST_RUN_TASK(factorial_test); // 启动factorial_test任务的多线程执行
 			printf("Factorial_test_001 END\n");
     	}
 
