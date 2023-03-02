@@ -21,6 +21,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import time
 import platform
 import zipfile
@@ -408,13 +409,15 @@ class ResultManager(object):
             "exec"))
 
         target_name = "obj"
+        tests_path = self.config.testcases_path
+        test_type = self.testsuite_path.split(tests_path)[1].strip(os.sep).split(os.sep)[0]
         cxx_cov_path = os.path.abspath(os.path.join(
             self.result_rootpath,
             "..",
             "coverage",
             "data",
             "cxx",
-            self.testsuite_name + '_' + self.config.testtype[0]))
+            self.testsuite_name + '_' + test_type))
 
         if self.is_exist_target_in_device(DEFAULT_TEST_PATH, target_name):
             if not os.path.exists(cxx_cov_path):
@@ -430,8 +433,8 @@ class ResultManager(object):
                 os.remove(tar_path)
             else:
                 subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" %
-                                 (tar_path, cxx_cov_path), shell=True)
-                subprocess.Popen("rm -rf %s" % tar_path, shell=True)
+                                 (tar_path, cxx_cov_path), shell=True).communicate()
+                subprocess.Popen("rm -rf %s" % tar_path, shell=True).communicate()
 
 
 ##############################################################################
@@ -543,7 +546,11 @@ class CppTestDriver(IDriver):
                     test_para)
         else:
             coverage_outpath = self.config.coverage_outpath
-            strip_num = len(coverage_outpath.strip("/").split("/"))
+            if coverage_outpath:
+                strip_num = len(coverage_outpath.strip("/").split("/"))
+            else:
+                root_path = (sys.framework_root_dir.split("test/testfwk/developer_test")[0])
+                strip_num = len(root_path.strip("/").split("/")) + 2
             if "fuzztest" == self.config.testtype[0]:
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage>
+    <item subsystem_name="account" function_count="147" coverage_value="0.0%" />
+    <item subsystem_name="Summary" function_count="147" coverage_value="0.0%" />
+</coverage>

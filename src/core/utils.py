@@ -138,6 +138,11 @@ def parse_device_name(product_form):
     if not json_info:
         return
     device_name = json_info.get('product_device')
+    if not device_name:
+        if product_form.startswith("rk"):
+            device_name = product_form
+        else:
+            device_name = "baltimore"
     return device_name
 
 
