@@ -73,7 +73,8 @@ subsystem  # 子系统
 - 用例源文件命名规范
 
     测试用例源文件名称和测试套内容保持一致，文件命名采用全小写+下划线方式命名，以test结尾，具体格式为：[功能]_[子功能]_test，子功能支持向下细分。
-示例：
+
+单线程示例：
     ```
     calculator_sub_test.cpp
     ```
@@ -222,26 +223,165 @@ subsystem  # 子系统
     	```
 		> **注意：** @tc.require: 格式必须以AR/SR或issue开头： 如：issueI56WJ7
 
-	    在编写用例时，我们提供了三种用例模板供您选择。
+多线程示例：
+    ```
+    base_object_test.cpp
+    ```
+
+- 多线程用例示例
+    ```
+    // 测试用例文件头注释信息及用例注释同单线程用例示例。
+    
+    #include "base_object.h"
+    #include <gtest/gtest.h>
+	#include <gtest/hwext/gtest-multithread.h>
+	#include <unistd.h>
+    
+    using namespace testing::ext;
+    using namespace testing::mt;
+
+	namespace OHOS {
+	namespace AAFwk {
+    class AAFwkBaseObjectTest : public testing::Test {......}
+
+	// Step 1:待测函数，返回阶乘结果
+	int factorial(int n)
+	{
+		int result = 1;
+		for (int i = 1; i <= n; i++) {
+			result *= i;
+		}
+		printf("Factorial Function Result : %d! = %d\n", n, result);
+		return result;
+	} 
+
+	// Step 2:使用断言比较预期与实际结果
+	void factorial_test()
+	{
+		int ret = factorial(3); // 调用函数获取结果
+		std::thread::id this_id = std::this_thread::get_id();
+		std::ostringstream oss;
+		oss << this_id;
+		std::string this_id_str = oss.str();
+		long int thread_id = atol(this_id_str.c_str());
+		printf("running thread...: %ld\n", thread_id); // 输出当前线程的id
+		EXPECT_EQ(ret, 6);
+	}
+
+	HWTEST_F(AAFwkBaseObjectTest, Factorial_test_001, TestSize.Level1)
+	{
+		SET_THREAD_NUM(4);
+		printf("Factorial_test_001 BEGIN\n");
+		GTEST_RUN_TASK(factorial_test);
+		printf("Factorial_test_001 END\n");
+	}
+
+	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
+	{
+		printf("Factorial_test_002 BEGIN\n");
+		factorial_test();
+		printf("Factorial_test_002 END\n");
+	}
+
+	}  // namespace AAFwk
+	}  // namespace OHOS
+
+    ```
+    详细内容介绍：
+    1. 添加测试用例文件头注释信息
+
+		> **注意：** 与单线程用例标准一致。
+
+    2. 引用测试框架头文件和命名空间
+	    ```
+    	#include <gtest/gtest.h>
+    	#include <gtest/hwext/gtest-multithread.h>
+		#include <unistd.h>
+    	using namespace testing::ext;
+   		using namespace testing::mt;
+    	```
+    3. 添加被测试类的头文件
+	    ```
+    	#include "base_object.h"
+    	```
+    4. 定义测试套（测试类）
+	    ```
+    	class AAFwkBaseObjectTest : public testing::Test {......}
+
+    	```
+	    > **注意：** 与单线程用例标准一致。
+
+    5. 测试用例实现，包含用例注释和逻辑实现
+
+	    ```
+		// Step 1:待测函数，返回阶乘结果
+		int factorial(int n)
+		{
+			int result = 1;
+			for (int i = 1; i <= n; i++) {
+				result *= i;
+			}
+			printf("Factorial Function Result : %d! = %d\n", n, result);
+			return result;
+		} 
+	
+		// Step 2:使用断言比较预期与实际结果
+		void factorial_test()
+		{
+			int ret = factorial(3); // 调用函数获取结果
+			std::thread::id this_id = std::this_thread::get_id();
+			std::ostringstream oss;
+			oss << this_id;
+			std::string this_id_str = oss.str();
+			long int thread_id = atol(this_id_str.c_str());
+			printf("running thread...: %ld\n", thread_id); // 输出当前线程的id
+			EXPECT_EQ(ret, 6);
+		}
+
+		// GTEST_RUN_TASK(TestFunction)多线程启动函数，参数为自定义函数。
+		// 未调用SET_THREAD_NUM()时，默认线程数10个。		
+    	HWTEST_F(AAFwkBaseObjectTest, Factorial_test_001, TestSize.Level1)
+    	{
+			SET_THREAD_NUM(4); // 设置线程数量，同一测试套中可动态设置线程数。
+			printf("Factorial_test_001 BEGIN\n");
+			GTEST_RUN_TASK(factorial_test); // 启动factorial_test任务的多线程执行
+			printf("Factorial_test_001 END\n");
+    	}
+
+		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)
+		// THREAD_NUM可设置用例执行的线程数量。
+		// HWMTEST_F会创建指定数量的线程并执行被测函数。
+    	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
+    	{
+			printf("Factorial_test_002 BEGIN\n");
+			factorial_test();
+			printf("Factorial_test_002 END\n");
+    	}
+    	```
+		> **注意：** 用例注释与单线程用例标准一致。
+		
+	    在编写用例时，我们提供了四种用例模板供您选择。
 	
 	    |      类型 |    描述 |
     	| ------------| ------------|
     	| HWTEST(A,B,C)| 用例执行不依赖Setup&Teardown时，可选取|
     	| HWTEST_F(A,B,C)| 用例执行(不含参数)依赖于Setup&Teardown时，可选取|
+		| HWMTEST_F(A,B,C,D)| 多线程用例执行依赖于Setup&Teardown时，可选取|
     	| HWTEST_P(A,B,C)| 用例执行(含参数)依赖于Set&Teardown时，可选取|
 
-	    其中，参数A，B，C的含义如下：
+	    其中，参数A，B，C，D的含义如下：
 	- 参数A为测试套名。
 	- 参数B为测试用例名，其命名必须遵循[功能点]_[编号]的格式，编号为3位数字，从001开始。
 	- 参数C为测试用例等级，具体分为门禁level0 以及非门禁level1-level4共五个等级，其中非门禁level1-level4等级的具体选取规则为：测试用例功能越重要，level等级越低。
+	- 参数D为多线程用例执行的线程数量设置。
 
 	    **注意：**
 	- 测试用例的预期结果必须有对应的断言。
 	- 测试用例必须填写用例等级。
 	- 测试体建议按照模板分步实现。
 	- 用例描述信息按照标准格式@tc.xxx value书写，注释信息必须包含用例名称，用例描述，用例类型，需求编号四项。其中用例测试类型@tc.type参数的选取，可参考下表。
-
-	    | 测试类型名称|类型编码|
+	- 如使用HWMTEST_F编写多线程执行用例，必须填线程数量。
+	    | 测试类型名称|类型编码| 
     	| ------------|------------|
     	|功能测试      |FUNC|
         |性能测试      |PERF|
