@@ -73,6 +73,7 @@ subsystem  # 子系统
 - 用例源文件命名规范
 
     测试用例源文件名称和测试套内容保持一致，文件命名采用全小写+下划线方式命名，以test结尾，具体格式为：[功能]_[子功能]_test，子功能支持向下细分。
+
 单线程示例：
     ```
     calculator_sub_test.cpp
@@ -409,7 +410,8 @@ subsystem  # 子系统
 		* @tc.name: Query
 		* @tc.desc: test Query function and iid == g_IID_IWeakReferenceSource.
 		*
-		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)，THREAD_NUM可设置用例执行的线程数量。
+		// HWMTEST_F(TEST_SUITE, TEST_TC, TEST_LEVEL, THREAD_NUM)宏的作用是创建一个多线程测试用例，宏定义的内部可调用需要被测试的函数。
+		// THREAD_NUM可设置用例执行的线程数量，宏定义会创建指定数量的线程并执行被测函数。
     	HWMTEST_F(AAFwkBaseObjectTest, Factorial_test_002, TestSize.Level1, 6)
     	{
 			printf("Factorial_test_002 BEGIN\n");
@@ -438,7 +440,7 @@ subsystem  # 子系统
 	- 测试用例必须填写用例等级。
 	- 测试体建议按照模板分步实现。
 	- 用例描述信息按照标准格式@tc.xxx value书写，注释信息必须包含用例名称，用例描述，用例类型，需求编号四项。其中用例测试类型@tc.type参数的选取，可参考下表。
-	- HWMTEST_F宏的作用是创建一个多线程测试用例，宏定义的内部可调用需要被测试的函数，线程数量由宏定义的第四个参数THREAD_NUM指定，宏定义会创建指定数量的线程并执行被测函数。
+	- 如使用HWMTEST_F编写多线程执行用例，必须填线程数量。
 	    | 测试类型名称|类型编码| 
     	| ------------|------------|
     	|功能测试      |FUNC|
