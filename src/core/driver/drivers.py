@@ -549,8 +549,11 @@ class CppTestDriver(IDriver):
             if coverage_outpath:
                 strip_num = len(coverage_outpath.strip("/").split("/"))
             else:
-                root_path = (sys.framework_root_dir.split("test/testfwk/developer_test")[0])
-                strip_num = len(root_path.strip("/").split("/")) + 2
+                ohos_config_path = os.path.join(sys.source_code_root_path, "ohos_config.json")
+                with open(ohos_config_path, 'r') as json_file:
+                    json_info = json.load(json_file)
+                    out_path = json_info.get("out_path")
+                strip_num = len(out_path.strip("/").split("/"))
             if "fuzztest" == self.config.testtype[0]:
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \

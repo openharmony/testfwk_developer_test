@@ -57,10 +57,12 @@ def call(cmd_list, is_show_cmd=False, out=None, err=None):
 def execute_command(command, printflag=False):
     try:
         cmd_list = shlex.split(command)
-        with open("coverage.log", 'a') as fd:
+        coverage_log_path = os.path.join(
+            CODEPATH, "/test/testfwk/developer_test/localCoverage", "coverage.log")
+        with open(coverage_log_path, 'a') as fd:
             call(cmd_list, printflag, fd, fd)
-    except IOError as err:
-        print("Error: Exception occur in open  err")
+    except IOError:
+        print("Error: Exception occur in open err")
 
 
 def get_subsystem_config_info():

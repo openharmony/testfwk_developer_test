@@ -1134,6 +1134,53 @@ reports/platform_log_xxxx_xx_xx_xx_xx_xx.log
 reports/latest
 ```
 
+### 覆盖率用户指导
+1. (可选执行)为了屏蔽非核心代码产生的冗余分支数据，可以在源码编译之前进入/test/testfwk/developer_test/localCoverage/restore_comment目录下执行：
+
+       python3 build_before_generate.py
+
+   选择对应的部件，执行命令例如：
+
+       run -tp partname
+       run -tp partname1 partname2
+2. 编译版本之前首先修改编译选项，涉及到自己子系统的build.gn文件cflags或者cflags_cc及idflags选项都需要加--coverage字段：
+       
+       idflags = [ "--coverage" ]
+       C:   cflags = [ "--coverage" ]
+       C++: cflags_cc = [ "--coverage" ]
+            
+**推荐：**     也可以参考窗口子系统的方式（推荐这种方式），参考链接：https://gitee.com/openharmony/window_window_manager/pulls/1274/files
+3. 执行覆盖率需要安装以下依赖包：
+   
+       1）安装lcov.
+       2）安装dos2unix, 安装命令：apt install dos2unix.
+
+4. 远程映射设备，修改usr_config.xml中的ip号，设备映射方式查看上面介绍的远程端口映射，
+
+```
+    <!-- 配置远程映射机器的IP(设备挂载的pc的ip) -->
+    <device type="usb-hdc">
+      <ip></ip>
+      <port></port>
+      <sn></sn>
+    </device>
+```
+5. 执行
+
+   ./start.sh
+
+       命令例如下：
+       run -t UT -tp 部件名 -cov coverage
+       run -t UT -ss 子系统名 -cov coverage
+       run -t UT -ss 子系统名 -tp 部件名 -cov coverage
+       run -t UT MST ST -tp 部件名 -cov coverage
+
+> **注意：** 必须添加 -cov coverage 参数
+
+6. 覆盖率报告路径
+
+/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html
+
 ### 涉及仓
 
 [test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice)
@@ -1144,7 +1191,7 @@ reports/latest
 | ---------- | ------------------------------------------------------------ |
 | 3.2.1.0    | 1、增加框架对接执行ACTS测试用例能力<br />2、增加ACTS多种颗粒度执行能力，如子系统、部件等 |
 | 3.2.2.0    | 1、增加测试任务统计能力，最多统计10个任务<br />2、增加按照指定测试任务ID执行测试任务能力<br />3、增加复测上次任务失败用例能力 |
-
+| 3.2.3.0 | 1、增加覆盖率执行<br />                           |
 
 
 

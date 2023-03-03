@@ -126,6 +126,15 @@ def scan_support_product():
     return productform_list
 
 
+def get_output_path():
+    # 获取输出路径
+    ohos_config_path = os.path.join(sys.source_code_root_path, "ohos_config.json")
+    with open(ohos_config_path, 'r') as json_file:
+        json_info = json.load(json_file)
+        out_name = json_info.get("out_path").split("out")[1].strip("/")
+    return out_name
+
+
 def parse_device_name(product_form):
     device_json_file = os.path.join(sys.source_code_root_path,
                                     "productdefine", "common", "products",
@@ -139,10 +148,7 @@ def parse_device_name(product_form):
         return
     device_name = json_info.get('product_device')
     if not device_name:
-        if product_form.startswith("rk"):
-            device_name = product_form
-        else:
-            device_name = "baltimore"
+        device_name = get_output_path()
     return device_name
 
 
