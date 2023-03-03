@@ -117,10 +117,11 @@ def get_subsystem_name(test_part_list, product_name):
 
 
 def generate_product_name(root_path):
-    # 获取产品形态
-    out_path = os.path.join(root_path, "out")
-    _, gcno_path = subprocess.getstatusoutput("find %s -name '*.gcno' | head -n 1" % out_path)
-    product_name = gcno_path.split(out_path)[1].strip("/").split("/")[0]
+    # 获取输出路径
+    ohos_config_path = os.path.join(root_path, "ohos_config.json")
+    with open(ohos_config_path, 'r') as json_file:
+        json_info = json.load(json_file)
+        product_name = json_info.get("out_path").split("out")[1].strip("/")
     return product_name
 
 
@@ -176,4 +177,4 @@ if __name__ == '__main__':
     subprocess.run("python3 %s" % restore_source_code_path, shell=True)
 
     print(r"See the code coverage report in: "
-          r"\test\testfwk\developer_test\localCoverage\codeCoverage\results\coverage\reports\cxx\html")
+          r"/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
