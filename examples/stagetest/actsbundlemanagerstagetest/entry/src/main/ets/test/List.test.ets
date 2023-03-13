@@ -14,9 +14,6 @@
  */
 
 import getProfileByAbility from './GetProfileByAbility.test.ets';
-import getProfileByExtensionAbility from './GetProfileByExtensionAbility.test.ets';
-import getBundleInfoForSelf from './GetBundleInfoForSelf.test.ets';
-import getSecondModuleTest from './GetSecondModule.test.ets';
 
 export default function testsuite() {
   getProfileByAbility();

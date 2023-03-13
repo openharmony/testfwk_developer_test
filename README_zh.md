@@ -524,12 +524,12 @@ subsystem  # 子系统
 
 **Fuzz测试**
 
-[Fuzz用例编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/fuzzlib/README_zh.md)
+[Fuzz用例编写规范](https://gitee.com/openharmony/testfwk_developer_test/blob/master/libs/fuzzlib/README_zh.md)
 
 
 **Benchmark测试**
 
-[Benchmark用例编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/benchmark/README_zh.md)
+[Benchmark用例编写规范](https://gitee.com/openharmony/testfwk_developer_test/blob/master/libs/benchmark/README_zh.md)
 
 
 #### 测试用例编译文件编写
@@ -817,15 +817,6 @@ subsystem  # 子系统
     }
     ```
     > **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
-
-**Fuzz测试**
-
-[Fuzz编译文件编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/fuzzlib/README_zh.md)
-
-**Benchmark测试**
-
-[Benchmark编译文件编写规范](https://gitee.com/openharmony/test_developertest/blob/master/libs/benchmark/README_zh.md)
-      
 
 **编译入口配置文件ohos.build**
 
