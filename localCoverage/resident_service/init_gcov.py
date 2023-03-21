@@ -81,11 +81,10 @@ def modify_faultloggerd_file(developer_path, device_sn, device_ip):
     hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
     _, enforce = subprocess.getstatusoutput("%s shell getenforce" % hdc_str)
     if_reboot = False
+    print("%s shell mount -o rw,remount /" % hdc_str)
+    subprocess.Popen("%s shell mount -o rw,remount /" % hdc_str, shell=True).communicate()
     if enforce != "Permissive":
         if_reboot = True
-        print("%s shell mount -o rw,remount /" % hdc_str)
-        subprocess.Popen("%s shell mount -o rw,remount /" % hdc_str,
-                         shell=True).communicate()
         subprocess.Popen("%s shell sed -i 's/enforcing/permissive/g' /system/etc/selinux/config" % hdc_str,
                          shell=True).communicate()
 
