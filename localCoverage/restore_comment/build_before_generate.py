@@ -53,12 +53,11 @@ def get_source_file_list(path):
     file_path_list = []
     file_path_list_append = file_path_list.append
     for root, dirs, files in os.walk(path):
-        if files:
-            for file_name in files:
-                file_path = os.path.join(root, file_name)
-                _, suffix = os.path.splitext(file_name)
-                if suffix in [".c", ".h", ".cpp"]:
-                    file_path_list_append(file_path)
+        for file_name in files:
+            file_path = os.path.join(root, file_name)
+            _, suffix = os.path.splitext(file_name)
+            if suffix in [".c", ".h", ".cpp"]:
+                file_path_list_append(file_path)
     return file_path_list
 
 
