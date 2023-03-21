@@ -360,4 +360,4 @@ The Python environment is required.
 
 **test\_developertest**
 
-[test\_xdevice](https://gitee.com/openharmony/test_xdevice/blob/master/README.md)
+[test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice/blob/master/README.md)

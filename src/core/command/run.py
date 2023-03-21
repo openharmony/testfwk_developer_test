@@ -187,9 +187,6 @@ class Run(object):
             options.resource_path = self.get_xts_tests_out_path(options.productform, options.testtype)
         else:
             test_dict = self.get_test_dict(options)
-        
-        for key in test_dict:
-            random.shuffle(test_dict[key])
 
         if not self._check_test_dictionary(test_dict):
             LOG.error("The test file list is empty.")
