@@ -710,14 +710,13 @@ class JSUnitTestDriver(IDriver):
     def __execute__(self, request):
         try:
             LOG.info("developertest driver")
-            self.result = os.path.join(
-                request.config.report_path, "result",
-                '.'.join((request.get_module_name(), "xml")))
             self.config = request.config
             self.config.target_test_path = DEFAULT_TEST_PATH
             self.config.device = request.config.environment.devices[0]
 
             suite_file = request.root.source.source_file
+            result_save_path = get_result_savepath(suite_file, self.config.report_path)
+            self.result = os.path.join(result_save_path, "%s.xml" % request.get_module_name())
             if not suite_file:
                 LOG.error("test source '%s' not exists" %
                           request.root.source.source_string)
@@ -755,6 +754,10 @@ class JSUnitTestDriver(IDriver):
                 self._run_jsunit(suite_file, self.hilog)
                 hilog_file_pipe.flush()
                 self.generate_console_output(self.hilog, request)
+                xml_path = os.path.join(
+                    request.config.report_path, "result",
+                    '.'.join((request.get_module_name(), "xml")))
+                shutil.move(xml_path, self.result)
         finally:
             self.config.device.device_log_collector.remove_log_address(None, self.hilog)
             self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
