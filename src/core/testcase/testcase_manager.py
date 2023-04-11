@@ -112,7 +112,7 @@ class TestCaseManager(object):
                 if file_name in filter_list_test_file:
                     continue
 
-                _, suffix_name = os.path.splitext(file_name)
+                prefix_name, suffix_name = os.path.splitext(file_name)
                 if suffix_name in FILTER_SUFFIX_NAME_LIST:
                     continue
 
