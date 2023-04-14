@@ -25,10 +25,12 @@ import platform
 
 from xdevice import platform_logger
 from core.utils import get_build_output_path
+from core.utils import get_output_path
 from core.utils import scan_support_product
 from core.common import is_open_source_product
 from core.config.config_manager import UserConfigManager
 
+BUILD_FILE_PATH = "./build_system.sh"
 BUILD_FILEPATH = "./build.sh"
 BUILD_LITE = "build/lite/build.py"
 BUILD_TARGET_PLATFORM = "build_platform=\"%s\""
@@ -184,8 +186,12 @@ class BuildTestcases(object):
         current_path = os.getcwd()
         os.chdir(self.project_rootpath)
 
-        command.append("--product-name")
-        command.append(productform)
+        if productform == "rk3568":
+            command.append("--product-name")
+            command.append(productform)
+        else:
+            global BUILD_FILEPATH
+            BUILD_FILEPATH = BUILD_FILE_PATH
 
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
@@ -206,8 +212,12 @@ class BuildTestcases(object):
         current_path = os.getcwd()
         os.chdir(self.project_rootpath)
 
-        command.append("--product-name")
-        command.append(productform)
+        if productform == "rk3568":
+            command.append("--product-name")
+            command.append(productform)
+        else:
+            global BUILD_FILEPATH
+            BUILD_FILEPATH = BUILD_FILE_PATH
 
         if os.path.exists(BUILD_FILEPATH):
             build_deps_files_command = [BUILD_FILEPATH]
@@ -229,9 +239,12 @@ class BuildTestcases(object):
         current_path = os.getcwd()
         #路径 deps_files_path = ~/OpenHarmony/out/baltimore/deps_files
         os.chdir(self.project_rootpath)
-        deps_files_path = os.path.abspath(os.path.join(
-            get_build_output_path(para.productform),
-            "deps_files"))
+        if para.productform == "rk3568":
+            deps_files_path = os.path.abspath(os.path.join(
+                get_build_output_path(para.productform), "deps_files"))
+        else:
+            deps_files_path = os.path.abspath(os.path.join(
+                get_output_path(),"deps_files"))
         LOG.info("deps_files_path: %s" % deps_files_path)
         build_part_deps_command.append(self.part_deps_path)
         build_part_deps_command.append("--deps-files-path")
@@ -311,17 +324,16 @@ class BuildTestcases(object):
             for test in target.split(','):
                 command.append("--build-target")
                 command.append(test)
-        target_cpu = self.build_parameter_dic.get("target_cpu")
-        if target_cpu == "arm64":
-            if productform == "m40":
-                command.append("--gn-args")
-                command.append("use_musl=false")
-                command.append("--gn-args")
-                command.append("use_custom_libcxx=true")
-                command.append("--gn-args")
-                command.append("use_custom_clang=true")
-            command.append("--target-cpu")
-            command.append(target_cpu)
+
+        if productform == "rk3568":
+            pass
+        else:
+            command.append("--abi-type")
+            command.append("generic_generic_arm_64only")
+            command.append("--device-type")
+            command.append("hisi_newbaltimore_newphone_standard")
+            command.append("--build-variant")
+            command.append("root")
         command.append("--ccache")
         self._delete_testcase_dir(productform)
         build_result = self._execute_build_command(productform, command)
@@ -335,18 +347,17 @@ class BuildTestcases(object):
         return build_result
 
     def build_deps_files(self, productform):
-        command = []
-        command.append("--ccache")
-        command.append("--gn-args")
-        command.append("pycache_enable=true")
-        command.append("--gn-args")
-        command.append("check_deps=true")
-        command.append("--build-only-gn")
-        target_cpu = self.build_parameter_dic.get("target_cpu")
-        if target_cpu == "arm64":
-            if productform == "m40":
-                command.append("--target-cpu")
-                command.append(target_cpu)
+        command = ["--ccache", "--gn-args", "pycache_enable=true", "--gn-args",
+                   "check_deps=true", "--build-only-gn"]
+        if productform == "rk3568":
+            pass
+        else:
+            command.append("--abi-type")
+            command.append("generic_generic_arm_64only")
+            command.append("--device-type")
+            command.append("hisi_newbaltimore_newphone_standard")
+            command.append("--build-variant")
+            command.append("root")
         return self._execute_build_deps_files_command(productform, command)
 
     #部件间依赖关系预处理，生成part_deps_info.json
