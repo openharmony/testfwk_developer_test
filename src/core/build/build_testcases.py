@@ -237,14 +237,14 @@ class BuildTestcases(object):
         build_part_deps_result = False
         build_part_deps_command = []
         current_path = os.getcwd()
-        #路径 deps_files_path = ~/OpenHarmony/out/baltimore/deps_files
+        # 路径 deps_files_path = ~/OpenHarmony/out/baltimore/deps_files
         os.chdir(self.project_rootpath)
         if para.productform == "rk3568":
             deps_files_path = os.path.abspath(os.path.join(
                 get_build_output_path(para.productform), "deps_files"))
         else:
             deps_files_path = os.path.abspath(os.path.join(
-                get_output_path(),"deps_files"))
+                "out", get_output_path(), "deps_files"))
         LOG.info("deps_files_path: %s" % deps_files_path)
         build_part_deps_command.append(self.part_deps_path)
         build_part_deps_command.append("--deps-files-path")
@@ -268,9 +268,9 @@ class BuildTestcases(object):
         current_path = os.getcwd()
         # eg.路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
         xts_project_rootpath = os.path.join(sys.source_code_root_path,
-                                                 "test",
-                                                 "xts",
-                                                 para.testtype[0])
+                                            "test",
+                                            "xts",
+                                            para.testtype[0])
         os.chdir(xts_project_rootpath)
         xts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
         xts_build_command.append("system_size=standard")
@@ -360,11 +360,11 @@ class BuildTestcases(object):
             command.append("root")
         return self._execute_build_deps_files_command(productform, command)
 
-    #部件间依赖关系预处理，生成part_deps_info.json
+    # 部件间依赖关系预处理，生成part_deps_info.json
     def build_part_deps(self, para):
         build_part_deps_result = self._execute_build_part_deps_command(para)
         return build_part_deps_result
-        
+
     def build_gn_file(self, productform):
         command = []
         if self.is_build_example:
