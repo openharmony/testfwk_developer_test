@@ -176,5 +176,9 @@ if __name__ == '__main__':
         developer_path, "localCoverage/restore_comment/restore_source_code.py")
     subprocess.run("python3 %s" % restore_source_code_path, shell=True)
 
+    keyword_path = os.path.join(
+        developer_path, "localCoverage/keyword_registration/keyword_filter.py")
+    subprocess.run("python3 %s" % keyword_path, shell=True)
+
     print(r"See the code coverage report in: "
           r"/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")

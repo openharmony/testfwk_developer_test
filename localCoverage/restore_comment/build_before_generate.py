@@ -84,12 +84,14 @@ def rewrite_source_file(source_path_list: list):
                 for key in keys:
                     if key in line and line.strip().startswith(key):
                         write_fp.write(line)
+                        break
                     elif " //LCOV_EXCL_BR_LINE" not in line and not line.strip().endswith("\\"):
                         write_fp.write(line.strip("\n").strip("\n\r") + " //LCOV_EXCL_BR_LINE")
                         write_fp.write("\n")
-                    else:
+                        break
+                    elif key == keys[-1]:
                         write_fp.write(line)
-                    break
+                        break
 
             os.remove(path)
             subprocess.Popen("mv %s %s" % (f"{source_dir}_bk.{suffix_name}", path),
