@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # 获取子系统部件与服务的关系
     system_info_dict, services_component_dict, component_gcda_dict = get_server_dict(command_str)
 
-    device_ip, sn = get_config_ip(os.path.join(developer_path, "config/user_config.xml"))
+    device_ip, _, sn = get_config_ip(os.path.join(developer_path, "config/user_config.xml"))
     device_sn_list = []
     if sn:
         device_sn_list.extend(sn.replace(" ", "").split(";"))
