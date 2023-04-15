@@ -194,7 +194,7 @@ if __name__ == '__main__':
     home_path = '/'.join(root_path.split("/")[:3])
 
     # 获取user_config中的device ip
-    device_ip, sn = get_config_ip(os.path.join(developer_path, "config/user_config.xml"))
+    device_ip, _, sn = get_config_ip(os.path.join(developer_path, "config/user_config.xml"))
     device_sn_list = []
     if sn:
         device_sn_list.extend(sn.replace(" ", "").split(";"))

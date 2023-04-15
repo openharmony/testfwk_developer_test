@@ -25,6 +25,7 @@ import xml.etree.ElementTree as ET
 def get_config_ip(filepath):
     ip_config = ""
     sn = ""
+    port = ""
     try:
         data_dic = {}
         if os.path.exists(filepath):
@@ -37,10 +38,11 @@ def get_config_ip(filepath):
                     data_dic[sub.tag] = sub.text if sub.text else ""
                 ip_config = data_dic.get("ip", "")
                 sn = data_dic.get("sn", "")
+                port = data_dic.get("port", "")
     except ET.ParseError as xml_exception:
         print("occurs exception:{}".format(xml_exception.args))
 
-    return ip_config, sn
+    return ip_config, port, sn
 
 
 def get_sn_list(command):
