@@ -21,13 +21,8 @@ import sys
 
 
 def _init_sys_config():
-    import os
-    import sys
-
-    current_path = os.path.abspath(os.path.dirname(__name__))
     sys.localcoverage_path = os.path.join(current_path, "..")
     sys.path.insert(0, sys.localcoverage_path)
-
 
 
 def find_part_so_dest_path(test_part: str) -> str:
@@ -108,11 +103,12 @@ def push_coverage_so(so_dict: dict):
 
 
 if __name__ == "__main__":
+    current_path = os.path.abspath(os.path.dirname(__name__))
+
     _init_sys_config()
     from localCoverage.resident_service.public_method import get_config_ip, get_sn_list
     from localCoverage.utils import get_product_name, hdc_command, tree_find_file_endswith, json_parse, logger
 
-    current_path = os.path.abspath(os.path.dirname(__name__))
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     out_path = os.path.join(root_path, "out", get_product_name(root_path))
     developer_path = os.path.join(root_path, "test", "testfwk", "developer_test")
