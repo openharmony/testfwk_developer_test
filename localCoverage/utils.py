@@ -33,7 +33,7 @@ def json_parse(json_file):
             return json.load(jf)
 
     logger("{} not exist.".format(json_file), "ERROR")
-    return
+    return {}
 
 
 def get_product_name(root_path):
@@ -44,11 +44,11 @@ def get_product_name(root_path):
         return product_name
 
     logger("{} not exist.".format(ohos_config), "ERROR")
-    return
+    return ""
 
 
 def shell_command(command):
-    process = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True)
+    process = Popen(command, stdout=PIPE, stderr=STDOUT)
     with process.stdout:
         for line in iter(process.stdout.readline, b""):
             logger(line.decode().strip(), "INFO")
@@ -64,7 +64,7 @@ def hdc_command(device_ip, device_port, device_sn, command):
     return exitcode
 
 
-def tree_find_file_endswith(path, suffix, file_list=[]):
+def tree_find_file_endswith(path, suffix, file_list=None):
     for f in os.listdir(path):
         full_path = os.path.join(path, f)
         if os.path.isfile(full_path) and full_path.endswith(suffix):
