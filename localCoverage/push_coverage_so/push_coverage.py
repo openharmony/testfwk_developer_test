@@ -24,34 +24,24 @@ sys.path.append(os.path.join(current_path, ".."))
 from localCoverage.resident_service.public_method import get_config_ip, get_sn_list
 from localCoverage.utils import get_product_name, hdc_command, tree_find_file_endswith, json_parse, logger
 
-root_path = current_path.split("/test/testfwk/developer_test")[0]
-out_path = os.path.join(root_path, "out", get_product_name(root_path))
-developer_path = os.path.join(root_path, "test", "testfwk", "developer_test")
-device_ip, device_port, device_sn_strs = get_config_ip(os.path.join(developer_path, "config", "user_config.xml"))
-if not device_port:
-    device_port = "8710"
-device_sn_list = device_sn_strs.split(";")
-if not device_sn_list:
-    device_sn_list = get_sn_list("hdc -s {}:{} list targets".format(device_ip, device_port))
 
-
-def find_part_so_dest_path(testpart: str) -> str:
+def find_part_so_dest_path(test_part: str) -> str:
     parts_info_json = os.path.join(out_path, "build_configs", "parts_info", "parts_path_info.json")
     if not os.path.exists(parts_info_json):
         logger("{} not exists.".format(parts_info_json), "ERROR")
         return ""
     json_obj = json_parse(parts_info_json)
     if json_obj:
-        if testpart not in json_obj:
-            logger("{} part not exist in {}.".format(testpart, parts_info_json), "ERROR")
+        if test_part not in json_obj:
+            logger("{} part not exist in {}.".format(test_part, parts_info_json), "ERROR")
             return ""
-        path = os.path.join(out_path, "obj", json_obj[testpart])
+        path = os.path.join(out_path, "obj", json_obj[test_part])
         return path
 
     return ""
 
 
-def find_subsystem_so_dest_path(subsystem: str) -> list:
+def find_subsystem_so_dest_path(sub_system: str) -> list:
     subsystem_config_json = os.path.join(out_path, "build_configs", "subsystem_info", "subsystem_build_config.json")
     if not os.path.exists(subsystem_config_json):
         logger("{} not exists.".format(subsystem_config_json), "ERROR")
@@ -59,15 +49,15 @@ def find_subsystem_so_dest_path(subsystem: str) -> list:
 
     json_obj = json_parse(subsystem_config_json)
     if json_obj:
-        if subsystem not in json_obj["subsystem"]:
-            logger("{} not exist in subsystem_build_config.json".format(subsystem), "ERROR")
+        if sub_system not in json_obj["subsystem"]:
+            logger("{} not exist in subsystem_build_config.json".format(sub_system), "ERROR")
             return []
-        if "path" not in json_obj["subsystem"][subsystem]:
-            logger("{} no path in subsystem_build_config.json".format(subsystem), "ERROR")
+        if "path" not in json_obj["subsystem"][sub_system]:
+            logger("{} no path in subsystem_build_config.json".format(sub_system), "ERROR")
             return []
 
         path = list()
-        for s in json_obj["subsystem"][subsystem]["path"]:
+        for s in json_obj["subsystem"][sub_system]["path"]:
             path.append(os.path.join(out_path, "obj", s))
         return path
 
@@ -114,6 +104,16 @@ def push_coverage_so(so_dict: dict):
 
 
 if __name__ == "__main__":
+    root_path = current_path.split("/test/testfwk/developer_test")[0]
+    out_path = os.path.join(root_path, "out", get_product_name(root_path))
+    developer_path = os.path.join(root_path, "test", "testfwk", "developer_test")
+    device_ip, device_port, device_sn_strs = get_config_ip(os.path.join(developer_path, "config", "user_config.xml"))
+    if not device_port:
+        device_port = "8710"
+    device_sn_list = device_sn_strs.split(";")
+    if not device_sn_list:
+        device_sn_list = get_sn_list("hdc -s {}:{} list targets".format(device_ip, device_port))
+
     subsystem_list, testpart_list = [], []
     param = sys.argv[1]
     if param.split("=")[0] == "testpart":
