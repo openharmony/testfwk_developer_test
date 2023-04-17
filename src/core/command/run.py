@@ -56,6 +56,20 @@ class Run(object):
     def process_command_run(self, command, options):
         current_raw_cmd = ",".join(list(map(str, options.current_raw_cmd.split(" "))))
         if options.coverage and platform.system() != "Windows":
+            push_cov_path = os.path.join(sys.framework_root_dir, "localCoverage/push_coverage_so/push_coverage.py")
+            if os.path.exists(push_cov_path):
+                if str(options.testpart) == "[]" and str(options.subsystem) == "[]":
+                    LOG.info("No subsystem or testpart input, no need push coverage so.")
+                else:
+                    if str(options.testpart) != "[]":
+                        param = "testpart=" + str(options.testpart)
+                    else:
+                        param = "subsystem=" + str(options.subsystem)
+                    subprocess.run("python3 {} {}".format(
+                        push_cov_path, param), shell=True)
+            else:
+                print(f"{push_cov_path} not exists.")
+
             init_gcov_path = os.path.join(sys.framework_root_dir, "localCoverage/resident_service/init_gcov.py")
             if os.path.exists(init_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (
@@ -344,14 +358,10 @@ class Run(object):
                 if is_open_source_product(product_form):
                     testcase_path = os.path.abspath(os.path.join(
                         get_build_output_path(product_form),
-                        "packages",
-                        "phone",
                         "tests"))
                 else:
                     testcase_path = os.path.abspath(os.path.join(
                         get_build_output_path(product_form),
-                        "packages",
-                        product_form,
                         "tests"))
             else:
                 testcase_path = os.path.join(
