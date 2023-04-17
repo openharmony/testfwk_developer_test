@@ -93,14 +93,13 @@ def push_coverage_so(so_dict: dict):
         hdc_command(device_ip, device_port, device, cmd)
         for source_path, dest_paths in so_dict.items():
             full_source = os.path.join(out_path, source_path)
-            if os.path.exists(full_source):
-                for dest_path in dest_paths:
-                    full_dest = os.path.join("/", dest_path)
-                    command = "file send {} {}".format(full_source, full_dest)
-
-                    hdc_command(device_ip, device_port, device, command)
-            else:
+            if not os.path.exists(full_source):
                 logger("{} not exist.".format(full_source), "ERROR")
+                continue
+            for dest_path in dest_paths:
+                full_dest = os.path.join("/", dest_path)
+                command = "file send {} {}".format(full_source, full_dest)
+                hdc_command(device_ip, device_port, device, command)
 
 
 if __name__ == "__main__":
