@@ -21,9 +21,11 @@ import json
 import time
 from subprocess import Popen, PIPE, STDOUT
 
+
 def logger(info, level):
     create_time = "{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
     print("[{}] [{}] [{}]".format(create_time, level, info))
+
 
 def json_parse(json_file):
     if os.path.exists(json_file):
