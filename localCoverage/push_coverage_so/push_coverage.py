@@ -116,9 +116,10 @@ if __name__ == "__main__":
     device_ip, device_port, device_sn_strs = get_config_ip(os.path.join(developer_path, "config", "user_config.xml"))
     if not device_port:
         device_port = "8710"
-    device_sn_list = device_sn_strs.split(";")
-    if not device_sn_list:
+    if not device_sn_strs:
         device_sn_list = get_sn_list("hdc -s {}:{} list targets".format(device_ip, device_port))
+    else:
+        device_sn_list = device_sn_strs.split(";")
 
     subsystem_list, testpart_list = [], []
     param = sys.argv[1]
