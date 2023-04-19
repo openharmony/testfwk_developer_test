@@ -47,8 +47,8 @@ def get_product_name(root_path):
     return ""
 
 
-def shell_command(command):
-    process = Popen(command, stdout=PIPE, stderr=STDOUT)
+def shell_command(command_list: list):
+    process = Popen(command_list, stdout=PIPE, stderr=STDOUT)
     with process.stdout:
         for line in iter(process.stdout.readline, b""):
             logger(line.decode().strip(), "INFO")
@@ -59,8 +59,9 @@ def shell_command(command):
 def hdc_command(device_ip, device_port, device_sn, command):
     connect_cmd = "hdc -s {}:{} -t {} ".format(device_ip, device_port, device_sn)
     cmd = connect_cmd + command
-    logger(cmd, "INFO")
-    _, exitcode = shell_command(cmd)
+    cmd_list = cmd.split(" ")
+    logger(cmd_list, "INFO")
+    _, exitcode = shell_command(cmd_list)
     return exitcode
 
 
