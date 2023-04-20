@@ -74,8 +74,7 @@ def get_all_part_service():
             services_component_dict = system_text_json["services_component_dict"]
             component_gcda_dict = system_text_json["component_gcda_dict"]
             return system_info_dict, services_component_dict, component_gcda_dict
-    else:
-        print("%s not exists.", system_part_service_path)
+    print("%s not exists.", system_part_service_path)
 
 
 def get_system_dict_to_server_name(server_name: str, system_info_dict):

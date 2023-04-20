@@ -23,8 +23,6 @@ import shutil
 import shlex
 import subprocess
 import sys
-sys.path.append("..")
-from localCoverage.coverage_tools import generate_product_name
 
 # 代码根目录
 root_path = os.getcwd()
@@ -37,8 +35,11 @@ COVERAGE_GCDA_RESULTS = "test/localCoverage/codeCoverage/results/coverage/data/c
 REPORT_PATH = "test/localCoverage/codeCoverage/results/coverage/reports/cxx"
 # llvm-gcov.sh
 LLVM_GCOV = "test/localCoverage/codeCoverage/llvm-gcov.sh"
-# 编译生成的out路径
-OUTPUT = "out/{}".format(generate_product_name(CODEPATH))
+
+
+def _init_sys_config():
+    sys.localcoverage_path = os.path.join(current_path, "..")
+    sys.path.insert(0, sys.localcoverage_path)
 
 
 def call(cmd_list, is_show_cmd=False, out=None, err=None):
@@ -284,6 +285,12 @@ def gen_final_report(cov_path):
 
 
 if __name__ == "__main__":
+    current_path = os.path.abspath(os.path.dirname(__name__))
+    _init_sys_config()
+    from localCoverage.utils import get_product_name
+    # 编译生成的out路径
+    OUTPUT = "out/{}".format(get_product_name(CODEPATH))
+
     gen_all_test_info(subsystem_list=get_subsystem_name_list())
     merge_all_test_subsystem_info(subsystem_list=get_subsystem_name_list())
     merge_all_subsystem_info()

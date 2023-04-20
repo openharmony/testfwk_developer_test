@@ -525,8 +525,7 @@ class KeywordRegistration:
                     no_change_file_tag += linecache.getline(index_path, tag_line + i)
                 file_rate_tag = linecache.getline(index_path, tag_line + 8)
                 file_covered_tag = linecache.getline(index_path, tag_line + 9)
-                file_tag = no_change_file_tag + file_rate_tag + \
-                           file_covered_tag
+                file_tag = no_change_file_tag + file_rate_tag + file_covered_tag
                 origin_file_covered_num, origin_file_total_num = map(
                     int, re.findall(r"(\d+)", file_covered_tag))
                 if origin_file_total_num:
@@ -601,7 +600,7 @@ class KeywordRegistration:
                         break
                 else:
                     break
-            except:
+            except Exception:
                 print("获取关键字if分支行报错", traceback.format_exc())
 
         return if_branch_line
@@ -642,7 +641,7 @@ class KeywordRegistration:
                     update_branch_tag = update_branch_tag.replace("> - <", ">   <")
                     update_branch_tag = update_branch_tag.replace("> # <", ">   <")
                     update_branch_tag = branch_tag + update_branch_tag
-                except:
+                except Exception:
                     return
         else:
             line_feed_index = branch_html.find(line_item)
@@ -671,7 +670,7 @@ class KeywordRegistration:
                         update_branch_tag = update_branch_tag.replace("> # <", ">   <")
                         branch_tag = branch_tag[line_feed_index + len(line_item) + 1:]
                         line_feed_index = branch_tag.find(line_item)
-                    except:
+                    except Exception:
                         return
 
                 branch_tag = branch_tag.replace("> - <", ">   <")
@@ -705,7 +704,7 @@ class KeywordRegistration:
                         branch_tag_after = branch_html[:line_feed_index]
                         branch_tag_after = branch_tag_after.replace("> - <", ">   <")
                         branch_tag = branch_tag_before + branch_tag_after
-                    except:
+                    except Exception:
                         return
                 else:
                     branch_tag = branch_html
@@ -750,7 +749,7 @@ class KeywordRegistration:
                                 branch_tag = branch_tag.replace("> - <", "> * <")
                         update_branch_tag += branch_tag
                         branch_html = branch_html[end_index + 5:]
-            except:
+            except Exception:
                 return
             update_branch_tag += branch_html
         return update_branch_tag

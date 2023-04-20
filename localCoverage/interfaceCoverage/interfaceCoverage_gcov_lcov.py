@@ -24,27 +24,24 @@ import shutil
 import subprocess
 import CppHeaderParser
 import get_innerkits_json
-import makeReport
-sys.path.append("..")
-from localCoverage.coverage_tools import generate_product_name
-
+import make_report
 
 root_path = os.getcwd()
 CODEPATH = root_path.split("/test/testfwk/developer_test")[0]
-product_name = generate_product_name(CODEPATH)
-PATH_INFO_PATH = "out/{}/innerkits/ohos-arm64".format(product_name)
-OUTPUT_JSON_PATH = "out/{}/packages/phone/innerkits/ohos-arm64".format(product_name)
-KIT_MODULES_INFO = "out/{}/packages/phone/innerkits/ohos-arm64/kits_modules_info.json".format(product_name)
 SUB_SYSTEM_INFO_PATH = os.path.join(
     CODEPATH, "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx")
 OUTPUT_REPORT_PATH = os.path.join(
     CODEPATH, "test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits"
 )
-
 filter_file_name_list = [
     "appexecfwk/libjnikit/include/jni.h",
 ]
 FILTER_CLASS_ATTRIBUTE_LIST = ["ACE_EXPORT", "OHOS_NWEB_EXPORT"]
+
+
+def _init_sys_config():
+    sys.localcoverage_path = os.path.join(current_path, "..")
+    sys.path.insert(0, sys.localcoverage_path)
 
 
 def create_coverage_result_outpath(filepath):
@@ -71,6 +68,7 @@ def get_subsystem_part_list(project_rootpath):
         return subsystme_part_dict
     else:
         print("subsystem_part_config_filepath not exists.")
+        return {}
 
 
 def load_json_data():
@@ -107,7 +105,7 @@ def get_file_list_by_postfix(path, postfix, filter_jar=""):
         for file_path in files:
             if "" != file_path and -1 == file_path.find(__file__):
                 pos = file_path.rfind(os.sep)
-                file_name = file_path[pos+1:]
+                file_name = file_path[pos + 1:]
                 file_path = os.path.join(dirs[0], file_path)
                 if filter_jar != "" and file_name == filter_jar:
                     print("Skipped %s" % file_path)
@@ -203,7 +201,7 @@ def get_sdk_interface_func_list(part_name):
             try:
                 if is_need_to_be_parsed(file):
                     interface_func_list += get_pubilc_func_list_from_headfile(file)
-            except:
+            except Exception:
                 print("get interface error ", sdk_path)
     else:
         print("Error: %s is not exist." % sdk_path)
@@ -237,7 +235,7 @@ def get_covered_function_list(subsystem_name):
                         func_info = get_function_info_string(temp_list[1])
                         if "" == func_info:
                             continue
-                        func_info = func_info.replace("\n", "") 
+                        func_info = func_info.replace("\n", "")
                         if func_info == temp_list[1] and func_info.startswith("_"):
                             continue
                         covered_function_list.append(func_info)
@@ -270,7 +268,7 @@ def get_para_sub_string(content):
         substring = content
     else:
         if -1 != ended_index:
-            substring = content[start_index:ended_index+1]
+            substring = content[start_index:ended_index + 1]
         else:
             substring = content[start_index:]
 
@@ -293,7 +291,7 @@ def filter_para_sub_string(source):
 def get_function_para_count(func_info):
     pos_start = func_info.find("(")
     pos_end = func_info.rfind(")")
-    content = func_info[pos_start+1: pos_end]
+    content = func_info[pos_start + 1: pos_end]
     if "" == content:
         return 0
     content = filter_para_sub_string(content)
@@ -315,7 +313,7 @@ def get_covered_result_data(public_interface_func_list, covered_func_list, subsy
                 continue
             curr_para = para_list[index]
             para_string += curr_para
-            if index < len(para_list)-1:
+            if index < len(para_list) - 1:
                 para_string += ", "
         fun_string = f"{return_val}' '{func_name}({para_string.strip().strip(',')})"
         fun_string = fun_string.strip()
@@ -359,7 +357,7 @@ def get_interface_coverage_result_list(subsystem_name, subsystem_part_dict):
         try:
             interface_func_list = get_sdk_interface_func_list(part_str)
             public_interface_func_list.extend(interface_func_list)
-        except:
+        except Exception:
             print("####")
     covered_func_list = get_covered_function_list(subsystem_name)
     interface_coverage_result_list = get_covered_result_data(
@@ -410,24 +408,24 @@ def make_summary_file(summary_list, output_path):
                          "function_count=\"%s\" coverage_value=\"%s\" />\n" % (
                     item[0], str(item[1]), item[3]))
             fd.write('</coverage>\n')
-    except(IOError, ValueError) as err_msg:
-        print("Error for make coverage result: ", err_msg)
+    except(IOError, ValueError):
+        print("Error for make coverage result:",)
 
 
 def make_result_file(interface_data_list, summary_list, output_path, title_name):
     report_path = os.path.join(output_path, "ohos_interfaceCoverage.html")
-    makeReport.create_html_start(report_path)
-    makeReport.create_title(report_path, title_name, summary_list)
-    makeReport.create_summary(report_path, summary_list)
+    make_report.create_html_start(report_path)
+    make_report.create_title(report_path, title_name, summary_list)
+    make_report.create_summary(report_path, summary_list)
     for item in interface_data_list:
         subsystem_name = item[0]
         data_list = item[1]
         if 0 == len(data_list):
             continue
         count, coverage = get_coverage_data(data_list)
-        makeReport.create_table_test(
+        make_report.create_table_test(
             report_path, subsystem_name, data_list, len(data_list), count)
-    makeReport.create_html_ended(report_path)
+    make_report.create_html_ended(report_path)
 
 
 def make_coverage_result_file(interface_data_list, output_path, title_name):
@@ -449,6 +447,14 @@ def make_interface_coverage_result():
 
 
 if __name__ == "__main__":
+    current_path = os.getcwd()
+    _init_sys_config()
+    from localCoverage.utils import get_product_name
+    product_name = get_product_name(CODEPATH)
+    PATH_INFO_PATH = "out/{}/innerkits/ohos-arm64".format(product_name)
+    OUTPUT_JSON_PATH = "out/{}/packages/phone/innerkits/ohos-arm64".format(product_name)
+    KIT_MODULES_INFO = "out/{}/packages/phone/innerkits/ohos-arm64/kits_modules_info.json".format(product_name)
+
     system_args = sys.argv[1]
     system_name_list = system_args.split(",")
     get_innerkits_json.gen_parts_info_json(
