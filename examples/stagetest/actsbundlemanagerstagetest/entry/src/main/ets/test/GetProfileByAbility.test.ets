@@ -42,11 +42,11 @@ export default function getProfileByAbility() {
     */
     it('getProfileByAbilityInvalidModulePro', 0, async function (done) {
       await manager.getProfileByAbility(MODULE_NAME_TEST, ABILITY_NAME, METADATA_NAME).then(data => {
-        console.info("getProfileByAbilityInvalidModulePro success" + JSON.stringify(data))
+        console.info('getProfileByAbilityInvalidModulePro success' + JSON.stringify(data))
         expect(data).assertFail()
         done()
       }).catch(err => {
-        console.info("getProfileByAbilityInvalidModulePro failed" + JSON.stringify(err))
+        console.info('getProfileByAbilityInvalidModulePro failed' + JSON.stringify(err))
         expect(err.code).assertEqual(ERROR_ABILITY_NOT_EXIST)
         done()
       })
@@ -60,11 +60,11 @@ export default function getProfileByAbility() {
     */
     it('getProfileByAbilityEmptyModulePro', 0, async function (done) {
       await manager.getProfileByAbility('', ABILITY_NAME, METADATA_NAME).then(data => {
-        console.info("getProfileByAbilityEmptyModulePro success" + JSON.stringify(data))
+        console.info('getProfileByAbilityEmptyModulePro success' + JSON.stringify(data))
         expect(data).assertFail()
         done()
       }).catch(err => {
-        console.info("getProfileByAbilityEmptyModulePro failed" + JSON.stringify(err))
+        console.info('getProfileByAbilityEmptyModulePro failed' + JSON.stringify(err))
         expect(err.code).assertEqual(ERROR_MODULE_NOT_EXIST)
         done()
       })

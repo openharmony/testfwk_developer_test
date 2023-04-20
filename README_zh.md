@@ -1143,8 +1143,10 @@ reports/latest
 **推荐：**     也可以参考窗口子系统的方式（推荐这种方式），参考链接：https://gitee.com/openharmony/window_window_manager/pulls/1274/files
 3. 执行覆盖率需要安装以下依赖包：
    
-       1）安装lcov.
+       1）安装lcov, 安装命令：sudo apt install lcov
        2）安装dos2unix, 安装命令：apt install dos2unix.
+       3）安装lxml, 安装命令: pip install lxml
+       4）安装selectolax, 安装命令: pip install selectolax
 
 4. 远程映射设备，修改usr_config.xml中的ip号，设备映射方式查看上面介绍的远程端口映射，
 
