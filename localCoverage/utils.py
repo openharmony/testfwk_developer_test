@@ -18,6 +18,7 @@
 
 import os
 import json
+import subprocess
 import time
 from subprocess import Popen, PIPE, STDOUT
 
@@ -63,6 +64,15 @@ def hdc_command(device_ip, device_port, device_sn, command):
     logger(cmd_list, "INFO")
     _, exitcode = shell_command(cmd_list)
     return exitcode
+
+
+def coverage_command(command):
+    proc = subprocess.Popen(command, shell=True)
+    try:
+        proc.communicate()
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.terminate()
 
 
 def tree_find_file_endswith(path, suffix, file_list=None):

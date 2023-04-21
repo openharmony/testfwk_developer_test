@@ -17,46 +17,44 @@
 #
 
 import os
-import subprocess
 import sys
 
 from public_method import get_server_dict, get_config_ip, get_sn_list
-sys.path.append("..")
-from localCoverage.coverage_tools import generate_product_name
 
 
-def attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
-               developer_path, resident_service_path, services_str):
+def _init_sys_config():
+    sys.localcoverage_path = os.path.join(current_path, "..")
+    sys.path.insert(0, sys.localcoverage_path)
+
+
+def attach_pid(device_ip, device_sn, process_str, component_gcda_dict, developer_path,
+               resident_service_path, services_str, root_path, device_port):
     """
     1. 在设备里ps -ef | grep SERVICE 获取进程号
     2. kill - '信号' pid
     """
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
+    hdc_str = "hdc -s %s:%s -t %s" % (device_ip, device_port, device_sn)
     print("%s shell chmod 777 /data/gcov -R" % hdc_str)
-    subprocess.Popen("%s shell chmod 777 /data/gcov -R" % hdc_str, shell=True).communicate()
-    subprocess.Popen("%s shell mount -o rw,remount /" % hdc_str, shell=True).communicate()
+    coverage_command("%s shell chmod 777 /data/gcov -R" % hdc_str)
+    coverage_command("%s shell mount -o rw,remount /" % hdc_str)
     local_sh_path = os.path.join(resident_service_path, "resources", "gcov_flush.sh")
-    subprocess.Popen("dos2unix %s" % local_sh_path, shell=True).communicate()
+    coverage_command("dos2unix %s" % local_sh_path)
     print("%s file send %s %s" % (hdc_str, local_sh_path, "/data/"))
-    subprocess.Popen("%s file send %s %s" % (hdc_str, local_sh_path, "/data/"),
-                     shell=True).communicate()
-    subprocess.Popen("%s shell chmod 777 /data/gcov_flush.sh" % hdc_str,
-                     shell=True).communicate()
+    coverage_command("%s file send %s %s" % (hdc_str, local_sh_path, "/data/"))
+    coverage_command("%s shell chmod 777 /data/gcov_flush.sh" % hdc_str)
     print("%s shell sh /data/gcov_flush.sh %s" % (hdc_str, services_str))
-    subprocess.Popen("%s shell sh /data/gcov_flush.sh %s" % (hdc_str, services_str),
-                     shell=True).communicate()
+    coverage_command("%s shell sh /data/gcov_flush.sh %s" % (hdc_str, services_str))
 
     # 拉取gcda文件
     get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
-                  developer_path, services_str)
+                  developer_path, services_str, root_path, device_port)
 
 
 def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
-                  developertest_path, services_str):
-    hdc_str = "hdc -s %s:8710 -t %s" % (device_ip, device_sn)
-    root_path = current_path.split("/test/testfwk/developer_test")[0]
-    home_path = '/'.join(root_path.split("/")[:3])
-    gcda_path = f"/data/gcov{root_path}"
+                  developertest_path, services_str, roots_path, device_port):
+    hdc_str = "hdc -s %s:%s -t %s" % (device_ip, device_port, device_sn)
+    home_path = '/'.join(roots_path.split("/")[:3])
+    gcda_path = f"/data/gcov{roots_path}"
 
     for component_gcda_path in component_gcda_dict[process_str]:
         gcov_root = os.path.join(gcda_path, 'out', product_name, component_gcda_path)
@@ -64,9 +62,9 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
         gcda_file_path = os.path.dirname(gcov_root)
         print("%s shell 'cd %s; tar -czf %s.tar.gz %s'" % (
             hdc_str, gcda_file_path, gcda_file_name, gcda_file_name))
-        subprocess.Popen("%s shell 'cd %s; tar -czf %s.tar.gz %s'" % (
+        coverage_command("%s shell 'cd %s; tar -czf %s.tar.gz %s'" % (
             hdc_str, gcda_file_path, gcda_file_name, gcda_file_name
-        ), shell=True).communicate()
+        ))
 
         local_gcda_path = os.path.dirname(
             os.path.join(developertest_path, "reports/coverage/data/cxx",
@@ -76,21 +74,20 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
             os.makedirs(local_gcda_path)
         tar_path = os.path.join(gcda_file_path, "%s.tar.gz" % gcda_file_name)
         print("%s file recv %s %s" % (hdc_str, tar_path, local_gcda_path))
-        subprocess.Popen("%s file recv %s %s" % (
-            hdc_str, tar_path, local_gcda_path), shell=True).communicate()
+        coverage_command("%s file recv %s %s" % (
+            hdc_str, tar_path, local_gcda_path))
 
         local_tar = os.path.join(local_gcda_path, "%s.tar.gz" % gcda_file_name)
         print("tar -zxf %s -C %s > /dev/null 2>&1" % (local_tar, local_gcda_path))
-        subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" % (
-            local_tar, local_gcda_path), shell=True).communicate()
-        subprocess.Popen("rm -rf %s" % local_tar, shell=True).communicate()
+        coverage_command("tar -zxf %s -C %s > /dev/null 2>&1" % (
+            local_tar, local_gcda_path))
+        coverage_command("rm -rf %s" % local_tar)
         print("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"))
-        subprocess.Popen("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"),
-                         shell=True).communicate()
+        coverage_command("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"))
 
 
 def get_service_list(device_ip, device_sn, system_info_dict, services_component_dict,
-                     component_gcda_dict, developer_path, resident_service_path):
+                     component_gcda_dict, developer_path, resident_service_path, root_path, port):
 
     service_list = []
     for key, value_list in system_info_dict.items():
@@ -104,7 +101,7 @@ def get_service_list(device_ip, device_sn, system_info_dict, services_component_
             services_list = process_str.split("|")
             for services_str in services_list:
                 attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
-                           developer_path, resident_service_path, services_str)
+                           developer_path, resident_service_path, services_str, root_path, port)
     return
 
 
@@ -112,25 +109,29 @@ if __name__ == '__main__':
     command_args = sys.argv[1]
     command_str = command_args.split("command_str=")[1].replace(",", " ")
     current_path = os.getcwd()
+    _init_sys_config()
+    from localCoverage.utils import get_product_name, coverage_command
+
     root_path = current_path.split("/test/testfwk/developer_test")[0]
-    developer_path = os.path.join(root_path, "test/testfwk/developer_test")
-    resident_service_path = os.path.join(
-        developer_path, "localCoverage/resident_service")
-    config_path = os.path.join(resident_service_path, "config")
-    product_name = generate_product_name(root_path)
+    developer_test_path = os.path.join(root_path, "test/testfwk/developer_test")
+    service_path = os.path.join(
+        developer_test_path, "localCoverage/resident_service")
+    config_path = os.path.join(service_path, "config")
+    product_name = get_product_name(root_path)
 
     # 获取子系统部件与服务的关系
-    system_info_dict, services_component_dict, component_gcda_dict = get_server_dict(command_str)
+    system_dict, services_dict, component_dict = get_server_dict(command_str)
 
-    device_ip, _, sn = get_config_ip(os.path.join(developer_path, "config/user_config.xml"))
+    ip, port, sn = get_config_ip(os.path.join(developer_test_path, "config/user_config.xml"))
+    if not port:
+        port = "8710"
     device_sn_list = []
     if sn:
         device_sn_list.extend(sn.replace(" ", "").split(";"))
     else:
-        device_sn_list = get_sn_list("hdc -s %s:8710 list targets" % device_ip)
+        device_sn_list = get_sn_list("hdc -s %s:%s list targets" % (ip, port))
 
-    if device_ip and len(device_sn_list) >= 1 and len(system_info_dict.keys()) >= 1:
-        for device_sn_str in device_sn_list:
-            get_service_list(device_ip, device_sn_str, system_info_dict, services_component_dict,
-                             component_gcda_dict, developer_path, resident_service_path)
-
+    if ip and len(device_sn_list) >= 1 and len(system_dict.keys()) >= 1:
+        for sn_str in device_sn_list:
+            get_service_list(ip, sn_str, system_dict, services_dict, component_dict,
+                             developer_test_path, service_path, root_path, port)
