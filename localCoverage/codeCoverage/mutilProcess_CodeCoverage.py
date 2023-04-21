@@ -24,9 +24,6 @@ import subprocess
 import multiprocessing
 import sys
 from multiprocessing import Process
-sys.path.append("..")
-from localCoverage.coverage_tools import generate_product_name
-
 # 根代码目录
 root_path = os.getcwd()
 CODEPATH = root_path.split("/test/testfwk/developer_test")[0]
@@ -38,12 +35,16 @@ COVERAGE_GCDA_RESULTS = "test/testfwk/developer_test/localCoverage/codeCoverage/
 REPORT_PATH = "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx"
 # llvm-gcov.sh
 LLVM_GCOV = "test/testfwk/developer_test/localCoverage/codeCoverage/llvm-gcov.sh"
-# 编译生成的out路径
-OUTPUT = "out/{}".format(generate_product_name(CODEPATH))
+
 # 测试套划分步长
 STEP_SIZE = 10
 # lcovrc配置文件集合
 LCOVRC_SET = f"{CODEPATH}/test/testfwk/developer_test/localCoverage/codeCoverage/coverage_rc"
+
+
+def _init_sys_config():
+    sys.localcoverage_path = os.path.join(current_path, "..")
+    sys.path.insert(0, sys.localcoverage_path)
 
 
 def call(cmd_list, is_show_cmd=False, out=None, err=None):
@@ -53,7 +54,7 @@ def call(cmd_list, is_show_cmd=False, out=None, err=None):
             print("execute command: {}".format(" ".join(cmd_list)))
         if 0 == subprocess.call(cmd_list, shell=False, stdout=out, stderr=err):
             return_flag = True
-    except:
+    except IOError:
         print("Error : command {} execute faild!".format(cmd_list))
         return_flag = False
 
@@ -348,28 +349,34 @@ def gen_final_report(cov_path):
 
 
 if __name__ == '__main__':
-    caseLst = gen_all_test_info(subsystem_list=get_subsystem_name_list())
+    current_path = os.path.abspath(os.path.dirname(__name__))
+    _init_sys_config()
+    from localCoverage.utils import get_product_name
+    # 编译生成的out路径
+    OUTPUT = "out/{}".format(get_product_name(CODEPATH))
+
+    case_list = gen_all_test_info(subsystem_list=get_subsystem_name_list())
     multiprocessing.set_start_method("fork")  # fork spawn forkserver
     start = end = 0
     Tag = False
     process_list = []
-    for i in range(len(caseLst)):
-        lcovrc_path = f"{LCOVRC_SET}/lcovrc_cov_{str(i)}"
-        print(lcovrc_path)
-        if os.path.exists(lcovrc_path):
-            print(f"{lcovrc_path}{'@' * 20}yes")
+    for i in range(len(case_list)):
+        lcov_path = f"{LCOVRC_SET}/lcovrc_cov_{str(i)}"
+        print(lcov_path)
+        if os.path.exists(lcov_path):
+            print(f"{lcov_path}{'@' * 20}yes")
         else:
             raise Exception("mutilProcess have error -rc path not existed. "
                             "please fix add run")
 
         start = end
         end += STEP_SIZE
-        if end >= len(caseLst):
-            end = len(caseLst)
+        if end >= len(case_list):
+            end = len(case_list)
             Tag = True
 
         p = Process(target=generate_coverage_info,
-                    args=(caseLst[start:end], lcovrc_path,
+                    args=(case_list[start:end], lcov_path,
                           get_subsystem_name_list()))
         p.daemon = True
         p.start()

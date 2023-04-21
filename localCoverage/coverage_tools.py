@@ -24,8 +24,10 @@ import shutil
 import subprocess
 from shutil import copyfile
 
+from utils import get_product_name, coverage_command
 
-def get_subsystem_config(test_part_list, developer_path):
+
+def get_subsystem_config(part_list, developer_path):
     all_system_info_path = os.path.join(
         developer_path, "localCoverage/all_subsystem_config.json"
     )
@@ -34,7 +36,7 @@ def get_subsystem_config(test_part_list, developer_path):
     )
     if os.path.exists(all_system_info_path):
         new_json_text = {}
-        for part in test_part_list:
+        for part in part_list:
             with open(all_system_info_path, "r", encoding="utf-8") as system_text:
                 system_text_json = json.load(system_text)
                 if part in system_text_json:
@@ -85,16 +87,15 @@ def execute_code_cov_tools(developer_path):
     llvm_gcov_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/llvm-gcov.sh"
     )
-    subprocess.Popen("dos2unix %s" % llvm_gcov_path, shell=True).communicate()
-    subprocess.Popen("chmod 777 %s" % llvm_gcov_path, shell=True).communicate()
+    coverage_command("dos2unix %s" % llvm_gcov_path)
+    coverage_command("chmod 777 %s" % llvm_gcov_path)
     tools_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/mutilProcess_CodeCoverage.py"
     )
-    code_coverage_process = subprocess.Popen("python3 %s" % tools_path, shell=True)
-    code_coverage_process.communicate()
+    coverage_command("python3 %s" % tools_path)
 
 
-def get_subsystem_name(test_part_list, product_name):
+def get_subsystem_name(part_list, product_name):
     if product_name:
         testfwk_json_path = os.path.join(
             root_path, "out", product_name, "build_configs/infos_for_testfwk.json"
@@ -104,7 +105,7 @@ def get_subsystem_name(test_part_list, product_name):
                 system_json = json.load(json_text)
                 subsystem_info = system_json.get("phone").get("subsystem_infos")
                 subsystem_list = []
-                for part in test_part_list:
+                for part in part_list:
                     for key in subsystem_info.keys():
                         if part in subsystem_info.get(key) and key not in subsystem_list:
                             subsystem_list.append(key)
@@ -112,17 +113,10 @@ def get_subsystem_name(test_part_list, product_name):
                 return subsystem_str
         else:
             print("%s not exists.", testfwk_json_path)
+            return ""
     else:
         print("product_name is not null")
-
-
-def generate_product_name(root_path):
-    # 获取输出路径
-    ohos_config_path = os.path.join(root_path, "ohos_config.json")
-    with open(ohos_config_path, 'r') as json_file:
-        json_info = json.load(json_file)
-        product_name = json_info.get("out_path").split("out")[1].strip("/")
-    return product_name
+        return ""
 
 
 def execute_interface_cov_tools(subsystem_str, developer_path):
@@ -131,10 +125,7 @@ def execute_interface_cov_tools(subsystem_str, developer_path):
         developer_path,
         "localCoverage/interfaceCoverage/get_innerkits_json.py"
     )
-    interface_coverage_process = subprocess.Popen(
-        "python3 %s" % innerkits_json_path, shell=True
-    )
-    interface_coverage_process.communicate()
+    coverage_command("python3 %s" % innerkits_json_path)
 
     interface_path = os.path.join(
         developer_path,
@@ -151,33 +142,33 @@ if __name__ == '__main__':
 
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
-    developer_path = os.path.join(root_path, "test/testfwk/developer_test")
+    developer_test_path = os.path.join(root_path, "test/testfwk/developer_test")
 
     # 获取产品形态
-    product_name = generate_product_name(root_path)
+    product_names = get_product_name(root_path)
 
     # copy gcda数据到覆盖率工具指定位置
-    copy_coverage(developer_path)
-    generate_coverage_rc(developer_path)
+    copy_coverage(developer_test_path)
+    generate_coverage_rc(developer_test_path)
 
     # 获取部件位置信息config
     if len(test_part_list) > 0:
-        get_subsystem_config(test_part_list, developer_path)
+        get_subsystem_config(test_part_list, developer_test_path)
 
     # 执行代码覆盖率
-    execute_code_cov_tools(developer_path)
+    execute_code_cov_tools(developer_test_path)
 
     # 源代码还原
     after_lcov_branch_path = os.path.join(
-        developer_path, "localCoverage/restore_comment/after_lcov_branch.py")
+        developer_test_path, "localCoverage/restore_comment/after_lcov_branch.py")
     if os.path.exists(after_lcov_branch_path):
         subprocess.run("python3 %s " % after_lcov_branch_path, shell=True)
     restore_source_code_path = os.path.join(
-        developer_path, "localCoverage/restore_comment/restore_source_code.py")
+        developer_test_path, "localCoverage/restore_comment/restore_source_code.py")
     subprocess.run("python3 %s" % restore_source_code_path, shell=True)
 
     keyword_path = os.path.join(
-        developer_path, "localCoverage/keyword_registration/keyword_filter.py")
+        developer_test_path, "localCoverage/keyword_registration/keyword_filter.py")
     subprocess.run("python3 %s" % keyword_path, shell=True)
 
     print(r"See the code coverage report in: "
