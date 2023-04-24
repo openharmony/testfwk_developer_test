@@ -65,22 +65,22 @@
       "foundation/ability/form_fwk"
     ]
   },
-  "wms": {
-    "name": "wms",
+  "window_manager_lite": {
+    "name": "window_manager_lite",
     "path": [
-      "foundation/graphic/wms"
+      "foundation/window/window_manager_lite"
     ]
   },
-  "ui": {
-    "name": "ui",
+  "ui_lite": {
+    "name": "ui_lite",
     "path": [
-      "foundation/graphic/ui"
+      "foundation/arkui/ui_lite"
     ]
   },
-  "graphic_utils": {
-    "name": "graphic_utils",
+  "graphic_utils_lite": {
+    "name": "graphic_utils_lite",
     "path": [
-      "foundation/graphic/utils"
+      "foundation/graphic/graphic_utils_lite"
     ]
   },
   "graphic_2d": {
