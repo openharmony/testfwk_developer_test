@@ -62,6 +62,19 @@ def copy_coverage(developer_path):
     shutil.copytree(coverage_path, code_path)
 
 
+def remove_thrd_gcda(developer_path):
+    print("remove thirdparty gcda")
+    gcda_dir_path = os.path.join(developer_path, "localCoverage/codeCoverage/results/coverage/data/cxx")
+    if os.path.exists(gcda_dir_path):
+        for i in os.listdir(gcda_dir_path):
+            remove_out = os.path.join(gcda_dir_path, i, "obj/out")
+            remove_thrd = os.path.join(gcda_dir_path, i, "obj/third_party")
+            if os.path.exists(remove_out):
+                print("remove {}".format(remove_out))
+                shutil.rmtree(remove_out)
+            if os.path.exists(remove_thrd):
+                print("remove {}".format(remove_thrd))
+                shutil.rmtree(remove_thrd)
 def generate_coverage_rc(developer_path):
     coverage_rc_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/coverage_rc"
@@ -150,6 +163,7 @@ if __name__ == '__main__':
     # copy gcda数据到覆盖率工具指定位置
     copy_coverage(developer_test_path)
     generate_coverage_rc(developer_test_path)
+    remove_thrd_gcda(developer_test_path)
 
     # 获取部件位置信息config
     if len(test_part_list) > 0:
