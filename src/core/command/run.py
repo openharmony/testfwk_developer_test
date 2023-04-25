@@ -60,14 +60,18 @@ class Run(object):
                 push_cov_path = os.path.join(sys.framework_root_dir, "localCoverage/push_coverage_so/push_coverage.py")
                 if os.path.exists(push_cov_path):
                     if str(options.testpart) == "[]" and str(options.subsystem) == "[]":
-                        LOG.info("No subsystem or testpart input, no need push coverage so.")
+                        LOG.info("No subsystem or part input. Not push coverage so.")
+                    elif str(options.testpart) != "[]" and str(options.subsystem) != "[]":
+                        LOG.info("Subsystem or part, there can be only one parameter exist. Not push coverage so.")
                     else:
                         if str(options.testpart) != "[]":
-                            param = "testpart=" + str(options.testpart)
+                            param = str(options.testpart)
+                            subprocess.run("python3 {} {} {}".format(
+                                push_cov_path, "testpart", param), shell=True)
                         else:
-                            param = "subsystem=" + str(options.subsystem)
-                        subprocess.run("python3 {} {}".format(
-                            push_cov_path, param), shell=True)
+                            param = str(options.subsystem)
+                            subprocess.run("python3 {} {} {}".format(
+                                push_cov_path, "subsystem", param), shell=True)
                 else:
                     print(f"{push_cov_path} not exists.")
 
