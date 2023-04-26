@@ -28,8 +28,6 @@ from multiprocessing import Pool
 from lxml import html
 from selectolax.parser import HTMLParser
 
-etree = html.etree
-
 
 class CoverageReportPath:
     def __init__(self, report_path):
@@ -39,7 +37,7 @@ class CoverageReportPath:
         """
         gcov文件生成器
         """
-        for root_path, dir, files in os.walk(self.report_path):
+        for root_path, _, files in os.walk(self.report_path):
             for file in files:
                 if not file.endswith(".gcov.html"):
                     continue
@@ -51,7 +49,7 @@ class CoverageReportPath:
         修改覆盖率报告css样式
         """
         css_file_path = ""
-        for root_path, dir, files in os.walk(self.report_path):
+        for root_path, _, files in os.walk(self.report_path):
             for file in files:
                 if file == "gcov.css":
                     css_file_path = os.path.join(root_path, file)
@@ -99,8 +97,8 @@ class KeywordRegistration:
                 keyword_dict = json.load(file)
             keyword_list = keyword_dict.get("KEYWORD")
             return keyword_list
-        except (FileNotFoundError, AttributeError, FileExistsError) as error:
-            print(f"获取报备过滤关键字报错，error:{error}")
+        except (FileNotFoundError, AttributeError, FileExistsError):
+            print(f"获取报备过滤关键字报错")
 
     @staticmethod
     def get_coverage_content(file_path):
@@ -122,6 +120,7 @@ class KeywordRegistration:
 
     @staticmethod
     def get_source_code(tag):
+        etree = html.etree
         parser = etree.HTMLParser(encoding="utf-8")
         parser_obj = etree.HTML(tag, parser=parser)
         source_code = parser_obj.xpath("//span[@class='lineNoCov' or "
@@ -227,7 +226,7 @@ class KeywordRegistration:
         while braces_sub:
             count += 1
             if count > 200:
-                return None, None
+                return [], []
             next_tag = get_tag(content, str(next_line))
             func_body_tag_list_append(next_tag)
             if "{" in next_tag:
@@ -337,8 +336,8 @@ class KeywordRegistration:
                 bracket_code = keyword_code[:bracket_index]
                 judge_key = bracket_code.split()[-1]
             return judge_key
-        except (IndexError, ValueError) as error:
-            print("获取关键字替代字符", error, traceback.format_exc())
+        except (IndexError, ValueError):
+            print("获取关键字替代字符失败")
 
     @staticmethod
     def get_branch_data_by_tag(tag_html: str, symbol_status=None):
@@ -389,7 +388,7 @@ class KeywordRegistration:
             if loop_count > 10:
                 break
             line_break += 1
-            origin_branch_html += "\n"
+            origin_branch_html = os.path.join(origin_branch_html, "\n")
             next_line_tag = get_tag(content, branch_line + line_break)
             if "{" in next_line_tag:
                 left_brace_exist = True
@@ -468,8 +467,8 @@ class KeywordRegistration:
             hit_shield_num = origin_hit - covered_nums
             total_shield_num = origin_total - branch_total
             self.update_statistic(file_path, hit_shield_num, total_shield_num)
-        except (IndexError, TypeError, FileNotFoundError) as error:
-            print("修改分支数据", error, traceback.format_exc())
+        except (IndexError, TypeError, FileNotFoundError):
+            print("修改分支数据失败")
 
     def update_statistic(self, file_path, hit_shield_num, total_shield_num):
         """
@@ -570,8 +569,8 @@ class KeywordRegistration:
                     file.write(content)
                     fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                 time.sleep(1)
-            except (IndexError, TypeError, FileNotFoundError) as error:
-                print("修改分支统计数据报错", error, traceback.format_exc())
+            except (IndexError, TypeError, FileNotFoundError):
+                print("修改分支统计数据出错")
 
     def _check_if_branch_line(self, judge_key, sub_branch_line_list,
                               key_line, content, function_name):
@@ -600,7 +599,7 @@ class KeywordRegistration:
                         break
                 else:
                     break
-            except Exception:
+            except (ValueError, KeyError):
                 print("获取关键字if分支行报错", traceback.format_exc())
 
         return if_branch_line
@@ -641,7 +640,7 @@ class KeywordRegistration:
                     update_branch_tag = update_branch_tag.replace("> - <", ">   <")
                     update_branch_tag = update_branch_tag.replace("> # <", ">   <")
                     update_branch_tag = branch_tag + update_branch_tag
-                except Exception:
+                except ValueError:
                     return
         else:
             line_feed_index = branch_html.find(line_item)
@@ -670,7 +669,7 @@ class KeywordRegistration:
                         update_branch_tag = update_branch_tag.replace("> # <", ">   <")
                         branch_tag = branch_tag[line_feed_index + len(line_item) + 1:]
                         line_feed_index = branch_tag.find(line_item)
-                    except Exception:
+                    except ValueError:
                         return
 
                 branch_tag = branch_tag.replace("> - <", ">   <")
@@ -704,7 +703,7 @@ class KeywordRegistration:
                         branch_tag_after = branch_html[:line_feed_index]
                         branch_tag_after = branch_tag_after.replace("> - <", ">   <")
                         branch_tag = branch_tag_before + branch_tag_after
-                    except Exception:
+                    except ValueError:
                         return
                 else:
                     branch_tag = branch_html
@@ -749,7 +748,7 @@ class KeywordRegistration:
                                 branch_tag = branch_tag.replace("> - <", "> * <")
                         update_branch_tag += branch_tag
                         branch_html = branch_html[end_index + 5:]
-            except Exception:
+            except (ValueError, TypeError):
                 return
             update_branch_tag += branch_html
         return update_branch_tag
@@ -771,7 +770,7 @@ class KeywordRegistration:
         """
         branch_line_list = self.get_coverage_lines_by_branch(file_path)
         if not branch_line_list:
-            return True
+            return
 
         branch_line_list.sort()
         no_change_content = self.get_coverage_content(file_path)
@@ -844,7 +843,7 @@ class KeywordRegistration:
                             branch_html, branch_length, condition_str_list,
                             judge_index_list)
                     if not update_branch_tag:
-                        return False
+                        return
 
                 update_branch_tag = self.update_source_code_tag(
                     update_branch_tag)
@@ -918,7 +917,7 @@ def main(report_path):
 
 if __name__ == '__main__':
     current_path = os.getcwd()
-    root_path = current_path.split("/test/testfwk/developer_test")[0]
-    developer_path = os.path.join(root_path, "test/testfwk/developer_test")
-    report_path = os.path.join(developer_path, "localCoverage/codeCoverage/results/coverage/reports/cxx/html")
-    main(report_path)
+    home_path = current_path.split("/test/testfwk/developer_test")[0]
+    developer_path = os.path.join(home_path, "test/testfwk/developer_test")
+    html_path = os.path.join(developer_path, "localCoverage/codeCoverage/results/coverage/reports/cxx/html")
+    main(html_path)
