@@ -122,23 +122,23 @@ if __name__ == "__main__":
         device_sn_list = device_sn_strs.split(";")
 
     subsystem_list, testpart_list = [], []
-    param = sys.argv[1]
-    if param.split("=")[0] == "testpart":
-        testpart_list = param.split("=")[1].lstrip("[").rstrip("]").split(",")
-    else:
-        subsystem_list = param.split("=")[1].lstrip("[").rstrip("]").split(",")
-
-    if subsystem_list:
-        for subsystem in subsystem_list:
-            json_path_list = find_subsystem_so_dest_path(subsystem)
-            for json_path in json_path_list:
-                source_dest_dict = find_so_source_dest(json_path)
+    testtype = sys.argv[1]
+    param_list = sys.argv[2:]
+    print(param_list)
+    if testtype == "testpart":
+        for param in param_list:
+            testpart_list.append(param.strip("[").strip("]").strip(","))
+            for testpart in testpart_list:
+                json_path_list = find_part_so_dest_path(testpart)
+                source_dest_dict = find_so_source_dest(json_path_list)
                 push_coverage_so(source_dest_dict)
-    elif testpart_list:
-        for testpart in testpart_list:
-            json_path_list = find_part_so_dest_path(testpart)
-            source_dest_dict = find_so_source_dest(json_path_list)
-            push_coverage_so(source_dest_dict)
     else:
-        logger("No subsystem or partname input, no need to push coverage so.", "INFO")
-        exit(0)
+        for param in param_list:
+            subsystem_list.append(param.strip("[").strip("]").strip(","))
+
+            if len(subsystem_list) == 1:
+                subsystem = subsystem_list[0]
+                json_path_list = find_subsystem_so_dest_path(subsystem)
+                for json_path in json_path_list:
+                    source_dest_dict = find_so_source_dest(json_path)
+                    push_coverage_so(source_dest_dict)

@@ -50,12 +50,10 @@ def modify_init_file(developer_path, hdc_str):
     if os.path.exists(cfg_file_path):
         with open(cfg_file_path, "r") as fp:
             json_data = json.load(fp)
-        if_reboot = False
 
         for jobs_list in json_data["jobs"]:
             if jobs_list["name"] == "init":
                 if jobs_list["cmds"][-1] != "export GCOV_FETCH_METHOD FM_SIGNA":
-                    if_reboot = True
                     jobs_list["cmds"].append("mkdir /data/gcov 0777 system system")
                     jobs_list["cmds"].append("export GCOV_PREFIX /data/gcov")
                     jobs_list["cmds"].append("export GCOV_FETCH_METHOD FM_SIGNA")
@@ -72,16 +70,14 @@ def modify_init_file(developer_path, hdc_str):
     print("%s file send %s %s" % (hdc_str, cfg_file_path, "/etc/"))
     coverage_command("%s file send %s %s" % (hdc_str, cfg_file_path, "/etc/"))
     coverage_command("%s shell param set persist.appspawn.client.timeout 120 > /dev/null 2>&1" % hdc_str)
-    return if_reboot
+    return
 
 
 def modify_faultloggerd_file(developer_path, hdc_str):
     _, enforce = subprocess.getstatusoutput("%s shell getenforce" % hdc_str)
-    if_reboot = False
     coverage_command("%s shell mount -o rw,remount /" % hdc_str)
     print("%s shell mount -o rw,remount /" % hdc_str)
     if enforce != "Permissive":
-        if_reboot = True
         coverage_command("%s shell sed -i 's/enforcing/permissive/g' /system/etc/selinux/config" % hdc_str)
 
     recv_path = os.path.join(developer_path, "localCoverage/resident_service/resources")
@@ -93,7 +89,6 @@ def modify_faultloggerd_file(developer_path, hdc_str):
         with open(cfg_file_path, "r") as fp:
             json_data = json.load(fp)
         if len(json_data["jobs"]) == 1 and json_data["jobs"][0]["name"] != "pre-init":
-            if_reboot = True
             json_data["jobs"].insert(0, {
                 "name": "pre-init",
                 "cmds": [
@@ -108,7 +103,7 @@ def modify_faultloggerd_file(developer_path, hdc_str):
     else:
         print("faultloggerd.cfg file not exists.")
 
-    return if_reboot
+    return
 
 
 def split_foundation_services(developer_path, system_info_dict, home_path, hdc_str):
@@ -129,14 +124,12 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_s
         coverage_command("%s file recv /system/profile/foundation.xml %s" % (hdc_str, restores_path))
 
     # 推送xml数据
-    flag = False
     for key, value_list in system_info_dict.items():
         for process_str in value_list:
             foundation_xml_path = os.path.join(config_path, process_str, "foundation.xml")
             print("%s shell mount -o rw,remount /" % hdc_str)
             coverage_command("%s shell mount -o rw,remount /" % hdc_str)
             if os.path.exists(foundation_xml_path):
-                flag = True
                 coverage_command("%s shell rm -rf /lost+found" % hdc_str)
                 coverage_command("%s shell rm -rf /log" % hdc_str)
                 coverage_command("%s shell rm -rf %s" % (hdc_str, home_path))
@@ -153,7 +146,7 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_s
                 print("%s file send %s %s" % (hdc_str, process_cfg_path, "/etc/init/"))
                 coverage_command("%s file send %s %s" % (
                     hdc_str, process_cfg_path, "/etc/init/"))
-    return flag
+    return
 
 
 def modify_cfg_xml_file(developer_path, device_ip, device_sn_list,
@@ -161,20 +154,19 @@ def modify_cfg_xml_file(developer_path, device_ip, device_sn_list,
     if device_ip and len(device_sn_list) >= 1:
         for device_sn_str in device_sn_list:
             hdc_str = "hdc -s %s:%s -t %s" % (device_ip, device_port, device_sn_str)
-            init_if_reboot = modify_init_file(developer_path, hdc_str)
-            log_if_reboot = modify_faultloggerd_file(
+            modify_init_file(developer_path, hdc_str)
+            modify_faultloggerd_file(
                 developer_path, hdc_str)
             # 推送服务对应的xml文件
-            xml_if_reboot = split_foundation_services(
-                developer_path, system_info_dict, home_path, hdc_str)
-            if init_if_reboot or log_if_reboot or xml_if_reboot:
-                print("%s shell reboot" % hdc_str)
-                coverage_command("%s shell reboot > /dev/null 2>&1" % hdc_str)
-                while True:
-                    after_sn_list = get_sn_list("hdc -s %s:%s list targets" % (device_ip, device_port))
-                    time.sleep(10)
-                    if device_sn_str in after_sn_list:
-                        break
+            split_foundation_services(
+            developer_path, system_info_dict, home_path, hdc_str)
+            print("%s shell reboot" % hdc_str)
+            coverage_command("%s shell reboot > /dev/null 2>&1" % hdc_str)
+            while True:
+                after_sn_list = get_sn_list("hdc -s %s:%s list targets" % (device_ip, device_port))
+                time.sleep(10)
+                if device_sn_str in after_sn_list:
+                    break
             coverage_command("%s shell getenforce" % hdc_str)
     else:
         print("user_config.xml device ip not config")

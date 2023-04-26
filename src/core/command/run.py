@@ -56,19 +56,24 @@ class Run(object):
     def process_command_run(self, command, options):
         current_raw_cmd = ",".join(list(map(str, options.current_raw_cmd.split(" "))))
         if options.coverage and platform.system() != "Windows":
-            push_cov_path = os.path.join(sys.framework_root_dir, "localCoverage/push_coverage_so/push_coverage.py")
-            if os.path.exists(push_cov_path):
-                if str(options.testpart) == "[]" and str(options.subsystem) == "[]":
-                    LOG.info("No subsystem or testpart input, no need push coverage so.")
-                else:
-                    if str(options.testpart) != "[]":
-                        param = "testpart=" + str(options.testpart)
+            if not options.pullgcda:
+                push_cov_path = os.path.join(sys.framework_root_dir, "localCoverage/push_coverage_so/push_coverage.py")
+                if os.path.exists(push_cov_path):
+                    if str(options.testpart) == "[]" and str(options.subsystem) == "[]":
+                        LOG.info("No subsystem or part input. Not push coverage so.")
+                    elif str(options.testpart) != "[]" and str(options.subsystem) != "[]":
+                        LOG.info("Subsystem or part, there can be only one parameter exist. Not push coverage so.")
                     else:
-                        param = "subsystem=" + str(options.subsystem)
-                    subprocess.run("python3 {} {}".format(
-                        push_cov_path, param), shell=True)
-            else:
-                print(f"{push_cov_path} not exists.")
+                        if str(options.testpart) != "[]":
+                            param = str(options.testpart)
+                            subprocess.run("python3 {} {} {}".format(
+                                push_cov_path, "testpart", param), shell=True)
+                        else:
+                            param = str(options.subsystem)
+                            subprocess.run("python3 {} {} {}".format(
+                                push_cov_path, "subsystem", param), shell=True)
+                else:
+                    print(f"{push_cov_path} not exists.")
 
             init_gcov_path = os.path.join(sys.framework_root_dir, "localCoverage/resident_service/init_gcov.py")
             if os.path.exists(init_gcov_path):
@@ -298,14 +303,15 @@ class Run(object):
             else:
                 print(f"{pull_service_gcov_path} not exists.")
 
-            cov_main_file_path = os.path.join(sys.framework_root_dir, "localCoverage/coverage_tools.py")
-            testpart = ",".join(list(map(str, options.partname_list)))
-            subsystem = ",".join(list(map(str, options.subsystem)))
-            if os.path.exists(cov_main_file_path):
-                subprocess.run("python3 %s testpart=%s subsystem=%s" % (
-                    cov_main_file_path, testpart, subsystem), shell=True)
-            else:
-                print(f"{cov_main_file_path} not exists.")
+            if not options.pullgcda:
+                cov_main_file_path = os.path.join(sys.framework_root_dir, "localCoverage/coverage_tools.py")
+                testpart = ",".join(list(map(str, options.partname_list)))
+                subsystem = ",".join(list(map(str, options.subsystem)))
+                if os.path.exists(cov_main_file_path):
+                    subprocess.run("python3 %s testpart=%s subsystem=%s" % (
+                        cov_main_file_path, testpart, subsystem), shell=True)
+                else:
+                    print(f"{cov_main_file_path} not exists.")
         return
 
     ##############################################################

@@ -245,6 +245,12 @@ class Console(object):
                                 default=False,
                                 help="Specify coverage"
                                 )
+            parser.add_argument("-pg", "--pullgcda",
+                                action="store_true",
+                                dest="pullgcda",
+                                default=False,
+                                help="Only pull gcda file."
+                                )
             parser.add_argument("-tf", "--testfile",
                                 action="store",
                                 type=str,
