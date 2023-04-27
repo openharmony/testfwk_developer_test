@@ -127,7 +127,7 @@ def get_server_dict(command):
             }
     elif " -ss " in command:
         system_name = command.split(" -ss ")[-1].split(" ")[0]
-        server_list = system_info_dict.get(system_name)
+        server_list = system_info_dict.get(system_name) if system_info_dict.get(system_name) else []
         system_info_dict_after = {
             system_name: server_list
         }
