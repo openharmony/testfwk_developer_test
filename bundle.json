@@ -12,7 +12,7 @@
     "dirs": {},
     "component": {
         "name": "developertest",
-	"subsystem": "developertest",
+        "subsystem": "testfwk",
       	"features" :[],
         "adapted_system_type": [ "standard" ],
       	"rom": "0KB",
