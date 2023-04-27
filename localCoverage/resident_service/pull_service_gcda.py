@@ -56,7 +56,7 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
     home_path = '/'.join(roots_path.split("/")[:3])
     gcda_path = f"/data/gcov{roots_path}"
 
-    component_gcda_paths = component_gcda_dict[process_str] if component_gcda_dict[process_str] else []
+    component_gcda_paths = component_gcda_dict.get(process_str) if component_gcda_dict.get(process_str) else []
     for component_gcda_path in component_gcda_paths:
         gcov_root = os.path.join(gcda_path, 'out', product_name, component_gcda_path)
         gcda_file_name = os.path.basename(gcov_root)
