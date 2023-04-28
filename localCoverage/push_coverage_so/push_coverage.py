@@ -26,6 +26,11 @@ def _init_sys_config():
 
 
 def find_part_so_dest_path(test_part: str) -> str:
+    """
+    获取指定部件的obj目录
+    :param test_part:部件名称
+    :return:部件obj目录
+    """
     parts_info_json = os.path.join(out_path, "build_configs", "parts_info", "parts_path_info.json")
     if not os.path.exists(parts_info_json):
         logger("{} not exists.".format(parts_info_json), "ERROR")
@@ -42,6 +47,11 @@ def find_part_so_dest_path(test_part: str) -> str:
 
 
 def find_subsystem_so_dest_path(sub_system: str) -> list:
+    """
+    获取指定子系统的obj目录
+    :param sub_system:子系统名
+    :return: 子系统下所有部件obj目录的列表
+    """
     subsystem_config_json = os.path.join(out_path, "build_configs", "subsystem_info", "subsystem_build_config.json")
     if not os.path.exists(subsystem_config_json):
         logger("{} not exists.".format(subsystem_config_json), "ERROR")
@@ -65,6 +75,11 @@ def find_subsystem_so_dest_path(sub_system: str) -> list:
 
 
 def find_so_source_dest(path: str) -> dict:
+    """
+    获取so和设备里所在目录的对应关系
+    :param path: 子系统obj目录
+    :return: so和设备里所在目录的对应关系dict
+    """
     so_dict = dict()
     json_list = list()
     if not path:
@@ -85,6 +100,11 @@ def find_so_source_dest(path: str) -> dict:
 
 
 def push_coverage_so(so_dict: dict):
+    """
+    推送so到设备
+    :param so_dict: so和设备里目录对应dict
+    :return:
+    """
     if not so_dict:
         logger("No coverage so to push.", "INFO")
         return
@@ -113,6 +133,7 @@ if __name__ == "__main__":
     out_path = os.path.join(root_path, "out", get_product_name(root_path))
     developer_path = os.path.join(root_path, "test", "testfwk", "developer_test")
 
+    # 获取远程映射相关hdc参数
     device_ip, device_port, device_sn_strs = get_config_ip(os.path.join(developer_path, "config", "user_config.xml"))
     if not device_port:
         device_port = "8710"
@@ -124,7 +145,8 @@ if __name__ == "__main__":
     subsystem_list, testpart_list = [], []
     testtype = sys.argv[1]
     param_list = sys.argv[2:]
-    print(param_list)
+
+    # 入参为ss子系统和tp部件分别处理
     if testtype == "testpart":
         for param in param_list:
             testpart_list.append(param.strip("[").strip("]").strip(","))
