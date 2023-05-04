@@ -75,6 +75,8 @@ def remove_thrd_gcda(developer_path):
             if os.path.exists(remove_thrd):
                 print("remove {}".format(remove_thrd))
                 shutil.rmtree(remove_thrd)
+
+
 def generate_coverage_rc(developer_path):
     coverage_rc_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/coverage_rc"
