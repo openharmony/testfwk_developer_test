@@ -54,13 +54,12 @@ def get_subsystem_part_list(project_rootpath):
     subsystme_part_dict = {}
     subsystem_part_config_filepath = os.path.join(
         project_rootpath, "out", product_name, "build_configs/infos_for_testfwk.json")
-    print(subsystem_part_config_filepath)
     if os.path.exists(subsystem_part_config_filepath):
         try:
             with open(subsystem_part_config_filepath, 'r') as f:
                 data = json.load(f)
         except IOError:
-            print("Error for open subsystem config file: ")
+            print("Error for open subsystem config file. ")
         if not data:
             print("subsystem_part config file error.")
         else:
@@ -184,7 +183,7 @@ def get_pubilc_func_list_from_headfile(cxx_header_filepath):
                  func_returntype)
             )
     except CppHeaderParser.CppParseError:
-        print("error")
+        print("")
     return pubilc_func_list
 
 
@@ -205,8 +204,6 @@ def get_sdk_interface_func_list(part_name):
                 print("get interface error ", sdk_path)
     else:
         print("Error: %s is not exist." % sdk_path)
-
-    print("interface_func_list:", interface_func_list)
     return interface_func_list
 
 
@@ -299,7 +296,7 @@ def get_function_para_count(func_info):
     return len(para_list)
 
 
-def get_covered_result_data(public_interface_func_list, covered_func_list, subsystem_name):
+def get_covered_result_data(public_interface_func_list, covered_func_list):
     coverage_result_list = []
     for item in public_interface_func_list:
         data_list = list(item)
@@ -361,7 +358,7 @@ def get_interface_coverage_result_list(subsystem_name, subsystem_part_dict):
             print("####")
     covered_func_list = get_covered_function_list(subsystem_name)
     interface_coverage_result_list = get_covered_result_data(
-        public_interface_func_list, covered_func_list, subsystem_name)
+        public_interface_func_list, covered_func_list)
     return interface_coverage_result_list
 
 
@@ -449,17 +446,20 @@ def make_interface_coverage_result():
 if __name__ == "__main__":
     current_path = os.getcwd()
     _init_sys_config()
-    from localCoverage.utils import get_product_name
+    from localCoverage.utils import get_product_name, get_target_cpu
     product_name = get_product_name(CODEPATH)
-    PATH_INFO_PATH = "out/{}/innerkits/ohos-arm64".format(product_name)
-    OUTPUT_JSON_PATH = "out/{}/packages/phone/innerkits/ohos-arm64".format(product_name)
-    KIT_MODULES_INFO = "out/{}/packages/phone/innerkits/ohos-arm64/kits_modules_info.json".format(product_name)
+    cpu_type = get_target_cpu(CODEPATH)
+    PATH_INFO_PATH = "out/{}/innerkits/ohos-{}".format(product_name, cpu_type)
+    OUTPUT_JSON_PATH = "out/{}/packages/phone/innerkits/ohos-{}".format(
+        product_name, cpu_type)
+    KIT_MODULES_INFO = "out/{}/packages/phone/innerkits/ohos-{}/kits_modules_info.json".format(
+        product_name, cpu_type)
 
     system_args = sys.argv[1]
     system_name_list = system_args.split(",")
     get_innerkits_json.gen_parts_info_json(
         get_innerkits_json.get_parts_list(os.path.join(CODEPATH, PATH_INFO_PATH)),
-        os.path.join(CODEPATH, OUTPUT_JSON_PATH)
+        os.path.join(CODEPATH, OUTPUT_JSON_PATH), cpu_type
     )
     if len(system_name_list) > 0:
         make_interface_coverage_result()

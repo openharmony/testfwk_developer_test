@@ -64,6 +64,22 @@ def get_product_name(root_path):
     return ""
 
 
+def get_target_cpu(root_path):
+    """
+    从ohos_config.json中获取编译cpu
+    :param root_path: ohos_config.json所在的目录
+    :return: 编译产量生成的路径
+    """
+    ohos_config = os.path.join(root_path, "ohos_config.json")
+    json_obj = json_parse(ohos_config)
+    if json_obj:
+        target_cpu = json_obj["target_cpu"]
+        return target_cpu
+
+    logger("{} not exist.".format(ohos_config), "ERROR")
+    return ""
+
+
 def shell_command(command_list: list):
     """
     命令行执行命令

@@ -27,14 +27,14 @@ def _init_sys_config():
     sys.path.insert(0, sys.localcoverage_path)
 
 
-def gen_parts_info_json(folder_list, output_json_path):
+def gen_parts_info_json(folder_list, output_json_path, target_cpu):
     """
     根据部件信息,生成字典至json文件中
     """
     if len(folder_list) != 0:
         data_dict = {}
         for folder_str in folder_list:
-            data_dict[folder_str] = f"innerkits/ohos-arm64/{folder_str}"
+            data_dict[folder_str] = f"innerkits/ohos-{target_cpu}/{folder_str}"
         output_json_path = os.path.join(output_json_path, "kits_modules_info.json")
         json_str = json.dumps(data_dict, indent=2)
         with open(output_json_path, "w") as json_file:
@@ -58,16 +58,17 @@ def get_parts_list(path):
 if __name__ == "__main__":
     current_path = os.getcwd()
     _init_sys_config()
-    from localCoverage.utils import get_product_name, coverage_command
+    from localCoverage.utils import get_product_name, coverage_command, get_target_cpu
 
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     product_name = get_product_name(root_path)
+    cpu_type = get_target_cpu(root_path)
     part_info_path = os.path.join(
-        root_path, "out", product_name, "innerkits/ohos-arm64"
+        root_path, "out", product_name, "innerkits/ohos-%s" % cpu_type
     )
     json_path = os.path.join(
-        root_path, "out", product_name, "packages/phone/innerkits/ohos-arm64"
+        root_path, "out", product_name, "packages/phone/innerkits/ohos-%s" % cpu_type
     )
     coverage_command("mkdir -p %s" % json_path)
     part_list = get_parts_list(part_info_path)
-    gen_parts_info_json(part_list, json_path)
+    gen_parts_info_json(part_list, json_path, cpu_type)
