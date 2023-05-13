@@ -52,7 +52,7 @@ def get_subsystem_config(part_list, developer_path):
 
 
 def copy_coverage(developer_path):
-    print("[*************** Start TO Get Coverage Report ***************]")
+    print("*" * 40, "Start TO Get Coverage Report", "*" * 40)
     coverage_path = os.path.join(developer_path, "reports/coverage")
     code_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/results/coverage"
@@ -135,7 +135,7 @@ def get_subsystem_name(part_list, product_name):
 
 
 def execute_interface_cov_tools(subsystem_str, developer_path):
-    print("[*************** Start TO Get Interface Coverage Report ***************]")
+    print("*" * 40, "Start TO Get Interface Coverage Report", "*" * 40)
     innerkits_json_path = os.path.join(
         developer_path,
         "localCoverage/interfaceCoverage/get_innerkits_json.py"
@@ -174,6 +174,17 @@ if __name__ == '__main__':
     # 执行代码覆盖率
     execute_code_cov_tools(developer_test_path)
 
+    # 执行接口覆盖率
+    if subsystem_args_str:
+        subsystem_str_name = subsystem_args_str
+    else:
+        subsystem_str_name = get_subsystem_name(test_part_list, product_names)
+
+    if subsystem_str_name:
+        execute_interface_cov_tools(subsystem_str_name, developer_test_path)
+    else:
+        print("subsystem or part without!")
+
     # 源代码还原
     after_lcov_branch_path = os.path.join(
         developer_test_path, "localCoverage/restore_comment/after_lcov_branch.py")
@@ -189,3 +200,5 @@ if __name__ == '__main__':
 
     print(r"See the code coverage report in: "
           r"/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
+    print(r"See the interface coverage report in: "
+          r"/test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits")
