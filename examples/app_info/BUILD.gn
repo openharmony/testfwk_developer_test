@@ -22,6 +22,6 @@ config("app_info_config") {
 ohos_shared_library("app_info") {
   sources = []
   public_configs = [ ":app_info_config" ]
-  subsystem_name = "developertest"
+  subsystem_name = "testfwk"
 }
 ###############################################################################

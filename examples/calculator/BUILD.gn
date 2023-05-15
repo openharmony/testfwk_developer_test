@@ -25,7 +25,7 @@ ohos_shared_library("calculator") {
     "src/calculator.cpp",
   ]
   public_configs = [ ":calculator_config" ]
-  subsystem_name = "developertest"
+  subsystem_name = "testfwk"
 }
 
 ohos_static_library("calculator_static") {

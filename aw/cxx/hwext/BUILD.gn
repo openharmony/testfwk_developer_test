@@ -26,7 +26,7 @@ ohos_static_library("performance_test_static") {
   deps = [ "//third_party/googletest:gtest" ]
   public_deps = [ "//third_party/libxml2:libxml2" ]
   public_configs = [ ":performance_test_config" ]
-  subsystem_name = "developertest"
+  subsystem_name = "testfwk"
   part_name = "developertest"
   external_deps = [ "c_utils:utils" ]
 }

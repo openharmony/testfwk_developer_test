@@ -28,6 +28,6 @@ ohos_shared_library("detector") {
     "src/detector.cpp",
   ]
   configs = [ ":detector_config" ]
-  subsystem_name = "developertest"
+  subsystem_name = "testfwk"
 }
 ###############################################################################
