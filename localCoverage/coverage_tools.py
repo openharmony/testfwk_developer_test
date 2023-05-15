@@ -134,7 +134,7 @@ def get_subsystem_name(part_list, product_name):
         return ""
 
 
-def execute_interface_cov_tools(subsystem_str, developer_path):
+def execute_interface_cov_tools(partname_str, developer_path):
     print("*" * 40, "Start TO Get Interface Coverage Report", "*" * 40)
     innerkits_json_path = os.path.join(
         developer_path,
@@ -146,14 +146,12 @@ def execute_interface_cov_tools(subsystem_str, developer_path):
         developer_path,
         "localCoverage/interfaceCoverage/interfaceCoverage_gcov_lcov.py"
     )
-    subprocess.run("python3 %s %s" % (interface_path, subsystem_str), shell=True)
+    subprocess.run("python3 %s %s" % (interface_path, partname_str), shell=True)
 
 
 if __name__ == '__main__':
     testpart_args = sys.argv[1]
-    subsystem_args = sys.argv[2]
     test_part_list = testpart_args.split("testpart=")[1].split(",")
-    subsystem_args_str = subsystem_args.split("subsystem=")[1]
 
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
@@ -175,13 +173,8 @@ if __name__ == '__main__':
     execute_code_cov_tools(developer_test_path)
 
     # 执行接口覆盖率
-    if subsystem_args_str:
-        subsystem_str_name = subsystem_args_str
-    else:
-        subsystem_str_name = get_subsystem_name(test_part_list, product_names)
-
-    if subsystem_str_name:
-        execute_interface_cov_tools(subsystem_str_name, developer_test_path)
+    if len(test_part_list) > 0:
+        execute_interface_cov_tools(testpart_args, developer_test_path)
     else:
         print("subsystem or part without!")
 

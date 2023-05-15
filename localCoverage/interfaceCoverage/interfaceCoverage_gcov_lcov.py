@@ -218,9 +218,9 @@ def get_function_info_string(func_string):
     return function_info
 
 
-def get_covered_function_list(subsystem_name):
+def get_covered_function_list(part_name):
     covered_function_list = []
-    file_name = f"{subsystem_name}_strip.info"
+    file_name = f"{part_name}_strip.info"
     file_path = os.path.join(SUB_SYSTEM_INFO_PATH, file_name)
     if os.path.exists(file_path):
         with open(file_path, "r") as fd:
@@ -230,12 +230,13 @@ def get_covered_function_list(subsystem_name):
                     temp_list = sub_line_string.split(",")
                     if len(temp_list) == 2 and int(temp_list[0]) != 0:
                         func_info = get_function_info_string(temp_list[1])
-                        if "" == func_info:
+                        after_func_info = func_info.decode("utf-8")
+                        if "" == after_func_info:
                             continue
-                        func_info = func_info.replace("\n", "")
-                        if func_info == temp_list[1] and func_info.startswith("_"):
+                        after_func_info = after_func_info.replace("\n", "")
+                        if after_func_info == temp_list[1] and after_func_info.startswith("_"):
                             continue
-                        covered_function_list.append(func_info)
+                        covered_function_list.append(after_func_info)
     else:
         pass
     return covered_function_list
@@ -347,16 +348,14 @@ def get_covered_result_data(public_interface_func_list, covered_func_list):
     return coverage_result_list
 
 
-def get_interface_coverage_result_list(subsystem_name, subsystem_part_dict):
-    part_list = subsystem_part_dict.get(subsystem_name, [])
+def get_interface_coverage_result_list(part_name):
     public_interface_func_list = []
-    for part_str in part_list:
-        try:
-            interface_func_list = get_sdk_interface_func_list(part_str)
-            public_interface_func_list.extend(interface_func_list)
-        except Exception:
-            print("####")
-    covered_func_list = get_covered_function_list(subsystem_name)
+    try:
+        interface_func_list = get_sdk_interface_func_list(part_name)
+        public_interface_func_list.extend(interface_func_list)
+    except Exception:
+        print("####")
+    covered_func_list = get_covered_function_list(part_name)
     interface_coverage_result_list = get_covered_result_data(
         public_interface_func_list, covered_func_list)
     return interface_coverage_result_list
@@ -369,7 +368,7 @@ def get_coverage_data(data_list):
         for item in data_list:
             if "Y" == item[2] or "Recorded" == item[2]:
                 covered_count += 1
-        coverage = str(covered_count * 100 / total_count) + "%"
+        coverage = str("%.2f" % (covered_count * 100 / total_count)) + "%"
     else:
         coverage = "0%"
     return covered_count, coverage
@@ -389,7 +388,7 @@ def get_summary_data(interface_data_list):
             total_count += len(data_list)
             covered_count += count
     if 0 != total_count:
-        total_coverage = str(covered_count * 100 / total_count) + "%"
+        total_coverage = str("%.2f" % (covered_count * 100 / total_count)) + "%"
         summary_list.append(["Summary", total_count, covered_count, total_coverage])
     return summary_list
 
@@ -431,14 +430,12 @@ def make_coverage_result_file(interface_data_list, output_path, title_name):
     make_result_file(interface_data_list, summary_list, output_path, title_name)
 
 
-def make_interface_coverage_result():
-    subsystem_name_list = system_name_list
+def make_interface_coverage_result(part_list):
     interface_data_list = []
-    subsystem_part_dict = get_subsystem_part_list(CODEPATH)
-    for subsystem_name in subsystem_name_list:
+    for part_name in part_list:
         coverage_result_list = get_interface_coverage_result_list(
-            subsystem_name, subsystem_part_dict)
-        interface_data_list.append([subsystem_name, coverage_result_list])
+            part_name)
+        interface_data_list.append([part_name, coverage_result_list])
     make_coverage_result_file(interface_data_list, OUTPUT_REPORT_PATH,
                               "Inner Interface")
 
@@ -455,13 +452,13 @@ if __name__ == "__main__":
     KIT_MODULES_INFO = "out/{}/packages/phone/innerkits/ohos-{}/kits_modules_info.json".format(
         product_name, cpu_type)
 
-    system_args = sys.argv[1]
-    system_name_list = system_args.split(",")
+    part_args = sys.argv[1]
+    part_name_list = part_args.split("testpart=")[1].split(",")
     get_innerkits_json.gen_parts_info_json(
         get_innerkits_json.get_parts_list(os.path.join(CODEPATH, PATH_INFO_PATH)),
         os.path.join(CODEPATH, OUTPUT_JSON_PATH), cpu_type
     )
-    if len(system_name_list) > 0:
-        make_interface_coverage_result()
+    if len(part_name_list) > 0:
+        make_interface_coverage_result(part_name_list)
     else:
         print("subsystem_name not exists!")

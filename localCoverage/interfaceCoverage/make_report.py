@@ -113,7 +113,6 @@ def create_title(reportpath, title_name, summary_list):
    </table>
    </div>
     """
-    summary_list.sort(key=sort_by_field_element, reverse=False)
     subsystems = ""
     count = 0
     for item in summary_list:
@@ -140,7 +139,7 @@ def create_summary(reportpath, summary_list):
 
     table_head = """
             <tr>
-                <th style="width:20%;">SubsystemName</th>
+                <th style="width:20%;">PartName</th>
                 <th style="width:20%;">TotalCount</th>
                 <th style="width:20%;">CoveredCount</th>
                 <th style="width:20%;">Coverage</th>
@@ -179,7 +178,7 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
     table_start = """<div><table class="reference" align="center"><tbody>"""
     table_head = """
         <tr>
-            <th>SubsystemName</th>
+            <th>PartName</th>
             <th>ClassName</th>
             <th>InterfaceName</th>
             <th>IsCovered</th>
@@ -201,7 +200,7 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
     """
     try:
         with open(reportpath, "a") as report:
-            print("subsystem_name==" + subsystem_name)
+            print("part_name==" + subsystem_name)
             tabletitle = table_title % (subsystem_name)
             print("tabletitle==" + tabletitle)
             tabletitle = "<h4 style=\"text-align: left;font-family: 微软雅黑;margin-left: 3%;\">" + tabletitle + "</h4>"
@@ -224,7 +223,7 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
                         "<font color=\"green\">" + str(line[2]) + "</font>")
                     report.write(content)
             if 0 != total_count:
-                coverage = str(covered_count * 100 / total_count) + "%"
+                coverage = str("%.2f" % (covered_count * 100 / total_count)) + "%"
             else:
                 coverage = "0%"
             coverage = table_summary % (total_count, covered_count, coverage)
