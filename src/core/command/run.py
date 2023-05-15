@@ -306,10 +306,9 @@ class Run(object):
             if not options.pullgcda:
                 cov_main_file_path = os.path.join(sys.framework_root_dir, "localCoverage/coverage_tools.py")
                 testpart = ",".join(list(map(str, options.partname_list)))
-                subsystem = ",".join(list(map(str, options.subsystem)))
                 if os.path.exists(cov_main_file_path):
-                    subprocess.run("python3 %s testpart=%s subsystem=%s" % (
-                        cov_main_file_path, testpart, subsystem), shell=True)
+                    subprocess.run("python3 %s testpart=%s" % (
+                        cov_main_file_path, testpart), shell=True)
                 else:
                     print(f"{cov_main_file_path} not exists.")
         return
