@@ -52,7 +52,7 @@ def get_subsystem_config(part_list, developer_path):
 
 
 def copy_coverage(developer_path):
-    print("*" * 40, "Start TO Get Coverage Report", "*" * 40)
+    print("*" * 40, "Start TO Get Code Coverage Report", "*" * 40)
     coverage_path = os.path.join(developer_path, "reports/coverage")
     code_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/results/coverage"

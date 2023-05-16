@@ -104,7 +104,6 @@ def create_title(reportpath, title_name, summary_list):
     report_title = content + """
     <div><table align="center"><tbody>
       <tr>
-          <th><img src="test.png"></th>
           <th align='left'>
           <h4 style="font-family: 微软雅黑;">Summary Report</h4>
           <h4 style="font-family: 微软雅黑;">接口总数%s, 已覆盖%s, 未覆盖%s</h4>
