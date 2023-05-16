@@ -50,7 +50,6 @@ def recover_source_file(cpp_arr_list, keys):
         print("no any .cpp file here")
         return
 
-    print("[**********  Start Recover Source File **********]")
     for path in cpp_arr_list:
         if not os.path.exists(path):
             return
@@ -68,7 +67,6 @@ def recover_source_file(cpp_arr_list, keys):
             os.remove(path)
             subprocess.Popen("mv %s %s" % (f"{path.split('.')[0]}_bk.html", path),
                              shell=True).communicate()
-    print("[**********  End Recover Source File **********]")
 
 
 if __name__ == '__main__':

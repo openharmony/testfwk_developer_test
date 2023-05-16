@@ -52,7 +52,7 @@ def get_subsystem_config(part_list, developer_path):
 
 
 def copy_coverage(developer_path):
-    print("[*************** Start TO Get Coverage Report ***************]")
+    print("*" * 40, "Start TO Get Code Coverage Report", "*" * 40)
     coverage_path = os.path.join(developer_path, "reports/coverage")
     code_path = os.path.join(
         developer_path, "localCoverage/codeCoverage/results/coverage"
@@ -134,8 +134,8 @@ def get_subsystem_name(part_list, product_name):
         return ""
 
 
-def execute_interface_cov_tools(subsystem_str, developer_path):
-    print("[*************** Start TO Get Interface Coverage Report ***************]")
+def execute_interface_cov_tools(partname_str, developer_path):
+    print("*" * 40, "Start TO Get Interface Coverage Report", "*" * 40)
     innerkits_json_path = os.path.join(
         developer_path,
         "localCoverage/interfaceCoverage/get_innerkits_json.py"
@@ -146,14 +146,12 @@ def execute_interface_cov_tools(subsystem_str, developer_path):
         developer_path,
         "localCoverage/interfaceCoverage/interfaceCoverage_gcov_lcov.py"
     )
-    subprocess.run("python3 %s %s" % (interface_path, subsystem_str), shell=True)
+    subprocess.run("python3 %s %s" % (interface_path, partname_str), shell=True)
 
 
 if __name__ == '__main__':
     testpart_args = sys.argv[1]
-    subsystem_args = sys.argv[2]
     test_part_list = testpart_args.split("testpart=")[1].split(",")
-    subsystem_args_str = subsystem_args.split("subsystem=")[1]
 
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
@@ -174,6 +172,12 @@ if __name__ == '__main__':
     # 执行代码覆盖率
     execute_code_cov_tools(developer_test_path)
 
+    # 执行接口覆盖率
+    if len(test_part_list) > 0:
+        execute_interface_cov_tools(testpart_args, developer_test_path)
+    else:
+        print("subsystem or part without!")
+
     # 源代码还原
     after_lcov_branch_path = os.path.join(
         developer_test_path, "localCoverage/restore_comment/after_lcov_branch.py")
@@ -189,3 +193,5 @@ if __name__ == '__main__':
 
     print(r"See the code coverage report in: "
           r"/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
+    print(r"See the interface coverage report in: "
+          r"/test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits")

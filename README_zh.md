@@ -1147,6 +1147,7 @@ reports/latest
        2）安装dos2unix, 安装命令：apt install dos2unix.
        3）安装lxml, 安装命令: pip install lxml
        4）安装selectolax, 安装命令: pip install selectolax
+       5）安装CppHeaderParser, 安装命令 pip install CppHeaderParser
 
 4. 远程映射设备，修改usr_config.xml中的ip号，设备映射方式查看上面介绍的远程端口映射，
 
