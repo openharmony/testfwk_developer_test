@@ -27,6 +27,29 @@ def _init_sys_config():
     sys.path.insert(0, sys.localcoverage_path)
 
 
+def restore_config(device_ip, device_port, device_sn, serv_path):
+    """
+    恢复设备内配置文件
+    :param device_ip:
+    :param device_sn:
+    :param serv_path:
+    :param services_str:
+    :param device_port:
+    :return:
+    """
+    remount_cmd = "shell mount -o rw,remount /"
+    hdc_command(device_ip, device_port, device_sn, remount_cmd)
+    origin_foundation = os.path.join(serv_path, "foundation_origin.xml")
+    restore_foundation_cmd = "file send {} /system/profile/foundation.xml".format(origin_foundation)
+    hdc_command(device_ip, device_port, device_sn, restore_foundation_cmd)
+    serv_list = FoundationServer.lib_dict
+    for serv in serv_list:
+        rm_xml_cmd = "shell rm /system/profile/{}.xml".format(serv)
+        hdc_command(device_ip, device_port, device_sn, rm_xml_cmd)
+        rm_cfg_cmd = "shell rm /etc/init/{}.cfg".format(serv)
+        hdc_command(device_ip, device_port, device_sn, rm_cfg_cmd)
+
+
 def attach_pid(device_ip, device_sn, process_str, component_gcda_dict, developer_path,
                resident_service_path, services_str, root_path, device_port):
     """
@@ -111,7 +134,7 @@ if __name__ == '__main__':
     command_str = command_args.split("command_str=")[1].replace(",", " ")
     current_path = os.getcwd()
     _init_sys_config()
-    from localCoverage.utils import get_product_name, coverage_command
+    from localCoverage.utils import get_product_name, coverage_command, hdc_command, FoundationServer
 
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     developer_test_path = os.path.join(root_path, "test/testfwk/developer_test")
@@ -136,3 +159,4 @@ if __name__ == '__main__':
         for sn_str in device_sn_list:
             get_service_list(ip, sn_str, system_dict, services_dict, component_dict,
                              developer_test_path, service_path, root_path, port)
+            restore_config(ip, port, sn_str, service_path)
