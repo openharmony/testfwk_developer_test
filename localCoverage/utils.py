@@ -18,9 +18,10 @@
 
 import os
 import json
+import stat
 import subprocess
 import time
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT, TimeoutExpired
 
 
 def logger(content, level):
@@ -87,11 +88,14 @@ def shell_command(command_list: list):
     :return:
     """
     process = Popen(command_list, stdout=PIPE, stderr=STDOUT)
-    with process.stdout:
-        for line in iter(process.stdout.readline, b""):
-            logger(line.decode().strip(), "INFO")
-    exitcode = process.wait()
-    return process, exitcode
+    try:
+        outs, errs = process.communicate(timeout=900)
+    except TimeoutExpired:
+        process.kill()
+        outs, errs = process.communicate()
+    logger(outs.decode("utf-8").strip(), "INFO")
+
+    return errs, process.returncode
 
 
 def hdc_command(device_ip, device_port, device_sn, command):
@@ -140,3 +144,46 @@ def tree_find_file_endswith(path, suffix, file_list=None):
         if os.path.isdir(full_path):
             tree_find_file_endswith(full_path, suffix, file_list)
     return file_list
+
+
+class FoundationServer:
+    """
+    foundation拆分的进程和其对应的so之间的对应关系
+    """
+    lib_dict = {
+        "ams": ["libabilityms.z.so", "libdataobsms.z.so", "libupms.z.so", "libappms.z.so"],
+        "bms": ["libbms.z.so"],
+        "call": ["libtel_call_manager.z.so"],
+        "dms": ["libdistributed_ability_manager_svr.z.so"],
+        "fms": ["libfms.z.so"],
+        "notification": ["libcesfwk_services.z.so", "libans.z.so"],
+        "power": ["libbatteryservice.z.so", "libdisplaymgrservice.z.so", "libpowermgrservice.z.so",
+                  "libthermalservice.z.so", "libbatterystats_service.z.so"],
+        "state": ["libtel_state_registry.z.so"],
+        "wms": ["libwms.z.so"]
+    }
+
+
+def is_elffile(filepath: str) -> bool:
+    """
+    判断文件是否二进制文件
+    :param filepath:
+    :return: bool
+    """
+    if not os.path.exists(filepath):
+        logger("{} not exists.".format(filepath), "ERROR")
+        return False
+
+    try:
+        file_states = os.stat(filepath)
+        file_mode = file_states[stat.ST_MODE]
+        if not stat.S_ISREG(file_mode):
+            return False
+        with open(filepath, "rb") as f:
+            header = (bytearray(f.read(4)[1:4])).decode(encoding="utf-8")
+            if header in ["ELF"]:
+                return True
+    except UnicodeDecodeError as e:
+        logger(e, "ERROR")
+
+    return False

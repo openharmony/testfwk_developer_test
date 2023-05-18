@@ -64,6 +64,19 @@ CYCLE_TIMES = 30
 ##############################################################################
 ##############################################################################
 
+class CollectingOutputReceiver:
+    def __init__(self):
+        self.output = ""
+
+    def __read__(self, output):
+        self.output = "%s%s" % (self.output, output)
+
+    def __error__(self, message):
+        pass
+
+    def __done__(self, result_code="", message=""):
+        pass
+
 
 class DisplayOutputReceiver:
     def __init__(self):
@@ -355,17 +368,23 @@ class ResultManager(object):
 
         result_josn_file_path = os.path.join(result_save_path,
                                              "%s.json" % self.testsuite_name)
+        result_log_file_path = os.path.join(result_save_path,
+                                             "%s.log" % self.testsuite_name)
 
         if self.testsuite_path.endswith('.hap'):
             remote_result_file = os.path.join(self.device_testpath,
                                               "testcase_result.xml")
             remote_json_result_file = os.path.join(self.device_testpath,
                                                    "%s.json" % self.testsuite_name)
+            remote_log_result_file = os.path.join(self.device_testpath,
+                                                   "%s.log" % self.testsuite_name)
         else:
             remote_result_file = os.path.join(self.device_testpath,
                                               "%s.xml" % self.testsuite_name)
             remote_json_result_file = os.path.join(self.device_testpath,
                                                    "%s.json" % self.testsuite_name)
+            remote_log_result_file = os.path.join(self.device_testpath,
+                                                   "%s.log" % self.testsuite_name)
 
         if self.config.testtype[0] != "fuzztest":
             if self.device.is_file_exist(remote_result_file):
@@ -376,6 +395,8 @@ class ResultManager(object):
                 result_file_path = result_josn_file_path
             else:
                 LOG.info("%s not exist", remote_result_file)
+
+        self.device.pull_file(remote_log_result_file, result_log_file_path)
 
         return result_file_path
 
@@ -532,18 +553,21 @@ class CppTestDriver(IDriver):
         if not self.config.coverage:
             if self.config.random == "random":
                 seed = random.randint(1, 100)
-                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s --gtest_shuffle --gtest_random_seed=%d" % (
+                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s --gtest_shuffle --gtest_random_seed=%d\
+                 > %s.log 2>&1" % (
                     self.config.target_test_path,
                     filename,
                     filename,
                     test_para,
-                    seed)
+                    seed,
+                    filename)
             else:
-                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s" % (
+                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s > %s.log 2>&1" % (
                     self.config.target_test_path,
                     filename,
                     filename,
-                    test_para)
+                    test_para,
+                    filename)
         else:
             coverage_outpath = self.config.coverage_outpath
             if coverage_outpath:
@@ -558,22 +582,23 @@ class CppTestDriver(IDriver):
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
                                 rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
-                                GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
+                                GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para} > {filename}.log 2>&1"
             else:
                 command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
-                          "GCOV_PREFIX_STRIP=%s ./%s %s" % \
+                          "GCOV_PREFIX_STRIP=%s ./%s %s > %s.log 2>&1" % \
                           (self.config.target_test_path,
                            filename,
                            str(strip_num),
                            filename,
-                           test_para)
+                           test_para,
+                           filename)
 
         result = ResultManager(suite_file, self.config)
         result.set_is_coverage(is_coverage_test)
 
         try:
             # get result
-            display_receiver = DisplayOutputReceiver()
+            display_receiver = CollectingOutputReceiver()
             self.config.device.execute_shell_command(
                 command,
                 receiver=display_receiver,
