@@ -25,6 +25,23 @@ def _init_sys_config():
     sys.path.insert(0, sys.localcoverage_path)
 
 
+def get_subsystem_name(partname: str) -> str:
+    """
+    获取部件所属的子系统名
+    :param partname:
+    :return: 子系统名
+    """
+    parts_info_json = os.path.join(out_path, "build_configs", "parts_info", "part_subsystem.json")
+    if not os.path.exists(parts_info_json):
+        logger("{} not exists.".format(parts_info_json), "ERROR")
+        return ""
+    json_obj = json_parse(parts_info_json)
+    if json_obj:
+        if partname not in json_obj:
+            logger("{} part not exist in {}".format(partname, parts_info_json), "ERROR")
+            return ""
+        return json_obj[partname]
+    return ""
 def find_part_so_dest_path(test_part: str) -> str:
     """
     获取指定部件的obj目录
@@ -74,7 +91,7 @@ def find_subsystem_so_dest_path(sub_system: str) -> list:
     return []
 
 
-def find_so_source_dest(path: str) -> dict:
+def find_so_source_dest(path: str, subsystem_name: str) -> dict:
     """
     获取so和设备里所在目录的对应关系
     :param path: 子系统obj目录
@@ -89,12 +106,17 @@ def find_so_source_dest(path: str) -> dict:
 
     for j in json_list:
         json_obj = json_parse(j)
+        if "subsystem_name" not in json_obj:
+            continue
+        if json_obj["subsystem_name"] != subsystem_name:
+            continue
         if "source" not in json_obj or "dest" not in json_obj:
             logger("{} json file error.".format(j), "ERROR")
             return {}
 
-        if json_obj["source"].endswith(".so"):
-            so_dict[json_obj["source"]] = json_obj["dest"]
+        source_path = os.path.join(out_path, json_obj["source"])
+        if source_path.endswith(".so"):
+            so_dict[source_path] = json_obj["dest"]
 
     return so_dict
 
@@ -112,13 +134,12 @@ def push_coverage_so(so_dict: dict):
         cmd = "shell mount -o rw,remount /"
         hdc_command(device_ip, device_port, device, cmd)
         for source_path, dest_paths in so_dict.items():
-            full_source = os.path.join(out_path, source_path)
-            if not os.path.exists(full_source):
-                logger("{} not exist.".format(full_source), "ERROR")
+            if not os.path.exists(source_path):
+                logger("{} not exist.".format(source_path), "ERROR")
                 continue
             for dest_path in dest_paths:
                 full_dest = os.path.join("/", dest_path)
-                command = "file send {} {}".format(full_source, full_dest)
+                command = "file send {} {}".format(source_path, full_dest)
                 hdc_command(device_ip, device_port, device, command)
 
 
@@ -127,7 +148,8 @@ if __name__ == "__main__":
 
     _init_sys_config()
     from localCoverage.resident_service.public_method import get_config_ip, get_sn_list
-    from localCoverage.utils import get_product_name, hdc_command, tree_find_file_endswith, json_parse, logger
+    from localCoverage.utils import get_product_name, hdc_command, tree_find_file_endswith,\
+                                    json_parse, logger, is_elffile
 
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     out_path = os.path.join(root_path, "out", get_product_name(root_path))
@@ -152,7 +174,8 @@ if __name__ == "__main__":
             testpart_list.append(param.strip("[").strip("]").strip(","))
             for testpart in testpart_list:
                 json_path_list = find_part_so_dest_path(testpart)
-                source_dest_dict = find_so_source_dest(json_path_list)
+                subsystem = get_subsystem_name(testpart)
+                source_dest_dict = find_so_source_dest(json_path_list, subsystem)
                 push_coverage_so(source_dest_dict)
     else:
         for param in param_list:
@@ -162,5 +185,5 @@ if __name__ == "__main__":
                 subsystem = subsystem_list[0]
                 json_path_list = find_subsystem_so_dest_path(subsystem)
                 for json_path in json_path_list:
-                    source_dest_dict = find_so_source_dest(json_path)
+                    source_dest_dict = find_so_source_dest(json_path, subsystem)
                     push_coverage_so(source_dest_dict)
