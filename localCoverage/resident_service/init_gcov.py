@@ -114,7 +114,7 @@ def modify_foundation_xml(serv, config_path, origin_xml) -> str:
     :param origin_xml: 原foundation.xml
     :return: 修改后foundation.xml路径
     """
-    lib_list = FoundationServer.lib_dict
+    lib_list = FoundationServer.lib_dict.get(serv)
 
     tree = ET.parse(origin_xml)
     root = tree.getroot()
@@ -140,7 +140,7 @@ def create_service_xml(serv, config_path, origin_xml) -> str:
     :param origin_xml: 原foundation.xml
     :return: xml文件路径
     """
-    lib_list = FoundationServer.lib_dict
+    lib_list = FoundationServer.lib_dict.get(serv)
 
     tree = ET.parse(origin_xml)
     root = tree.getroot()
