@@ -107,17 +107,15 @@ def find_so_source_dest(path: str, subsystem_name: str) -> dict:
     for j in json_list:
         json_obj = json_parse(j)
         if "subsystem_name" not in json_obj:
-            logger("subsystem_name not in {}".format(j), "INFO")
             continue
         if json_obj["subsystem_name"] != subsystem_name:
-            logger("{} != {}. No need to deal.".format(json_obj["subsystem_name"], subsystem_name), "INFO")
             continue
         if "source" not in json_obj or "dest" not in json_obj:
             logger("{} json file error.".format(j), "ERROR")
             return {}
 
         source_path = os.path.join(out_path, json_obj["source"])
-        if is_elffile(source_path):
+        if source_path.endswith(".so"):
             so_dict[source_path] = json_obj["dest"]
 
     return so_dict
