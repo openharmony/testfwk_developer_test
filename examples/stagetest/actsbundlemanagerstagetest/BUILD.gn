@@ -24,7 +24,7 @@ ohos_js_stage_unittest("ActsBundleMgrStageEtsTest") {
   ets2abc = true
   certificate_profile = "signature/openharmony_sx.p7b"
   hap_name = "ActsBundleMgrStageEtsTest"
-  subsystem_name = "developertest"
+  subsystem_name = "testfwk"
   part_name = "stage_test"
   module_out_path = want_output_path
 }
