@@ -287,8 +287,8 @@
       "foundation/multimedia/histreamer"
     ]
   },
-  "multimedia_player_framework": {
-    "name": "multimedia_player_framework",
+  "player_framework": {
+    "name": "player_framework",
     "path": [
       "foundation/multimedia/player_framework"
     ]
