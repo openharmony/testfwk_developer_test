@@ -36,7 +36,7 @@
     "power": ["battery_manager", "battery_statistics", "display_manager", "power_manager", "thermal_manager"],
     "huks_service": ["huks"],
     "dlp_permission": ["dlp_permission_service"],
-    "media_service": ["multimedia_player_framework"],
+    "media_service": ["player_framework"],
     "device_usage_st": ["device_usage_statistics"],
     "accountmgr": ["os_account"],
     "av_session": ["multimedia_av_session"],
