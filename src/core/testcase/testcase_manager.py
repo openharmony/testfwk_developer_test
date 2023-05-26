@@ -149,7 +149,7 @@ class TestCaseManager(object):
                         continue
                     suite_file_dictionary.get("PYT").append(suite_file)
                 elif suffix_name == "":
-                    if file_name.find("rust") != -1:
+                    if file_name.startswith("rust_"):
                         Scheduler.update_test_type_in_source("OHRust", DeviceTestType.oh_rust_test)
                         suite_file_dictionary.get("OHRust").append(suite_file)
                     else:
