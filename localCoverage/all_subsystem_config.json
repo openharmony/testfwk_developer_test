@@ -281,8 +281,8 @@
       "foundation/multimedia/omx_adapter"
     ]
   },
-  "multimedia_histreamer": {
-    "name": "multimedia_histreamer",
+  "histreamer": {
+    "name": "histreamer",
     "path": [
       "foundation/multimedia/histreamer"
     ]
