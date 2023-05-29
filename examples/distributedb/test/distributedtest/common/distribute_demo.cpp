@@ -28,80 +28,96 @@ using namespace OHOS::HiviewDFX;
 
 namespace
 {
-	constexpr HiLogLabel LABEL={LOG_CORE,0,"DistributedtestDemo"};
+    constexpr HiLogLabel LABEL={LOG_CORE, 0, "DistributeDemo"};
 
-	const int MSG_LENGTH = 100;
-	const int EXPECT_RETURN_VALUE = 111;
+    const int MSG_LENGTH = 100;
+    const int EXPECT_RETURN_VALUE = 111;
 }
 
-class DistributedtestDemo:public DistributeTest
-{
+class DistributeDemo: public DistributeTest {
 public:
-	DistributedtestDemo() = default;
-	~DistributedtestDemo() = default;
+    DistributeDemo() = default;
+    ~DistributeDemo() = default;
 
-	static void SetUpTestCase(){};
-	static void TearDownTestCase(){};
-	virtual void SetUp(){};
-	virtual void TearDown(){};
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
 };
 
-void DistributedtestDemo::SetUpTestCase()
+void DistributeDemo::SetUpTestCase()
 {
 }
-void DistributedtestDemo::TearDownTestCase()
+void DistributeDemo::TearDownTestCase()
 {
 }
 
-void DistributedtestDemo::SetUp()
+void DistributeDemo::SetUp()
 {
 }
-void DistributedtestDemo::TearDown()
+void DistributeDemo::TearDown()
 {
 }
+
 /*
 * @tc.name:SendMessageTest001
 * @tc.desc:Verify the distributed test framework interface SendMessage.
 * @tc.type:FUNC
 * @tc.require:ArOOOCQGMV
 */
-HWTEST_F(DistributedtestDemo, SendMessageTest001,TestSize.Level1)
+HWTEST_F(DistributeDemo, SendMessageTest001, TestSize.Level1)
 {
-	char msgbuf[MSG_LENGTH] = "I am testcase 1";
-	int ret = SendMessage(AGENT_NO::ONE,msgbuf,MSG_LENGTH);
-
-	if(ret == 0)
-	{
-		EXPECT_FALSE(ret)<<"ret = 2";
-	}
-
-}
-
-HWTEST_F(DistributedtestDemo, SendMessageTest002, TestSize.Level1)
-{
-	char msgbuf[MSG_LENGTH] = "I am recall";
-	int ret = SendMessage(AGENT_NO::ONE, msgbuf,MSG_LENGTH,[&](const std::string &szreturnbuf, int rlen)->bool{
-		std::string szbuf = "ok";
-		HiLog::Info(LABEL, "SendMessageTest002 = %s",szbuf.c_str());
-		return true;
-	});
-	if(ret == 0)
-	{
-		EXPECT_TRUE(1)<<"ret = 0";
-	}
-}
-
-HWTEST_F(DistributedtestDemo, SendMessageTest003, TestSize.Level1)
-{
-    char msgbuf[MSG_LENGTH] = "I am testcase 2";
+    char msgbuf[MSG_LENGTH] = "I am testcase 1";
     int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH);
-    if(ret == 0)
-    {
-	    EXPECT_FALSE(ret)<<"ret = 0";
+
+    if (ret == 0) {
+        EXPECT_FALSE(ret)<<"ret = 2";
+    }
+
+}
+
+/*
+* @tc.name:SendMessageTest002
+* @tc.desc:Verify the distributed test framework interface SendMessage.
+* @tc.type:FUNC
+* @tc.require:ArOOOCQGMV
+*/
+HWTEST_F(DistributeDemo, SendMessageTest002, TestSize.Level1)
+{
+    char msgbuf[MSG_LENGTH] = "I am recall";
+    int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH,
+        [&](const std::string &szreturnbuf, int rlen)->bool{
+        std::string szbuf = "ok";
+        HiLog::Info(LABEL, "SendMessageTest002 = %s", szbuf.c_str());
+        return true;
+    });
+    if (ret == 0){
+        EXPECT_TRUE(1)<<"ret = 0";
     }
 }
 
-HWTEST_F(DistributedtestDemo, RunCmdOnAgent001, TestSize.Level1)
+/*
+* @tc.name:SendMessageTest003
+* @tc.desc:Verify the distributed test framework interface SendMessage.
+* @tc.type:FUNC
+* @tc.require:ArOOOCQGMV
+*/
+HWTEST_F(DistributeDemo, SendMessageTest003, TestSize.Level1)
+{
+    char msgbuf[MSG_LENGTH] = "I am testcase 2";
+    int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH);
+    if (ret == 0) {
+        EXPECT_FALSE(ret)<<"ret = 0";
+    }
+}
+
+/*
+* @tc.name:RunCmdOnAgent001
+* @tc.desc:Verify the distributed test framework interface SendMessage.
+* @tc.type:FUNC
+* @tc.require:ArOOOCQGMV
+*/
+HWTEST_F(DistribuDistributeDemotedtestDemo, RunCmdOnAgent001, TestSize.Level1)
 {
     std::string command = "query_command";
     std::string cmdArgs = "query a name?";
