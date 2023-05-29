@@ -26,82 +26,79 @@ using namespace OHOS;
 using namespace OHOS::DistributeSystemTest;
 using namespace OHOS::HiviewDFX;
 
-namespace{
-	constexpr HiLogLabel LABEL = {LOG_CORE, 0, "DistributedtestDemoAgent"};
+namespace
+{
+    constexpr HiLogLabel LABEL = {LOG_CORE, 0, "DistributedtestDemoAgent"};
 	
-	std::string g_appId = "com.ohos.nb.service.user1_test";
-	std::string g_storeId = "student_1";
+    std::string g_appId = "com.ohos.nb.service.user1_test";
+    std::string g_storeId = "student_1";
 	
-	const int CMD_RETURN_TWO = 111;
+    const int CMD_RETURN_TWO = 111;
 }
 
 class DistributedtestDemoAgent:public DistributedAgent{
 public: 
-	DistributedtestDemoAgent();
-	~DistributedtestDemoAgent();
+    DistributedtestDemoAgent();
+    ~DistributedtestDemoAgent();
 	
-	virtual bool SetUp();
-	virtual bool TearDown();
+    virtual bool SetUp();
+    virtual bool TearDown();
 	
-	virtual int OnProcessMsg(const std::string &dtrMsg, int len, std::string &strReturnValue, int returnBufLen);
-	virtual int OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
-		const std::string &strExpectValue, int expectValueLen);
+    virtual int OnProcessMsg(const std::string &dtrMsg, int len, std::string &strReturnValue, int returnBufLen);
+    virtual int OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
+	    const std::string &strExpectValue, int expectValueLen);
 	
-	int GetKvValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue, 
-		int expectValueLen);
+    int GetKvValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue, 
+	    int expectValueLen);
 				
-	int AddTwoValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue,
+    int AddTwoValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue,
 					int expectValueLen);
-	int ProcessByUseMap(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
+    int ProcessByUseMap(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
 					const std::string &strExpectValue, int expectValueLen);
 };
 
-DistributedtestDemoAgent::DistributedtestDemoAgent(){
+DistributedtestDemoAgent::DistributedtestDemoAgent()
+{
 
 }
 
-DistributedtestDemoAgent::~DistributedtestDemoAgent(){}
+DistributedtestDemoAgent::~DistributedtestDemoAgent()
+{
+
+}
 
 
 bool DistributedtestDemoAgent::SetUp()
 {
-	return true;
+    return true;
 }
 
 bool DistributedtestDemoAgent::TearDown()
 {
-	/**
-	*@tc.teardown:Recovery test agent device environment
+	/*
+	* @tc.teardown:Recovery test agent device environment
 	*/
-	return true;
+    return true;
 }
 
 // The entry of handlingthe major test case message
 int DistributedtestDemoAgent::OnProcessMsg(const std::string &strMsg, int len, std::string &strReturnValue, int returnValueLen)
 {
-	
-	
-	int nret = 0;
-	//std::string returnStr = "agent return message.";
-	std::string strrq = "I am recall";
-	if(strstr(strMsg.c_str(),strrq.c_str()))
-	{
-		strReturnValue = "ok";
-		nret = 5;
-		return nret;
-	}
-	std::string strrq = "I am testcase2";
-	if(strstr(strMsg.c_str(), strrq.c_str()))
-	{
-		HiLog::Info(LABEL, "I am testcase2");
-		nret = 7;
-		return nret;
-	}
-	else
-	{
-		//return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
-		nret = 2;
-		return nret;
+    std::string returnStr = "agent return message.";
+    std::string strrq = "I am recall";
+    if(strstr(strMsg.c_str(),strrq.c_str()))
+    {
+	    strReturnValue = "ok";
+	    return strReturnValue;
+    }
+    std::string strrq = "I am testcase2";
+    if(strstr(strMsg.c_str(), strrq.c_str()))
+    {
+	    HiLog::Info(LABEL, "I am testcase2");
+    }
+    else
+    {
+        return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
 	}
 }
 
@@ -109,8 +106,10 @@ int DistributedtestDemoAgent::OnProcessMsg(const std::string &strMsg, int len, s
 int DistributedtestDemoAgent::OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen, 
 		const std::string &strExpectValue, int expectValueLen)
 {
-	if(strCommand == "query_command"){
-		if(strArgs == "query a name?"){
+    if(strCommand == "query_command")
+    {
+        if(strArgs == "query a name?")
+        {
 			return CMD_RETURN_TWO;
 		}
 	}
@@ -119,41 +118,27 @@ int DistributedtestDemoAgent::OnProcessCmd(const std::string &strCommand, int cm
 
 int main()
 {
-	//Test agent main function
+	// Test agent main function
 	
 	DistributedtestDemoAgent obj;
-	if(obj.SetUp()){
+	if(obj.SetUp())
+    {
 		obj.Start("agent.desc");
 		obj.Join();
-	}else{
+	}
+    else
+    {
 		HiLog::Error(LABEL, "Init environment failed.");
 	}
 	
-	if(obj.TearDown()){
+	if(obj.TearDown())
+    {
 		return 0;
-	}else{
+	}
+    else
+    {
 		HiLog::Error(LABEL, "Clear environment failed.");
 		return -1;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
