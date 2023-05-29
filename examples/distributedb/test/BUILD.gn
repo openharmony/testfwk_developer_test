@@ -34,7 +34,7 @@ config("module_private_config") {
 ohos_distributedtest("DistributeDemo") {
   module_out_path = module_output_path
 
-  sources = [ "distribute_demo.cpp" ]
+  sources = [ "./distributedtest/common/distribute_demo.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -54,7 +54,7 @@ ohos_distributedtest("DistributeDemo") {
 ohos_distributedtest("DistributeDemoAgent") {
   module_out_path = module_output_path
 
-  sources = [ "distribute_demo_agent.cpp" ]
+  sources = [ "./distributedtest/common/distribute_demo_agent.cpp" ]
 
   configs = [ ":module_private_config" ]
 
