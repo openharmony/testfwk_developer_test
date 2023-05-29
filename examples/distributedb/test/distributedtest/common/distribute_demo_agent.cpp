@@ -28,29 +28,30 @@ using namespace OHOS::HiviewDFX;
 
 namespace
 {
-    constexpr HiLogLabel LABEL = {LOG_CORE, 0, "DistributedtestDemoAgent"};
-	
-    std::string g_appId = "com.ohos.nb.service.user1_test";
-    std::string g_storeId = "student_1";
-	
-    const int CMD_RETURN_TWO = 111;
+	constexpr HiLogLabel LABEL = {LOG_CORE, 0, "DistributedtestDemoAgent"};
+
+	std::string g_appId = "com.ohos.nb.service.user1_test";
+	std::string g_storeId = "student_1";
+
+	const int CMD_RETURN_TWO = 111;
 }
 
-class DistributedtestDemoAgent:public DistributedAgent{
-public: 
-    DistributedtestDemoAgent();
-    ~DistributedtestDemoAgent();
-	
-    virtual bool SetUp();
-    virtual bool TearDown();
-	
+class DistributedtestDemoAgent:public DistributedAgent
+{
+public:
+	DistributedtestDemoAgent();
+	~DistributedtestDemoAgent();
+
+	virtual bool SetUp();
+	virtual bool TearDown();
+
     virtual int OnProcessMsg(const std::string &dtrMsg, int len, std::string &strReturnValue, int returnBufLen);
     virtual int OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
-	    const std::string &strExpectValue, int expectValueLen);
-	
-    int GetKvValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue, 
+		const std::string &strExpectValue, int expectValueLen);
+
+    int GetKvValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue,
 	    int expectValueLen);
-				
+
     int AddTwoValue(const std::string &strArgs, int argsLen, const std::string &strExpectValue,
 					int expectValueLen);
     int ProcessByUseMap(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
@@ -82,33 +83,35 @@ bool DistributedtestDemoAgent::TearDown()
 }
 
 // The entry of handlingthe major test case message
-int DistributedtestDemoAgent::OnProcessMsg(const std::string &strMsg, int len, std::string &strReturnValue, int returnValueLen)
+void DistributedtestDemoAgent::OnProcessMsg(const std::string &strMsg, int len, std::string &strReturnValue, int returnValueLen)
 {
-    std::string returnStr = "agent return message.";
-    std::string strrq = "I am recall";
-    if(strstr(strMsg.c_str(),strrq.c_str()))
-    {
-	    strReturnValue = "ok";
-	    return strReturnValue;
-    }
-    std::string strrq = "I am testcase2";
-    if(strstr(strMsg.c_str(), strrq.c_str()))
-    {
-	    HiLog::Info(LABEL, "I am testcase2");
-    }
-    else
-    {
-        return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
+
+
+	std::string returnStr = "agent return message.";
+	std::string strrq = "I am recall";
+	if(strstr(strMsg.c_str(),strrq.c_str()))
+	{
+		strReturnValue = "ok";
+		return strReturnValue;
+	}
+	std::string strrq = "I am testcase2";
+	if(strstr(strMsg.c_str(), strrq.c_str()))
+	{
+		HiLog::Info(LABEL, "I am testcase2");
+	}
+	else
+	{
+		return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
 	}
 }
 
 
-int DistributedtestDemoAgent::OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen, 
+void DistributedtestDemoAgent::OnProcessCmd(const std::string &strCommand, int cmdLen, const std::string &strArgs, int argsLen,
 		const std::string &strExpectValue, int expectValueLen)
 {
-    if(strCommand == "query_command")
+	if(strCommand == "query_command")
     {
-        if(strArgs == "query a name?")
+		if(strArgs == "query a name?")
         {
 			return CMD_RETURN_TWO;
 		}
@@ -119,7 +122,7 @@ int DistributedtestDemoAgent::OnProcessCmd(const std::string &strCommand, int cm
 int main()
 {
 	// Test agent main function
-	
+
 	DistributedtestDemoAgent obj;
 	if(obj.SetUp())
     {
@@ -130,7 +133,7 @@ int main()
     {
 		HiLog::Error(LABEL, "Init environment failed.");
 	}
-	
+
 	if(obj.TearDown())
     {
 		return 0;
