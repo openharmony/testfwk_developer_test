@@ -40,32 +40,25 @@ public:
 	DistributedtestDemo() = default;
 	~DistributedtestDemo() = default;
 
-	static void SetUpTestCase();
-	static void TearDownTestCase();
-	virtual void SetUp();
-	virtual void TearDown();
+	static void SetUpTestCase(){};
+	static void TearDownTestCase(){};
+	virtual void SetUp(){};
+	virtual void TearDown(){};
 };
 
 void DistributedtestDemo::SetUpTestCase()
 {
-
 }
-
 void DistributedtestDemo::TearDownTestCase()
 {
-
 }
 
 void DistributedtestDemo::SetUp()
 {
-
 }
-
 void DistributedtestDemo::TearDown()
 {
-
 }
-
 /*
 * @tc.name:SendMessageTest001
 * @tc.desc:Verify the distributed test framework interface SendMessage.
@@ -92,7 +85,6 @@ HWTEST_F(DistributedtestDemo, SendMessageTest002, TestSize.Level1)
 		HiLog::Info(LABEL, "SendMessageTest002 = %s",szbuf.c_str());
 		return true;
 	});
-
 	if(ret == 0)
 	{
 		EXPECT_TRUE(1)<<"ret = 0";
@@ -101,30 +93,28 @@ HWTEST_F(DistributedtestDemo, SendMessageTest002, TestSize.Level1)
 
 HWTEST_F(DistributedtestDemo, SendMessageTest003, TestSize.Level1)
 {
-	char msgbuf[MSG_LENGTH] = "I am testcase 2";
-	int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH);
-	if(ret == 0)
-	{
-		EXPECT_FALSE(ret)<<"ret = 0";
-	}
-
+    char msgbuf[MSG_LENGTH] = "I am testcase 2";
+    int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH);
+    if(ret == 0)
+    {
+	    EXPECT_FALSE(ret)<<"ret = 0";
+    }
 }
-
 
 HWTEST_F(DistributedtestDemo, RunCmdOnAgent001, TestSize.Level1)
 {
-	std::string command = "query_command";
-	std::string cmdArgs = "query a name?";
-	std::string expectValue = "111";
-	RunCmdOnAgent(AGENT_NO::ONE, command, cmdArgs, expectValue);
-	EXPECT_EQ(GetReturnVal(), EXPECT_RETURN_VALUE);
+    std::string command = "query_command";
+    std::string cmdArgs = "query a name?";
+    std::string expectValue = "111";
+    RunCmdOnAgent(AGENT_NO::ONE, command, cmdArgs, expectValue);
+    EXPECT_EQ(GetReturnVal(), EXPECT_RETURN_VALUE);
 }
 
 int main(int argc, char*argv[])
 {
-	g_pDistributetestEnv = new DistributeTestEnvironment("major.desc");
-	testing::AddGlobalTestEnvironment(g_pDistributetestEnv);
-	testing::GTEST_FLAG(output) = "xml:./";
-	testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+    g_pDistributetestEnv = new DistributeTestEnvironment("major.desc");
+    testing::AddGlobalTestEnvironment(g_pDistributetestEnv);
+    testing::GTEST_FLAG(output) = "xml:./";
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
