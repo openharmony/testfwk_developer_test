@@ -91,8 +91,7 @@ void DistributeDemoAgent::OnProcessMsg(const std::string &strMsg,
     std::string strrq = "I am testcase2";
     if (strstr(strMsg.c_str(), strrq.c_str())) {
         HiLog::Info(LABEL, "I am testcase2");
-    }
-    else {
+    } else {
         return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
     }
 }
