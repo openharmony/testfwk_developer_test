@@ -16,7 +16,7 @@ import("//build/test.gni")
 module_output_path = "developertest/distributedb"
 
 ###############################################################################
-config("module_private_config"){
+config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -25,7 +25,7 @@ config("module_private_config"){
   ]
 }
 
-ohos_distributedtest("DistributeDemo"){
+ohos_distributedtest("DistributeDemo") {
   module_out_path = module_output_path
 
   sources = [ "./distributedtest/common/distribute_demo.cpp" ]
@@ -40,12 +40,10 @@ ohos_distributedtest("DistributeDemo"){
     "samgr:samgr_proxy",
   ]
 
-  deps = [
-    "//third_party/googletest:gtest"
-  ]
+  deps = [ "//third_party/googletest:gtest" ]
 }
 
-ohos_distributedtest("DistributeDemoAgent"){
+ohos_distributedtest("DistributeDemoAgent") {
   module_out_path = module_output_path
 
   sources = [ "./distributedtest/common/distribute_demo_agent.cpp" ]
@@ -60,13 +58,11 @@ ohos_distributedtest("DistributeDemoAgent"){
     "samgr:samgr_proxy",
   ]
 
-  deps = [
-    "//third_party/googletest:gtest",
-  ]
+  deps = [ "//third_party/googletest:gtest" ]
 }
 
 ###############################################################################
-group("distributedtest"){
+group("distributedtest") {
   testonly = true
   deps = [
     ":DistributeDemo",
