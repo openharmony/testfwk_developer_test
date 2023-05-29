@@ -21,7 +21,7 @@ config("module_private_config"){
 
   include_dirs = [
     "../../../../../../commonlibrary/c_utils/base/include",
-    "../../../aw/distributed"
+    "../../../aw/distributed",
   ]
 }
 
@@ -37,7 +37,7 @@ ohos_distributedtest("DistributeDemo"){
     "hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy"
+    "samgr:samgr_proxy",
   ]
 
   deps = [
@@ -57,11 +57,11 @@ ohos_distributedtest("DistributeDemoAgent"){
     "hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy"
+    "samgr:samgr_proxy",
   ]
 
   deps = [
-    "//third_party/googletest:gtest"
+    "//third_party/googletest:gtest",
   ]
 }
 
@@ -70,7 +70,7 @@ group("distributedtest"){
   testonly = true
   deps = [
     ":DistributeDemo",
-    ":DistributeDemoAgent"
+    ":DistributeDemoAgent",
   ]
 }
 ###############################################################################
