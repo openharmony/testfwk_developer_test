@@ -26,15 +26,14 @@ using namespace testing::ext;
 using namespace OHOS::DistributeSystemTest;
 using namespace OHOS::HiviewDFX;
 
-namespace
-{
-    constexpr HiLogLabel LABEL={LOG_CORE, 0, "DistributeDemo"};
+namespace {
+    constexpr HiLogLabel LABEL = {LOG_CORE, 0, "DistributeDemo"};
 
     const int MSG_LENGTH = 100;
     const int EXPECT_RETURN_VALUE = 111;
 }
 
-class DistributeDemo: public DistributeTest {
+class DistributeDemo : public DistributeTest {
 public:
     DistributeDemo() = default;
     ~DistributeDemo() = default;
@@ -73,7 +72,6 @@ HWTEST_F(DistributeDemo, SendMessageTest001, TestSize.Level1)
     if (ret == 0) {
         EXPECT_FALSE(ret)<<"ret = 2";
     }
-
 }
 
 /*
@@ -86,12 +84,12 @@ HWTEST_F(DistributeDemo, SendMessageTest002, TestSize.Level1)
 {
     char msgbuf[MSG_LENGTH] = "I am recall";
     int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH,
-        [&](const std::string &szreturnbuf, int rlen)->bool{
+        [&](const std::string &szreturnbuf, int rlen)->bool {
         std::string szbuf = "ok";
         HiLog::Info(LABEL, "SendMessageTest002 = %s", szbuf.c_str());
         return true;
     });
-    if (ret == 0){
+    if (ret == 0) {
         EXPECT_TRUE(1)<<"ret = 0";
     }
 }
@@ -117,7 +115,7 @@ HWTEST_F(DistributeDemo, SendMessageTest003, TestSize.Level1)
 * @tc.type:FUNC
 * @tc.require:ArOOOCQGMV
 */
-HWTEST_F(DistribuDistributeDemotedtestDemo, RunCmdOnAgent001, TestSize.Level1)
+HWTEST_F(DistributeDemo, RunCmdOnAgent001, TestSize.Level1)
 {
     std::string command = "query_command";
     std::string cmdArgs = "query a name?";
