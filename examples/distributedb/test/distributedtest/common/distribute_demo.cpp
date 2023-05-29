@@ -23,7 +23,7 @@
 using namespace std;
 using namespace OHOS;
 using namespace testing::ext;
-using namespace OHOS::DistributeSystemTest;
+using namespace OHOS::DistributeDemo;
 using namespace OHOS::HiviewDFX;
 
 namespace {
@@ -34,7 +34,6 @@ namespace {
 }
 
 class DistributeDemo : public DistributeTest {
-public:
     DistributeDemo() = default;
     ~DistributeDemo() = default;
 
