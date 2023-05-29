@@ -35,7 +35,7 @@ namespace {
     const int CMD_RETURN_TWO = 111;
 }
 
-class DistributeDemoAgent: public DistributedAgent {
+class DistributeDemoAgent : public DistributedAgent {
 public:
     DistributeDemoAgent();
     ~DistributeDemoAgent();
@@ -80,53 +80,50 @@ bool DistributeDemoAgent::TearDown()
 
 // The entry of handlingthe major test case message
 void DistributeDemoAgent::OnProcessMsg(const std::string &strMsg,
-        int len, std::string &strReturnValue, int returnValueLen)
+    int len, std::string &strReturnValue, int returnValueLen)
 {
     std::string returnStr = "agent return message.";
     std::string strrq = "I am recall";
     if (strstr(strMsg.c_str(), strrq.c_str())) {
-	    strReturnValue = "ok";
-	    return strReturnValue;
+        strReturnValue = "ok";
+        return strReturnValue;
     }
     std::string strrq = "I am testcase2";
     if (strstr(strMsg.c_str(), strrq.c_str())) {
-	    HiLog::Info(LABEL, "I am testcase2");
+        HiLog::Info(LABEL, "I am testcase2");
     }
     else {
-	    return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
+        return DistributedAgent::OnProcessMsg(strMsg, len, strReturnValue, returnValueLen);
     }
 }
 
 void DistributeDemoAgent::OnProcessCmd(const std::string &strCommand,
-        int cmdLen, const std::string &strExpectValue, int expectValueLen)
+    int cmdLen, const std::string &strExpectValue, int expectValueLen)
 {
     if (strCommand == "query_command") {
         if (strArgs == "query a name?") {
             return CMD_RETURN_TWO;
-		}
-	}
+        }
+    }
     return DistributedAgent::OnProcessCmd(strCommand, cmdLen, strExpectValue, expectValueLen);
 }
 
 int main()
 {
 	// Test agent main function
-
-	DistributeDemoAgent obj;
+    DistributeDemoAgent obj;
     if (obj.SetUp()) {
         obj.Start("agent.desc");
         obj.Join();
-	}
-    else {
+    } else {
         HiLog::Error(LABEL, "Init environment failed.");
-	}
+    }
 
     if (obj.TearDown()) {
         return 0;
-	}
-    else {
-		HiLog::Error(LABEL, "Clear environment failed.");
-		return -1;
-	}
+    } else {
+        HiLog::Error(LABEL, "Clear environment failed.");
+        return -1;
+    }
 }
 
