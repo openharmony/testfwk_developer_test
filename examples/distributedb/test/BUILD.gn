@@ -20,26 +20,15 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//foundation/distributeddatamgr/kv_store/frameworks/innerkitsimpl/distributeddatafwk/include",
-    "//foundation/distributeddatamgr/kv_store/frameworks/innerkitsimpl/distributeddatafwk/src",
-    "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/app_distributeddata/include",
-    "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/distributeddata/include",
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/app/include",
-    "//test/testfwk/developer_test/aw/distributed",
+    "../../../../../../commonlibrary/c_utils/base/include",
+    "../../../aw/distributed",
   ]
-
-  # link library
-  #ldflags = [ "-llog" ]
-
-  # library path
-  lib_dirs = [ "//foundation/appexecfwk/libs" ]
 }
 
 ohos_distributedtest("DistributeDemo") {
   module_out_path = module_output_path
 
-  sources = [ "//test/testfwk/developer_test/examples/distributedb/test/distributedtest/common/distribute_demo.cpp" ]
+  sources = [ "./distributedtest/common/distribute_demo.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -51,17 +40,13 @@ ohos_distributedtest("DistributeDemo") {
     "samgr:samgr_proxy",
   ]
 
-  deps = [
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
-    "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/distributeddata/:distributeddata_inner",
-    "//third_party/googletest:gtest",
-  ]
+  deps = [ "//third_party/googletest:gtest" ]
 }
 
 ohos_distributedtest("DistributeDemoAgent") {
   module_out_path = module_output_path
 
-  sources = [ "//test/testfwk/developer_test/examples/distributedb/test/distributedtest/common/distribute_demo_agent.cpp" ]
+  sources = [ "./distributedtest/common/distribute_demo_agent.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -73,11 +58,7 @@ ohos_distributedtest("DistributeDemoAgent") {
     "samgr:samgr_proxy",
   ]
 
-  deps = [
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter:distributeddata_adapter",
-    "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/distributeddata/:distributeddata_inner",
-    "//third_party/googletest:gtest",
-  ]
+  deps = [ "//third_party/googletest:gtest" ]
 }
 
 ###############################################################################
