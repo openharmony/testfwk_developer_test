@@ -68,9 +68,7 @@ namespace {
         char msgbuf[MSG_LENGTH] = "I am testcase 1";
         int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH);
 
-        if (ret == 0) {
-            EXPECT_FALSE(ret)<<"ret = 2";
-        }
+        EXPECT_FALSE(ret)<<"ret = 2";
     }
 
     HWTEST_F(DistributeDemo, SendMessageTest002, TestSize.Level1)
@@ -82,18 +80,14 @@ namespace {
             HiLog::Info(LABEL, "SendMessageTest002 = %s", szbuf.c_str());
             return true;
         });
-        if (ret == 0) {
-            EXPECT_TRUE(1)<<"ret = 0";
-        }
+        EXPECT_TRUE(ret)<<"ret = 0";
     }
 
     HWTEST_F(DistributeDemo, SendMessageTest003, TestSize.Level1)
     {
         char msgbuf[MSG_LENGTH] = "I am testcase 2";
         int ret = SendMessage(AGENT_NO::ONE, msgbuf, MSG_LENGTH);
-        if (ret == 0) {
-            EXPECT_FALSE(ret)<<"ret = 0";
-        }
+        EXPECT_FALSE(ret)<<"ret = 0";
     }
 
     HWTEST_F(DistributeDemo, RunCmdOnAgent001, TestSize.Level1)
