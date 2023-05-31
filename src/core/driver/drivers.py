@@ -172,6 +172,7 @@ def get_test_log_savepath(result_rootpath):
     LOG.info("test_log_savepath = {}".format(test_log_path))
     return test_log_path
 
+
 # all testsuit common Unavailable test result xml
 def _create_empty_result_file(filepath, filename, error_message):
     error_message = str(error_message)
@@ -671,8 +672,7 @@ class CppTestDriver(IDriver):
 
         # push resource files
         resource_manager = ResourceManager()
-        resource_data_dic, resource_dir = \
-            resource_manager.get_resource_data_dic(suite_file)
+        resource_data_dic, resource_dir = resource_manager.get_resource_data_dic(suite_file)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir,
                                                self.config.device)
         # execute testcase
@@ -695,9 +695,8 @@ class CppTestDriver(IDriver):
                     test_para,
                     filename)
         else:
-            coverage_outpath = self.config.coverage_outpath
-            if coverage_outpath:
-                strip_num = len(coverage_outpath.strip("/").split("/"))
+            if self.config.coverage_outpath:
+                strip_num = len(self.config.coverage_outpath.strip("/").split("/"))
             else:
                 ohos_config_path = os.path.join(sys.source_code_root_path, "ohos_config.json")
                 with open(ohos_config_path, 'r') as json_file:
@@ -735,9 +734,7 @@ class CppTestDriver(IDriver):
             return_message = str(exception.args)
 
         self.result = result.get_test_results_hidelog(return_message)
-        resource_manager.process_cleaner_data(resource_data_dic,
-                                              resource_dir,
-                                              self.config.device)
+        resource_manager.process_cleaner_data(resource_data_dic, resource_dir, self.config.device)
 
     @staticmethod
     def _alter_init(name):
