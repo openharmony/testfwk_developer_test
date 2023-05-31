@@ -162,8 +162,8 @@ class Run(object):
             history_cmd = self.history_cmd_list[-1]
             command = history_cmd["command"]
             options = history_cmd["options"]
-            latest_report_path = os.path.join(
-                sys.framework_root_dir, "reports/latest/summary_report.xml")
+            from xdevice import Variables
+            latest_report_path = os.path.join(Variables.temp_dir, "latest/summary_report.xml")
             tree = ElementTree.parse(latest_report_path)
             root = tree.getroot()
             has_failed_case = 0
@@ -282,7 +282,8 @@ class Run(object):
                 scheduler.exec_command(command, options)
         if need_record_history:
             #读文件获取运行结果
-            latest_report_path = os.path.join(sys.framework_root_dir, "reports/latest/summary_report.xml")
+            from xdevice import Variables
+            latest_report_path = os.path.join(Variables.temp_dir, "latest/summary_report.xml")
             with open(latest_report_path) as report_file:
                 for report_line in report_file:
                     if "testsuites name=\"summary_report\"" in report_line:
