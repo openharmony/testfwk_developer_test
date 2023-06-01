@@ -550,10 +550,7 @@ class CppTestDriver(IDriver):
             self.config.device.set_device_report_path(request.config.report_path)
             self.config.device.device_log_collector.start_hilog_task()
             self._init_gtest()
-            if self.config.hidelog:
-                self._run_gtest_hidelog(suite_file)
-            else:
-                self._run_gtest(suite_file)
+            self._run_gtest(suite_file)
 
         finally:
             serial = "{}_{}".format(str(request.config.device.__get_serial__()), time.time_ns())
@@ -574,8 +571,7 @@ class CppTestDriver(IDriver):
                 "mkdir -p %s" % os.path.join(self.config.target_test_path,
                                              "corpus"))
 
-    def _run_gtest(self, suite_file):
-        from xdevice import Variables
+    def _gtest_command(self, suite_file):
         filename = os.path.basename(suite_file)
         test_para = self._get_test_para(self.config.testcase,
                                         self.config.testlevel,
@@ -583,18 +579,7 @@ class CppTestDriver(IDriver):
                                         self.config.target_test_path,
                                         suite_file,
                                         filename)
-        is_coverage_test = True if self.config.coverage else False
 
-        # push testsuite file
-        self.config.device.push_file(suite_file, self.config.target_test_path)
-        self._push_corpus_if_exist(suite_file)
-
-        # push resource files
-        resource_manager = ResourceManager()
-        resource_data_dic, resource_dir = \
-            resource_manager.get_resource_data_dic(suite_file)
-        resource_manager.process_preparer_data(resource_data_dic, resource_dir,
-                                               self.config.device)
         # execute testcase
         if not self.config.coverage:
             if self.config.random == "random":
@@ -624,8 +609,8 @@ class CppTestDriver(IDriver):
             if "fuzztest" == self.config.testtype[0]:
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
-                                rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
-                                GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
+                                        rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
+                                        GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
             else:
                 command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
                           "GCOV_PREFIX_STRIP=%s ./%s %s" % \
@@ -635,35 +620,13 @@ class CppTestDriver(IDriver):
                            filename,
                            test_para)
 
-        result = ResultManager(suite_file, self.config)
-        result.set_is_coverage(is_coverage_test)
+        if self.config.hidelog:
+            command += " > {}.log 2>&1".format(filename)
 
-        try:
-            # get result
-            display_receiver = DisplayOutputReceiver()
-            self.config.device.execute_shell_command(
-                command,
-                receiver=display_receiver,
-                timeout=TIME_OUT,
-                retry=0)
-            return_message = display_receiver.output
-        except (ExecuteTerminate, DeviceError) as exception:
-            return_message = str(exception.args)
+        return command
 
-        self.result = result.get_test_results(return_message)
-        resource_manager.process_cleaner_data(resource_data_dic,
-                                              resource_dir,
-                                              self.config.device)
-
-    def _run_gtest_hidelog(self, suite_file):
+    def _run_gtest(self, suite_file):
         from xdevice import Variables
-        filename = os.path.basename(suite_file)
-        test_para = self._get_test_para(self.config.testcase,
-                                        self.config.testlevel,
-                                        self.config.testtype,
-                                        self.config.target_test_path,
-                                        suite_file,
-                                        filename)
         is_coverage_test = True if self.config.coverage else False
 
         # push testsuite file
@@ -672,69 +635,45 @@ class CppTestDriver(IDriver):
 
         # push resource files
         resource_manager = ResourceManager()
-        resource_data_dic, resource_dir = resource_manager.get_resource_data_dic(suite_file)
+        resource_data_dic, resource_dir = \
+            resource_manager.get_resource_data_dic(suite_file)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir,
                                                self.config.device)
-        # execute testcase
-        if not self.config.coverage:
-            if self.config.random == "random":
-                seed = random.randint(1, 100)
-                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s --gtest_shuffle --gtest_random_seed=%d\
-                 > %s.log 2>&1" % (
-                    self.config.target_test_path,
-                    filename,
-                    filename,
-                    test_para,
-                    seed,
-                    filename)
-            else:
-                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s > %s.log 2>&1" % (
-                    self.config.target_test_path,
-                    filename,
-                    filename,
-                    test_para,
-                    filename)
-        else:
-            if self.config.coverage_outpath:
-                strip_num = len(self.config.coverage_outpath.strip("/").split("/"))
-            else:
-                ohos_config_path = os.path.join(sys.source_code_root_path, "ohos_config.json")
-                with open(ohos_config_path, 'r') as json_file:
-                    json_info = json.load(json_file)
-                    out_path = json_info.get("out_path")
-                strip_num = len(out_path.strip("/").split("/"))
-            if "fuzztest" == self.config.testtype[0]:
-                self._push_corpus_cov_if_exist(suite_file)
-                command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
-                                rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
-                                GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para} > {filename}.log 2>&1"
-            else:
-                command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
-                          "GCOV_PREFIX_STRIP=%s ./%s %s > %s.log 2>&1" % \
-                          (self.config.target_test_path,
-                           filename,
-                           str(strip_num),
-                           filename,
-                           test_para,
-                           filename)
+
+        command = self._gtest_command(suite_file)
 
         result = ResultManager(suite_file, self.config)
         result.set_is_coverage(is_coverage_test)
 
         try:
             # get result
-            return_message = ""
-            display_receiver = CollectingOutputReceiver()
-            self.config.device.execute_shell_command(
-                command,
-                receiver=display_receiver,
-                timeout=TIME_OUT,
-                retry=0)
+            if self.config.hidelog:
+                return_message = ""
+                display_receiver = CollectingOutputReceiver()
+                self.config.device.execute_shell_command(
+                    command,
+                    receiver=display_receiver,
+                    timeout=TIME_OUT,
+                    retry=0)
+            else:
+                display_receiver = DisplayOutputReceiver()
+                self.config.device.execute_shell_command(
+                    command,
+                    receiver=display_receiver,
+                    timeout=TIME_OUT,
+                    retry=0)
+                return_message = display_receiver.output
         except (ExecuteTerminate, DeviceError) as exception:
             return_message = str(exception.args)
 
-        self.result = result.get_test_results_hidelog(return_message)
-        resource_manager.process_cleaner_data(resource_data_dic, resource_dir, self.config.device)
+        if self.config.hidelog:
+            self.result = result.get_test_results_hidelog(return_message)
+        else:
+            self.result = result.get_test_results(return_message)
+
+        resource_manager.process_cleaner_data(resource_data_dic,
+                                              resource_dir,
+                                              self.config.device)
 
     @staticmethod
     def _alter_init(name):
