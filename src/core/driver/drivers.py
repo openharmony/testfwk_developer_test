@@ -635,8 +635,7 @@ class CppTestDriver(IDriver):
 
         # push resource files
         resource_manager = ResourceManager()
-        resource_data_dic, resource_dir = \
-            resource_manager.get_resource_data_dic(suite_file)
+        resource_data_dic, resource_dir = resource_manager.get_resource_data_dic(suite_file)
         resource_manager.process_preparer_data(resource_data_dic, resource_dir,
                                                self.config.device)
 
