@@ -251,6 +251,12 @@ class Console(object):
                                 default=False,
                                 help="Only pull gcda file."
                                 )
+            parser.add_argument("-hlg", "--hidelog",
+                                action="store_true",
+                                dest="hidelog",
+                                default=False,
+                                help="Not show task log in console."
+                                )
             parser.add_argument("-tf", "--testfile",
                                 action="store",
                                 type=str,
