@@ -163,6 +163,16 @@ def get_result_savepath(testsuit_path, result_rootpath):
     return result_path
 
 
+def get_test_log_savepath(result_rootpath):
+    test_log_path = os.path.join(result_rootpath, "log", "test_log")
+
+    if not os.path.exists(test_log_path):
+        os.makedirs(test_log_path)
+
+    LOG.info("test_log_savepath = {}".format(test_log_path))
+    return test_log_path
+
+
 # all testsuit common Unavailable test result xml
 def _create_empty_result_file(filepath, filename, error_message):
     error_message = str(error_message)
@@ -305,7 +315,7 @@ class ResultManager(object):
 
     def get_test_results(self, error_message=""):
         # Get test result files
-        filepath = self.obtain_test_result_file()
+        filepath, _ = self.obtain_test_result_file()
         if "fuzztest" == self.config.testtype[0]:
             LOG.info("create fuzz test report")
             _create_fuzz_result_file(filepath, self.testsuite_name,
@@ -323,6 +333,37 @@ class ResultManager(object):
             self.obtain_coverage_data()
 
         return filepath
+
+    def get_test_results_hidelog(self, error_message=""):
+        # Get test result files
+        result_file_path, test_log_path = self.obtain_test_result_file()
+        log_content = ""
+        if not error_message:
+            if os.path.exists(test_log_path):
+                with open(test_log_path, "r") as log:
+                    log_content = log.readlines()
+            else:
+                LOG.error("{}: Test log not exist.".format(test_log_path))
+        else:
+            log_content = error_message
+
+        if "fuzztest" == self.config.testtype[0]:
+            LOG.info("create fuzz test report")
+            _create_fuzz_result_file(result_file_path, self.testsuite_name,
+                                     log_content)
+            if not self.is_coverage:
+                self._obtain_fuzz_corpus()
+
+        if not os.path.exists(result_file_path):
+            _create_empty_result_file(result_file_path, self.testsuite_name,
+                                      log_content)
+        if "benchmark" == self.config.testtype[0]:
+            self._obtain_benchmark_result()
+        # Get coverage data files
+        if self.is_coverage:
+            self.obtain_coverage_data()
+
+        return result_file_path
 
     def _obtain_fuzz_corpus(self):
         command = f"cd {DEFAULT_TEST_PATH}; tar czf {self.testsuite_name}_corpus.tar.gz corpus;"
@@ -363,28 +404,23 @@ class ResultManager(object):
     def obtain_test_result_file(self):
         result_save_path = get_result_savepath(self.testsuite_path,
                                                self.result_rootpath)
+
         result_file_path = os.path.join(result_save_path,
                                         "%s.xml" % self.testsuite_name)
 
         result_josn_file_path = os.path.join(result_save_path,
                                              "%s.json" % self.testsuite_name)
-        result_log_file_path = os.path.join(result_save_path,
-                                             "%s.log" % self.testsuite_name)
 
         if self.testsuite_path.endswith('.hap'):
             remote_result_file = os.path.join(self.device_testpath,
                                               "testcase_result.xml")
             remote_json_result_file = os.path.join(self.device_testpath,
                                                    "%s.json" % self.testsuite_name)
-            remote_log_result_file = os.path.join(self.device_testpath,
-                                                   "%s.log" % self.testsuite_name)
         else:
             remote_result_file = os.path.join(self.device_testpath,
                                               "%s.xml" % self.testsuite_name)
             remote_json_result_file = os.path.join(self.device_testpath,
                                                    "%s.json" % self.testsuite_name)
-            remote_log_result_file = os.path.join(self.device_testpath,
-                                                   "%s.log" % self.testsuite_name)
 
         if self.config.testtype[0] != "fuzztest":
             if self.device.is_file_exist(remote_result_file):
@@ -396,9 +432,16 @@ class ResultManager(object):
             else:
                 LOG.info("%s not exist", remote_result_file)
 
-        self.device.pull_file(remote_log_result_file, result_log_file_path)
+        if self.config.hidelog:
+            remote_log_result_file = os.path.join(self.device_testpath,
+                                                  "%s.log" % self.testsuite_name)
+            test_log_save_path = get_test_log_savepath(self.result_rootpath)
+            test_log_file_path = os.path.join(test_log_save_path,
+                                              "%s.log" % self.testsuite_name)
+            self.device.pull_file(remote_log_result_file, test_log_file_path)
+            return result_file_path, test_log_file_path
 
-        return result_file_path
+        return result_file_path, ""
 
     def make_empty_result_file(self, error_message=""):
         result_savepath = get_result_savepath(self.testsuite_path,
@@ -528,8 +571,7 @@ class CppTestDriver(IDriver):
                 "mkdir -p %s" % os.path.join(self.config.target_test_path,
                                              "corpus"))
 
-    def _run_gtest(self, suite_file):
-        from xdevice import Variables
+    def _gtest_command(self, suite_file):
         filename = os.path.basename(suite_file)
         test_para = self._get_test_para(self.config.testcase,
                                         self.config.testlevel,
@@ -537,37 +579,23 @@ class CppTestDriver(IDriver):
                                         self.config.target_test_path,
                                         suite_file,
                                         filename)
-        is_coverage_test = True if self.config.coverage else False
 
-        # push testsuite file
-        self.config.device.push_file(suite_file, self.config.target_test_path)
-        self._push_corpus_if_exist(suite_file)
-
-        # push resource files
-        resource_manager = ResourceManager()
-        resource_data_dic, resource_dir = \
-            resource_manager.get_resource_data_dic(suite_file)
-        resource_manager.process_preparer_data(resource_data_dic, resource_dir,
-                                               self.config.device)
         # execute testcase
         if not self.config.coverage:
             if self.config.random == "random":
                 seed = random.randint(1, 100)
-                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s --gtest_shuffle --gtest_random_seed=%d\
-                 > %s.log 2>&1" % (
+                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s --gtest_shuffle --gtest_random_seed=%d" % (
                     self.config.target_test_path,
                     filename,
                     filename,
                     test_para,
-                    seed,
-                    filename)
+                    seed)
             else:
-                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s > %s.log 2>&1" % (
+                command = "cd %s; rm -rf %s.xml; chmod +x *; ./%s %s" % (
                     self.config.target_test_path,
                     filename,
                     filename,
-                    test_para,
-                    filename)
+                    test_para)
         else:
             coverage_outpath = self.config.coverage_outpath
             if coverage_outpath:
@@ -581,34 +609,67 @@ class CppTestDriver(IDriver):
             if "fuzztest" == self.config.testtype[0]:
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
-                                rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
-                                GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para} > {filename}.log 2>&1"
+                                        rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
+                                        GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
             else:
                 command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
-                          "GCOV_PREFIX_STRIP=%s ./%s %s > %s.log 2>&1" % \
+                          "GCOV_PREFIX_STRIP=%s ./%s %s" % \
                           (self.config.target_test_path,
                            filename,
                            str(strip_num),
                            filename,
-                           test_para,
-                           filename)
+                           test_para)
+
+        if self.config.hidelog:
+            command += " > {}.log 2>&1".format(filename)
+
+        return command
+
+    def _run_gtest(self, suite_file):
+        from xdevice import Variables
+        is_coverage_test = True if self.config.coverage else False
+
+        # push testsuite file
+        self.config.device.push_file(suite_file, self.config.target_test_path)
+        self._push_corpus_if_exist(suite_file)
+
+        # push resource files
+        resource_manager = ResourceManager()
+        resource_data_dic, resource_dir = resource_manager.get_resource_data_dic(suite_file)
+        resource_manager.process_preparer_data(resource_data_dic, resource_dir,
+                                               self.config.device)
+
+        command = self._gtest_command(suite_file)
 
         result = ResultManager(suite_file, self.config)
         result.set_is_coverage(is_coverage_test)
 
         try:
             # get result
-            display_receiver = CollectingOutputReceiver()
-            self.config.device.execute_shell_command(
-                command,
-                receiver=display_receiver,
-                timeout=TIME_OUT,
-                retry=0)
-            return_message = display_receiver.output
+            if self.config.hidelog:
+                return_message = ""
+                display_receiver = CollectingOutputReceiver()
+                self.config.device.execute_shell_command(
+                    command,
+                    receiver=display_receiver,
+                    timeout=TIME_OUT,
+                    retry=0)
+            else:
+                display_receiver = DisplayOutputReceiver()
+                self.config.device.execute_shell_command(
+                    command,
+                    receiver=display_receiver,
+                    timeout=TIME_OUT,
+                    retry=0)
+                return_message = display_receiver.output
         except (ExecuteTerminate, DeviceError) as exception:
             return_message = str(exception.args)
 
-        self.result = result.get_test_results(return_message)
+        if self.config.hidelog:
+            self.result = result.get_test_results_hidelog(return_message)
+        else:
+            self.result = result.get_test_results(return_message)
+
         resource_manager.process_cleaner_data(resource_data_dic,
                                               resource_dir,
                                               self.config.device)

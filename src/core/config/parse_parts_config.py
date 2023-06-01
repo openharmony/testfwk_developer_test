@@ -61,7 +61,6 @@ class ParsePartsConfig(object):
 
         # 检验给出的路径是否真地存在
         if not os.path.exists(config_filepath):
-            print("Error: %s is not exist." % config_filepath)
             return None, None
 
         data_dic = None

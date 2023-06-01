@@ -1134,9 +1134,9 @@ reports/latest
 
        run -tp partname
        run -tp partname1 partname2
-2. 编译版本之前首先修改编译选项，涉及到自己子系统的build.gn文件cflags或者cflags_cc及idflags选项都需要加--coverage字段：
+2. 编译版本之前首先修改编译选项，涉及到自己子系统的build.gn文件cflags或者cflags_cc及ldflags选项都需要加--coverage字段：
        
-       idflags = [ "--coverage" ]
+       ldflags = [ "--coverage" ]
        C:   cflags = [ "--coverage" ]
        C++: cflags_cc = [ "--coverage" ]
             
