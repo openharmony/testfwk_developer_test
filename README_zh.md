@@ -58,7 +58,7 @@ subsystem  # 子系统
 │   │       │   ├── ohos_test.xml  # 资源配置文件
 │   │       ... └── 1.txt  # 资源   
 │   │            
-│   ├── ohos_build  # 编译入口配置  
+│   ├── bundle.json  # 编译入口配置  
 │   ...
 │
 ...
@@ -357,6 +357,9 @@ subsystem  # 子系统
 			factorial_test();
 			printf("Factorial_test_002 END\n");
     	}
+		// 新增多线程接口MTEST_ADD_TASK(THREAD_ID,ThreadTestFunc),注册多线程，但不在该用例中执行，之后统一执行，适合多个用例组合场景下的多线程测试。
+		// THREAD_ID从0开始定义区别不同的线程，也可以使用随机THREAD_ID，即传入RANDOM_THREAD_ID,此场景下THREAD_ID是不会重复的。
+		// 新增多线程接口MTEST_POST_RUN(),统一执行之前注册的多线程用例。
     	```
 		> **注意：** 用例注释与单线程用例标准一致。
 		
@@ -818,30 +821,37 @@ subsystem  # 子系统
     ```
     > **说明：** 进行条件分组的目的在于执行用例时可以选择性的执行某一种特定类型的用例。
 
-**编译入口配置文件ohos.build**
+**编译入口配置文件bundle.json**
 
 当完成用例编译配置文件编写后，需要进一步编写部件编译配置文件，以关联到具体的测试用例。
 ```
-"partA": {
-    "module_list": [
-          
+"build": {
+    "sub_component": [
+		"//test/testfwk/developer_test/examples/app_info:app_info",  
+		"//test/testfwk/developer_test/examples/detector:detector",  
+		"//test/testfwk/developer_test/examples/calculator:calculator"
     ],
     "inner_list": [
-          
+		{
+			"header": {
+				"header_base": "////test/testfwk/developer_test/examples/detector/include",
+				"header_files": [
+					"detector.h"
+				]
+		},
+		"name": "//test/testfwk/developer_test/examples/detector:detector"
+	  }
     ],
-    "system_kits": [
-          
-    ],
-    "test_list": [ //配置模块calculator下的test
-      "//system/subsystem/partA/calculator/test:unittest",  
-      "//system/subsystem/partA/calculator/test:fuzztest",
-      "//system/subsystem/partA/calculator/test:benchmarktest"
+    "test": [ //配置模块calculator下的test
+      "//test/testfwk/developer_test/examples/app_info/test:unittest",  
+      "//test/testfwk/developer_test/examples/calculator/test:unittest",
+      "//test/testfwk/developer_test/examples/calculator/test:fuzztest"
  }
 ```
 > **说明：** test_list中配置的是对应模块的测试用例。
 
 #### 测试用例资源配置
-测试依赖资源主要包括测试用例在执行过程中需要的图片文件，视频文件、第三方库等对外的文件资源。
+测试依赖资源主要包括测试用例在执行过程中需要的图片文件，视频文件、第三方库等对外的文件资源，目前只支持静态资源的配置。
 
 依赖资源文件配置步骤如下：
 1. 在部件的test目录下创建resource目录，在resource目录下创建对应的模块，在模块目录中存放该模块所需要的资源文件
@@ -976,22 +986,28 @@ subsystem  # 子系统
 	run -t UT
 	run -t UT -tp PartName
 	run -t UT -tp PartName -tm TestModuleName
+	run -t UT -tp ability_base -ts base_object_test
 	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest -tc interger_sub_00l
+	run -t UT -ts base_object_test
+	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
+	run -t UT -ts CalculatorSubTest -tc CalculatorSubTest.interger_sub_00l
 	run -t UT -cov coverage
+	run -t UT -ra random
+	run -t UT -tp PartName -pd partdeps
 	```
 
 	
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK，另外还有ACTS，HATS等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
-	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
+	-tc [TESTCASE]: 指定测试用例，同时需要注明测试套内class名称，不可独立使用，需结合-ts指定上级测试套使用。
 	-cov [COVERAGE]: 覆盖率执行参数
-	-h : 帮助命令。
+	-h : 帮助命令
+	-ra [random]: c++用例乱序执行参数
+	-pd [partdeps]: 二级依赖部件执行参数
 	```
 
 	
@@ -1043,20 +1059,26 @@ subsystem  # 子系统
 	run -t UT
 	run -t UT -tp PartName
 	run -t UT -tp PartName -tm TestModuleName
+	run -t UT -tp ability_base -ts base_object_test
 	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest -tc interger_sub_00l
+	run -t UT -ts base_object_test
+	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
+	run -t UT -ts CalculatorSubTest -tc CalculatorSubTest.interger_sub_00l
 	run -t -cov coverage
+	run -t UT -ra random
+	run -t UT -tp PartName -pd partdeps
 	```
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK，ACTS等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
-	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
+	-tc [TESTCASE]: 指定测试用例，同时需要注明测试套内class名称，不可独立使用，需结合-ts指定上级测试套使用。
 	-cov [COVERAGE]: 覆盖率执行参数。
-	-h : 帮助命令。
+	-h : 帮助命令
+	-ra [random]: c++用例乱序执行参数
+	-pd [partdeps]: 二级依赖部件执行参数
 	```
 
 	在linux下可以使用help命令查看有哪些产品形态、测试类型、支持的子系统、部件
@@ -1068,25 +1090,28 @@ subsystem  # 子系统
 	查看支持的测试子系统： show subsystemlist
 	查看支持的测试部件：   show partlist
 	```
-	2)ACTS命令
+	2)ACTS/HATS命令
 
-	当选择完产品形态，可以参考如下执行执行ACTS测试用例
+	当选择完产品形态，可以参考如下执行ACTS或HATS测试用例
 	```
 	run -t ACTS
+	run -t HATS
 	run -t ACTS -ss arkui
 	run -t ACTS -ss arkui, modulemanager
 	run -t ACTS -ss arkui -ts ActsAceEtsTest
-	run -t ACTS -ss arkui -tp ActsPartName 
-	run -t ACTS -ss arkui -ts ActsAceEtsTest, ActsAceEtsResultTest
+	run -t HATS -ss telephony -ts HatsHdfV1RilServiceTest
+	run -t ACTS -ss arkui -tp ActsPartName
+	run -t ACTS -ss arkui -ts ActsAceEtsTest,ActsAceEtsResultTest
+	run -t HATS -ss powermgr -ts HatsPowermgrBatteryTest,HatsPowermgrThermalTest
 	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001
 	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001 --repeat 2
 	run -hl
 	run -rh 1
 	run --retry
 	```
-	执行命令参数说明,与TDD有所不同：
+	执行命令参数说明，ACTS和HATS命令参数一致，与TDD有所不同：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有ACTS，HATS等。（必选参数）
 	-ss [SUBSYSTEM]: 指定子系统，可单独使用，且可以执行多个子系统，用逗号隔开。
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用，且可以执行多个测试套，用逗号隔开。
@@ -1173,8 +1198,8 @@ reports/latest
 
 6. 覆盖率报告路径
 
-/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html
-
+代码覆盖率报告：/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html
+接口覆盖率报告：/test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits/html
 ### 涉及仓
 
 [test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice)
