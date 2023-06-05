@@ -986,7 +986,8 @@ subsystem  # 子系统
 	run -t UT
 	run -t UT -tp PartName
 	run -t UT -tp PartName -tm TestModuleName
-	run -t UT -tp PartName -tm TestModuleName -ts base_object_test
+	run -t UT -tp ability_base -ts base_object_test
+	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
 	run -t UT -ts base_object_test
 	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
 	run -t UT -cov coverage
@@ -1055,7 +1056,8 @@ subsystem  # 子系统
 	run -t UT
 	run -t UT -tp PartName
 	run -t UT -tp PartName -tm TestModuleName
-	run -t UT -tp PartName -tm TestModuleName -ts base_object_test
+	run -t UT -tp ability_base -ts base_object_test
+	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
 	run -t UT -ts base_object_test
 	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
 	run -t -cov coverage
@@ -1101,7 +1103,7 @@ subsystem  # 子系统
 	run -rh 1
 	run --retry
 	```
-	执行命令参数说明,ACTS和HATS命令参数一致,与TDD有所不同：
+	执行命令参数说明，ACTS和HATS命令参数一致，与TDD有所不同：
 	```
 	-t [TESTTYPE]: 指定测试用例类型，有ACTS，HATS等。（必选参数）
 	-ss [SUBSYSTEM]: 指定子系统，可单独使用，且可以执行多个子系统，用逗号隔开。
