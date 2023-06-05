@@ -993,6 +993,7 @@ subsystem  # 子系统
 	run -t UT -ts CalculatorSubTest -tc CalculatorSubTest.interger_sub_00l
 	run -t UT -cov coverage
 	run -t UT -ra random
+	run -t UT -tp PartName -pd partdeps
 	```
 
 	
@@ -1006,6 +1007,7 @@ subsystem  # 子系统
 	-cov [COVERAGE]: 覆盖率执行参数
 	-h : 帮助命令
 	-ra [random]: c++用例乱序执行参数
+	-pd [partdeps]: 二级依赖部件执行参数
 	```
 
 	
@@ -1064,6 +1066,7 @@ subsystem  # 子系统
 	run -t UT -ts CalculatorSubTest -tc CalculatorSubTest.interger_sub_00l
 	run -t -cov coverage
 	run -t UT -ra random
+	run -t UT -tp PartName -pd partdeps
 	```
 	执行命令参数说明：
 	```
@@ -1075,6 +1078,7 @@ subsystem  # 子系统
 	-cov [COVERAGE]: 覆盖率执行参数。
 	-h : 帮助命令
 	-ra [random]: c++用例乱序执行参数
+	-pd [partdeps]: 二级依赖部件执行参数
 	```
 
 	在linux下可以使用help命令查看有哪些产品形态、测试类型、支持的子系统、部件
