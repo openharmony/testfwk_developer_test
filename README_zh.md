@@ -990,6 +990,7 @@ subsystem  # 子系统
 	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
 	run -t UT -ts base_object_test
 	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
+	run -t UT -ts CalculatorSubTest -tc CalculatorSubTest.interger_sub_00l
 	run -t UT -cov coverage
 	run -t UT -ra random
 	```
@@ -1060,6 +1061,7 @@ subsystem  # 子系统
 	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
 	run -t UT -ts base_object_test
 	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
+	run -t UT -ts CalculatorSubTest -tc CalculatorSubTest.interger_sub_00l
 	run -t -cov coverage
 	run -t UT -ra random
 	```
