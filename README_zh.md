@@ -357,6 +357,9 @@ subsystem  # 子系统
 			factorial_test();
 			printf("Factorial_test_002 END\n");
     	}
+		// 新增多线程接口MTEST_ADD_TASK(THREAD_ID,ThreadTestFunc),注册多线程，但不在该用例中执行，之后统一执行，适合多个用例组合场景下的多线程测试。
+		// THREAD_ID从0开始定义区别不同的线程，也可以使用随机THREAD_ID，即传入RANDOM_THREAD_ID,此场景下THREAD_ID是不会重复的。
+		// 新增多线程接口MTEST_POST_RUN(),统一执行之前注册的多线程用例。
     	```
 		> **注意：** 用例注释与单线程用例标准一致。
 		
@@ -983,9 +986,9 @@ subsystem  # 子系统
 	run -t UT
 	run -t UT -tp PartName
 	run -t UT -tp PartName -tm TestModuleName
-	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest -tc interger_sub_00l
+	run -t UT -tp PartName -tm TestModuleName -ts base_object_test
+	run -t UT -ts base_object_test
+	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
 	run -t UT -cov coverage
 	run -t UT -ra random
 	```
@@ -993,14 +996,14 @@ subsystem  # 子系统
 	
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK，另外还有ACTS，HATS等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
-	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
+	-tc [TESTCASE]: 指定测试用例，同时需要注明测试套内class名称，不可独立使用，需结合-ts指定上级测试套使用。
 	-cov [COVERAGE]: 覆盖率执行参数
 	-h : 帮助命令
-	-ra [random]: c++用例乱序执行触发参数
+	-ra [random]: c++用例乱序执行参数
 	```
 
 	
@@ -1052,22 +1055,22 @@ subsystem  # 子系统
 	run -t UT
 	run -t UT -tp PartName
 	run -t UT -tp PartName -tm TestModuleName
-	run -t UT -tp PartName -tm TestModuleName -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest
-	run -t UT -ts CalculatorSubTest -tc interger_sub_00l
+	run -t UT -tp PartName -tm TestModuleName -ts base_object_test
+	run -t UT -ts base_object_test
+	run -t UT -ts base_object_test -tc AAFwkBaseObjectTest.BaseObject_test_001
 	run -t -cov coverage
 	run -t UT -ra random
 	```
 	执行命令参数说明：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK，ACTS等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK等。（必选参数）
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
-	-tc [TESTCASE]: 指定测试用例，不可独立使用，需结合-ts指定上级测试套使用。
+	-tc [TESTCASE]: 指定测试用例，同时需要注明测试套内class名称，不可独立使用，需结合-ts指定上级测试套使用。
 	-cov [COVERAGE]: 覆盖率执行参数。
 	-h : 帮助命令
-	-ra [random]: c++用例乱序执行触发参数
+	-ra [random]: c++用例乱序执行参数
 	```
 
 	在linux下可以使用help命令查看有哪些产品形态、测试类型、支持的子系统、部件
@@ -1088,8 +1091,10 @@ subsystem  # 子系统
 	run -t ACTS -ss arkui
 	run -t ACTS -ss arkui, modulemanager
 	run -t ACTS -ss arkui -ts ActsAceEtsTest
-	run -t ACTS -ss arkui -tp ActsPartName 
-	run -t ACTS -ss arkui -ts ActsAceEtsTest, ActsAceEtsResultTest
+	run -t HATS -ss telephony -ts HatsHdfV1RilServiceTest
+	run -t ACTS -ss arkui -tp ActsPartName
+	run -t ACTS -ss arkui -ts ActsAceEtsTest,ActsAceEtsResultTest
+	run -t HATS -ss powermgr -ts HatsPowermgrBatteryTest,HatsPowermgrThermalTest
 	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001
 	run -t ACTS -ss arkui -ts ActsAceEtsTest -ta class:alphabetIndexerTest#alphabetIndexerTest001 --repeat 2
 	run -hl
@@ -1098,7 +1103,7 @@ subsystem  # 子系统
 	```
 	执行命令参数说明,ACTS和HATS命令参数一致,与TDD有所不同：
 	```
-	-t [TESTTYPE]: 指定测试用例类型，有UT，MST，ST，PERF，FUZZ，BENCHMARK,ACTS等。（必选参数）
+	-t [TESTTYPE]: 指定测试用例类型，有ACTS，HATS等。（必选参数）
 	-ss [SUBSYSTEM]: 指定子系统，可单独使用，且可以执行多个子系统，用逗号隔开。
 	-tp [TESTPART]: 指定部件，可独立使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用，且可以执行多个测试套，用逗号隔开。
