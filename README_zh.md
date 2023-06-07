@@ -994,6 +994,10 @@ subsystem  # 子系统
 	run -t UT -cov coverage
 	run -t UT -ra random
 	run -t UT -tp PartName -pd partdeps
+	run -t UT -ts base_object_test --repeat 5
+	run -hl
+	run -rh 3
+	run --retry
 	```
 
 	
@@ -1004,10 +1008,14 @@ subsystem  # 子系统
 	-tm [TESTMODULE]: 指定模块，不可独立使用，需结合-tp指定上级部件使用。
 	-ts [TESTSUITE]: 指定测试套，可独立使用。
 	-tc [TESTCASE]: 指定测试用例，同时需要注明测试套内class名称，不可独立使用，需结合-ts指定上级测试套使用。
-	-cov [COVERAGE]: 覆盖率执行参数
+	-cov [COVERAGE]: 覆盖率执行参数。
 	-h : 帮助命令
 	-ra [random]: c++用例乱序执行参数
 	-pd [partdeps]: 二级依赖部件执行参数
+	--repeat : 支持设置用例执行次数。
+	-hl [HISTORYLIST]: 显示最近10条测试用例，超过10条，只显示最近10条。
+	-rh [RUNHISTORY]: 执行历史记录的第几条记录运行
+	--retry：检查上次运行结果，如果有失败用例则重复测试
 	```
 
 	
@@ -1067,6 +1075,10 @@ subsystem  # 子系统
 	run -t -cov coverage
 	run -t UT -ra random
 	run -t UT -tp PartName -pd partdeps
+	run -t UT -ts base_object_test --repeat 5
+	run -hl
+	run -rh 3
+	run --retry
 	```
 	执行命令参数说明：
 	```
@@ -1079,6 +1091,10 @@ subsystem  # 子系统
 	-h : 帮助命令
 	-ra [random]: c++用例乱序执行参数
 	-pd [partdeps]: 二级依赖部件执行参数
+	--repeat : 支持设置用例执行次数。
+	-hl [HISTORYLIST]: 显示最近10条测试用例，超过10条，只显示最近10条。
+	-rh [RUNHISTORY]: 执行历史记录的第几条记录运行
+	--retry：检查上次运行结果，如果有失败用例则重复测试
 	```
 
 	在linux下可以使用help命令查看有哪些产品形态、测试类型、支持的子系统、部件
