@@ -173,10 +173,12 @@ class Run(object):
                 print(child.tag, ":", child.attrib)
                 for grand in child:
                     print(grand.tag, ":", grand.attrib)
-                    if grand.attrib["result"] == 'false':
-                        fail_case = grand.attrib["classname"] + "#" + grand.attrib["name"]
-                        fail_list.append(fail_case)
-                        has_failed_case += 1
+                    for sub_child in grand:
+                        if sub_child.tag == 'failure':
+                            fail_case = grand.attrib["classname"] + "#" + grand.attrib["name"]
+                            fail_list.append(fail_case)
+                            has_failed_case += 1
+                            break
             test_targets["class"] = fail_list
             setattr(options, "testargs", test_targets)
             print("retry option:", options)
