@@ -177,6 +177,7 @@ def create_service_json(serv, config_path, origin_json) -> str:
             if f_dict["systemability"][i]["libpath"] == lib:
                 tmp_list.append(f_dict["systemability"][i])
     f_dict["systemability"] = tmp_list
+    f_dict["process"] = "{}".format(serv)
 
     new_json = os.path.join(config_path, '{}.json'.format(serv))
     with open(new_json, "w", encoding="utf-8") as f:
@@ -223,7 +224,7 @@ def create_service_cfg(serv, config_path, origin_cfg) -> str:
         json_obj = json.load(jf)
         json_obj["jobs"][0]["name"] = "services:{}".format(serv)
 
-        json_obj["services"][0]["name"] = "services:{}".format(serv)
+        json_obj["services"][0]["name"] = "{}".format(serv)
 
         path_list = json_obj["services"][0]["path"]
         path_list.remove("/system/profile/foundation.json")
@@ -247,14 +248,14 @@ def remove_configs(config_path, serv):
     logger("Clear xml and cfg...", "INFO")
     config_file_list = [
         os.path.join(config_path, "foundation.json"),
-        os.path.join(config_path, "foundation_origin.json"),
         os.path.join(config_path, "{}.json".format(serv)),
         os.path.join(config_path, "foundation.cfg"),
         os.path.join(config_path, "{}.cfg".format(serv))
     ]
     for cfg in config_file_list:
-        logger("remove {}".format(cfg), "INFO")
-        os.remove(cfg)
+        if os.path.exists(cfg):
+            logger("remove {}".format(cfg), "INFO")
+            os.remove(cfg)
 
 
 def split_foundation_services(developer_path, system_info_dict, home_path, hdc_dict):
@@ -293,7 +294,6 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
     for _, value_list in system_info_dict.items():
         for process_str in value_list:
             if process_str in foundation_process_list:
-                remove_configs(config_path, process_str)
                 foundation_json = modify_foundation_json(process_str, config_path, origin_json)
                 service_json = create_service_json(process_str, config_path, origin_json)
                 service_cfg = create_service_cfg(process_str, config_path, origin_cfg)
@@ -302,6 +302,7 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(foundation_json))
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(service_json))
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /etc/init/".format(service_cfg))
+                remove_configs(config_path, process_str)
 
     return
 
