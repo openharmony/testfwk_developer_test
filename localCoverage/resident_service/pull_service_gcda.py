@@ -39,12 +39,12 @@ def restore_config(device_ip, device_port, device_sn, serv_path):
     """
     remount_cmd = "shell mount -o rw,remount /"
     hdc_command(device_ip, device_port, device_sn, remount_cmd)
-    origin_foundation = os.path.join(serv_path, "foundation_origin.xml")
-    restore_foundation_cmd = "file send {} /system/profile/foundation.xml".format(origin_foundation)
+    origin_foundation = os.path.join(serv_path, "foundation_origin.json")
+    restore_foundation_cmd = "file send {} /system/profile/foundation.json".format(origin_foundation)
     hdc_command(device_ip, device_port, device_sn, restore_foundation_cmd)
     serv_list = FoundationServer.lib_dict
     for serv in serv_list:
-        rm_xml_cmd = "shell rm /system/profile/{}.xml".format(serv)
+        rm_xml_cmd = "shell rm /system/profile/{}.json".format(serv)
         hdc_command(device_ip, device_port, device_sn, rm_xml_cmd)
         rm_cfg_cmd = "shell rm /etc/init/{}.cfg".format(serv)
         hdc_command(device_ip, device_port, device_sn, rm_cfg_cmd)
