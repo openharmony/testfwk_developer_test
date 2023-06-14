@@ -280,7 +280,7 @@ class BuildTestcases(object):
                 xts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
             if para.testsuit != "" and len(para.subsystem) == 0:
                 LOG.error("Please specify subsystem.")
-                return
+                return False
         else:
             global BUILD_FILEPATH
             BUILD_FILEPATH = BUILD_FILE_PATH
