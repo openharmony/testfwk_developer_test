@@ -160,7 +160,8 @@ class FoundationServer:
         "power": ["libbatteryservice.z.so", "libdisplaymgrservice.z.so", "libpowermgrservice.z.so",
                   "libthermalservice.z.so", "libbatterystats_service.z.so"],
         "state": ["libtel_state_registry.z.so"],
-        "wms": ["libwms.z.so"]
+        "wms": ["libwms.z.so"],
+        "theme": ["libscreenlock_server.z.so"]
     }
 
 
