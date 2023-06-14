@@ -17,6 +17,7 @@
 #
 
 import os
+import shutil
 import subprocess
 import json
 import sys
@@ -146,10 +147,9 @@ def modify_foundation_json(serv, config_path, origin_json) -> str:
         f_dict = json.load(f)
 
     tmp_list = list()
-    for lib in lib_list:
-        for i in range(len(f_dict["systemability"])):
-            if f_dict["systemability"][i]["libpath"] != lib:
-                tmp_list.append(f_dict["systemability"][i])
+    for i in range(len(f_dict["systemability"])):
+        if f_dict["systemability"][i]["libpath"] not in lib_list:
+            tmp_list.append(f_dict["systemability"][i])
     f_dict["systemability"] = tmp_list
 
     new_json = os.path.join(config_path, 'foundation.json')
@@ -239,23 +239,15 @@ def create_service_cfg(serv, config_path, origin_cfg) -> str:
     return cfg_path
 
 
-def remove_configs(config_path, serv):
+def remove_configs(config_path):
     """
     清理配置文件目录下的xml和cfg文件
     :param config_path: 配置文件目录
     :return:
     """
-    logger("Clear xml and cfg...", "INFO")
-    config_file_list = [
-        os.path.join(config_path, "foundation.json"),
-        os.path.join(config_path, "{}.json".format(serv)),
-        os.path.join(config_path, "foundation.cfg"),
-        os.path.join(config_path, "{}.cfg".format(serv))
-    ]
-    for cfg in config_file_list:
-        if os.path.exists(cfg):
-            logger("remove {}".format(cfg), "INFO")
-            os.remove(cfg)
+    logger("Clear config path...", "INFO")
+    shutil.rmtree(config_path)
+    os.mkdir(config_path)
 
 
 def split_foundation_services(developer_path, system_info_dict, home_path, hdc_dict):
@@ -264,8 +256,8 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
     XXX.cfg文件推送到/etc/init/
     reboot设备，可以将服务从foundation中拆分出来，成为一个独立服务进程
     """
-    config_path = os.path.join(developer_path, "localCoverage", "resident_service")
-
+    config_path = os.path.join(developer_path, "localCoverage", "resident_service", "config")
+    remove_configs(config_path)
 
     device_ip = hdc_dict["device_ip"]
     hdc_port = hdc_dict["device_port"]
@@ -302,7 +294,6 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(foundation_json))
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(service_json))
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /etc/init/".format(service_cfg))
-                remove_configs(config_path, process_str)
 
     return
 
