@@ -262,28 +262,29 @@ class BuildTestcases(object):
         os.chdir(current_path)
         return build_part_deps_result
 
-    def _execute_build_xts_command(self, para):
+    def _execute_build_xts_command(self, para, xts_build_command):
         build_result = False
-        xts_build_command = []
         current_path = os.getcwd()
         # eg.路径 acts_rootpath = ~/OpenHarmony/test/xts/acts
         xts_project_rootpath = os.path.join(sys.source_code_root_path,
                                             "test",
                                             "xts",
                                             para.testtype[0])
-        os.chdir(xts_project_rootpath)
-        xts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
-        xts_build_command.append("system_size=standard")
-        if len(para.subsystem) > 0:
-            input_subsystem = ",".join(para.subsystem)
-            xts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
-        if para.testsuit != "" and len(para.subsystem) == 0:
-            LOG.error("Please specify subsystem.")
-            return
-        target_cpu = self.build_parameter_dic.get("target_cpu")
-        if target_cpu == "arm64":
-            xts_build_command.append("target_arch=" + target_cpu)
-            xts_build_command.append("use_musl=true")
+        os.chdir(self.project_rootpath)
+        if para.productform == "rk3568":
+            os.chdir(xts_project_rootpath)
+            xts_build_command.append(BUILD_PRODUCT_NAME % para.productform)
+            xts_build_command.append("system_size=standard")
+            if len(para.subsystem) > 0:
+                input_subsystem = ",".join(para.subsystem)
+                xts_build_command.append(BUILD_TARGET_SUBSYSTEM % input_subsystem)
+            if para.testsuit != "" and len(para.subsystem) == 0:
+                LOG.error("Please specify subsystem.")
+                return False
+        else:
+            global BUILD_FILEPATH
+            BUILD_FILEPATH = BUILD_FILE_PATH
+
         if os.path.exists(BUILD_FILEPATH):
             build_command = [BUILD_FILEPATH]
             build_command.extend(xts_build_command)
@@ -343,8 +344,25 @@ class BuildTestcases(object):
     # 编译XTS测试用例
     def build_xts_testcases(self, para):
         self._delete_xts_testcase_dir(para)
-        build_result = self._execute_build_xts_command(para)
+        xts_build_command = []
+        if para.productform == "rk3568":
+            pass
+        else:
+            xts_build_test_command = ["--abi-type", "generic_generic_arm_64only", "--device-type",
+                                      get_output_path().split("/")[-1], "--build-variant", "root", "--gn-args",
+                                      "build_xts=true", "--export-para", "xts_suitename:" + para.testtype[0]]
+            if len(para.subsystem) > 0:
+                input_subsystem = ",".join(para.subsystem)
+                xts_build_test_command.append("--build-target")
+                xts_build_test_command.append(input_subsystem)
+            if para.testsuit != "" and len(para.subsystem) == 0:
+                LOG.error("Please specify subsystem.")
+                return
+            xts_build_command.extend(xts_build_test_command)
+            xts_build_command.append("--ccache")
+        build_result = self._execute_build_xts_command(para, xts_build_command)
         return build_result
+
 
     def build_deps_files(self, productform):
         command = ["--ccache", "--gn-args", "pycache_enable=true", "--gn-args",
