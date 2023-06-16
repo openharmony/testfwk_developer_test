@@ -27,24 +27,23 @@ def _init_sys_config():
     sys.path.insert(0, sys.localcoverage_path)
 
 
-def restore_config(device_ip, device_port, device_sn, serv_path):
+def restore_config(device_ip, device_port, device_sn, cfg_path):
     """
     恢复设备内配置文件
     :param device_ip:
     :param device_sn:
-    :param serv_path:
-    :param services_str:
+    :param cfg_path:
     :param device_port:
     :return:
     """
     remount_cmd = "shell mount -o rw,remount /"
     hdc_command(device_ip, device_port, device_sn, remount_cmd)
-    origin_foundation = os.path.join(serv_path, "foundation_origin.xml")
-    restore_foundation_cmd = "file send {} /system/profile/foundation.xml".format(origin_foundation)
+    origin_foundation = os.path.join(cfg_path, "foundation_origin.json")
+    restore_foundation_cmd = "file send {} /system/profile/foundation.json".format(origin_foundation)
     hdc_command(device_ip, device_port, device_sn, restore_foundation_cmd)
     serv_list = FoundationServer.lib_dict
     for serv in serv_list:
-        rm_xml_cmd = "shell rm /system/profile/{}.xml".format(serv)
+        rm_xml_cmd = "shell rm /system/profile/{}.json".format(serv)
         hdc_command(device_ip, device_port, device_sn, rm_xml_cmd)
         rm_cfg_cmd = "shell rm /etc/init/{}.cfg".format(serv)
         hdc_command(device_ip, device_port, device_sn, rm_cfg_cmd)
@@ -159,4 +158,4 @@ if __name__ == '__main__':
         for sn_str in device_sn_list:
             get_service_list(ip, sn_str, system_dict, services_dict, component_dict,
                              developer_test_path, service_path, root_path, port)
-            restore_config(ip, port, sn_str, service_path)
+            restore_config(ip, port, sn_str, config_path)
