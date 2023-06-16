@@ -17,6 +17,7 @@
 #
 
 import os
+import shutil
 import subprocess
 import json
 import sys
@@ -132,6 +133,59 @@ def modify_foundation_xml(serv, config_path, origin_xml) -> str:
     return os.path.join(config_path, 'foundation.xml')
 
 
+def modify_foundation_json(serv, config_path, origin_json) -> str:
+    """
+    修改foundation.json文件，删去拆分的进程相关
+    :param serv: 拆分进程
+    :param config_path: 配置文件路径
+    :param origin_json: 原foundation.json
+    :return: 修改后foundation.json路径
+    """
+    lib_list = FoundationServer.lib_dict.get(serv)
+
+    with open(origin_json, "r", encoding="UTF-8") as f:
+        f_dict = json.load(f)
+
+    tmp_list = list()
+    for i in range(len(f_dict["systemability"])):
+        if f_dict["systemability"][i]["libpath"] not in lib_list:
+            tmp_list.append(f_dict["systemability"][i])
+    f_dict["systemability"] = tmp_list
+
+    new_json = os.path.join(config_path, 'foundation.json')
+    with open(new_json, "w", encoding="utf-8") as f:
+        json.dump(f_dict, f, indent=4)
+
+    return new_json
+
+
+def create_service_json(serv, config_path, origin_json) -> str:
+    """
+    创建进程json
+    :param serv: 进程名
+    :param config_path:配置文件所在目录
+    :param origin_json: 原foundation.json
+    :return: json文件路径
+    """
+    lib_list = FoundationServer.lib_dict.get(serv)
+    with open(origin_json, "r", encoding="UTF-8") as f:
+        f_dict = json.load(f)
+
+    tmp_list = list()
+    for lib in lib_list:
+        for i in range(len(f_dict["systemability"])):
+            if f_dict["systemability"][i]["libpath"] == lib:
+                tmp_list.append(f_dict["systemability"][i])
+    f_dict["systemability"] = tmp_list
+    f_dict["process"] = "{}".format(serv)
+
+    new_json = os.path.join(config_path, '{}.json'.format(serv))
+    with open(new_json, "w", encoding="utf-8") as f:
+        json.dump(f_dict, f, indent=4)
+
+    return new_json
+
+
 def create_service_xml(serv, config_path, origin_xml) -> str:
     """
     创建进程xml
@@ -168,16 +222,16 @@ def create_service_cfg(serv, config_path, origin_cfg) -> str:
     """
     with open(origin_cfg, "r") as jf:
         json_obj = json.load(jf)
-        json_obj["jobs"][0]["name"] = "services:{}".format("wms")
+        json_obj["jobs"][0]["name"] = "services:{}".format(serv)
 
-        json_obj["services"][0]["name"] = "services:{}".format("wms")
+        json_obj["services"][0]["name"] = "{}".format(serv)
 
         path_list = json_obj["services"][0]["path"]
-        path_list.remove("/system/profile/foundation.xml")
-        path_list.append("/system/profile/{}.xml".format(serv))
+        path_list.remove("/system/profile/foundation.json")
+        path_list.append("/system/profile/{}.json".format(serv))
         json_obj["services"][0]["path"] = path_list
 
-        json_obj["services"][0]["jobs"]["on-start"] = "services:{}".format("wms")
+        json_obj["services"][0]["jobs"]["on-start"] = "services:{}".format(serv)
 
     cfg_path = os.path.join(config_path, "{}.cfg".format(serv))
     with open(cfg_path, 'w') as r:
@@ -191,16 +245,9 @@ def remove_configs(config_path):
     :param config_path: 配置文件目录
     :return:
     """
-    logger("Clear xml and cfg...", "INFO")
-
-    file_list = os.listdir(config_path)
-    for file in file_list:
-        if file.endswith(".xml"):
-            os.remove(os.path.join(config_path, file))
-            logger("remove {}".format(os.path.join(config_path, file)), "INFO")
-        if file.endswith(".cfg"):
-            os.remove(os.path.join(config_path, file))
-            logger("remove {}".format(os.path.join(config_path, file)), "INFO")
+    logger("Clear config path...", "INFO")
+    shutil.rmtree(config_path)
+    os.mkdir(config_path)
 
 
 def split_foundation_services(developer_path, system_info_dict, home_path, hdc_dict):
@@ -209,21 +256,21 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
     XXX.cfg文件推送到/etc/init/
     reboot设备，可以将服务从foundation中拆分出来，成为一个独立服务进程
     """
-    config_path = os.path.join(developer_path, "localCoverage", "resident_service")
+    config_path = os.path.join(developer_path, "localCoverage", "resident_service", "config")
     remove_configs(config_path)
 
     device_ip = hdc_dict["device_ip"]
     hdc_port = hdc_dict["device_port"]
     device_sn = hdc_dict["device_sn_str"]
 
-    hdc_command(device_ip, hdc_port, device_sn, "file recv /system/profile/foundation.xml {}".format(config_path))
+    hdc_command(device_ip, hdc_port, device_sn, "file recv /system/profile/foundation.json {}".format(config_path))
     hdc_command(device_ip, hdc_port, device_sn, "file recv /etc/init/foundation.cfg {}".format(config_path))
 
-    if os.path.exists(os.path.join(config_path, "foundation.xml")):
-        origin_xml = os.path.join(config_path, "foundation_origin.xml")
-        os.rename(os.path.join(config_path, "foundation.xml"), origin_xml)
+    if os.path.exists(os.path.join(config_path, "foundation.json")):
+        origin_json = os.path.join(config_path, "foundation_origin.json")
+        os.rename(os.path.join(config_path, "foundation.json"), origin_json)
     else:
-        logger("{} not exist, Cannot modify.".format(os.path.join(config_path, "foundation.xml")), "ERROR")
+        logger("{} not exist, Cannot modify.".format(os.path.join(config_path, "foundation.json")), "ERROR")
         return
 
     if os.path.exists(os.path.join(config_path, "foundation.cfg")):
@@ -239,13 +286,13 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
     for _, value_list in system_info_dict.items():
         for process_str in value_list:
             if process_str in foundation_process_list:
-                foundation_xml = modify_foundation_xml(process_str, config_path, origin_xml)
-                service_xml = create_service_xml(process_str, config_path, origin_xml)
+                foundation_json = modify_foundation_json(process_str, config_path, origin_json)
+                service_json = create_service_json(process_str, config_path, origin_json)
                 service_cfg = create_service_cfg(process_str, config_path, origin_cfg)
 
                 hdc_command(device_ip, hdc_port, device_sn, "shell rm -rf {}".format(home_path))
-                hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(foundation_xml))
-                hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(service_xml))
+                hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(foundation_json))
+                hdc_command(device_ip, hdc_port, device_sn, "file send {} /system/profile/".format(service_json))
                 hdc_command(device_ip, hdc_port, device_sn, "file send {} /etc/init/".format(service_cfg))
 
     return
@@ -260,7 +307,7 @@ def modify_cfg_xml_file(developer_path, device_ip, device_sn_list,
             modify_init_file(developer_path, hdc_str)
             modify_faultloggerd_file(
                 developer_path, hdc_str)
-            # 推送服务对应的xml文件
+            # 推送服务对应的配置文件
             split_foundation_services(developer_path, system_info_dict, home_path, hdc_dict)
             logger("{} shell reboot".format(hdc_str), "INFO")
             coverage_command("%s shell reboot > /dev/null 2>&1" % hdc_str)
