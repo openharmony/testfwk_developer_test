@@ -1161,11 +1161,6 @@ test/developertest/reports/xxxx_xx_xx_xx_xx_xx
 reports/platform_log_xxxx_xx_xx_xx_xx_xx.log
 ```
 
-#### 最新测试报告
-```
-reports/latest
-```
-
 ### 覆盖率用户指导
 1. (可选执行)为了屏蔽非核心代码产生的冗余分支数据，可以在源码编译之前进入/test/testfwk/developer_test/localCoverage/restore_comment目录下执行：
 
@@ -1214,8 +1209,9 @@ reports/latest
 
 6. 覆盖率报告路径
 
-代码覆盖率报告：/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html
-接口覆盖率报告：/test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits/html
+   代码覆盖率报告：/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html
+
+   接口覆盖率报告：/test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits/html
 ### 涉及仓
 
 [test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice)
