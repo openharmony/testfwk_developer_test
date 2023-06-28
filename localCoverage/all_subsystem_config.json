@@ -1216,10 +1216,16 @@
             "foundation/arkui/ace_engine/frameworks/core/pipeline_ng"
         ]
     },
-      "container_linux_service_broker": {
+    "container_linux_service_broker": {
         "name": "container_linux_service_broker",
         "path": [
             "vendor/huawei/virt_service/linux_fusion_service"
+        ]
+    },
+    "container_manager": {
+        "name": "container_manager",
+        "path": [
+            "vendor/huawei/virt_service/container_manager"
         ]
     }
 }
