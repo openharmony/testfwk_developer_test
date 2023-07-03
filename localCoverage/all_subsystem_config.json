@@ -1108,10 +1108,10 @@
       "commonlibrary/ets_utils"
     ]
   },
-  "selinux": {
-    "name": "selinux",
+  "selinux_adapter": {
+    "name": "selinux_adapter",
     "path": [
-      "base/security/selinux"
+      "base/security/selinux_adapter"
     ]
   },
   "access_token": {
