@@ -32,7 +32,7 @@ ohos_static_library("distributedtest_lib") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hiviewdfx_hilog_native:libhilog",
+      "hilog:libhilog",
     ]
   } else {
     external_deps = [
