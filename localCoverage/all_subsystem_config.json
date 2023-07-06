@@ -89,8 +89,8 @@
       "foundation/graphic/graphic_2d"
     ]
   },
-  "multimedia_image_framework": {
-    "name": "multimedia_image_framework",
+  "image_framework": {
+    "name": "image_framework",
     "path": [
       "foundation/multimedia/image_framework"
     ]
