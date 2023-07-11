@@ -7,7 +7,8 @@
         "mainElement": "ohos.acts.bundle.stage.test.MainAbility",
         "deviceTypes": [
             "default",
-            "tablet"
+            "tablet",
+            "2in1"
         ],
         "deliveryWithInstall": true,
         "installationFree": false,
@@ -15,10 +16,11 @@
         "pages": "$profile:main_pages",
         "metadata": [
             {
-              "name": "ArkTSPartialUpdate",
-              "value": "false"
+                "name": "MetaData1",
+                "value": "MetaDataValue",
+                "resource": "$profile:shortcuts_config"
             }
-          ],
+        ],
         "abilities": [
             {
                 "name": "ohos.acts.bundle.stage.test.MainAbility",
@@ -34,7 +36,7 @@
                         "actions": [
                             "action.system.home"
                         ],
-                        "entities":[
+                        "entities": [
                             "entity.system.home"
                         ]
                     }
@@ -351,29 +353,26 @@
             }
         ],
         "requestPermissions": [
-          {
-            "name": "ohos.permission.GET_BUNDLE_INFO",
-            "reason": "$string:permission_reason",
-            "usedScene": {
-              "abilities": ["MainAbility"],
-              "when": "always"
+            {
+                "name": "ohos.permission.GET_BUNDLE_INFO",
+                "reason": "$string:permission_reason",
+                "usedScene": {
+                    "abilities": [
+                        "MainAbility"
+                    ],
+                    "when": "always"
+                }
+            },
+            {
+                "name": "ohos.permission.READ_CALENDAR",
+                "reason": "$string:permission_reason",
+                "usedScene": {
+                    "abilities": [
+                        "MainAbility"
+                    ],
+                    "when": "inuse"
+                }
             }
-          },
-          {
-            "name": "ohos.permission.READ_CALENDAR",
-            "reason": "$string:permission_reason",
-            "usedScene": {
-              "abilities": ["MainAbility"],
-              "when": "inuse"
-            }
-          }
-        ],
-        "metadata": [
-          {
-            "name": "MetaData1",
-            "value": "MetaDataValue",
-            "resource": "$profile:shortcuts_config"
-          }
         ]
     }
 }
