@@ -60,7 +60,7 @@
       "drivers_peripheral_power"
     ],
     "ans": ["distributed_notification_service"],
-    "render_service": ["graphic", "graphic_standard"],
+    "render_service": ["graphic", "graphic_2d"],
     "dlp_credential_|dlp_credential_service_sa": ["dlp_credential_service"],
     "locationhub": ["location"],
     "time_service": ["time_service"],
