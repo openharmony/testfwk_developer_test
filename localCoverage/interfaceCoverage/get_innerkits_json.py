@@ -40,7 +40,7 @@ def gen_parts_info_json(folder_list, output_json_path, target_cpu):
         with open(output_json_path, "w") as json_file:
             json_file.write(json_str)
     else:
-        print("Failed to obtain component information")
+        print("part_name list information is null")
 
 
 def get_parts_list(path):
@@ -50,7 +50,7 @@ def get_parts_list(path):
     if os.path.exists(path):
         folder_list = os.listdir(path)
     else:
-        print("The folder does not exist")
+        print("The folder: %s does not exist" % path)
         folder_list = []
     return folder_list
 

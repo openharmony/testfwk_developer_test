@@ -30,7 +30,7 @@ import random
 from dataclasses import dataclass
 from json import JSONDecodeError
 
-from xdevice import DeviceTestType
+from xdevice import DeviceTestType, check_result_report
 from xdevice import DeviceLabelType
 from xdevice import CommonParserType
 from xdevice import ExecuteTerminate
@@ -55,6 +55,7 @@ __all__ = [
 
 LOG = platform_logger("Drivers")
 DEFAULT_TEST_PATH = "/%s/%s/" % ("data", "test")
+OBJ = "obj"
 
 TIME_OUT = 900 * 1000
 JS_TIMEOUT = 10
@@ -472,7 +473,7 @@ class ResultManager(object):
             "data",
             "exec"))
 
-        target_name = "obj"
+
         tests_path = self.config.testcases_path
         test_type = self.testsuite_path.split(tests_path)[1].strip(os.sep).split(os.sep)[0]
         cxx_cov_path = os.path.abspath(os.path.join(
@@ -483,6 +484,10 @@ class ResultManager(object):
             "cxx",
             self.testsuite_name + '_' + test_type))
 
+        if os.path.basename(self.testsuite_name).startswith("rust_"):
+            target_name = "lib.unstripped"
+        else:
+            target_name = OBJ
         if self.is_exist_target_in_device(DEFAULT_TEST_PATH, target_name):
             if not os.path.exists(cxx_cov_path):
                 os.makedirs(cxx_cov_path)
@@ -495,10 +500,13 @@ class ResultManager(object):
                 process = subprocess.Popen("tar -zxf %s -C %s" % (tar_path, cxx_cov_path), shell=True)
                 process.communicate()
                 os.remove(tar_path)
+                os.rename(os.path.join(cxx_cov_path, target_name), os.path.join(cxx_cov_path, OBJ))
             else:
                 subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" %
                                  (tar_path, cxx_cov_path), shell=True).communicate()
                 subprocess.Popen("rm -rf %s" % tar_path, shell=True).communicate()
+                subprocess.Popen("mv %s %s" % (os.path.join(cxx_cov_path, target_name),
+                                               os.path.join(cxx_cov_path, OBJ)), shell=True).communicate()
 
 
 ##############################################################################
@@ -1121,3 +1129,98 @@ class JSUnitTestDriver(IDriver):
         else:
             print("file %s not exist" % hap_filepath)
         return package_name, ability_name
+
+
+
+@Plugin(type=Plugin.DRIVER, id=DeviceTestType.oh_rust_test)
+class OHRustTestDriver(IDriver):
+    def __init__(self):
+        self.result = ""
+        self.error_message = ""
+        self.config = None
+
+    def __check_environment__(self, device_options):
+        pass
+
+    def __check_config__(self, config):
+        pass
+
+    def __execute__(self, request):
+        try:
+            LOG.debug("Start to execute open harmony rust test")
+            self.config = request.config
+            self.config.device = request.config.environment.devices[0]
+            self.config.target_test_path = "/system/bin"
+
+            suite_file = request.root.source.source_file
+            LOG.debug("Testsuite filepath:{}".format(suite_file))
+
+            if not suite_file:
+                LOG.error("test source '{}' not exists".format(
+                    request.root.source.source_string))
+                return
+
+            self.result = "{}.xml".format(
+                os.path.join(request.config.report_path,
+                             "result", request.get_module_name()))
+            self.config.device.set_device_report_path(request.config.report_path)
+            self.config.device.device_log_collector.start_hilog_task()
+            self._init_oh_rust()
+            self._run_oh_rust(suite_file, request)
+        except Exception as exception:
+            self.error_message = exception
+            if not getattr(exception, "error_no", ""):
+                setattr(exception, "error_no", "03409")
+            LOG.exception(self.error_message, exc_info=False, error_no="03409")
+        finally:
+            serial = "{}_{}".format(str(request.config.device.__get_serial__()),
+                                    time.time_ns())
+            log_tar_file_name = "{}_{}".format(
+                request.get_module_name(), str(serial).replace(":", "_"))
+            self.config.device.device_log_collector.stop_hilog_task(
+                log_tar_file_name)
+            self.result = check_result_report(
+                request.config.report_path, self.result, self.error_message)
+
+    def _init_oh_rust(self):
+        self.config.device.connector_command("target mount")
+        self.config.device.execute_shell_command(
+            "mount -o rw,remount,rw /")
+
+    def _run_oh_rust(self, suite_file, request=None):
+        self.config.device.push_file(suite_file, self.config.target_test_path)
+        resource_manager = ResourceManager()
+        resource_data_dict, resource_dir = \
+            resource_manager.get_resource_data_dic(suite_file)
+        resource_manager.process_preparer_data(resource_data_dict,
+                                               resource_dir,
+                                               self.config.device)
+        for listener in request.listeners:
+            listener.device_sn = self.config.device.device_sn
+
+        parsers = get_plugin(Plugin.PARSER, CommonParserType.oh_rust)
+        if parsers:
+            parsers = parsers[:1]
+        parser_instances = []
+        for parser in parsers:
+            parser_instance = parser.__class__()
+            parser_instance.suite_name = request.get_module_name()
+            parser_instance.listeners = request.listeners
+            parser_instances.append(parser_instance)
+        handler = ShellHandler(parser_instances)
+        if self.config.coverage:
+            command = "cd {}; chmod +x *; GCOV_PREFIX=. ./{}".format(
+                self.config.target_test_path, os.path.basename(suite_file))
+        else:
+            command = "cd {}; chmod +x *; ./{}".format(
+                self.config.target_test_path, os.path.basename(suite_file))
+        self.config.device.execute_shell_command(
+            command, timeout=TIME_OUT, receiver=handler, retry=0)
+        if self.config.coverage:
+            result = ResultManager(suite_file, self.config)
+            result.obtain_coverage_data()
+        resource_manager.process_cleaner_data(resource_data_dict, resource_dir,
+                                              self.config.device)
+
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
