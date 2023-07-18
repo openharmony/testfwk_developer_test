@@ -100,22 +100,22 @@ std::string DistributedCfg::GetDeviceIp(std::string fileName, size_t devNo)
     devNo--;
     if (!OpenCfg(fileName)) {
         HiLog::Error(DistributedCfg::LABEL,
-                                "OpenCfg() failed! make sure the filename:%s of major or agent",
-                                fileName.c_str());
+                    "OpenCfg() failed! make sure the filename:%s of major or agent",
+                    fileName.c_str());
         return "";
     }
     std::string valueOfIps;
     if (!GetCfgVal("agentlist", valueOfIps)) {
         HiLog::Error(DistributedCfg::LABEL,
-                                "GetCfgVal() failed! make sure the filename:%s of major or agent",
-                                fileName.c_str());
+                    "GetCfgVal() failed! make sure the filename:%s of major or agent",
+                    fileName.c_str());
         return "";
     }
     std::string ip = GetValueInString(valueOfIps, devNo);
     if (!ip.compare("")) {
         HiLog::Error(DistributedCfg::LABEL,
-                                "GetValueOfString() return ""! %zu maybe bigger than the sum of devices_online",
-                                devNo + 1);
+                    "GetValueOfString() return ""! %zu maybe bigger than the sum of devices_online",
+                    devNo + 1);
         return "";
     }
     HiLog::Info(DistributedCfg::LABEL, "get %zu device's ip :  %s", devNo + 1, ip.c_str());
@@ -126,23 +126,23 @@ std::string DistributedCfg::GetDeviceUuid(std::string fileName, size_t devNo)
 {
     if (!OpenCfg(fileName)) {
         HiLog::Error(DistributedCfg::LABEL,
-                                "OpenCfg() failed! make sure the filename:%s of major or agent",
-                                fileName.c_str());
+                    "OpenCfg() failed! make sure the filename:%s of major or agent",
+                    fileName.c_str());
         return "";
     }
     std::string valueOfUuids;
     if (!GetCfgVal("devicesuuid", valueOfUuids)) {
         HiLog::Error(DistributedCfg:LABEL,
-                                "GetCfgVal() failed! make sure the filename:%s of major or agent",
-                                fileName.c_str());
+                    "GetCfgVal() failed! make sure the filename:%s of major or agent",
+                    fileName.c_str());
         return "";
     }
     std::string uuid = GetValueInString(valueOfUuids, devNo);
     if (!uuid.compare("")) {
         printf("device:%zu uuid is null \n", devNo);
         HiLog::Error(DistributedCfg::LABEL,
-                                "GetValueOfString() return ""! %zu maybe bigger than the sum of devices_online",
-                                devNo);
+                    "GetValueOfString() return ""! %zu maybe bigger than the sum of devices_online",
+                    devNo);
         return "";
     }
     HiLog::Info(DistributedCfg::LABEL, "get %zu device's uuid :  %s", devNo, uuid.c_str());
