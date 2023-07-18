@@ -235,7 +235,7 @@ class Distribute:
             return ""
 
         isemulator = re.findall('readonly', str(output))
-        output = device.shell_with_output("ifconfig")
+        output = device.shell_with_output("ifconfig waln0")
         if output == "":
             return ""
 

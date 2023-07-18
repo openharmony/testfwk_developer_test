@@ -42,7 +42,7 @@ public:
     static const int RECE_LEN = 10;
     static const int CMD_LENGTH = 50;
     static const int HALF_NUM = 2;
-    static constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0, "DistributedAgent"};
+    static constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0xD001690, "DistributedAgent"};
 
 protected:
     virtual bool SetUp();
