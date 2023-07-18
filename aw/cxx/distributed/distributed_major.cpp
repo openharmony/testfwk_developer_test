@@ -219,7 +219,7 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
                         break;
                     } else {
                         HiLog::Error(DistributeTestEnvironment::LABEL, "get error message. type is :%d",
-                                        pCmdTest->cmdTestType);
+                            pCmdTest->cmdTestType);
                     }
                 } else {
                     if (!rlen) {
