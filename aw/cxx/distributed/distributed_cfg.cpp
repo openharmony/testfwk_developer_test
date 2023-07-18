@@ -132,7 +132,7 @@ std::string DistributedCfg::GetDeviceUuid(std::string fileName, size_t devNo)
     }
     std::string valueOfUuids;
     if (!GetCfgVal("devicesuuid", valueOfUuids)) {
-        HiLog::Error(DistributedCfg:LABEL,
+        HiLog::Error(DistributedCfg::LABEL,
             "GetCfgVal() failed! make sure the filename:%s of major or agent",
             fileName.c_str());
         return "";
