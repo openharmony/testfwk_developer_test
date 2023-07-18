@@ -49,7 +49,7 @@ public:
     static std::unique_ptr<DistributedCfg>& GetInstance();
     static std::unique_ptr<DistributedCfg> getCfg_;
 
-    static constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0xD001690, "DistributeTestEnvironment"};
+    static constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0xD001690, "DistributedCfg"};
 
 private:
     std::map<std::string, std::string> cfgMap_;  // <cfgkey, cfgvalue>  from env.desc file
