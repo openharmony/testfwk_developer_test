@@ -29,6 +29,7 @@
 #include "distributed_cfg.h"
 
 #include "gtest/gtest.h"
+#include "hilog/log.h"
 
 namespace OHOS {
 namespace DistributeSystemTest {
@@ -53,6 +54,8 @@ public:
     void Init(std::string fileName);
 
     std::vector<DistDeviceInfo> clientList_;
+
+    static constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0xD001690, "DistributeTestEnvironment"};
 
 private:
     DistributedCfg clientCfg_;
