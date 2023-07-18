@@ -19,6 +19,8 @@
 #include <map>
 #include <iostream>
 
+#include "hilog/log.h"
+
 namespace OHOS {
 namespace DistributeSystemTest {
 using namespace std;
@@ -46,6 +48,8 @@ public:
     std::string GetDeviceUuid(std::string fileName, size_t devNo);
     static std::unique_ptr<DistributedCfg>& GetInstance();
     static std::unique_ptr<DistributedCfg> getCfg_;
+
+    static constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0xD001690, "DistributeTestEnvironment"};
 
 private:
     std::map<std::string, std::string> cfgMap_;  // <cfgkey, cfgvalue>  from env.desc file

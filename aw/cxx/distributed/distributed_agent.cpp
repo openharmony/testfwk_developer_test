@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <erron.h>
 
 namespace OHOS {
 namespace DistributeSystemTest {
@@ -99,6 +100,7 @@ int DistributedAgent::InitAgentServer()
 
     addr.sin_port = htons(agentPort_);
     int err = ::bind(serverSockFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
+    HiLog::Info(DistributedAgent::LABEL, "agent bind error code %{publice}d.\n", erron);
     if (err < 0) {
         HiLog::Error(DistributedAgent::LABEL, "agent bind error.\n");
         close(serverSockFd);

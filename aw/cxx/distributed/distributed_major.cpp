@@ -28,7 +28,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "securec.h"
-#include "hilog/log.h"
 
 namespace OHOS {
 namespace DistributeSystemTest {
@@ -37,7 +36,6 @@ using namespace testing;
 using namespace OHOS::HiviewDFX;
 DistributeTestEnvironment  *g_pDistributetestEnv = nullptr;
 namespace {
-    const constexpr HiviewDFX::HiLogLabel LABEL = {LOG_CORE, 0, "DistributeTestEnvironment"};
     const int CONNECT_TIME = 3;
     const int SLEEP_TIME = 1000;
     const int HALF_BUF_LEN = 2;
@@ -83,7 +81,7 @@ void DistributeTestEnvironment::Init(std::string fileName)
     if (sscanf_s(strPort.c_str(), "%d", &serverPort_) < 1) {
         serverPort_ = DEFAULT_AGENT_PORT;
     }
-    HiLog::Info(LABEL, "get device port :  %d", serverPort_);
+    HiLog::Info(DistributeTestEnvironment::LABEL, "get device port :  %d", serverPort_);
 }
 
 DistributeTestEnvironment::~DistributeTestEnvironment()
@@ -136,12 +134,12 @@ int DistributeTestEnvironment::ConnectAgent(size_t devNo)
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));  // delay 10ms
     }
     if (connectCount >= CONNECT_TIME) {
-        HiLog::Error(LABEL, "connect to agent %s fail.", serverIp.c_str());
+        HiLog::Error(DistributeTestEnvironment::LABEL, "connect to agent %s fail.", serverIp.c_str());
         close(clientSockFd);
         clientSockFd = -1;
         return 0;
     }
-    HiLog::Info(LABEL, "connect to agent %s success.", serverIp.c_str());
+    HiLog::Info(DistributeTestEnvironment::LABEL, "connect to agent %s success.", serverIp.c_str());
     clientList_[devNo].fd = clientSockFd;
     return 1;
 }
@@ -172,11 +170,11 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
     bool breturn = false;
     devNo = devNo - 1;
     if (devNo >= clientList_.size()) {
-        HiLog::Info(LABEL, "can not find no %zu device.", devNo);
+        HiLog::Info(DistributeTestEnvironment::LABEL, "can not find no %zu device.", devNo);
         return breturn;
     }
     if (clientList_[devNo].fd <= 0) {
-        HiLog::Info(LABEL, "connect is failure %zu device.", devNo);
+        HiLog::Info(DistributeTestEnvironment::LABEL, "connect is failure %zu device.", devNo);
         return breturn;
     }
     if (pstrMsg == nullptr) {
@@ -190,7 +188,7 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
     pCmdMsg->len = htons(len);
     int rlen = send(clientList_[devNo].fd, pCmdMsg, static_cast<size_t>(len + DST_COMMAND_HEAD_LEN), 0);
     if (rlen <= 0) {
-        HiLog::Error(LABEL, "agent socket is closed.");
+        HiLog::Error(DistributeTestEnvironment::LABEL, "agent socket is closed.");
         return breturn;
     }
     // get ret value ;
@@ -209,7 +207,7 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
                         continue;
                     }
                     recv(clientList_[devNo].fd, pCmdTest->alignmentCmd, pCmdTest->len, 0);
-                    HiLog::Info(LABEL, "recv agent data : No.%d command type :%d length :%d",
+                    HiLog::Info(DistributeTestEnvironment::LABEL, "recv agent data : No.%d command type :%d length :%d",
                         pCmdTest->no, pCmdTest->cmdTestType, pCmdTest->len);
                     if ((globalCommandNo == pCmdTest->no) && (cmdType == pCmdTest->cmdTestType)) {
                         // get ret value ;
@@ -220,12 +218,12 @@ bool DistributeTestEnvironment::SendToAgent(size_t devNo, int cmdType, void *pst
                         }
                         break;
                     } else {
-                        HiLog::Error(LABEL, "get error message. type is :%d", pCmdTest->cmdTestType);
+                        HiLog::Error(DistributeTestEnvironment::LABEL, "get error message. type is :%d", pCmdTest->cmdTestType);
                     }
                 } else {
                     if (!rlen) {
                         // peer socket is closed.
-                        HiLog::Error(LABEL, "device socket close.");
+                        HiLog::Error(DistributeTestEnvironment::LABEL, "device socket close.");
                         break;
                     }
                 }
@@ -284,7 +282,7 @@ bool DistributeTestEnvironment::RunTestCmd(size_t devNo, const std::string &strC
         pCmdTest->len =  lenptr;
         breturn = SendToAgent(devNo, DST_COMMAND_CALL, pCmdTest, pCmdTest->len, onProcessReturn);
     } else {
-        HiLog::Error(LABEL, "command data is too long \n");
+        HiLog::Error(DistributeTestEnvironment::LABEL, "command data is too long \n");
     }
     return breturn;
 };
@@ -304,7 +302,7 @@ bool DistributeTestEnvironment::SendMessage(size_t devNo, const std::string &str
         pCmdTest->len = msgLen;
         breturn = SendToAgent(devNo, DST_COMMAND_MSG, pCmdTest, msgLen, onProcessReturnMsg);
     } else {
-        HiLog::Info(LABEL, "message data is too long.\n");
+        HiLog::Info(DistributeTestEnvironment::LABEL, "message data is too long.\n");
     }
     return breturn;
 }
@@ -329,7 +327,7 @@ bool DistributeTestEnvironment::Notify(size_t devNo, const std::string &strMsg, 
         pCmdTest->len = msgLen;
         breturn = SendToAgent(devNo, DST_COMMAND_NOTIFY, pCmdTest, msgLen, nullptr);
     } else {
-        HiLog::Info(LABEL, "notify data is too long.\n");
+        HiLog::Info(DistributeTestEnvironment::LABEL, "notify data is too long.\n");
     }
     return breturn;
 }
@@ -449,7 +447,7 @@ bool DistributeTest::SendMessage(AGENT_NO devNo, const std::string &msg, int len
     if (g_pDistributetestEnv != nullptr) {
         return g_pDistributetestEnv->SendMessage(devNo, msg, len,
             [&](const std::string &szreturnbuf, int rlen)->bool {
-                HiLog::Info(LABEL, "onprocessmsg len :%d.", rlen);
+                HiLog::Info(DistributeTestEnvironment::LABEL, "onprocessmsg len :%d.", rlen);
                 return OnMsgProc(szreturnbuf, rlen);
             });
     }
