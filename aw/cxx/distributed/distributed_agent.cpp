@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <erron.h>
+#include <errno.h>
 
 namespace OHOS {
 namespace DistributeSystemTest {
