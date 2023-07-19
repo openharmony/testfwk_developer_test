@@ -1150,7 +1150,7 @@ class OHRustTestDriver(IDriver):
             LOG.debug("Start to execute open harmony rust test")
             self.config = request.config
             self.config.device = request.config.environment.devices[0]
-            self.config.target_test_path = "/system/bin"
+            self.config.target_test_path = DEFAULT_TEST_PATH
 
             suite_file = request.root.source.source_file
             LOG.debug("Testsuite filepath:{}".format(suite_file))
