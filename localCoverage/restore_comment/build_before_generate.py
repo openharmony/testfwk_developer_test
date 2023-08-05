@@ -114,25 +114,25 @@ def add_lcov(subsystem_config_path):
                         rewrite_source_file(source_file_path)
                     else:
                         print("The directory does not exist.", file_path)
-    except:
+    except(FileNotFoundError, AttributeError, ValueError, KeyError):
         print("add LCOV_EXCL_BR_LINE Error")
 
 
-def get_part_config_json(part_name_list, all_system_info_path, part_info_path):
-    if os.path.exists(all_system_info_path):
+def get_part_config_json(part_list, system_info_path, part_path):
+    if os.path.exists(system_info_path):
         new_json_text = {}
-        for part in part_name_list:
-            with open(all_system_info_path, "r") as system_text:
+        for part in part_list:
+            with open(system_info_path, "r") as system_text:
                 system_text_json = json.load(system_text)
                 if part in system_text_json:
                     new_json_text[part] = system_text_json[part]
                 else:
                     print("part not in all_subsystem_config.json")
         new_json = json.dumps(new_json_text, indent=4)
-        with open(part_info_path, "w") as out_file:
+        with open(part_path, "w") as out_file:
             out_file.write(new_json)
     else:
-        print("%s not exists.", all_system_info_path)
+        print("%s not exists.", system_info_path)
 
 
 if __name__ == '__main__':
