@@ -505,8 +505,9 @@ class ResultManager(object):
                 subprocess.Popen("tar -zxf %s -C %s > /dev/null 2>&1" %
                                  (tar_path, cxx_cov_path), shell=True).communicate()
                 subprocess.Popen("rm -rf %s" % tar_path, shell=True).communicate()
-                subprocess.Popen("mv %s %s" % (os.path.join(cxx_cov_path, target_name),
-                                               os.path.join(cxx_cov_path, OBJ)), shell=True).communicate()
+                if target_name != OBJ:
+                    subprocess.Popen("mv %s %s" % (os.path.join(cxx_cov_path, target_name),
+                                                   os.path.join(cxx_cov_path, OBJ)), shell=True).communicate()
 
 
 ##############################################################################

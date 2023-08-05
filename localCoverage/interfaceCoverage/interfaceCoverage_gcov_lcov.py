@@ -26,13 +26,6 @@ import CppHeaderParser
 import get_innerkits_json
 import make_report
 
-root_path = os.getcwd()
-CODEPATH = root_path.split("/test/testfwk/developer_test")[0]
-SUB_SYSTEM_INFO_PATH = os.path.join(
-    CODEPATH, "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx")
-OUTPUT_REPORT_PATH = os.path.join(
-    CODEPATH, "test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits"
-)
 filter_file_name_list = [
     "appexecfwk/libjnikit/include/jni.h",
 ]
@@ -442,6 +435,12 @@ def make_interface_coverage_result(part_list):
 
 if __name__ == "__main__":
     current_path = os.getcwd()
+    CODEPATH = current_path.split("/test/testfwk/developer_test")[0]
+    SUB_SYSTEM_INFO_PATH = os.path.join(
+        CODEPATH, "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx")
+    OUTPUT_REPORT_PATH = os.path.join(
+        CODEPATH, "test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits"
+    )
     _init_sys_config()
     from localCoverage.utils import get_product_name, get_target_cpu
     product_name = get_product_name(CODEPATH)

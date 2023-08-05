@@ -42,5 +42,5 @@ if __name__ == '__main__':
                                     f"{file_path}_primal", file_path), shell=True).communicate()
                         else:
                             print("The directory does not exist.", file_path)
-    except:
+    except(FileNotFoundError, AttributeError, ValueError, KeyError):
         print("restore source code Error")

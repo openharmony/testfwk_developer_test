@@ -171,6 +171,10 @@ if __name__ == '__main__':
 
     # 执行代码覆盖率
     execute_code_cov_tools(developer_test_path)
+    # 报备
+    keyword_path = os.path.join(
+        developer_test_path, "localCoverage/keyword_registration/keyword_filter.py")
+    subprocess.run("python3 %s" % keyword_path, shell=True)
 
     # 执行接口覆盖率
     if len(test_part_list) > 0:
@@ -186,10 +190,6 @@ if __name__ == '__main__':
     restore_source_code_path = os.path.join(
         developer_test_path, "localCoverage/restore_comment/restore_source_code.py")
     subprocess.run("python3 %s" % restore_source_code_path, shell=True)
-
-    keyword_path = os.path.join(
-        developer_test_path, "localCoverage/keyword_registration/keyword_filter.py")
-    subprocess.run("python3 %s" % keyword_path, shell=True)
 
     print(r"See the code coverage report in: "
           r"/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
