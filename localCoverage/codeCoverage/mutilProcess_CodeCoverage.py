@@ -24,9 +24,7 @@ import subprocess
 import multiprocessing
 import sys
 from multiprocessing import Process
-# 根代码目录
-root_path = os.getcwd()
-CODEPATH = root_path.split("/test/testfwk/developer_test")[0]
+
 # 子系统json目录
 SYSTEM_JSON = "test/testfwk/developer_test/localCoverage/codeCoverage/subsystem_config.json"
 # 覆盖率gcda
@@ -35,11 +33,8 @@ COVERAGE_GCDA_RESULTS = "test/testfwk/developer_test/localCoverage/codeCoverage/
 REPORT_PATH = "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx"
 # llvm-gcov.sh
 LLVM_GCOV = "test/testfwk/developer_test/localCoverage/codeCoverage/llvm-gcov.sh"
-
 # 测试套划分步长
 STEP_SIZE = 10
-# lcovrc配置文件集合
-LCOVRC_SET = f"{CODEPATH}/test/testfwk/developer_test/localCoverage/codeCoverage/coverage_rc"
 
 
 def _init_sys_config():
@@ -350,6 +345,9 @@ def gen_final_report(cov_path):
 
 if __name__ == '__main__':
     current_path = os.path.abspath(os.path.dirname(__name__))
+    CODEPATH = current_path.split("/test/testfwk/developer_test")[0]
+    # lcovrc配置文件集合
+    LCOVRC_SET = f"{CODEPATH}/test/testfwk/developer_test/localCoverage/codeCoverage/coverage_rc"
     _init_sys_config()
     from localCoverage.utils import get_product_name
     # 编译生成的out路径

@@ -24,9 +24,6 @@ import shlex
 import subprocess
 import sys
 
-# 代码根目录
-root_path = os.getcwd()
-CODEPATH = root_path.split("/test/testfwk/developer_test")[0]
 # 子系统json目录
 SYSTEM_JSON = "build/subsystem_config.json"
 # 覆盖率gcda
@@ -286,6 +283,7 @@ def gen_final_report(cov_path):
 
 if __name__ == "__main__":
     current_path = os.path.abspath(os.path.dirname(__name__))
+    CODEPATH = current_path.split("/test/testfwk/developer_test")[0]
     _init_sys_config()
     from localCoverage.utils import get_product_name
     # 编译生成的out路径

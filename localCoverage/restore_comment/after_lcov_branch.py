@@ -45,12 +45,12 @@ def get_file_list_by_postfix(path, postfix=""):
     return file_list
 
 
-def recover_source_file(cpp_arr_list, keys):
-    if not cpp_arr_list:
+def recover_source_file(cpp_list, keys):
+    if not cpp_list:
         print("no any .cpp file here")
         return
 
-    for path in cpp_arr_list:
+    for path in cpp_list:
         if not os.path.exists(path):
             return
         for key in keys:
