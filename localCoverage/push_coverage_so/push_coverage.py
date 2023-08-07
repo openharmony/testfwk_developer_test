@@ -43,6 +43,7 @@ def get_subsystem_name(partname: str) -> str:
         return json_obj[partname]
     return ""
 
+
 def find_part_so_dest_path(test_part: str) -> str:
     """
     获取指定部件的obj目录

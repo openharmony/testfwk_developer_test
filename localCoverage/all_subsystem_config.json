@@ -1227,6 +1227,12 @@
         "path": [
             "vendor/huawei/virt_service/container_manager"
         ]
+    },
+    "container_comm": {
+        "name": "container_comm",
+        "path": [
+            "vendor/huawei/virt_service/container_comm"
+        ]
     }
 }
 

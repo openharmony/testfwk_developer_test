@@ -78,7 +78,7 @@ class Run(object):
             init_gcov_path = os.path.join(sys.framework_root_dir, "localCoverage/resident_service/init_gcov.py")
             if os.path.exists(init_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (
-                    init_gcov_path, current_raw_cmd),shell=True)
+                    init_gcov_path, current_raw_cmd), shell=True)
             else:
                 print(f"{init_gcov_path} not exists.")
 
@@ -422,7 +422,7 @@ class Run(object):
         xts_test_case_path = self.get_xts_tests_out_path(options.productform, options.testtype)
         if not os.path.exists(xts_test_case_path):
             LOG.error("%s is not exist." % xts_test_case_path)
-            return None
+            return
         xts_test_dict = TestCaseManager().get_xts_test_files(xts_test_case_path, options)
         return xts_test_dict
 
