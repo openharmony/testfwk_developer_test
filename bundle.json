@@ -1,7 +1,7 @@
 {
-    "name": "@openharmony/developertest",
+    "name": "@openharmony/developer_test",
     "version": "3.1.0",
-    "description": "developertest",
+    "description": "developer_test",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
     "segment": {
@@ -11,7 +11,7 @@
     "repository": "",
     "dirs": {},
     "component": {
-        "name": "developertest",
+        "name": "developer_test",
         "subsystem": "testfwk",
       	"features" :[],
         "adapted_system_type": [ "standard" ],
