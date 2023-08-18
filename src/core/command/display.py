@@ -70,7 +70,7 @@ CMD_KEY_SUBSYSTEMLIST_ACTS = "actssubsystemlist"
 # hats子系统名称列表
 CMD_KEY_SUBSYSTEMLIST_HATS = "hatssubsystemlist"
 
-TOOL_VERSION_INFO = """Welcome to DeveloperTest V3.2.2.0
+TOOL_VERSION_INFO = """Welcome to developer_test V3.2.2.0
 """
 
 HLEP_COMMAND_INFOMATION = """use help [follow command] for more information:

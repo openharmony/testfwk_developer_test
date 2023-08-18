@@ -36,7 +36,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 
 ### 配置启动测试框架<a name="section005187487501"></a>
 
-参考[ 开发者测试组件](https://gitee.com/openharmony/test_developertest/blob/master/README_zh.md)中的描述完成测试框架安装、设备连接配置，并在linux环境下通过
+参考[ 开发者测试组件](https://gitee.com/openharmony/testfwk_developer_test/blob/master/README_zh.md)中的描述完成测试框架安装、设备连接配置，并在linux环境下通过
 
 ```
 ./start.sh
@@ -77,10 +77,10 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 3. gen命令示例，-t、-fn和-dp均为必选项
 
    ```
-   gen -t FUZZ -fn calculator_fuzzer -dp test/developertest/example/calculator/test/fuzztest/common
+   gen -t FUZZ -fn calculator_fuzzer -dp test/developer_test/example/calculator/test/fuzztest/common
    ```
    
-   执行完毕后会在test/developertest/example/calculator/test/fuzztest/common目录下生成一个Fuzz用例demo。
+   执行完毕后会在test/developer_test/example/calculator/test/fuzztest/common目录下生成一个Fuzz用例demo。
 
 
 
@@ -149,7 +149,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ```
    ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
      module_out_path = module_output_path
-     fuzz_config_file = "//test/developertest/examples/calculator/test/fuzztest/common/calculator_fuzzer"
+     fuzz_config_file = "//test/developer_test/examples/calculator/test/fuzztest/common/calculator_fuzzer"
      include_dirs = []
      cflags = [
        "-g",
@@ -202,11 +202,11 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 
    ```
    "tests": [
-     "//test/developertest/examples/calculator/test:unittest",
-     "//test/developertest/examples/calculator/test:fuzztest", #添加DTFuzz用例路径
-     "//test/developertest/examples/detector/test:unittest",
-     "//test/developertest/examples/sleep/test:performance",
-     "//test/developertest/examples/distributedb/test:distributedtest"
+     "//test/developer_test/examples/calculator/test:unittest",
+     "//test/developer_test/examples/calculator/test:fuzztest", #添加DTFuzz用例路径
+     "//test/developer_test/examples/detector/test:unittest",
+     "//test/developer_test/examples/sleep/test:performance",
+     "//test/developer_test/examples/distributedb/test:distributedtest"
    ]
    ```
 
@@ -228,7 +228,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 Fuzz能力集成，在测试类型-t中新增FUZZ类型，执行Fuzz测试指令示例，其中-t为必选，-ss和-tm为可选
 
 ```
-run -t FUZZ -ss developertest -tm calculator
+run -t FUZZ -ss developer_test -tm calculator
 ```
 
 | 参数 | 描述       | 说明     | 备注                     |

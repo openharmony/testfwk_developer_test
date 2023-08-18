@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 
-want_output_path = "developertest/stage_test"
+want_output_path = "developer_test/stage_test"
 
 ohos_js_stage_unittest("ActsBundleMgrStageEtsTest") {
   hap_profile = "entry/src/main/module.json"

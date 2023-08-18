@@ -804,7 +804,7 @@ class JSUnitTestDriver(IDriver):
 
     def __execute__(self, request):
         try:
-            LOG.info("developertest driver")
+            LOG.info("developer_test driver")
             self.config = request.config
             self.config.target_test_path = DEFAULT_TEST_PATH
             self.config.device = request.config.environment.devices[0]
