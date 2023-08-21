@@ -13,6 +13,7 @@
     "component": {
         "name": "developer_test",
         "subsystem": "testfwk",
+        "syscap": [],
       	"features" :[],
         "adapted_system_type": [ "mini", "small", "standard" ],
       	"rom": "0KB",
