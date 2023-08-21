@@ -14,7 +14,7 @@
         "name": "developer_test",
         "subsystem": "testfwk",
       	"features" :[],
-        "adapted_system_type": [ "standard" ],
+        "adapted_system_type": [ "mini", "small", "standard" ],
       	"rom": "0KB",
       	"ram": "0KB",
       	"deps": {},
