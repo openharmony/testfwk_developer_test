@@ -1,5 +1,5 @@
 {
-    "name": "@openharmony/developertest",
+    "name": "@openharmony/developer_test",
     "version": "3.1.0",
     "description": "developer_test",
     "license": "Apache License 2.0",
@@ -11,7 +11,7 @@
     "repository": "",
     "dirs": {},
     "component": {
-        "name": "developertest",
+        "name": "developer_test",
         "subsystem": "testfwk",
         "syscap": [],
       	"features" :[],
@@ -34,7 +34,8 @@
               "//test/testfwk/developer_test/examples/calculator/test:benchmarktest",
               "//test/testfwk/developer_test/examples/detector/test:unittest",
               "//test/testfwk/developer_test/examples/sleep/test:performance",
-              "//test/testfwk/developer_test/examples/distributedb/test:distributedtest"
+              "//test/testfwk/developer_test/examples/distributedb/test:distributedtest",
+              "//test/testfwk/developer_test/examples/stagetest/actsbundlemanagerstagetest:unittest"
           ]
   	}
   }
