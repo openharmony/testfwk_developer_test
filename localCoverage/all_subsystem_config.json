@@ -239,8 +239,8 @@
       "foundation/multimedia/audio_framework"
     ]
   },
-  "audio_manager_lite": {
-    "name": "audio_manager_lite",
+  "audio_lite": {
+    "name": "audio_lite",
     "path": [
       "foundation/multimedia/audio_lite"
     ]
