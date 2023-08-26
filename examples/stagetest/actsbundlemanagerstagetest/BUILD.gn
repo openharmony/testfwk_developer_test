@@ -40,8 +40,8 @@ ohos_resources("actbmsstageetstest_resources") {
   deps = [ ":actbmsstageetstest_app_profile" ]
   hap_profile = "entry/src/main/module.json"
 }
-group("unittest") {
-  testonly = true
-  deps = []
+# group("unittest") {
+#   testonly = true
+#   deps = []
   # deps += [ ":ActsBundleMgrStageEtsTest" ]
-}
+# }
