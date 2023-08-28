@@ -44,4 +44,4 @@ group("unittest") {
   testonly = true
   deps = []
   deps += [ ":ActsBundleMgrStageEtsTest" ]
- }
+}
