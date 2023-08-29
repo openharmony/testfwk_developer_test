@@ -697,7 +697,9 @@ class CppTestDriver(IDriver):
             f.writelines(lines)
 
     def _push_corpus_cov_if_exist(self, suite_file):
-        cov_file = suite_file + "_corpus.tar.gz"
+        corpus_path = suite_file.split("fuzztest")[-1].strip(os.sep)
+        cov_file = os.path.join(
+            sys.framework_root_dir, "reports", "latest_corpus", corpus_path + "_corpus.tar.gz")
         LOG.info("corpus_cov file :%s" % str(cov_file))
         self.config.device.push_file(cov_file, os.path.join(self.config.target_test_path))
 

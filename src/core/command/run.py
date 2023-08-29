@@ -17,6 +17,7 @@
 #
 import platform
 import random
+import shutil
 import subprocess
 from pydoc import classname
 import time
@@ -298,6 +299,13 @@ class Run(object):
                 del self.history_cmd_list[0]
             self.history_cmd_list.append(cmd_record)
         print("-------------run end: ", self.history_cmd_list)
+        if "fuzztest" == options.testtype[0] and options.coverage is False:
+            report = get_plugin(plugin_type=Plugin.REPORTER, plugin_id="ALL")[0]
+            latest_corpus_path = os.path.join(sys.framework_root_dir, "reports", "latest_corpus")
+            if os.path.exists(latest_corpus_path):
+                shutil.rmtree(latest_corpus_path)
+            shutil.copytree(os.path.join(report.report_path, "result"), latest_corpus_path)
+
         if options.coverage and platform.system() != "Windows":
             pull_service_gcov_path = os.path.join(
                 sys.framework_root_dir, "localCoverage/resident_service/pull_service_gcda.py")
