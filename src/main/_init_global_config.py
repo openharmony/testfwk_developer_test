@@ -23,7 +23,7 @@ def _init_global_config():
 
     # insert src path for loading xdevice modules
     # 当前脚本运行的绝对路径 去掉最后两个路径
-    # 变量注释 framework_src_dir = OpenHarmony/test/developertest
+    # 变量注释 framework_src_dir = OpenHarmony/test/developer_test
     sys.framework_src_dir = os.path.abspath(os.path.dirname(
         os.path.dirname(__file__)))
 
@@ -31,7 +31,7 @@ def _init_global_config():
     sys.path.insert(0, sys.framework_src_dir)
 
     # 当前脚本运行的绝对路径 去掉最后两个路径
-    # 变量注释 framework_root_dir = OpenHarmony/test/developertest
+    # 变量注释 framework_root_dir = OpenHarmony/test/developer_test
     sys.framework_root_dir = os.path.abspath(os.path.dirname(
         os.path.dirname(os.path.dirname(__file__))))
 
@@ -53,14 +53,14 @@ def _init_global_config():
         "src"))
     sys.path.insert(1, sys.xdevice_extension_dir)
 
-    # 变量注释 pytest_dir = OpenHarmony/test/developertest/aw/python
+    # 变量注释 pytest_dir = OpenHarmony/test/developer_test/aw/python
     sys.pytest_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "aw",
         "python"))
     sys.path.insert(2, sys.pytest_dir)
 
-    # 变量注释 adapter_dir = OpenHarmony/test/developertest/adapter/aw/python
+    # 变量注释 adapter_dir = OpenHarmony/test/developer_test/adapter/aw/python
     sys.adapter_dir = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "adapter"
@@ -68,16 +68,16 @@ def _init_global_config():
         "python"))
     sys.path.insert(3, sys.adapter_dir)
 
-    # 变量注释 hmh_script = OpenHarmony/test/developertest/libs
+    # 变量注释 hmh_script = OpenHarmony/test/developer_test/libs
     sys.hmh_script = os.path.abspath(os.path.join(
         sys.framework_root_dir,
         "libs"))
     sys.path.insert(4, sys.hmh_script)
 
-    # 变量注释 framework_res_dir = OpenHarmony/test/developertest
+    # 变量注释 framework_res_dir = OpenHarmony/test/developer_test
     sys.framework_res_dir = sys.framework_root_dir
 
-    # 变量注释 exec_dir = OpenHarmony/test/developertest
+    # 变量注释 exec_dir = OpenHarmony/test/developer_test
     sys.exec_dir = sys.framework_root_dir
 
     from core.common import get_source_code_root_path

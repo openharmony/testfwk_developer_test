@@ -38,7 +38,7 @@ class Gen(object):
 
     def gen_fuzzer_list_file(self, fuzzer_list):
         filepath = os.path.join(sys.source_code_root_path, "test",
-            "developertest", "libs", "fuzzlib", "fuzzer_list.txt")
+            "developer_test", "libs", "fuzzlib", "fuzzer_list.txt")
         LOG.info("The fuzzer list file path: %s" % filepath)
         with open(filepath, "w") as gn_file:
             gn_file.truncate(0)
