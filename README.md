@@ -15,7 +15,7 @@ This module allows you to develop new test cases for new features, or modify exi
 ## Directory Structure<a name="section102031353175317"></a>
 
 ```
-developertest/
+developer_test/
 ├── aw                            # Static libraries of the test framework
 │   ├── cxx                      # C++ libraries
 │   └── python                   # Python libraries
@@ -157,7 +157,7 @@ The Python environment is required.
         ```
 
 
--   Configure the developers test module in the configuration file  **developertest/config/user\_config.xml**.
+-   Configure the developers test module in the configuration file  **developer_test/config/user\_config.xml**.
     1.  Modify basic configuration parameters of the test framework.
 
         \[build\]    \# Configure build parameters of the test case.
@@ -206,7 +206,7 @@ The Python environment is required.
         ```
 
 
--   \(Optional\) Modify the configuration file  **config/user\_config.xml**  of the  **developertest**  module. If a test case has been compiled, specify the compilation output directory of the test case. In this case, the test platform will not recompile the test case.
+-   \(Optional\) Modify the configuration file  **config/user\_config.xml**  of the  **developer_test**  module. If a test case has been compiled, specify the compilation output directory of the test case. In this case, the test platform will not recompile the test case.
     1.  Specify the output directory of the test case, that is, the compilation output directory between the  **<test\_cases\>**  tags. 
 
         ```
@@ -232,7 +232,7 @@ The Python environment is required.
     -   An empty directory is created on the development host for mounting test cases through the NFS, and the NFS service is started properly.
 
 -   Run test suites.
-    -   Start the test framework and go to the  **test/developertest**  directory.
+    -   Start the test framework and go to the  **test/developer_test**  directory.
         1.  Run the following command to start the test framework in Windows.
 
             ```
@@ -248,7 +248,7 @@ The Python environment is required.
 
     -   Select a device form.
 
-        Configure device forms based on the actual development board, for example,  **developertest/config/framework\_config.xml**.
+        Configure device forms based on the actual development board, for example,  **developer_test/config/framework\_config.xml**.
 
     -   Run test commands.
         1.  To query the subsystems, modules, product forms, and test types supported by test cases, run the  **show**  commands.
@@ -358,6 +358,6 @@ The Python environment is required.
 
 [testing subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/test.md)
 
-**test\_developertest**
+**test\_developer_test**
 
-[test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice/blob/master/README.md)
+[test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice/blob/master/README_zh.md)

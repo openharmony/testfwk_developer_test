@@ -263,7 +263,7 @@ BENCHMARK_MAIN();
   
 import("//build/test.gni")  
   
-module_output_path = "developertest/calculator"  
+module_output_path = "developer_test/calculator"  
    
 ohos_benchmarktest("BenchmarkDemoTest") {
   module_out_path = module_output_path
@@ -309,7 +309,7 @@ group("benchmarktest") {
 3. 指定文件输出路径  
 
    ```  
-   module_output_path = "developertest/calculator"  
+   module_output_path = "developer_test/calculator"  
    ```
 
 > **说明：** 此处输出路径为部件/模块名。  

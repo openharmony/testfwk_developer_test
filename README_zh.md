@@ -1,5 +1,5 @@
 # 开发自测试执行框架
-OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-developertest，开发者可根据测试需求开发相关测试用例，开发阶段提前发现缺陷，大幅提高代码质量。
+OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-developer_test，开发者可根据测试需求开发相关测试用例，开发阶段提前发现缺陷，大幅提高代码质量。
 
 本文从基础环境构建，用例开发，编译以及执行等方面介绍OpenHarmony开发自测试执行框架如何运行和使用。
 ## 基础环境构建
@@ -13,7 +13,7 @@ OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-develope
 以下是开发自测试框架的目录层级架构，在使用开发自测试框架过程中可在相应目录查找对应组件。
 ```
 test  # 测试子系统
-├── developertest  # 开发者自测试框架
+├── developer_test  # 开发者自测试框架
 │   ├── aw  # 测试框架的静态库
 │   ├── config  # 测试框架配置
 │   │   │ ...
@@ -549,7 +549,7 @@ subsystem  # 子系统
     
     import("//build/test.gni")
     
-    module_output_path = "developertest/calculator"
+    module_output_path = "developer_test/calculator"
     
     config("module_private_config") {
       visibility = [ ":*" ]
@@ -589,7 +589,7 @@ subsystem  # 子系统
     	```
     3. 指定文件输出路径
     	```
-    	module_output_path = "developertest/calculator"
+    	module_output_path = "developer_test/calculator"
     	```
     	> **说明：** 此处输出路径为部件/模块名。
     
@@ -653,13 +653,13 @@ subsystem  # 子系统
     
     import("//build/test.gni")
     
-    module_output_path = "developertest/app_info"
+    module_output_path = "developer_test/app_info"
     
     ohos_js_unittest("GetAppInfoJsTest") {
       module_out_path = module_output_path
     
       hap_profile = "./config.json"
-      certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
+      certificate_profile = "//test/developer_test/signature/openharmony_sx.p7b"
     }
     
     group("unittest") {
@@ -683,7 +683,7 @@ subsystem  # 子系统
     3. 指定文件输出路径
     
     	```
-    	module_output_path = "developertest/app_info"
+    	module_output_path = "developer_test/app_info"
     	```
     	> **说明：** 此处输出路径为部件/模块名。
     	
@@ -704,7 +704,7 @@ subsystem  # 子系统
     	  module_out_path = module_output_path
     	   
     	  hap_profile = "./config.json"
-    	  certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
+    	  certificate_profile = "//test/developer_test/signature/openharmony_sx.p7b"
     	}
     	```
     	 config.json为hap编译所需配置文件，需要开发者根据被测sdk版本配置“target”项，其余项可默认，具体如下所示：
@@ -786,7 +786,7 @@ subsystem  # 子系统
     
     import("//build/test.gni")
 
-    want_output_path = "developertest/stage_test"
+    want_output_path = "developer_test/stage_test"
     
     ohos_js_stage_unittest("ActsBundleMgrStageEtsTest") {
       hap_profile = "entry/src/main/module.json"
@@ -797,7 +797,7 @@ subsystem  # 子系统
       ets2abc = true
       certificate_profile = "signature/openharmony_sx.p7b"
       hap_name = "ActsBundleMgrStageEtsTest"
-      subsystem_name = "developertest"
+      subsystem_name = "developer_test"
       part_name = "stage_test"  // 部件名称
       module_out_path = want_output_path   // 必须定义输出路径
     }
@@ -951,7 +951,7 @@ subsystem  # 子系统
 ##### 搭建执行环境
 1. 在Windows环境创建测试框架目录Test，并在此目录下创建testcase目录
 
-2. 从Linux环境拷贝测试框架developertest和xdevice到创建的Test目录下，拷贝编译好的测试用例到testcase目录下
+2. 从Linux环境拷贝测试框架developer_test和xdevice到创建的Test目录下，拷贝编译好的测试用例到testcase目录下
 	
 	>**说明：** 将测试框架及测试用例从Linux环境移植到Windows环境，以便后续执行。
 	
@@ -1144,7 +1144,7 @@ subsystem  # 子系统
 #### 测试结果
 测试结果输出根路径如下：
 ```
-test/developertest/reports/xxxx_xx_xx_xx_xx_xx
+test/developer_test/reports/xxxx_xx_xx_xx_xx_xx
 ```
 >**说明：** 测试报告文件目录将自动生成。
 
