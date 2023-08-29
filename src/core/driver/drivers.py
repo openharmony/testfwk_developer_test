@@ -618,13 +618,14 @@ class CppTestDriver(IDriver):
             if "fuzztest" == self.config.testtype[0]:
                 self._push_corpus_cov_if_exist(suite_file)
                 command = f"cd {self.config.target_test_path}; tar zxf {filename}_corpus.tar.gz; \
-                                        rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX=.; \
+                                        rm -rf {filename}.xml; chmod +x *; GCOV_PREFIX={DEFAULT_TEST_PATH}; \
                                         GCOV_PREFIX_STRIP={strip_num} ./{filename} {test_para}"
             else:
-                command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=. " \
+                command = "cd %s; rm -rf %s.xml; chmod +x *; GCOV_PREFIX=%s " \
                           "GCOV_PREFIX_STRIP=%s ./%s %s" % \
                           (self.config.target_test_path,
                            filename,
+                           DEFAULT_TEST_PATH,
                            str(strip_num),
                            filename,
                            test_para)
