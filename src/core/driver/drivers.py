@@ -686,16 +686,26 @@ class CppTestDriver(IDriver):
 
     @staticmethod
     def _alter_init(name):
-        lines = list()
-        with open(name, "r") as f:
-            for line in f:
-                line_strip = line.strip()
-                if not line_strip:
-                    continue
-                if line_strip[0] != "#" and line_strip[0] != "/" and line_strip[0] != "*":
-                    lines.append(line_strip)
-        with open(name, "w") as f:
-            f.writelines(lines)
+        with open(name, "rb") as f:
+            lines = f.read()
+        str_content = lines.decode("utf-8")
+
+        pattern_sharp = '^\s*#.*$(\n|\r\n)'
+        pattern_star = '/\*.*?\*/(\n|\r\n)+'
+        pattern_xml = '<!--[\s\S]*?-->(\n|\r\n)+'
+
+        if re.match(pattern_sharp, str_content, flags=re.M):
+            striped_content = re.sub(pattern_sharp, '', str_content, flags=re.M)
+        elif re.findall(pattern_star, str_content, flags=re.S):
+            striped_content = re.sub(pattern_star, '', str_content, flags=re.S)
+        elif re.findall(pattern_xml, str_content, flags=re.S):
+            striped_content = re.sub(pattern_xml, '', str_content, flags=re.S)
+        else:
+            striped_content = str_content
+
+        striped_bt = striped_content.encode("utf-8")
+        with open(name, "wb") as f:
+            f.write(striped_bt)
 
     def _push_corpus_cov_if_exist(self, suite_file):
         corpus_path = suite_file.split("fuzztest")[-1].strip(os.sep)
