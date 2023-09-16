@@ -1805,12 +1805,6 @@
       "foundation/communication/ipc/interfaces/kits"
     ]
   },
-  "media_service": {
-    "name": "media_service",
-    "path": [
-      "foundation/multimedia/media_lite/services"
-    ]
-  },
   "media_utils_lite": {
     "name": "media_utils_lite",
     "path": [
