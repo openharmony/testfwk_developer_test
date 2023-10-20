@@ -55,7 +55,7 @@ def get_product_name(root_path):
     :param root_path: ohos_config.json所在的目录
     :return: 编译产量生成的路径
     """
-    ohos_config = os.path.join(root_path, "ohos_config.json")
+    ohos_config = os.path.join(root_path, "out", "ohos_config.json")
     json_obj = json_parse(ohos_config)
     if json_obj:
         product_name = json_obj["out_path"].split("out")[1].strip("/")
@@ -71,7 +71,7 @@ def get_target_cpu(root_path):
     :param root_path: ohos_config.json所在的目录
     :return: 编译产量生成的路径
     """
-    ohos_config = os.path.join(root_path, "ohos_config.json")
+    ohos_config = os.path.join(root_path, "out", "ohos_config.json")
     json_obj = json_parse(ohos_config)
     if json_obj:
         target_cpu = json_obj["target_cpu"]
