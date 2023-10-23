@@ -610,7 +610,7 @@ class CppTestDriver(IDriver):
             if coverage_outpath:
                 strip_num = len(coverage_outpath.strip("/").split("/"))
             else:
-                ohos_config_path = os.path.join(sys.source_code_root_path, "ohos_config.json")
+                ohos_config_path = os.path.join(sys.source_code_root_path, "out", "ohos_config.json")
                 with open(ohos_config_path, 'r') as json_file:
                     json_info = json.load(json_file)
                     out_path = json_info.get("out_path")
