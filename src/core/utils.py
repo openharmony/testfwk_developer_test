@@ -128,7 +128,7 @@ def scan_support_product():
 
 def get_output_path():
     # 获取输出路径
-    ohos_config_path = os.path.join(sys.source_code_root_path, "ohos_config.json")
+    ohos_config_path = os.path.join(sys.source_code_root_path, "out", "ohos_config.json")
     with open(ohos_config_path, 'r') as json_file:
         json_info = json.load(json_file)
         out_name = json_info.get("out_path").split("out")[1].strip("/")
