@@ -1130,18 +1130,6 @@
       "commonlibrary/memory_utils"
     ]
   },
-  "resourceschedule_ffrt_core": {
-    "name": "resourceschedule_ffrt_core",
-    "path": [
-      "foundation/resourceschedule/ffrt_core"
-    ]
-  },
-  "resourceschedule_ffrt_sched_override": {
-    "name": "resourceschedule_ffrt_sched_override",
-    "path": [
-      "vendor/huawei/foundation/resourceschedule/ffrt_sched_override"
-    ]
-  },
   "ace_engine": {
     "name": "ace_engine",
     "path": [
