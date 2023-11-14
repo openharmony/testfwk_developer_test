@@ -77,10 +77,10 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 3. gen命令示例，-t、-fn和-dp均为必选项
 
    ```
-   gen -t FUZZ -fn calculator_fuzzer -dp test/developer_test/example/calculator/test/fuzztest/common
+   gen -t FUZZ -fn calculator_fuzzer -dp base/account/os_account/test/fuzztest/osaccount
    ```
    
-   执行完毕后会在test/developer_test/example/calculator/test/fuzztest/common目录下生成一个Fuzz用例demo。
+   这里以os_accont模块作为示例演示fuzz，执行完毕后会在base/account/os_account/test/fuzztest/osaccount目录下生成一个Fuzz用例demo。
 
 
 
@@ -149,7 +149,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ```
    ohos_fuzztest("CalculatorFuzzTest") {     #定义测试套名称CalculatorFuzzTest
      module_out_path = module_output_path
-     fuzz_config_file = "//test/developer_test/examples/calculator/test/fuzztest/common/calculator_fuzzer"
+     fuzz_config_file = "//base/account/os_account/test/fuzztest/osaccount/calculator_fuzzer"
      include_dirs = []
      cflags = [
        "-g",
@@ -176,7 +176,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ```
    **注意：** 
    - #### 测试套名称必须采用大驼峰风格，并且必须以FuzzTest结尾，测试套前缀与fuzzer目录名相对应（例如：calculator_fuzzer，只能有一个下划线）。
-   - module_out_path为测试套编译输出目录，内容为部件+模块名。
+   - module_out_path为测试套编译输出目录，内容为部件+模块名，例如"os_account/os_account"。
    
 
 3. Fuzz配置编写
@@ -191,7 +191,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    <!-- memory usage limit in Mb -->
    <rss_limit_mb>4096</rss_limit_mb>
    ```
-
+   需要注意的是这里fuzz测试用例设置的默认的运行时间为300s, 实际使用中可以根据自己使用需要进行更改。
    
 
 ### Fuzz用例编译<a name="section00816581589"></a>
@@ -210,17 +210,21 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
    ]
    ```
 
-2. 在用例路径下的BUILD.gn添加group，如examples/calculator/test的BUILD.gn
+2. 在用例路径下的BUILD.gn添加group，例如在os_account/test/fuzztest/osaccount/calculator_fuzzer的BUILD.gn中添加
 
    ```
    group("fuzztest") {
      testonly = true
      deps = []
      
-     deps += [ "fuzztest/common/calculator_fuzzer:fuzztest" ]
+     deps += [ "calculator_fuzzer:fuzztest" ]
    }
    ```
-   
+3. 编译时添加--build-target选项，如
+
+   ```
+   ./build.sh --product-name rk3568 --build-target CalculatorFuzzTest
+   ```
    
 
 ### Fuzz用例执行<a name="section7510974319"></a>
@@ -239,6 +243,8 @@ run -t FUZZ -ss developer_test -tm calculator
 
 - Windows环境脱离源码执行
 
+  首先将testfwk_developer_test 和 testfwk_xdevice 两个仓库的代码下载到本地，这里假设放到D盘并在D:\test 目录下创建developer_test, xdevice和tests三个目录，developer_test和xdevice目录分别存放对应仓库的代码。
+
   Windows环境可通过归档DTFuzz用例配置文件project.xml、语料corpus和可执行文件执行DTFuzz。
 
   1. 归档用例配置文件、语料以及用例可执行文件
@@ -250,13 +256,13 @@ run -t FUZZ -ss developer_test -tm calculator
      D:\test\tests
      ```
 
-     用例可执行文件为DTFuzz源文件编译产出文件，以二进制形式存储在out/release/tests/fuzztest下。测试用例的配置文件均编译输出在out/release/tests/res目录下对应的xxxx_fuzzer目录中。
+     用例可执行文件为DTFuzz源文件编译产出文件，以二进制形式存储在out/release/tests/fuzztest下。测试用例的配置文件均编译输出在out/release/tests/res目录下对应的xxxx_fuzzer目录中。（release为对应的产品名，如编译rk3568则在out/rk3568下面）
      将fuzztest目录以及res目录直接拷贝到该路径下即可。
 
      
   2. 配置用例路径
   
-     config\user_config.xml中配置用例归档路径：
+     在developer_test\config\user_config.xml中配置用例归档路径：
   
      ```
      <!-- configure test cases path -->
@@ -267,7 +273,7 @@ run -t FUZZ -ss developer_test -tm calculator
   
   3. 执行用例
   
-     执行DTFuzz命令示例
+     在developer_test下执行./start.bat开启测试框架，执行DTFuzz命令示例
   
      ```
      run -t FUZZ -ts CalculatorFuzzTest
