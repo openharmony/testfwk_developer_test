@@ -15,6 +15,7 @@
 
 import manager from '@ohos.bundle.bundleManager';
 import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from "@ohos/hypium"
+import { BusinessError } from '@ohos.base';
 
 const MODULE_NAME = "testModule"
 const MODULE_NAME_TEST = "testModule1"
@@ -33,19 +34,19 @@ const ERROR_PROFILE_NOT_EXIST = 17700024
 const ERROR_MODULE_NOT_EXIST = 17700002
 
 export default function getProfileByAbility() {
-  describe('getProfileByAbility', function () {
+  describe('getProfileByAbility', () => {
    /*
     * @tc.number: SUB_BMS_APPINFO_QUERYMETAFILE_0011
     * @tc.name: getProfileByAbilityInvalidModulePro
     * @tc.desc: Check the invalid moduleName (by promise)
     * @tc.level   0
     */
-    it('getProfileByAbilityInvalidModulePro', 0, async function (done) {
+    it('getProfileByAbilityInvalidModulePro', 0, async (done: Function) => {
       await manager.getProfileByAbility(MODULE_NAME_TEST, ABILITY_NAME, METADATA_NAME).then(data => {
         console.info('getProfileByAbilityInvalidModulePro success' + JSON.stringify(data))
         expect(data).assertFail()
         done()
-      }).catch(err => {
+      }).catch((err: BusinessError) => {
         console.info('getProfileByAbilityInvalidModulePro failed' + JSON.stringify(err))
         expect(err.code).assertEqual(ERROR_ABILITY_NOT_EXIST)
         done()
@@ -58,12 +59,12 @@ export default function getProfileByAbility() {
     * @tc.desc: Check the empty moduleName (by promise)
     * @tc.level   0
     */
-    it('getProfileByAbilityEmptyModulePro', 0, async function (done) {
+    it('getProfileByAbilityEmptyModulePro', 0, async (done: Function) => {
       await manager.getProfileByAbility('', ABILITY_NAME, METADATA_NAME).then(data => {
         console.info('getProfileByAbilityEmptyModulePro success' + JSON.stringify(data))
         expect(data).assertFail()
         done()
-      }).catch(err => {
+      }).catch((err: BusinessError) => {
         console.info('getProfileByAbilityEmptyModulePro failed' + JSON.stringify(err))
         expect(err.code).assertEqual(ERROR_MODULE_NOT_EXIST)
         done()
