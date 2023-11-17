@@ -42,7 +42,7 @@ def get_subsystem_config(part_list, developer_path):
                 if part in system_text_json:
                     new_json_text[part] = system_text_json[part]
                 else:
-                    print("part not in all_subsystem_config.json")
+                    print("Error: part not in all_subsystem_config.json")
 
         new_json = json.dumps(new_json_text, indent=4)
         with open(system_info_path, "w") as out_file:

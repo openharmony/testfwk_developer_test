@@ -25,9 +25,9 @@ struct Index {
 
   aboutToAppear(){
     console.info("start run testcase!!!!")
-    var abilityDelegator: any
+    let abilityDelegator: any
     abilityDelegator = AbilityDelegatorRegistry.getAbilityDelegator()
-    var abilityDelegatorArguments: any
+    let abilityDelegatorArguments: any
     abilityDelegatorArguments = AbilityDelegatorRegistry.getArguments()
     console.info('start run testcase!!!')
     Hypium.hypiumTest(abilityDelegator, abilityDelegatorArguments, testsuite)
