@@ -1900,5 +1900,59 @@
     "path": [
       "commonlibrary/rust/ylong_runtime"
     ]
+  },
+  "findnetwork": {
+    "name": "findnetwork",
+    "path": [
+      "vendor/huawei/domains/finddevice/findnetwork"
+    ]
+  },
+  "push_manager_service": {
+    "name": "push_manager_service",
+    "path": [
+      "vendor/huawei/domains/push/push_manager_service"
+    ]
+  },
+  "quickfix_engine": {
+    "name": "quickfix_engine",
+    "path": [
+      "vendor/huawei/base/update/quickfix_engine"
+    ]
+  },
+  "security_guard": {
+    "name": "security_guard",
+    "path": [
+      "base/security/security_guard"
+    ]
+  },
+  "container_hmos_service_broker": {
+    "name": "container_hmos_service_broker",
+    "path": [
+      "vendor/huawei/virt_service/container_hmos_service_broker"
+    ]
+  },
+  "iShare": {
+    "name": "iShare",
+    "path": [
+      "vendor/huawei/foundation/HMconnect/iShare"
+    ]
+  },
+  "cast_engine": {
+    "name": "cast_engine",
+    "path": [
+      "vendor/huawei/foundation/HMconnect/CastEngine"
+    ]
+  },
+  "CollaborationFwk": {
+    "name": "CollaborationFwk",
+    "path": [
+      "vendor/huawei/foundation/HMconnect/CollaborationFwk"
+    ]
+  },
+  "sys_installer_ext": {
+    "name": "sys_installer_ext",
+    "path": [
+      "vendor/huawei/base/update/sys_installer_ext"
+    ]
   }
 }
