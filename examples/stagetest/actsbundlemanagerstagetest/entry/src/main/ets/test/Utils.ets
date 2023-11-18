@@ -14,9 +14,9 @@
  */
 
 export default class Utils {
-  static sleep(time) {
-    return new Promise((resolve, reject) => {
-      setTimeout((data) => {
+  static sleep(time: number) {
+    return new Promise<Object>((resolve, reject) => {
+      setTimeout((data: Object[]) => {
         resolve(data)
       }, time)
     }).then(() => {

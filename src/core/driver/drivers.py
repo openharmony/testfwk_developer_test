@@ -101,7 +101,8 @@ class DisplayOutputReceiver:
         lines = self._process_output(output)
         for line in lines:
             line = line.strip()
-            if line:
+            if "[ RUN      ]" in line or "[       OK ]" in line or "[==========]" in line or \
+                    "[----------]" in line or "[  PASSED  ]" in line or "[  FAILED  ]" in line:
                 LOG.info(get_decode(line))
 
     def __error__(self, message):
@@ -164,8 +165,9 @@ def get_result_savepath(testsuit_path, result_rootpath):
     return result_path
 
 
-def get_test_log_savepath(result_rootpath):
-    test_log_path = os.path.join(result_rootpath, "log", "test_log")
+def get_test_log_savepath(result_rootpath, result_suit_path):
+    suit_path = result_suit_path.split("result")[-1].strip(os.sep).split(os.sep)[0]
+    test_log_path = os.path.join(result_rootpath, "log", "test_log", suit_path)
 
     if not os.path.exists(test_log_path):
         os.makedirs(test_log_path)
@@ -436,7 +438,7 @@ class ResultManager(object):
         if self.config.hidelog:
             remote_log_result_file = os.path.join(self.device_testpath,
                                                   "%s.log" % self.testsuite_name)
-            test_log_save_path = get_test_log_savepath(self.result_rootpath)
+            test_log_save_path = get_test_log_savepath(self.result_rootpath, result_save_path)
             test_log_file_path = os.path.join(test_log_save_path,
                                               "%s.log" % self.testsuite_name)
             self.device.pull_file(remote_log_result_file, test_log_file_path)
