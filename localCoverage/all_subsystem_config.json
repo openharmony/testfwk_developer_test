@@ -531,10 +531,10 @@
       "base/hiviewdfx/hidumper_lite"
     ]
   },
-  "blackbox": {
-    "name": "blackbox",
+  "blackbox_lite": {
+    "name": "blackbox_lite",
     "path": [
-      "base/hiviewdfx/blackbox"
+      "base/hiviewdfx/blackbox_lite"
     ]
   },
   "hidumper": {
