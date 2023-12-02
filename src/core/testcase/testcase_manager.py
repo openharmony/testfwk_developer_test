@@ -91,7 +91,11 @@ class TestCaseManager(object):
         filter_list_test_file = FilterConfigManager().get_filtering_list(
             "testfile_name", options.productform)
         # 遍历测试用例输出目录下面的所有文件夹，每个文件夹对应一个子系统
+        command_list = options.current_raw_cmd.split(" ")
         for part_name in os.listdir(test_case_out_path):
+            if "-ss" in command_list or "-tp" in command_list:
+                if part_name not in options.partname_list:
+                    continue
             part_case_dir = os.path.join(test_case_out_path, part_name)
             if not os.path.isdir(part_case_dir):
                 continue
