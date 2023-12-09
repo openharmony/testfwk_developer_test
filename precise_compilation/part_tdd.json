@@ -1,0 +1,757 @@
+[
+  {
+    "name": "ability_ability_runtime",
+    "parts": "ability_runtime",
+    "buildTarget": "ability_runtime_test"
+  },
+  {
+    "name": "ability_ability_base",
+    "parts": "ability_base",
+    "buildTarget": "ability_base_test"
+  },
+  {
+    "name": "ability_form_fwk",
+    "parts": "form_fwk",
+    "buildTarget": "form_fwk_test"
+  },
+  {
+    "name": "ability_idl_tool",
+    "parts": "idl_tool",
+    "buildTarget": "idl_tool_test"
+  },
+  {
+    "name": "ability_dmsfwk",
+    "parts": "dmsfwk",
+    "buildTarget": "dmsfwk_test"
+  },
+  {
+    "name": "account_os_account",
+    "parts": "os_account",
+    "buildTarget": "os_account_test"
+  },
+  {
+    "name": "ai_neural_network_runtime",
+    "parts": "neural_network_runtime",
+    "buildTarget": "neural_network_runtime_test"
+  },
+  {
+    "name": "ai_intelligent_voice_framework",
+    "parts": "intelligent_voice_framework",
+    "buildTarget": "intelligent_voice_framework_test"
+  },
+  {
+    "name": "applications_dlp_manager",
+    "parts": "dlp_manager",
+    "buildTarget": "dlp_manager_test"
+  },
+  {
+    "name": "applications_calendar_data",
+    "parts": "calendar_data",
+    "buildTarget": "calendar_data_test"
+  },
+  {
+    "name": "arkcompiler_runtime_core",
+    "parts": "runtime_core",
+    "buildTarget": "runtime_core_test"
+  },
+  {
+    "name": "arkcompiler_ets_runtime",
+    "parts": "ets_runtime",
+    "buildTarget": "ets_runtime_test"
+  },
+  {
+    "name": "arkcompiler_ets_frontend",
+    "parts": "ets_frontend",
+    "buildTarget": "ets_frontend_test"
+  },
+  {
+    "name": "arkcompiler_toolchain",
+    "parts": "toolchain",
+    "buildTarget": "toolchain_test"
+  },
+  {
+    "name": "arkui_ace_engine",
+    "parts": "ace_engine",
+    "buildTarget": "ace_engine_test"
+  },
+  {
+    "name": "arkui_napi",
+    "parts": "napi",
+    "buildTarget": "napi_test"
+  },
+  {
+    "name": "arkui_ui_appearance",
+    "parts": "ui_appearance",
+    "buildTarget": "ui_appearance_test"
+  },
+  {
+    "name": "barrierfree_accessibility",
+    "parts": "accessibility",
+    "buildTarget": "accessibility_test"
+  },
+  {
+    "name": "bundlemanager_bundle_framework",
+    "parts": "bundle_framework",
+    "buildTarget": "bundle_framework_test"
+  },
+  {
+    "name": "bundlemanager_bundle_tool",
+    "parts": "bundle_tool",
+    "buildTarget": "bundle_tool_test"
+  },
+  {
+    "name": "bundlemanager_distributed_bundle_framework",
+    "parts": "distributed_bundle_framework",
+    "buildTarget": "distributed_bundle_framework_test"
+  },
+  {
+    "name": "bundlemanager_ecological_rule_manager",
+    "parts": "ecological_rule_manager",
+    "buildTarget": "ecological_rule_manager_test"
+  },
+  {
+    "name": "commonlibrary_c_utils",
+    "parts": "c_utils",
+    "buildTarget": "c_utils_test"
+  },
+  {
+    "name": "commonlibrary_ets_utils",
+    "parts": "ets_utils",
+    "buildTarget": "ets_utils_test"
+  },
+  {
+    "name": "commonlibrary_memory_utils",
+    "parts": "memory_utils",
+    "buildTarget": "memory_utils_test"
+  },
+  {
+    "name": "communication_nfc",
+    "parts": "nfc",
+    "buildTarget": "nfc_test"
+  },
+  {
+    "name": "communication_netstack",
+    "parts": "netstack",
+    "buildTarget": "netstack_test"
+  },
+  {
+    "name": "communication_dsoftbus",
+    "parts": "dsoftbus",
+    "buildTarget": "dsoftbus_test"
+  },
+  {
+    "name": "communication_ipc",
+    "parts": "ipc",
+    "buildTarget": "ipc_test"
+  },
+  {
+    "name": "communication_netmanager_base",
+    "parts": "netmanager_base",
+    "buildTarget": "netmanager_base_test"
+  },
+  {
+    "name": "communication_netmanager_ext",
+    "parts": "netmanager_ext",
+    "buildTarget": "netmanager_ext_test"
+  },
+  {
+    "name": "communication_wifi",
+    "parts": "wifi",
+    "buildTarget": "wifi_test"
+  },
+  {
+    "name": "communication_dhcp",
+    "parts": "dhcp",
+    "buildTarget": "dhcp_test"
+  },
+  {
+    "name": "customization_config_policy",
+    "parts": "config_policy",
+    "buildTarget": "config_policy_test"
+  },
+  {
+    "name": "customization_enterprise_device_management",
+    "parts": "enterprise_device_management",
+    "buildTarget": "enterprise_device_management_test"
+  },
+  {
+    "name": "developtools_hdc",
+    "parts": "hdc",
+    "buildTarget": "hdc_test"
+  },
+  {
+    "name": "developtools_smartperf_host",
+    "parts": "smartperf_host",
+    "buildTarget": "smartperf_host_test"
+  },
+  {
+    "name": "developtools_hiperf",
+    "parts": "hiperf",
+    "buildTarget": "hiperf_test"
+  },
+  {
+    "name": "developtools_syscap_codec",
+    "parts": "syscap_codec",
+    "buildTarget": "syscap_codec_test"
+  },
+  {
+    "name": "developtools_global_resource_tool",
+    "parts": "global_resource_tool",
+    "buildTarget": "global_resource_tool_test"
+  },
+  {
+    "name": "deviceprofile_device_info_manager",
+    "parts": "device_info_manager",
+    "buildTarget": "device_info_manager_test"
+  },
+  {
+    "name": "distributeddatamgr_relational_store",
+    "parts": "relational_store",
+    "buildTarget": "relational_store_test"
+  },
+  {
+    "name": "distributeddatamgr_data_share",
+    "parts": "data_share",
+    "buildTarget": "data_share_test"
+  },
+  {
+    "name": "distributeddatamgr_preferences",
+    "parts": "preferences",
+    "buildTarget": "preferences_test"
+  },
+  {
+    "name": "distributeddatamgr_kv_store",
+    "parts": "kv_store",
+    "buildTarget": "kv_store_test"
+  },
+  {
+    "name": "distributeddatamgr_data_object",
+    "parts": "data_object",
+    "buildTarget": "data_object_test"
+  },
+  {
+    "name": "distributeddatamgr_datamgr_service",
+    "parts": "datamgr_service",
+    "buildTarget": "datamgr_service_test"
+  },
+  {
+    "name": "distributeddatamgr_pasteboard",
+    "parts": "pasteboard",
+    "buildTarget": "pasteboard_test"
+  },
+  {
+    "name": "distributeddatamgr_udmf",
+    "parts": "udmf",
+    "buildTarget": "udmf_test"
+  },
+  {
+    "name": "distributedhardware_device_manager",
+    "parts": "device_manager",
+    "buildTarget": "device_manager_test"
+  },
+  {
+    "name": "distributedhardware_distributed_hardware_fwk",
+    "parts": "distributed_hardware_fwk",
+    "buildTarget": "distributed_hardware_fwk_test"
+  },
+  {
+    "name": "distributedhardware_distributed_camera",
+    "parts": "distributed_camera",
+    "buildTarget": "distributed_camera_test"
+  },
+  {
+    "name": "distributedhardware_distributed_screen",
+    "parts": "distributed_screen",
+    "buildTarget": "distributed_screen_test"
+  },
+  {
+    "name": "distributedhardware_distributed_audio",
+    "parts": "distributed_audio",
+    "buildTarget": "distributed_audio_test"
+  },
+  {
+    "name": "distributedhardware_distributed_input",
+    "parts": "distributed_input",
+    "buildTarget": "distributed_input_test"
+  },
+  {
+    "name": "filemanagement_file_api",
+    "parts": "file_api",
+    "buildTarget": "file_api_test"
+  },
+  {
+    "name": "filemanagement_user_file_service",
+    "parts": "user_file_service",
+    "buildTarget": "user_file_service_test"
+  },
+  {
+    "name": "filemanagement_storage_service",
+    "parts": "storage_service",
+    "buildTarget": "storage_service_test"
+  },
+  {
+    "name": "filemanagement_dfs_service",
+    "parts": "dfs_service",
+    "buildTarget": "dfs_service_test"
+  },
+  {
+    "name": "filemanagement_app_file_service",
+    "parts": "app_file_service",
+    "buildTarget": "app_file_service_test"
+  },
+  {
+    "name": "global_i18n",
+    "parts": "i18n",
+    "buildTarget": "i18n_test"
+  },
+  {
+    "name": "global_resource_management",
+    "parts": "resource_management",
+    "buildTarget": "resource_management_test"
+  },
+  {
+    "name": "graphic_graphic_2d",
+    "parts": "graphic_2d",
+    "buildTarget": "graphic_2d_test"
+  },
+  {
+    "name": "graphic_graphic_surface",
+    "parts": "graphic_surface",
+    "buildTarget": "graphic_surface_test"
+  },
+  {
+    "name": "hiviewdfx_faultloggerd",
+    "parts": "faultloggerd",
+    "buildTarget": "faultloggerd_test"
+  },
+  {
+    "name": "hiviewdfx_hichecker",
+    "parts": "hichecker",
+    "buildTarget": "hichecker_test"
+  },
+  {
+    "name": "hiviewdfx_hidumper",
+    "parts": "hidumper",
+    "buildTarget": "hidumper_test"
+  },
+  {
+    "name": "hiviewdfx_hiappevent",
+    "parts": "hiappevent",
+    "buildTarget": "hiappevent_test"
+  },
+  {
+    "name": "hiviewdfx_hicollie",
+    "parts": "hicollie",
+    "buildTarget": "hicollie_test"
+  },
+  {
+    "name": "hiviewdfx_hitrace",
+    "parts": "hitrace",
+    "buildTarget": "hitrace_test"
+  },
+  {
+    "name": "hiviewdfx_hisysevent",
+    "parts": "hisysevent",
+    "buildTarget": "hisysevent_test"
+  },
+  {
+    "name": "hiviewdfx_hiview",
+    "parts": "hiview",
+    "buildTarget": "hiview_test"
+  },
+  {
+    "name": "inputmethod_imf",
+    "parts": "imf",
+    "buildTarget": "imf_test"
+  },
+  {
+    "name": "kernel_linux",
+    "parts": "linux",
+    "buildTarget": "linux_test"
+  },
+  {
+    "name": "msdp_device_status",
+    "parts": "device_status",
+    "buildTarget": "device_status_test"
+  },
+  {
+    "name": "multimedia_audio_framework",
+    "parts": "audio_framework",
+    "buildTarget": "audio_framework_test"
+  },
+  {
+    "name": "multimedia_camera_framework",
+    "parts": "camera_framework",
+    "buildTarget": "camera_framework_test"
+  },
+  {
+    "name": "multimedia_drm_framework",
+    "parts": "drm_framework",
+    "buildTarget": "drm_framework_test"
+  },
+  {
+    "name": "multimedia_histreamer",
+    "parts": "histreamer",
+    "buildTarget": "histreamer_test"
+  },
+  {
+    "name": "multimedia_player_framework",
+    "parts": "player_framework",
+    "buildTarget": "player_framework_test"
+  },
+  {
+    "name": "multimedia_av_codec",
+    "parts": "av_codec",
+    "buildTarget": "av_codec_test"
+  },
+  {
+    "name": "multimedia_media_library",
+    "parts": "media_library",
+    "buildTarget": "media_library_test"
+  },
+  {
+    "name": "multimedia_image_framework",
+    "parts": "image_framework",
+    "buildTarget": "image_framework_test"
+  },
+  {
+    "name": "multimedia_av_session",
+    "parts": "av_session",
+    "buildTarget": "av_session_test"
+  },
+  {
+    "name": "multimodalinput_input",
+    "parts": "input",
+    "buildTarget": "input_test"
+  },
+  {
+    "name": "notification_common_event_service",
+    "parts": "common_event_service",
+    "buildTarget": "common_event_service_test"
+  },
+  {
+    "name": "notification_eventhandler",
+    "parts": "eventhandler",
+    "buildTarget": "eventhandler_test"
+  },
+  {
+    "name": "notification_distributed_notification_service",
+    "parts": "distributed_notification_service",
+    "buildTarget": "distributed_notification_service_test"
+  },
+  {
+    "name": "powermgr_battery_manager",
+    "parts": "battery_manager",
+    "buildTarget": "battery_manager_test"
+  },
+  {
+    "name": "powermgr_display_manager",
+    "parts": "display_manager",
+    "buildTarget": "display_manager_test"
+  },
+  {
+    "name": "powermgr_power_manager",
+    "parts": "power_manager",
+    "buildTarget": "power_manager_test"
+  },
+  {
+    "name": "powermgr_thermal_manager",
+    "parts": "thermal_manager",
+    "buildTarget": "thermal_manager_test"
+  },
+  {
+    "name": "powermgr_battery_statistics",
+    "parts": "battery_statistics",
+    "buildTarget": "battery_statistics_test"
+  },
+  {
+    "name": "print_print_fwk",
+    "parts": "print_fwk",
+    "buildTarget": "print_fwk_test"
+  },
+  {
+    "name": "request_request",
+    "parts": "request",
+    "buildTarget": "request_test"
+  },
+  {
+    "name": "resourceschedule_resource_schedule_service",
+    "parts": "resource_schedule_service",
+    "buildTarget": "resource_schedule_service_test"
+  },
+  {
+    "name": "resourceschedule_background_task_mgr",
+    "parts": "background_task_mgr",
+    "buildTarget": "background_task_mgr_test"
+  },
+  {
+    "name": "resourceschedule_device_usage_statistics",
+    "parts": "device_usage_statistics",
+    "buildTarget": "device_usage_statistics_test"
+  },
+  {
+    "name": "resourceschedule_device_standby",
+    "parts": "device_standby",
+    "buildTarget": "device_standby_test"
+  },
+  {
+    "name": "resourceschedule_work_scheduler",
+    "parts": "work_scheduler",
+    "buildTarget": "work_scheduler_test"
+  },
+  {
+    "name": "resourceschedule_memmgr",
+    "parts": "memmgr",
+    "buildTarget": "memmgr_test"
+  },
+  {
+    "name": "resourceschedule_ffrt",
+    "parts": "ffrt",
+    "buildTarget": "ffrt_test"
+  },
+  {
+    "name": "resourceschedule_qos_manager",
+    "parts": "qos_manager",
+    "buildTarget": "qos_manager_test"
+  },
+  {
+    "name": "security_appverify",
+    "parts": "appverify",
+    "buildTarget": "appverify_test"
+  },
+  {
+    "name": "security_dataclassification",
+    "parts": "dataclassification",
+    "buildTarget": "dataclassification_test"
+  },
+  {
+    "name": "security_device_auth",
+    "parts": "device_auth",
+    "buildTarget": "device_auth_test"
+  },
+  {
+    "name": "security_dlp_permission_service",
+    "parts": "dlp_permission_service",
+    "buildTarget": "dlp_permission_service_test"
+  },
+  {
+    "name": "security_huks",
+    "parts": "huks",
+    "buildTarget": "huks_test"
+  },
+  {
+    "name": "security_device_security_level",
+    "parts": "device_security_level",
+    "buildTarget": "device_security_level_test"
+  },
+  {
+    "name": "security_access_token",
+    "parts": "access_token",
+    "buildTarget": "access_token_test"
+  },
+  {
+    "name": "security_security_component_manager",
+    "parts": "security_component_manager",
+    "buildTarget": "security_component_manager_test"
+  },
+  {
+    "name": "security_selinux_adapter",
+    "parts": "selinux_adapter",
+    "buildTarget": "selinux_adapter_test"
+  },
+  {
+    "name": "security_code_signature",
+    "parts": "code_signature",
+    "buildTarget": "code_signature_test"
+  },
+  {
+    "name": "security_crypto_framework",
+    "parts": "crypto_framework",
+    "buildTarget": "crypto_framework_test"
+  },
+  {
+    "name": "security_certificate_manager",
+    "parts": "certificate_manager",
+    "buildTarget": "certificate_manager_test"
+  },
+  {
+    "name": "security_certificate_framework",
+    "parts": "certificate_framework",
+    "buildTarget": "certificate_framework_test"
+  },
+  {
+    "name": "sensors_miscdevice",
+    "parts": "miscdevice",
+    "buildTarget": "miscdevice_test"
+  },
+  {
+    "name": "sensors_sensor",
+    "parts": "sensor",
+    "buildTarget": "sensor_test"
+  },
+  {
+    "name": "startup_appspawn",
+    "parts": "appspawn",
+    "buildTarget": "appspawn_test"
+  },
+  {
+    "name": "startup_init",
+    "parts": "init",
+    "buildTarget": "init_test"
+  },
+  {
+    "name": "systemabilitymgr_safwk",
+    "parts": "safwk",
+    "buildTarget": "safwk_test"
+  },
+  {
+    "name": "systemabilitymgr_samgr",
+    "parts": "samgr",
+    "buildTarget": "samgr_test"
+  },
+  {
+    "name": "telephony_ril_adapter",
+    "parts": "ril_adapter",
+    "buildTarget": "ril_adapter_test"
+  },
+  {
+    "name": "telephony_call_manager",
+    "parts": "call_manager",
+    "buildTarget": "call_manager_test"
+  },
+  {
+    "name": "telephony_cellular_call",
+    "parts": "cellular_call",
+    "buildTarget": "cellular_call_test"
+  },
+  {
+    "name": "telephony_core_service",
+    "parts": "core_service",
+    "buildTarget": "core_service_test"
+  },
+  {
+    "name": "telephony_sms_mms",
+    "parts": "sms_mms",
+    "buildTarget": "sms_mms_test"
+  },
+  {
+    "name": "telephony_state_registry",
+    "parts": "state_registry",
+    "buildTarget": "state_registry_test"
+  },
+  {
+    "name": "telephony_telephony_data",
+    "parts": "telephony_data",
+    "buildTarget": "telephony_data_test"
+  },
+  {
+    "name": "telephony_cellular_data",
+    "parts": "cellular_data",
+    "buildTarget": "cellular_data_test"
+  },
+  {
+    "name": "theme_wallpaper_mgr",
+    "parts": "wallpaper_mgr",
+    "buildTarget": "wallpaper_mgr_test"
+  },
+  {
+    "name": "theme_screenlock_mgr",
+    "parts": "screenlock_mgr",
+    "buildTarget": "screenlock_mgr_test"
+  },
+  {
+    "name": "thirdparty_jerryscript",
+    "parts": "jerryscript",
+    "buildTarget": "jerryscript_test"
+  },
+  {
+    "name": "thirdparty_libphonenumber",
+    "parts": "libphonenumber",
+    "buildTarget": "libphonenumber_test"
+  },
+  {
+    "name": "thirdparty_libunwind",
+    "parts": "libunwind",
+    "buildTarget": "libunwind_test"
+  },
+  {
+    "name": "thirdparty_musl",
+    "parts": "musl",
+    "buildTarget": "musl_test"
+  },
+  {
+    "name": "thirdparty_openssl",
+    "parts": "openssl",
+    "buildTarget": "openssl_test"
+  },
+  {
+    "name": "thirdparty_mindspore",
+    "parts": "mindspore",
+    "buildTarget": "mindspore_test"
+  },
+  {
+    "name": "thirdparty_cups",
+    "parts": "cups",
+    "buildTarget": "cups_test"
+  },
+  {
+    "name": "thirdparty_cups-filters",
+    "parts": "cups-filters",
+    "buildTarget": "cups-filters_test"
+  },
+  {
+    "name": "thirdparty_lzma",
+    "parts": "lzma",
+    "buildTarget": "lzma_test"
+  },
+  {
+    "name": "thirdparty_vixl",
+    "parts": "vixl",
+    "buildTarget": "vixl_test"
+  },
+  {
+    "name": "time_time_service",
+    "parts": "time_service",
+    "buildTarget": "time_service_test"
+  },
+  {
+    "name": "usb_usb_manager",
+    "parts": "usb_manager",
+    "buildTarget": "usb_manager_test"
+  },
+  {
+    "name": "useriam_pin_auth",
+    "parts": "pin_auth",
+    "buildTarget": "pin_auth_test"
+  },
+  {
+    "name": "useriam_user_auth_framework",
+    "parts": "user_auth_framework",
+    "buildTarget": "user_auth_framework_test"
+  },
+  {
+    "name": "useriam_face_auth",
+    "parts": "face_auth",
+    "buildTarget": "face_auth_test"
+  },
+  {
+    "name": "useriam_fingerprint_auth",
+    "parts": "fingerprint_auth",
+    "buildTarget": "fingerprint_auth_test"
+  },
+  {
+    "name": "web_webview",
+    "parts": "webview",
+    "buildTarget": "webview_test"
+  },
+  {
+    "name": "window_window_manager",
+    "parts": "window_manager",
+    "buildTarget": "window_manager_test"
+  },
+  {
+    "name": "xts_device_attest",
+    "parts": "device_attest",
+    "buildTarget": "device_attest_test"
+  }
+]
