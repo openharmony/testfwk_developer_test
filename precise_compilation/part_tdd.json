@@ -127,7 +127,7 @@
   {
     "name": "communication_nfc",
     "parts": "nfc",
-    "buildTarget": "communication/nfc:nfc_test"
+    "buildTarget": "out/rk3568/build_configs/communication/nfc:nfc_test"
   },
   {
     "name": "communication_netstack",
@@ -572,7 +572,7 @@
   {
     "name": "security_certificate_manager",
     "parts": "certificate_manager",
-    "buildTarget": "security/device_certificate_manager:device_certificate_manager_test"
+    "buildTarget": "out/rk3568/build_configs/security/device_certificate_manager:device_certificate_manager_test"
   },
   {
     "name": "security_certificate_framework",
