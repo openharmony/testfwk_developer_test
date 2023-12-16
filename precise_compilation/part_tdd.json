@@ -55,11 +55,6 @@
     "buildTarget": "applications/calendar_data:calendar_data_test"
   },
   {
-    "name": "barrierfree_accessibility",
-    "parts": "accessibility",
-    "buildTarget": "barrierfree/accessibility:accessibility_test"
-  },
-  {
     "name": "communication_netstack",
     "parts": "netstack",
     "buildTarget": "communication/netstack:netstack_test"
