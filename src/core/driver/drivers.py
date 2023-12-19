@@ -101,8 +101,7 @@ class DisplayOutputReceiver:
         lines = self._process_output(output)
         for line in lines:
             line = line.strip()
-            if "[ RUN      ]" in line or "[       OK ]" in line or "[==========]" in line or \
-                    "[----------]" in line or "[  PASSED  ]" in line or "[  FAILED  ]" in line:
+            if line:
                 LOG.info(get_decode(line))
 
     def __error__(self, message):
@@ -567,7 +566,8 @@ class CppTestDriver(IDriver):
             serial = "{}_{}".format(str(request.config.device.__get_serial__()), time.time_ns())
             log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
                 ":", "_"))
-            self.config.device.device_log_collector.stop_hilog_task(log_tar_file_name)
+            self.config.device.device_log_collector.stop_hilog_task(
+                log_tar_file_name, module_name=request.get_module_name())
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
@@ -1198,9 +1198,13 @@ class OHRustTestDriver(IDriver):
             log_tar_file_name = "{}_{}".format(
                 request.get_module_name(), str(serial).replace(":", "_"))
             self.config.device.device_log_collector.stop_hilog_task(
-                log_tar_file_name)
+                log_tar_file_name, module_name=request.get_module_name())
             self.result = check_result_report(
                 request.config.report_path, self.result, self.error_message)
+            result_save_path = get_result_savepath(
+                request.root.source.source_file, self.config.report_path)
+            shutil.move(self.result, result_save_path)
+
 
     def _init_oh_rust(self):
         self.config.device.connector_command("target mount")
