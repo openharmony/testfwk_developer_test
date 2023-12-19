@@ -1217,10 +1217,10 @@
       "vendor/huawei/base/hiviewdfx/hiview_plugins/boot_detector_plugin"
     ]
   },
-  "bundle_adapter": {
-    "name": "bundle_adapter",
+  "bundle_framework_ext": {
+    "name": "bundle_framework_ext",
     "path": [
-      "vendor/huawei/foundation/bundlemanager/bundle_adapter"
+      "vendor/huawei/foundation/bundlemanager/bundle_framework_ext"
     ]
   },
   "advanced_ui_component": {
