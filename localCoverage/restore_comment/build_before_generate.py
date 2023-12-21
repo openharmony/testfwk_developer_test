@@ -21,31 +21,6 @@ import subprocess
 import json
 
 
-def get_file_list(find_path, postfix=""):
-    file_names = os.listdir(find_path)
-    file_list = []
-    if len(file_names) > 0:
-        for fn in file_names:
-            if postfix != "":
-                if fn.find(postfix) != -1 and fn[-len(postfix):] == postfix:
-                    file_list.append(fn)
-            else:
-                file_list.append(fn)
-    return
-
-
-def get_file_list_by_postfix(path, postfix=""):
-    file_list = []
-    for dirs in os.walk(path):
-        files = get_file_list(find_path=dirs[0], postfix=postfix)
-        for file_name in files:
-            if "" != file_name and -1 == file_name.find(__file__):
-                file_name = os.path.join(dirs[0], file_name)
-                if os.path.isfile(file_name):
-                    file_list.append(file_name)
-    return file_list
-
-
 def get_source_file_list(path):
     """
     获取path路径下源文件路径列表
@@ -56,7 +31,7 @@ def get_source_file_list(path):
         for file_name in files:
             file_path = os.path.join(root, file_name)
             _, suffix = os.path.splitext(file_name)
-            if suffix in [".c", ".h", ".cpp"]:
+            if suffix in [".c", ".cpp"]:
                 file_path_list_append(file_path)
     return file_path_list
 
@@ -81,15 +56,18 @@ def rewrite_source_file(source_path_list: list):
                   encoding="utf-8", errors="ignore") as write_fp:
 
             for line in code_lines:
+                sign_number = 0
                 for key in keys:
+                    sign_number += 1
                     if key in line and line.strip().startswith(key):
                         write_fp.write(line)
                         break
-                    elif " //LCOV_EXCL_BR_LINE" not in line and not line.strip().endswith("\\"):
+                    elif " //LCOV_EXCL_BR_LINE" not in line and not line.strip().endswith("\\") \
+                            and sign_number == len(keys):
                         write_fp.write(line.strip("\n").strip("\n\r") + " //LCOV_EXCL_BR_LINE")
                         write_fp.write("\n")
                         break
-                    elif key == keys[-1]:
+                    elif sign_number == len(keys):
                         write_fp.write(line)
                         break
 
@@ -107,9 +85,11 @@ def add_lcov(subsystem_config_path):
             if "path" in value.keys():
                 for path_str in value["path"]:
                     file_path = os.path.join(root_path, path_str)
+                    primal_path = f"{file_path}_primal"
                     if os.path.exists(file_path):
-                        subprocess.Popen("cp -r %s %s" % (
-                            file_path, f"{file_path}_primal"), shell=True).communicate()
+                        if not os.path.exists(primal_path):
+                            subprocess.Popen("cp -r %s %s" % (
+                                file_path, primal_path), shell=True).communicate()
                         source_file_path = get_source_file_list(file_path)
                         rewrite_source_file(source_file_path)
                     else:
