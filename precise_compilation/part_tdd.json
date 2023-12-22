@@ -746,7 +746,7 @@
   },
   {
     "name": "communication_bluetooth_service",
-    "parts": "bluetooth_service_override",
-    "buildTarget": "communication/bluetooth_service_override:bluetooth_service_override_test"
+    "parts": "bluetooth_service",
+    "buildTarget": "communication/bluetooth_service:bluetooth_service_test"
   }
 ]
