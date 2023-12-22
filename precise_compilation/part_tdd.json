@@ -685,11 +685,6 @@
     "buildTarget": "barrierfree/accessibility:accessibility_test"
   },
   {
-    "name": "communication_nfc",
-    "parts": "nfc",
-    "buildTarget": "communication/nfc:nfc_test"
-  },
-  {
     "name": "drivers_hdf_core",
     "parts": "hdf_core",
     "buildTarget": "hdf/hdf_core:hdf_core_test"
