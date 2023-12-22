@@ -678,5 +678,80 @@
     "name": "graphic_graphic_surface",
     "parts": "graphic_surface",
     "buildTarget": "graphic/graphic_surface:graphic_surface_test"
+  },
+  {
+    "name": "accessibility",
+    "parts": "accessibility",
+    "buildTarget": "barrierfree/accessibility:accessibility_test"
+  },
+  {
+    "name": "communication_nfc",
+    "parts": "nfc",
+    "buildTarget": "communication/nfc:nfc_test"
+  },
+  {
+    "name": "drivers_hdf_core",
+    "parts": "hdf_core",
+    "buildTarget": "hdf/hdf_core:hdf_core_test"
+  },
+  {
+    "name": "hiviewdfx_hilog",
+    "parts": "hilog_override",
+    "buildTarget": "hiviewdfx/hilog_override:hilog_override_test"
+  },
+  {
+    "name": "useriam_face_auth",
+    "parts": "face_auth_override",
+    "buildTarget": "useriam/face_auth_override:face_auth_override_test"
+  },
+  {
+    "name": "useriam_fingerprint_auth",
+    "parts": "fingerprint_auth_override",
+    "buildTarget": "useriam/fingerprint_auth_override:fingerprint_auth_override_test"
+  },
+  {
+    "name": "third_party_musl",
+    "parts": "musl",
+    "buildTarget": "thirdparty/musl:musl_test"
+  },
+  {
+    "name": "update_updater",
+    "parts": "updater",
+    "buildTarget": "updater/updater:updater_test"
+  },
+  {
+    "name": "update_update_service",
+    "parts": "update_service",
+    "buildTarget": "updater/update_service:update_service_test"
+  },
+  {
+    "name": "update_sys_installer",
+    "parts": "sys_installer",
+    "buildTarget": "updater/sys_installer:sys_installer_test"
+  },
+  {
+    "name": "resourceschedule_memmgr",
+    "parts": "memmgr_plugin",
+    "buildTarget": "resourceschedule/memmgr_plugin:memmgr_plugin_test"
+  },
+  {
+    "name": "linux_frame_aware_sched",
+    "parts": "frame_aware_sched",
+    "buildTarget": "resourceschedule/frame_aware_sched:frame_aware_sched_test"
+  },
+  {
+    "name": "third_party_mindspore",
+    "parts": "mindspore",
+    "buildTarget": "thirdparty/mindspore:mindspore_test"
+  },
+  {
+    "name": "base_location",
+    "parts": "location",
+    "buildTarget": "location/location:location_test"
+  },
+  {
+    "name": "communication_bluetooth_service",
+    "parts": "bluetooth_service_override",
+    "buildTarget": "communication/bluetooth_service_override:bluetooth_service_override_test"
   }
 ]
