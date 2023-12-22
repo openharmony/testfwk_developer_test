@@ -691,8 +691,8 @@
   },
   {
     "name": "hiviewdfx_hilog",
-    "parts": "hilog_override",
-    "buildTarget": "hiviewdfx/hilog_override:hilog_override_test"
+    "parts": "hilog",
+    "buildTarget": "hiviewdfx/hilog:hilog_test"
   },
   {
     "name": "useriam_face_auth",
