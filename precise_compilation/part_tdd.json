@@ -696,13 +696,13 @@
   },
   {
     "name": "useriam_face_auth",
-    "parts": "face_auth_override",
-    "buildTarget": "useriam/face_auth_override:face_auth_override_test"
+    "parts": "face_auth",
+    "buildTarget": "useriam/face_auth:face_auth_test"
   },
   {
     "name": "useriam_fingerprint_auth",
-    "parts": "fingerprint_auth_override",
-    "buildTarget": "useriam/fingerprint_auth_override:fingerprint_auth_override_test"
+    "parts": "fingerprint_auth",
+    "buildTarget": "useriam/fingerprint_auth:fingerprint_auth_test"
   },
   {
     "name": "third_party_musl",
