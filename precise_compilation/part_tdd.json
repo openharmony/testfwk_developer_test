@@ -360,11 +360,6 @@
     "buildTarget": "security/device_security_level:device_security_level_test"
   },
   {
-    "name": "security_access_token",
-    "parts": "access_token",
-    "buildTarget": "security/access_token:access_token_test"
-  },
-  {
     "name": "security_security_component_manager",
     "parts": "security_component_manager",
     "buildTarget": "security/security_component_manager:security_component_manager_test"
