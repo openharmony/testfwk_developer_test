@@ -272,7 +272,7 @@
   {
     "name": "multimedia_camera_framework",
     "parts": "camera_framework",
-    "buildTarget": "multimedia/camera_framework:camera_framework_test"
+    "buildTarget": "multimedia/camera_framework:camera_framework_test,web/webview:webview_test"
   },
   {
     "name": "multimedia_histreamer",
