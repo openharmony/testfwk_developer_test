@@ -275,9 +275,9 @@
     "buildTarget": "multimedia/camera_framework:camera_framework_test,web/webview:webview_test"
   },
   {
-    "name": "multimedia_histreamer",
-    "parts": "histreamer",
-    "buildTarget": "multimedia/histreamer:histreamer_test"
+    "name": "multimedia_media_foundation",
+    "parts": "media_foundation",
+    "buildTarget": "multimedia/media_foundation:histreamer_test"
   },
   {
     "name": "multimedia_player_framework",
