@@ -263,10 +263,10 @@
       "foundation/multimedia/av_session"
     ]
   },
-  "histreamer": {
-    "name": "histreamer",
+  "media_foundation": {
+    "name": "media_foundation",
     "path": [
-      "foundation/multimedia/histreamer"
+      "foundation/multimedia/media_foundation"
     ]
   },
   "player_framework": {
