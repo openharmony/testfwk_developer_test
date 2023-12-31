@@ -27,7 +27,7 @@
   {
     "name": "arkui_ace_engine",
     "parts": "ace_engine",
-    "buildTarget": "arkui/ace_engine:ace_engine_test"
+    "buildTarget": "arkui/ace_engine:ace_engine_test,window/window_manager:window_manager_test"
   },
   {
     "name": "arkui_napi",
