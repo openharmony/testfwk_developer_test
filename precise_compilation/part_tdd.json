@@ -277,7 +277,7 @@
   {
     "name": "multimedia_media_foundation",
     "parts": "media_foundation",
-    "buildTarget": "multimedia/media_foundation:histreamer_test"
+    "buildTarget": "multimedia/media_foundation:media_foundation_test"
   },
   {
     "name": "multimedia_player_framework",
