@@ -332,7 +332,7 @@
   {
     "name": "security_appverify",
     "parts": "appverify",
-    "buildTarget": "security/appverify:appverify_test"
+    "buildTarget": "security/appverify:appverify_test,bundlemanager/bundle_framework:bundle_framework_test"
   },
   {
     "name": "security_dataclassification",
