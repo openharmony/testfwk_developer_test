@@ -19,6 +19,10 @@
 import os
 import subprocess
 import json
+import stat
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 def get_source_file_list(path):
@@ -52,9 +56,11 @@ def rewrite_source_file(source_path_list: list):
         with open(path, "r", encoding="utf-8", errors="ignore") as read_fp:
             code_lines = read_fp.readlines()
         source_dir, suffix_name = os.path.splitext(path)
-        with open(f"{source_dir}_bk.{suffix_name}", "w",
-                  encoding="utf-8", errors="ignore") as write_fp:
-
+        # with open(f"{source_dir}_bk.{suffix_name}", "w",
+        #           encoding="utf-8", errors="ignore") as write_fp:
+        if os.path.exists(f"{source_dir}_bk.{suffix_name}"):
+            os.remove(f"{source_dir}_bk.{suffix_name}")
+        with os.fdopen(os.open(f"{source_dir}_bk.{suffix_name}", FLAGS, MODES), 'w') as read_fp:
             for line in code_lines:
                 sign_number = 0
                 for key in keys:
@@ -109,7 +115,10 @@ def get_part_config_json(part_list, system_info_path, part_path):
                 else:
                     print("Error: part not in all_subsystem_config.json")
         new_json = json.dumps(new_json_text, indent=4)
-        with open(part_path, "w") as out_file:
+        # with open(part_path, "w") as out_file:
+        if os.path.exists(part_path):
+            os.remove(part_path)
+        with os.fdopen(os.open(part_path, FLAGS, MODES), 'w') as out_file:
             out_file.write(new_json)
     else:
         print("%s not exists.", system_info_path)

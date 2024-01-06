@@ -20,10 +20,15 @@ import os
 import subprocess
 import sys
 import re
+import stat
+
 from xdevice import platform_logger
 from xdevice import EnvironmentManager
 from xdevice import ResultReporter
 from xdevice import ExecInfo
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 LOG = platform_logger("distribute_utils")
 
@@ -32,7 +37,10 @@ def make_device_info_file(tmp_path):
     env_manager = EnvironmentManager()
     device_info_file_path = os.path.join(tmp_path,
                                          "device_info_file.txt")
-    with open(device_info_file_path, "w") as file_handle:
+    # with open(device_info_file_path, "w") as file_handle:
+    if os.path.exists(device_info_file_path):
+        os.remove(device_info_file_path)
+    with os.fdopen(os.open(device_info_file_path, FLAGS, MODES), 'w') as file_handle:
         if not env_manager.managers:
             return
         if list(env_manager.managers.values())[0].devices_list:

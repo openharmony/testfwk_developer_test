@@ -17,6 +17,10 @@
 import sys
 import os
 import time
+import stat
+
+FLAGS = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 class Colored(object):
@@ -82,7 +86,8 @@ class Colored(object):
                 self.get_fuzz_current_project_log_dir(),
                 "run.log"
             )
-            with open(run_log, 'ab') as f:
+            # with open(run_log, 'ab') as f:
+            with os.fdopen(os.open(run_log, FLAGS, MODES), 'ab') as fout:
                 f.write(msg + "\n")
 
 

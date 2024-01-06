@@ -21,6 +21,12 @@ import sys
 import datetime
 from importlib import reload
 reload(sys)
+import os
+import stat
+
+FLAGS_WRITE = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+FLAGS_ADD = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 html_head = """
@@ -88,7 +94,8 @@ def sort_by_field_element_data(elem):
 
 def create_html_start(reportpath):
     try:
-        with open(reportpath, "w") as report:
+        # with open(reportpath, "w") as report:
+        with os.fdopen(os.open(reportpath, FLAGS_WRITE, MODES), 'w') as fout:
             report.write(html_head)
             report.write(html_body_start)
     except(IOError, ValueError):
@@ -123,7 +130,8 @@ def create_title(reportpath, title_name, summary_list):
             nocoverd = item[1] - item[2]
             report_title = report_title % (item[1], item[2], nocoverd)
     try:
-        with open(reportpath, "a") as report:
+        # with open(reportpath, "a") as report:
+        with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             report.write(report_title)
     except(IOError, ValueError):
         print("Error for create html title")
@@ -158,7 +166,8 @@ def create_summary(reportpath, summary_list):
     try:
         if len(summary_list) == 0:
             return
-        with open(reportpath, "a") as report:
+        # with open(reportpath, "a") as report:
+        with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             report.write(table_title)
             report.write(table_start)
             report.write(table_head)
@@ -198,7 +207,8 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
     table_ended = """</tbody></table></div>
     """
     try:
-        with open(reportpath, "a") as report:
+        # with open(reportpath, "a") as report:
+        with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             print("part_name==" + subsystem_name)
             tabletitle = table_title % (subsystem_name)
             print("tabletitle==" + tabletitle)
@@ -234,7 +244,8 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
 
 def create_html_ended(reportpath):
     try:
-        with open(reportpath, "a") as report:
+        # with open(reportpath, "a") as report:
+        with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             report.write(html_body_ended)
             report.write(html_ended)
     except(IOError, ValueError):

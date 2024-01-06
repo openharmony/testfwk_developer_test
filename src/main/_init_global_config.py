@@ -122,13 +122,13 @@ def _load_internal_plugins():
         import benchmark.report.benchmark_reporter
         _iter_module_plugins([core.driver, benchmark.report.benchmark_reporter])
 
-    except (ModuleNotFoundError, ImportError):
+    except ImportError:
         pass
 
     try:
         import script.report
         _iter_module_plugins([script.report])
-    except (ModuleNotFoundError, ImportError):
+    except importError:
         pass
 
 

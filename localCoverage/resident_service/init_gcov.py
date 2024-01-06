@@ -24,6 +24,11 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from public_method import get_server_dict, get_config_ip, get_sn_list
+import stat
+
+FLAGS_WRITE = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+FLAGS_ADD = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 def _init_sys_config():
@@ -61,7 +66,10 @@ def modify_init_file(developer_path, hdc_str):
                 else:
                     return
         json_str = json.dumps(json_data, indent=2)
-        with open(cfg_file_path, "w") as json_file:
+        # with open(cfg_file_path, "w") as json_file:
+        if os.path.exists(cfg_file_path):
+            os.remove(cfg_file_path)
+        with os.fdopen(os.open(cfg_file_path, FLAGS_WRITE, MODES), 'w') as json_file:
             json_file.write(json_str)
     else:
         print("init.cfg file not exists")
@@ -97,7 +105,10 @@ def modify_faultloggerd_file(developer_path, hdc_str):
                 ]
             })
             json_str = json.dumps(json_data, indent=4)
-            with open(cfg_file_path, "w") as json_file:
+            # with open(cfg_file_path, "w") as json_file:
+            if os.path.exists(cfg_file_path):
+                os.remove(cfg_file_path)
+            with os.fdopen(os.open(cfg_file_path, FLAGS_WRITE, MODES), 'w') as json_file:
                 json_file.write(json_str)
             print("%s file send %s %s" % (hdc_str, cfg_file_path, "/system/etc/init/"))
             coverage_command("%s file send %s %s" % (hdc_str, cfg_file_path, "/system/etc/init/"))
@@ -153,7 +164,10 @@ def modify_foundation_json(serv, config_path, origin_json) -> str:
     f_dict["systemability"] = tmp_list
 
     new_json = os.path.join(config_path, 'foundation.json')
-    with open(new_json, "w", encoding="utf-8") as f:
+    # with open(new_json, "w", encoding="utf-8") as f:
+    if os.path.exists(new_json):
+        os.remove(new_json)
+    with os.fdopen(os.open(new_json, FLAGS_WRITE, MODES), 'w') as f:
         json.dump(f_dict, f, indent=4)
 
     return new_json
@@ -180,7 +194,10 @@ def create_service_json(serv, config_path, origin_json) -> str:
     f_dict["process"] = "{}".format(serv)
 
     new_json = os.path.join(config_path, '{}.json'.format(serv))
-    with open(new_json, "w", encoding="utf-8") as f:
+    # with open(new_json, "w", encoding="utf-8") as f:
+    if os.path.exists(new_json):
+        os.remove(new_json)
+    with os.fdopen(os.open(new_json, FLAGS_WRITE, MODES), 'w') as f:
         json.dump(f_dict, f, indent=4)
 
     return new_json
@@ -234,7 +251,10 @@ def create_service_cfg(serv, config_path, origin_cfg) -> str:
         json_obj["services"][0]["jobs"]["on-start"] = "services:{}".format(serv)
 
     cfg_path = os.path.join(config_path, "{}.cfg".format(serv))
-    with open(cfg_path, 'w') as r:
+    # with open(cfg_path, 'w') as r:
+    if os.path.exists(cfg_path):
+        os.remove(cfg_path)
+    with os.fdopen(os.open(cfg_path, FLAGS_WRITE, MODES), 'w') as f:
         json.dump(json_obj, r, indent=4)
     return cfg_path
 

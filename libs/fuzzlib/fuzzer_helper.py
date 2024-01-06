@@ -29,6 +29,7 @@ import time
 import copy
 import shutil
 from pprint import pprint
+import stat
 
 from tools.colored import Colored
 from tools.templates import GN_ENTRY_TEMPLATE
@@ -37,6 +38,9 @@ from tools.templates import PROJECT_DEMO_TEMPLATE
 from tools.templates import PROJECT_HEADER_TEMPLATE
 from tools.templates import PROJECT_XML_TEMPLATE
 from tools.run_result import RunResult
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 SOURCE_ROOT_DIR = os.path.dirname(
@@ -93,7 +97,7 @@ def _get_fuzzer_yaml_config(fuzzer_name):
         fuzzer_name,
         "project.yaml")
     if not os.path.exists(project_yaml_path):
-        return
+        return {}
     #log run stdout to fuzzlog dir
     with open(project_yaml_path) as filehandle:
         yaml_config = yaml.safe_load(filehandle)
@@ -129,18 +133,22 @@ def generate(args):
     color_logger.green('Writing new files to %s' % project_dir_path)
 
     file_path = os.path.join(project_dir_path, 'project.xml')
-    with open(file_path, 'w') as filehandle:
+    # with open(file_path, 'w') as filehandle:
+    with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_XML_TEMPLATE % template_args)
 
     file_path = os.path.join(project_dir_path, "%s.cpp" % args.project_name)
-    with open(file_path, 'w') as filehandle:
+    # with open(file_path, 'w') as filehandle:
+    with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_DEMO_TEMPLATE % template_args)
 
     file_path = os.path.join(project_dir_path, "%s.h" % args.project_name)
-    with open(file_path, 'w') as filehandle:
+    # with open(file_path, 'w') as filehandle:
+    with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_HEADER_TEMPLATE % template_args)
     file_path = os.path.join(project_dir_path, "BUILD.gn")
-    with open(file_path, 'w') as filehandle:
+    # with open(file_path, 'w') as filehandle:
+    with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_GN_TEMPLATE % template_args)
 
     corpus_dir = os.path.join(project_dir_path, 'corpus')
@@ -148,6 +156,7 @@ def generate(args):
         os.mkdir(corpus_dir)
         with open(os.path.join(corpus_dir, 'init'), 'w') as filehandle:
             filehandle.write("FUZZ")
+    return 0
 
 
 #complie fuzzer project
@@ -187,7 +196,8 @@ def make(args,  stdout=None):
     )
     if not os.path.exists(os.path.dirname(subsystem_src_flag_file_path)):
         os.makedirs(os.path.dirname(subsystem_src_flag_file_path))
-    with open(subsystem_src_flag_file_path, "wb") as file_handle:
+    # with open(subsystem_src_flag_file_path, "wb") as file_handle:
+    with os.fdopen(os.open(subsystem_src_flag_file_path, FLAGS, MODES), 'wb') as filehandle:
         file_handle.write(args.project_name.encode())
 
     try:
@@ -260,6 +270,9 @@ def main():
 
     elif args.command == 'report':
         report(args)
+        return 1
+    else:
+        return 0
 
 if __name__ == "__main__":
     main()
