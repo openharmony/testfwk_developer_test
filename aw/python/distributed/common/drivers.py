@@ -22,12 +22,16 @@ import subprocess
 import tempfile
 from abc import ABCMeta
 from abc import abstractmethod
+import stat
 
 from core.config.resource_manager import ResourceManager
 
 
 ##############################################################################
 ##############################################################################
+
+FLAGS = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 DEVICE_TEST_PATH = "/%s/%s/" % ("data", "test")
 
@@ -48,10 +52,11 @@ def make_long_command_file(command, longcommand_path, filename):
     sh_file_name = '%s.sh' % filename
     file_path = os.path.join(longcommand_path, sh_file_name)
     try:
-        with open(file_path, "a") as file_desc:
+        # with open(file_path, "a") as file_desc:
+        with os.fdopen(os.open(file_path, FLAGS, MODES), 'a') as file_desc:
             file_desc.write(command)
     except(IOError, ValueError) as err_msg:
-        print("Error for make long command file: ", err_msg)
+        print(f"Error for make long command file: {file_path}")
     return sh_file_name, file_path
 
 
@@ -161,6 +166,8 @@ class CppTestDriver(ITestDriver):
 
         if options.coverage:
             receive_coverage_data(self.device, result_path, suite_file, file_name)
+        
+        del long_command_path
 
 
 ##############################################################################

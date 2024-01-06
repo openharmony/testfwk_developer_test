@@ -20,6 +20,10 @@
 import os
 import json
 import sys
+import stat
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 def _init_sys_config():
@@ -37,7 +41,8 @@ def gen_parts_info_json(folder_list, output_json_path, target_cpu):
             data_dict[folder_str] = f"innerkits/ohos-{target_cpu}/{folder_str}"
         output_json_path = os.path.join(output_json_path, "kits_modules_info.json")
         json_str = json.dumps(data_dict, indent=2)
-        with open(output_json_path, "w") as json_file:
+        # with open(output_json_path, "w") as json_file:
+        with os.fdopen(os.open(output_json_path, FLAGS, MODES), 'w') as json_file:
             json_file.write(json_str)
     else:
         print("part_name list information is null")

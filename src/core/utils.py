@@ -139,13 +139,14 @@ def parse_device_name(product_form):
     device_json_file = os.path.join(sys.source_code_root_path,
                                     "productdefine", "common", "products",
                                     "{}.json".format(product_form))
+    device_name = ""
     if not os.path.exists(device_json_file):
-        return
+        return device_name
 
     with open(device_json_file, 'r') as json_file:
         json_info = json.load(json_file)
     if not json_info:
-        return
+        return device_name
     device_name = json_info.get('product_device')
     if not device_name:
         device_name = get_output_path()
