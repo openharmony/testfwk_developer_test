@@ -254,7 +254,7 @@ def create_service_cfg(serv, config_path, origin_cfg) -> str:
     # with open(cfg_path, 'w') as r:
     if os.path.exists(cfg_path):
         os.remove(cfg_path)
-    with os.fdopen(os.open(cfg_path, FLAGS_WRITE, MODES), 'w') as f:
+    with os.fdopen(os.open(cfg_path, FLAGS_WRITE, MODES), 'w') as r:
         json.dump(json_obj, r, indent=4)
     return cfg_path
 

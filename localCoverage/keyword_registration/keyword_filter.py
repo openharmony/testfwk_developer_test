@@ -67,7 +67,7 @@ span.branchnocovupdate
   background-color:#BBBBBB;
 }"""
         # with open(css_file_path, "a+", encoding="utf-8") as file:
-        with os.fdopen(os.open(css_file_path, FLAGS_WRITE, MODES), 'a+') as file:
+        with os.fdopen(os.open(css_file_path, FLAGS_ADD, MODES), 'a+') as file:
             file.write(text)
 
     def get_statistic_path(self, gcov_file_path: str):
