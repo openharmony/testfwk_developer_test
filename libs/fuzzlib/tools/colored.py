@@ -87,7 +87,7 @@ class Colored(object):
                 "run.log"
             )
             # with open(run_log, 'ab') as f:
-            with os.fdopen(os.open(run_log, FLAGS, MODES), 'ab') as fout:
+            with os.fdopen(os.open(run_log, FLAGS, MODES), 'ab') as f:
                 f.write(msg + "\n")
 
 

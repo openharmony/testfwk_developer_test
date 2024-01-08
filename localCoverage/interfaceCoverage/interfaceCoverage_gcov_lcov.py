@@ -395,6 +395,8 @@ def make_summary_file(summary_list, output_path):
     report_path = os.path.join(output_path, "coverage_summary_file.xml")
     try:
         # with open(report_path, "w") as fd:
+        if os.path.exists(report_path):
+            os.remove(report_path)
         with os.fdopen(os.open(report_path, FLAGS, MODES), 'w') as fd:
             fd.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             fd.write('<coverage>\n')

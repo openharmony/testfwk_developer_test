@@ -42,6 +42,8 @@ def gen_parts_info_json(folder_list, output_json_path, target_cpu):
         output_json_path = os.path.join(output_json_path, "kits_modules_info.json")
         json_str = json.dumps(data_dict, indent=2)
         # with open(output_json_path, "w") as json_file:
+        if os.path.exists(output_json_path):
+            os.remove(output_json_path)
         with os.fdopen(os.open(output_json_path, FLAGS, MODES), 'w') as json_file:
             json_file.write(json_str)
     else:
