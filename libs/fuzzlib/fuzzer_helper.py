@@ -134,27 +134,38 @@ def generate(args):
 
     file_path = os.path.join(project_dir_path, 'project.xml')
     # with open(file_path, 'w') as filehandle:
+    if os.path.exists(file_path):
+        os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_XML_TEMPLATE % template_args)
 
     file_path = os.path.join(project_dir_path, "%s.cpp" % args.project_name)
     # with open(file_path, 'w') as filehandle:
+    if os.path.exists(file_path):
+        os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_DEMO_TEMPLATE % template_args)
 
     file_path = os.path.join(project_dir_path, "%s.h" % args.project_name)
     # with open(file_path, 'w') as filehandle:
+    if os.path.exists(file_path):
+        os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_HEADER_TEMPLATE % template_args)
     file_path = os.path.join(project_dir_path, "BUILD.gn")
     # with open(file_path, 'w') as filehandle:
+    if os.path.exists(file_path):
+        os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_GN_TEMPLATE % template_args)
 
     corpus_dir = os.path.join(project_dir_path, 'corpus')
     if not os.path.exists(corpus_dir):
         os.mkdir(corpus_dir)
-        with open(os.path.join(corpus_dir, 'init'), 'w') as filehandle:
+        if os.path.exists(os.path.join(corpus_dir, 'init')):
+            os.remove(os.path.join(corpus_dir, 'init'))
+        # with open(os.path.join(corpus_dir, 'init'), 'w') as filehandle:
+        with os.fdopen(os.open(os.path.join(corpus_dir, 'init'), FLAGS, MODES), 'w') as filehandle:
             filehandle.write("FUZZ")
     return 0
 

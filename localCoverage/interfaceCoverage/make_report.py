@@ -95,7 +95,9 @@ def sort_by_field_element_data(elem):
 def create_html_start(reportpath):
     try:
         # with open(reportpath, "w") as report:
-        with os.fdopen(os.open(reportpath, FLAGS_WRITE, MODES), 'w') as fout:
+        if os.path.exists(reportpath):
+            os.remove(reportpath)
+        with os.fdopen(os.open(reportpath, FLAGS_WRITE, MODES), 'w') as report:
             report.write(html_head)
             report.write(html_body_start)
     except(IOError, ValueError):

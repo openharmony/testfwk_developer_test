@@ -60,7 +60,7 @@ def rewrite_source_file(source_path_list: list):
         #           encoding="utf-8", errors="ignore") as write_fp:
         if os.path.exists(f"{source_dir}_bk.{suffix_name}"):
             os.remove(f"{source_dir}_bk.{suffix_name}")
-        with os.fdopen(os.open(f"{source_dir}_bk.{suffix_name}", FLAGS, MODES), 'w') as read_fp:
+        with os.fdopen(os.open(f"{source_dir}_bk.{suffix_name}", FLAGS, MODES), 'w') as write_fp:
             for line in code_lines:
                 sign_number = 0
                 for key in keys:

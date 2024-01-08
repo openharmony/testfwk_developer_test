@@ -717,6 +717,8 @@ class CppTestDriver(IDriver):
 
         striped_bt = striped_content.encode("utf-8")
         # with open(name, "wb") as f:
+        if os.path.exists(name):
+            os.remove(name)
         with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
             f.write(striped_bt)
 
