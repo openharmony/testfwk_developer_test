@@ -2,7 +2,7 @@
   {
     "name": "ability_ability_runtime",
     "parts": "ability_runtime",
-    "buildTarget": "ability/ability_runtime:ability_runtime_test"
+    "buildTarget": "ability/ability_runtime:ability_runtime_test,ability/form_fwk:form_fwk_test"
   },
   {
     "name": "ability_ability_base",
