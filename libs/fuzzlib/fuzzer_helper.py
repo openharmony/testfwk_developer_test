@@ -208,6 +208,8 @@ def make(args,  stdout=None):
     if not os.path.exists(os.path.dirname(subsystem_src_flag_file_path)):
         os.makedirs(os.path.dirname(subsystem_src_flag_file_path))
     # with open(subsystem_src_flag_file_path, "wb") as file_handle:
+    if os.path.exists(subsystem_src_flag_file_path):
+        os.remove(subsystem_src_flag_file_path)
     with os.fdopen(os.open(subsystem_src_flag_file_path, FLAGS, MODES), 'wb') as file_handle:
         file_handle.write(args.project_name.encode())
 

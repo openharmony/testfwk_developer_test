@@ -67,8 +67,6 @@ def execute_command(command, printflag=False):
         coverage_log_path = os.path.join(
             CODEPATH, "test/testfwk/developer_test/localCoverage", "coverage.log")
         # with open(coverage_log_path, 'a') as fd:
-        if os.path.exists(coverage_log_path):
-            os.remove(coverage_log_path)
         with os.fdopen(os.open(coverage_log_path, FLAGS, MODES), 'a') as fd:
             call(cmd_list, printflag, fd, fd)
     except IOError:
