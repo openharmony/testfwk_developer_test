@@ -128,7 +128,7 @@ def _load_internal_plugins():
     try:
         import script.report
         _iter_module_plugins([script.report])
-    except importError:
+    except ImportError:
         pass
 
 

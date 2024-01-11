@@ -67,8 +67,9 @@ span.branchnocovupdate
   background-color:#BBBBBB;
 }"""
         # with open(css_file_path, "a+", encoding="utf-8") as file:
-        with os.fdopen(os.open(css_file_path, FLAGS_ADD, MODES), 'a+') as file:
-            file.write(text)
+        if os.path.exists(css_file_path):
+            with os.fdopen(os.open(css_file_path, FLAGS_ADD, MODES), 'a+') as file:
+                file.write(text)
 
     def get_statistic_path(self, gcov_file_path: str):
         """
@@ -211,9 +212,7 @@ class KeywordRegistration:
                     keyword_branch_list_append(line)
             for key in keyword_branch_list:
                 keyword_line_list_remove(key)
-            return keyword_line_list
-        else:
-            return
+        return keyword_line_list
 
     def code_body_judge(self, line, content):
         """
@@ -312,7 +311,7 @@ class KeywordRegistration:
 
                             function_name = function_name_str.split()[-1]
                             return function_name
-               return "" 
+            return "" 
         except (OSError, IndexError, TypeError) as error:
             print(f"覆盖率报告{branch_line}行获取函数名报错, error:{error}",
                   traceback.format_exc())

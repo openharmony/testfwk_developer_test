@@ -269,7 +269,7 @@ class BenchmarkReport(object):
 
                     try:
                         # with open(os.path.abspath(out_report_file_path), "w") \
-                        is os.path.exists(os.path.abspath(out_report_file_path)):
+                        if os.path.exists(os.path.abspath(out_report_file_path)):
                             os.remove(os.path.abspath(out_report_file_path))
                         with os.fdopen(os.open(os.path.abspath(out_report_file_path),
                                        FLAGS, MODES), 'w') as output_fd:
@@ -278,7 +278,7 @@ class BenchmarkReport(object):
                     except IOError as err_msg:
                         print("Error5 for open failed:", out_report_file_path)
             except IOError as err_msg:
-                print("Error6 for open failed", tmpl_file_path))
+                print("Error6 for open failed", tmpl_file_path)
 
     def _generate_all_benchmark_detail(self, dest_dir_parh):
         for benchmark_info in self.benchmark_list:
@@ -332,7 +332,7 @@ class BenchmarkReport(object):
 
                     try:
                         # with open(os.path.abspath(out_report_file_path), "w") \
-                        is os.path.exists(os.path.abspath(out_report_file_path)):
+                        if os.path.exists(os.path.abspath(out_report_file_path)):
                             os.remove(os.path.abspath(out_report_file_path))
                         with os.fdopen(os.open(os.path.abspath(out_report_file_path),
                                        FLAGS, MODES), 'w') as output_fd:

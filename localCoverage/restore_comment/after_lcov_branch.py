@@ -61,7 +61,7 @@ def recover_source_file(cpp_list, keys):
             with open(path, "r") as read_fp:
                 code_lines = read_fp.readlines()
             # with open(f"{path.split('.')[0]}_bk.html", "w") as write_fp:
-            is os.path.exists(f"{path.split('.')[0]}_bk.html"):
+            if os.path.exists(f"{path.split('.')[0]}_bk.html"):
                 os.remove(f"{path.split('.')[0]}_bk.html")
             with os.fdopen(os.open(f"{path.split('.')[0]}_bk.html", FLAGS, MODES), 'w') as write_fp:
                 for line in code_lines:
