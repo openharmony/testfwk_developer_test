@@ -46,6 +46,7 @@ from core.utils import get_decode
 from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
 from core.config.config_manager import FuzzerConfigManager
+import xml.etree.ElementTree as ET
 
 __all__ = [
     "CppTestDriver",
@@ -173,6 +174,16 @@ def get_test_log_savepath(result_rootpath, result_suit_path):
 
     LOG.info("test_log_savepath = {}".format(test_log_path))
     return test_log_path
+
+
+def update_xml(suite_file, result_xml):
+    suite_path_txt = suite_file.split(".")[0] + "_path.txt"
+    if os.path.exists(suite_path_txt) and os.path.exists(result_xml):
+        with open(suite_path_txt, "r") as path_text:
+            line = path_text.readline().replace("//", "").strip()
+        tree = ET.parse(result_xml)
+        tree.getroot().attrib["path"] = line
+        tree.write(result_xml)
 
 
 # all testsuit common Unavailable test result xml
@@ -685,6 +696,7 @@ class CppTestDriver(IDriver):
             self.result = result.get_test_results_hidelog(return_message)
         else:
             self.result = result.get_test_results(return_message)
+        update_xml(suite_file, self.result)
 
         resource_manager.process_cleaner_data(resource_data_dic,
                                               resource_dir,
@@ -872,6 +884,7 @@ class JSUnitTestDriver(IDriver):
                     request.config.report_path, "result",
                     '.'.join((request.get_module_name(), "xml")))
                 shutil.move(xml_path, self.result)
+                update_xml(suite_file, self.result)
         finally:
             self.config.device.device_log_collector.remove_log_address(None, self.hilog)
             self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
@@ -1204,6 +1217,8 @@ class OHRustTestDriver(IDriver):
             result_save_path = get_result_savepath(
                 request.root.source.source_file, self.config.report_path)
             shutil.move(self.result, result_save_path)
+            update_xml(request.root.source.source_file,
+                       os.path.join(result_save_path, os.path.basename(self.result)))
 
 
     def _init_oh_rust(self):
