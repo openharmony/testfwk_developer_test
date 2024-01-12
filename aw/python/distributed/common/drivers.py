@@ -166,7 +166,8 @@ class CppTestDriver(ITestDriver):
         if options.coverage:
             receive_coverage_data(self.device, result_path, suite_file, file_name)
         
-        del long_command_path
+        if os.path.exists(long_command_path):
+            os.remove(long_command_path)
 
 
 ##############################################################################
