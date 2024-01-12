@@ -32,8 +32,10 @@ static double TimeDiff(struct timeval *x , struct timeval *y)
         return 0;
     }
 
-    double xUs = reinterpret_cast<double>(x->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL) + reinterpret_cast<double>(x->tv_usec);
-    double yUs = reinterpret_cast<double>(y->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL) + reinterpret_cast<double>(y->tv_usec);
+    double xUs = reinterpret_cast<double>(x->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL) +
+     reinterpret_cast<double>(x->tv_usec);
+    double yUs = reinterpret_cast<double>(y->tv_sec * SleepTest::ID_MS_TO_NS_LEVEL) +
+     reinterpret_cast<double>(y->tv_usec);
 
     return (yUs - xUs);
 }
