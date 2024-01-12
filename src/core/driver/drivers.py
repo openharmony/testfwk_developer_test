@@ -62,6 +62,9 @@ TIME_OUT = 900 * 1000
 JS_TIMEOUT = 10
 CYCLE_TIMES = 30
 
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
+
 
 ##############################################################################
 ##############################################################################
@@ -196,7 +199,7 @@ def _create_empty_result_file(filepath, filename, error_message):
     if filename.endswith(".hap"):
         filename = filename.split(".")[0]
     if not os.path.exists(filepath):
-        with open(filepath, "w", encoding='utf-8') as file_desc:
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -243,7 +246,7 @@ def _sleep_according_to_result(result):
 
 def _create_fuzz_crash_file(filepath, filename):
     if not os.path.exists(filepath):
-        with open(filepath, "w", encoding='utf-8') as file_desc:
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -269,7 +272,7 @@ def _create_fuzz_crash_file(filepath, filename):
 
 def _create_fuzz_pass_file(filepath, filename):
     if not os.path.exists(filepath):
-        with open(filepath, "w", encoding='utf-8') as file_desc:
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -722,7 +725,9 @@ class CppTestDriver(IDriver):
             striped_content = str_content
 
         striped_bt = striped_content.encode("utf-8")
-        with open(name, "wb") as f:
+        if os.path.exists(name):
+            os.remove(name)
+        with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
             f.write(striped_bt)
 
     def _push_corpus_cov_if_exist(self, suite_file):
@@ -1100,8 +1105,6 @@ class JSUnitTestDriver(IDriver):
                         driver_dict = data_dic.get("driver")
                         if driver_dict and "test-timeout" in driver_dict.keys():
                             test_timeout = int(driver_dict["shell-timeout"]) / 1000
-                        else:
-                            return
                     return test_timeout
         except JSONDecodeError:
             return test_timeout
@@ -1123,7 +1126,7 @@ class JSUnitTestDriver(IDriver):
             try:
                 zf_desc.extractall(path=hap_bak_path)
             except RuntimeError as error:
-                print(error)
+                print("Unzip error: ", hap_bak_path)
             zf_desc.close()
 
             # verify config.json file

@@ -17,6 +17,8 @@
 #
 
 import os
+import stat
+
 from xdevice import platform_logger
 from core.utils import scan_support_product
 from core.config.config_manager import UserConfigManager, FrameworkConfigManager
@@ -25,6 +27,9 @@ from core.build.pretreat_targets import PretreatTargets
 from core.build.build_testcases import BuildTestcases
 from core.command.gen import Gen
 from core.command.run import Run
+
+FLAGS = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 LOG = platform_logger("BuildManager")
 
@@ -37,7 +42,9 @@ class BuildManager(object):
     @classmethod
     def _make_gn_file(cls, filepath, target_list):
         LOG.info("The gn file path: %s" % filepath)
-        with open(filepath, "w") as gn_file:
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as gn_file:
             gn_file.write("group(\"make_temp_test\") {\n")
             gn_file.write("  testonly = true\n")
             gn_file.write("  deps = []\n")

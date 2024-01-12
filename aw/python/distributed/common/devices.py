@@ -54,7 +54,7 @@ def get_package_name(hap_filepath):
         try:
             zf_desc.extractall(path=hap_bak_path)
         except RuntimeError as error:
-            print(error)
+            print("Unzip error: ", hap_bak_path)
         zf_desc.close()
 
         # verify config.json file
@@ -216,14 +216,15 @@ class DeviceShell:
                                 stderr=subprocess.PIPE,
                                 shell=True)
 
+        result = ""
         try:
             data, _ = proc.communicate()
             if isinstance(data, bytes):
-                data = data.decode('utf-8', 'ignore')
+                result = data.decode('utf-8', 'ignore')
         finally:
             proc.stdout.close()
             proc.stderr.close()
-        return data
+        return result if result else data
 
     @classmethod
     def check_path_legal(cls, path):
