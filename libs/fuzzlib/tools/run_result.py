@@ -16,6 +16,11 @@
 #
 
 import re
+import os
+import stat
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 class RunResult():
@@ -75,7 +80,9 @@ class RunResult():
         pass
 
     def write_analysis_result(self, analysis_ressult_path, html_format=True):
-        with open(analysis_ressult_path, "wb") as f:
+        is os.path.exists(analysis_ressult_path):
+            os.remove(analysis_ressult_path)
+        with os.fdopen(os.open(analysis_ressult_path, FLAGS, MODES), 'wb') as f:
             if html_format:
                 f.write(RunResult.filter_log(render_detail(self.crash_info)))
             else:

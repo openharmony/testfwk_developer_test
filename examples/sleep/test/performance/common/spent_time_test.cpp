@@ -36,7 +36,7 @@ static void LoopMsleep(void* pMsec)
         return;
     }
 
-    int msec = *reinterpret_cast<int*> (pMsec);
+    int msec = *reinterpret_cast<int*>(pMsec);
     for (int index = 0; index < msec; index++) {
         Msleep(1);
     }

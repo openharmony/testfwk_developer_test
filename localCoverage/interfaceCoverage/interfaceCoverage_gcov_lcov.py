@@ -22,9 +22,14 @@ import sys
 import json
 import shutil
 import subprocess
+import stat
+
 import CppHeaderParser
 import get_innerkits_json
 import make_report
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 filter_file_name_list = [
     "appexecfwk/libjnikit/include/jni.h",
@@ -389,7 +394,9 @@ def get_summary_data(interface_data_list):
 def make_summary_file(summary_list, output_path):
     report_path = os.path.join(output_path, "coverage_summary_file.xml")
     try:
-        with open(report_path, "w") as fd:
+        if os.path.exists(report_path):
+            os.remove(report_path)
+        with os.fdopen(os.open(report_path, FLAGS, MODES), 'w') as fd:
             fd.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             fd.write('<coverage>\n')
             for item in summary_list:

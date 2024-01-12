@@ -18,6 +18,10 @@
 
 import os
 import subprocess
+import stat
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 def get_file_list(find_path, postfix=""):
@@ -56,7 +60,9 @@ def recover_source_file(cpp_list, keys):
         for key in keys:
             with open(path, "r") as read_fp:
                 code_lines = read_fp.readlines()
-            with open(f"{path.split('.')[0]}_bk.html", "w") as write_fp:
+            if os.path.exists(f"{path.split('.')[0]}_bk.html"):
+                os.remove(f"{path.split('.')[0]}_bk.html")
+            with os.fdopen(os.open(f"{path.split('.')[0]}_bk.html", FLAGS, MODES), 'w') as write_fp:
                 for line in code_lines:
                     if key in line:
                         write_fp.write(line.strip("\n").strip("\n\r").replace(" //LCOV_EXCL_BR_LINE", ""))
