@@ -298,7 +298,7 @@ class Run(object):
             if len(self.history_cmd_list) >= 10:
                 del self.history_cmd_list[0]
             self.history_cmd_list.append(cmd_record)
-        print("-------------run end: ", self.history_cmd_list)
+
         if "fuzztest" == options.testtype[0] and options.coverage is False:
             report = get_plugin(plugin_type=Plugin.REPORTER, plugin_id="ALL")[0]
             latest_corpus_path = os.path.join(sys.framework_root_dir, "reports", "latest_corpus")

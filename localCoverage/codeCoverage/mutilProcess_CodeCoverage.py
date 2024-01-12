@@ -66,7 +66,6 @@ def execute_command(command, printflag=False):
         cmd_list = shlex.split(command)
         coverage_log_path = os.path.join(
             CODEPATH, "test/testfwk/developer_test/localCoverage", "coverage.log")
-        # with open(coverage_log_path, 'a') as fd:
         with os.fdopen(os.open(coverage_log_path, FLAGS, MODES), 'a') as fd:
             call(cmd_list, printflag, fd, fd)
     except IOError:

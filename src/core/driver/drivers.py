@@ -188,7 +188,6 @@ def _create_empty_result_file(filepath, filename, error_message):
     if filename.endswith(".hap"):
         filename = filename.split(".")[0]
     if not os.path.exists(filepath):
-        # with open(filepath, "w", encoding='utf-8') as file_desc:
         with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
@@ -236,7 +235,6 @@ def _sleep_according_to_result(result):
 
 def _create_fuzz_crash_file(filepath, filename):
     if not os.path.exists(filepath):
-        # with open(filepath, "w", encoding='utf-8') as file_desc:
         with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
@@ -263,7 +261,6 @@ def _create_fuzz_crash_file(filepath, filename):
 
 def _create_fuzz_pass_file(filepath, filename):
     if not os.path.exists(filepath):
-        # with open(filepath, "w", encoding='utf-8') as file_desc:
         with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
@@ -716,7 +713,6 @@ class CppTestDriver(IDriver):
             striped_content = str_content
 
         striped_bt = striped_content.encode("utf-8")
-        # with open(name, "wb") as f:
         if os.path.exists(name):
             os.remove(name)
         with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:

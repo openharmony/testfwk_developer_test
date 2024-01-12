@@ -311,7 +311,6 @@ class Distribute:
         final_file = os.path.join(file_dir, file_name.split('.')[0] + ".desc")
         if os.path.exists(final_file):
             os.remove(final_file)
-        # with open(file_path, 'w') as file_desc:
         if os.path.exists(file_path):
             os.remove(file_path)
         with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as file_desc:

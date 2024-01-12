@@ -46,7 +46,6 @@ class Gen(object):
         LOG.info("The fuzzer list file path: %s" % filepath)
         if os.path.exists(filepath):
             os.remove(filepath)
-        # with open(filepath, "w") as gn_file:
         with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as gn_file:
             gn_file.truncate(0)
             if fuzzer_list:

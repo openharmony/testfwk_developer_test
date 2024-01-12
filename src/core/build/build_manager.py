@@ -42,7 +42,6 @@ class BuildManager(object):
     @classmethod
     def _make_gn_file(cls, filepath, target_list):
         LOG.info("The gn file path: %s" % filepath)
-        # with open(filepath, "w") as gn_file:
         if os.path.exists(filepath):
             os.remove(filepath)
         with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as gn_file:

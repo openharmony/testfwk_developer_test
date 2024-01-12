@@ -66,7 +66,6 @@ span.branchnocovupdate
 {
   background-color:#BBBBBB;
 }"""
-        # with open(css_file_path, "a+", encoding="utf-8") as file:
         if os.path.exists(css_file_path):
             with os.fdopen(os.open(css_file_path, FLAGS_ADD, MODES), 'a+') as file:
                 file.write(text)
@@ -479,7 +478,6 @@ class KeywordRegistration:
             if replace_tag in content:
                 content = content.replace(replace_tag, update_tag)
 
-            # with open(file_path, "w", encoding="utf-8") as file:
             os.remove(file_path)
             with os.fdopen(os.open(file_path, FLAGS_WRITE, MODES), 'w') as file:
                 file.write(content)
@@ -586,7 +584,6 @@ class KeywordRegistration:
                     content = content.replace(replace_tag, update_tag)
                 if file_tag in content:
                     content = content.replace(file_tag, update_branch_tag)
-                # with open(index_path, "w", encoding="utf-8") as file:
                 os.remove(index_path)
                 with os.fdopen(os.open(index_path, FLAGS_WRITE, MODES), 'w') as file:
                     file.write(content)
@@ -879,7 +876,7 @@ class KeywordRegistration:
                         update_source_code_tag_list)
                     content = content.replace(
                         source_code_tag_html, update_source_code_tag_html)
-            # with open(file_path, "w", encoding="utf-8") as new_html:
+
             os.remove(file_path)
             with os.fdopen(os.open(file_path, FLAGS_WRITE, MODES), 'w') as new_html:
                 new_html.write(content)
@@ -887,7 +884,7 @@ class KeywordRegistration:
         content = self.get_coverage_content(file_path)
         content = content.replace('> * </span>', '>   </span>')
         os.remove(file_path)
-        # with open(file_path, "w", encoding="utf-8") as new_html:
+
         with os.fdopen(os.open(file_path, FLAGS_WRITE, MODES), 'w') as new_html:
             new_html.write(content)
 

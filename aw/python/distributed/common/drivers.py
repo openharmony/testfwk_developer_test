@@ -52,7 +52,6 @@ def make_long_command_file(command, longcommand_path, filename):
     sh_file_name = '%s.sh' % filename
     file_path = os.path.join(longcommand_path, sh_file_name)
     try:
-        # with open(file_path, "a") as file_desc:
         with os.fdopen(os.open(file_path, FLAGS, MODES), 'a') as file_desc:
             file_desc.write(command)
     except(IOError, ValueError) as err_msg:

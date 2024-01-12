@@ -92,7 +92,6 @@ class PretreatTargets(object):
             return False
         os.rename(gn_path, gn_bak_path)
         template_args = {'output_path': output_path, 'suite_name': name}
-        # with open(gn_path, 'w') as filehandle:
         os.remove(gn_path)
         with os.fdopen(os.open(gn_path, FLAGS_WRITE, MODES), 'w') as filehandle:
             filehandle.write(JsTestConst.BUILD_GN_FILE_TEMPLATE %
@@ -106,7 +105,6 @@ class PretreatTargets(object):
             if file.endswith(".js"):
                 LOG.info("file: %s" % file)
                 shutil.copy(os.path.join(target_path, file), test_path)
-                # with open(os.path.join(test_path, "List.test.js"), 'a') \
                 with os.fdopen(os.open(os.path.join(test_path, "List.test.js"), 
                                        FLAGS_ADD, MODES), 'a') as list_data:
                     list_data.write("require('./%s')\n" % file)
@@ -122,7 +120,6 @@ class PretreatTargets(object):
                     line = line.replace("TargetName", name)
                 json_data += line
         os.remove(i18n_path)
-        # with open(i18n_path, 'w') as i18n_file:
         with os.fdopen(os.open(i18n_path, FLAGS_WRITE, MODES), 'w') as i18n_file:
             i18n_file.write(json_data)
         return True

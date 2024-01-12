@@ -94,7 +94,6 @@ def sort_by_field_element_data(elem):
 
 def create_html_start(reportpath):
     try:
-        # with open(reportpath, "w") as report:
         if os.path.exists(reportpath):
             os.remove(reportpath)
         with os.fdopen(os.open(reportpath, FLAGS_WRITE, MODES), 'w') as report:
@@ -132,7 +131,6 @@ def create_title(reportpath, title_name, summary_list):
             nocoverd = item[1] - item[2]
             report_title = report_title % (item[1], item[2], nocoverd)
     try:
-        # with open(reportpath, "a") as report:
         with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             report.write(report_title)
     except(IOError, ValueError):
@@ -168,7 +166,7 @@ def create_summary(reportpath, summary_list):
     try:
         if len(summary_list) == 0:
             return
-        # with open(reportpath, "a") as report:
+
         with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             report.write(table_title)
             report.write(table_start)
@@ -209,7 +207,6 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
     table_ended = """</tbody></table></div>
     """
     try:
-        # with open(reportpath, "a") as report:
         with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             print("part_name==" + subsystem_name)
             tabletitle = table_title % (subsystem_name)
@@ -246,7 +243,6 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
 
 def create_html_ended(reportpath):
     try:
-        # with open(reportpath, "a") as report:
         with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
             report.write(html_body_ended)
             report.write(html_ended)
