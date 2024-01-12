@@ -80,7 +80,6 @@ class RunResult():
         pass
 
     def write_analysis_result(self, analysis_ressult_path, html_format=True):
-        # with open(analysis_ressult_path, "wb") as f:
         is os.path.exists(analysis_ressult_path):
             os.remove(analysis_ressult_path)
         with os.fdopen(os.open(analysis_ressult_path, FLAGS, MODES), 'wb') as f:

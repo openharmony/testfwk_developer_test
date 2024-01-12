@@ -268,7 +268,6 @@ class BenchmarkReport(object):
                                         len(content_new)]
 
                     try:
-                        # with open(os.path.abspath(out_report_file_path), "w") \
                         if os.path.exists(os.path.abspath(out_report_file_path)):
                             os.remove(os.path.abspath(out_report_file_path))
                         with os.fdopen(os.open(os.path.abspath(out_report_file_path),
@@ -331,7 +330,6 @@ class BenchmarkReport(object):
                         self._update_report_summary(content_new, detail_info)
 
                     try:
-                        # with open(os.path.abspath(out_report_file_path), "w") \
                         if os.path.exists(os.path.abspath(out_report_file_path)):
                             os.remove(os.path.abspath(out_report_file_path))
                         with os.fdopen(os.open(os.path.abspath(out_report_file_path),

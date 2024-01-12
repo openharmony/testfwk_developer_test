@@ -85,7 +85,6 @@ def create_empty_result_file(savepath, filename, message=""):
     if filename.endswith(".hap"):
         filename = filename.split(".")[0]
     if not os.path.exists(savepath):
-        # with open(savepath, "w", encoding='utf-8') as file_desc:
         with os.fdopen(os.open(savepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())

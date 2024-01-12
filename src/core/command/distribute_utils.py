@@ -37,7 +37,6 @@ def make_device_info_file(tmp_path):
     env_manager = EnvironmentManager()
     device_info_file_path = os.path.join(tmp_path,
                                          "device_info_file.txt")
-    # with open(device_info_file_path, "w") as file_handle:
     if os.path.exists(device_info_file_path):
         os.remove(device_info_file_path)
     with os.fdopen(os.open(device_info_file_path, FLAGS, MODES), 'w') as file_handle:

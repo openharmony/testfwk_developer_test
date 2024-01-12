@@ -49,7 +49,6 @@ def get_subsystem_config(part_list, developer_path):
                     print("Error: part not in all_subsystem_config.json")
 
         new_json = json.dumps(new_json_text, indent=4)
-        # with open(system_info_path, "w") as out_file:
         if os.path.exists(system_info_path):
             os.remove(system_info_path)
         with os.fdopen(os.open(system_info_path, FLAGS, MODES), 'w') as out_file:

@@ -133,27 +133,23 @@ def generate(args):
     color_logger.green('Writing new files to %s' % project_dir_path)
 
     file_path = os.path.join(project_dir_path, 'project.xml')
-    # with open(file_path, 'w') as filehandle:
     if os.path.exists(file_path):
         os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_XML_TEMPLATE % template_args)
 
     file_path = os.path.join(project_dir_path, "%s.cpp" % args.project_name)
-    # with open(file_path, 'w') as filehandle:
     if os.path.exists(file_path):
         os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_DEMO_TEMPLATE % template_args)
 
     file_path = os.path.join(project_dir_path, "%s.h" % args.project_name)
-    # with open(file_path, 'w') as filehandle:
     if os.path.exists(file_path):
         os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
         filehandle.write(PROJECT_HEADER_TEMPLATE % template_args)
     file_path = os.path.join(project_dir_path, "BUILD.gn")
-    # with open(file_path, 'w') as filehandle:
     if os.path.exists(file_path):
         os.remove(file_path)
     with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as filehandle:
@@ -164,7 +160,6 @@ def generate(args):
         os.mkdir(corpus_dir)
         if os.path.exists(os.path.join(corpus_dir, 'init')):
             os.remove(os.path.join(corpus_dir, 'init'))
-        # with open(os.path.join(corpus_dir, 'init'), 'w') as filehandle:
         with os.fdopen(os.open(os.path.join(corpus_dir, 'init'), FLAGS, MODES), 'w') as filehandle:
             filehandle.write("FUZZ")
     return 0
@@ -207,7 +202,6 @@ def make(args,  stdout=None):
     )
     if not os.path.exists(os.path.dirname(subsystem_src_flag_file_path)):
         os.makedirs(os.path.dirname(subsystem_src_flag_file_path))
-    # with open(subsystem_src_flag_file_path, "wb") as file_handle:
     if os.path.exists(subsystem_src_flag_file_path):
         os.remove(subsystem_src_flag_file_path)
     with os.fdopen(os.open(subsystem_src_flag_file_path, FLAGS, MODES), 'wb') as file_handle:

@@ -65,7 +65,6 @@ def modify_init_file(developer_path, hdc_str):
                 else:
                     return
         json_str = json.dumps(json_data, indent=2)
-        # with open(cfg_file_path, "w") as json_file:
         if os.path.exists(cfg_file_path):
             os.remove(cfg_file_path)
         with os.fdopen(os.open(cfg_file_path, FLAGS, MODES), 'w') as json_file:
@@ -104,7 +103,6 @@ def modify_faultloggerd_file(developer_path, hdc_str):
                 ]
             })
             json_str = json.dumps(json_data, indent=4)
-            # with open(cfg_file_path, "w") as json_file:
             if os.path.exists(cfg_file_path):
                 os.remove(cfg_file_path)
             with os.fdopen(os.open(cfg_file_path, FLAGS, MODES), 'w') as json_file:
@@ -163,7 +161,6 @@ def modify_foundation_json(serv, config_path, origin_json) -> str:
     f_dict["systemability"] = tmp_list
 
     new_json = os.path.join(config_path, 'foundation.json')
-    # with open(new_json, "w", encoding="utf-8") as f:
     if os.path.exists(new_json):
         os.remove(new_json)
     with os.fdopen(os.open(new_json, FLAGS, MODES), 'w') as f:
@@ -193,7 +190,6 @@ def create_service_json(serv, config_path, origin_json) -> str:
     f_dict["process"] = "{}".format(serv)
 
     new_json = os.path.join(config_path, '{}.json'.format(serv))
-    # with open(new_json, "w", encoding="utf-8") as f:
     if os.path.exists(new_json):
         os.remove(new_json)
     with os.fdopen(os.open(new_json, FLAGS, MODES), 'w') as f:
@@ -250,7 +246,6 @@ def create_service_cfg(serv, config_path, origin_cfg) -> str:
         json_obj["services"][0]["jobs"]["on-start"] = "services:{}".format(serv)
 
     cfg_path = os.path.join(config_path, "{}.cfg".format(serv))
-    # with open(cfg_path, 'w') as r:
     if os.path.exists(cfg_path):
         os.remove(cfg_path)
     with os.fdopen(os.open(cfg_path, FLAGS, MODES), 'w') as r:
