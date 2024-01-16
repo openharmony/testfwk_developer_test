@@ -27,6 +27,7 @@ import platform
 import zipfile
 import stat
 import random
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from json import JSONDecodeError
 
@@ -46,7 +47,6 @@ from core.utils import get_decode
 from core.utils import get_fuzzer_path
 from core.config.resource_manager import ResourceManager
 from core.config.config_manager import FuzzerConfigManager
-import xml.etree.ElementTree as ET
 
 __all__ = [
     "CppTestDriver",
