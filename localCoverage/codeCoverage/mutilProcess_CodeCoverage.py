@@ -209,7 +209,8 @@ def cut_info(subsystem, test_dir):
         test_dir, f"{subsystem}_strip.info"
     )
 
-    remove = r"'*/third_party/*' 'sdk/android-arm64/*'"
+    remove = r"'*/third_party/*' '*/prebuilts/*' '*/unittest/*' " \
+             r"'*/moduletest/*' '*/systemtest/*' '*.h*'"
     if not os.path.exists(trace_file):
         print(f"Error: trace file {trace_file} not exists!")
         return
