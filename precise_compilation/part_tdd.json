@@ -725,11 +725,6 @@
     "buildTarget": "resourceschedule/memmgr_plugin:memmgr_plugin_test"
   },
   {
-    "name": "linux_frame_aware_sched",
-    "parts": "frame_aware_sched",
-    "buildTarget": "resourceschedule/frame_aware_sched:frame_aware_sched_test"
-  },
-  {
     "name": "third_party_mindspore",
     "parts": "mindspore",
     "buildTarget": "thirdparty/mindspore:mindspore_test"
