@@ -277,12 +277,12 @@
   {
     "name": "multimedia_media_foundation",
     "parts": "media_foundation",
-    "buildTarget": "multimedia/media_foundation:media_foundation_test"
+    "buildTarget": "multimedia/media_foundation:media_foundation_test,web/webview:webview_test"
   },
   {
     "name": "multimedia_player_framework",
     "parts": "player_framework",
-    "buildTarget": "multimedia/player_framework:player_framework_test"
+    "buildTarget": "multimedia/player_framework:player_framework_test,web/webview:webview_test"
   },
   {
     "name": "multimedia_av_codec",
