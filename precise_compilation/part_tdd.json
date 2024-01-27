@@ -120,11 +120,6 @@
     "buildTarget": "distributeddatamgr/preferences:preferences_test"
   },
   {
-    "name": "distributeddatamgr_kv_store",
-    "parts": "kv_store",
-    "buildTarget": "distributeddatamgr/kv_store:kv_store_test,notification/distributed_notification_service:distributed_notification_service_test,ability/ability_runtime:ability_runtime_test,ability/form_fwk:form_fwk_test"
-  },
-  {
     "name": "distributeddatamgr_data_object",
     "parts": "data_object",
     "buildTarget": "distributeddatamgr/data_object:data_object_test"
