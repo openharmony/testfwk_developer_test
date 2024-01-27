@@ -122,7 +122,7 @@
   {
     "name": "distributeddatamgr_kv_store",
     "parts": "kv_store",
-    "buildTarget": "distributeddatamgr/kv_store:kv_store_test"
+    "buildTarget": "distributeddatamgr/kv_store:kv_store_test,notification/distributed_notification_service:distributed_notification_service_test"
   },
   {
     "name": "distributeddatamgr_data_object",
