@@ -18,9 +18,6 @@ config("gtest_private_config") {
 
 config("gtest_config") {
   include_dirs = [ "//third_party/googletest/googletest/include" ]
-  cflags = [ "-std=c++17" ]
-  cflags_objcc = [ "-std=c++17" ]
-  cflags_cc = [ "-std=c++17" ]
 }
 
 static_library("gtest") {
@@ -56,7 +53,6 @@ static_library("gtest") {
     "//third_party/googletest/googletest/include/gtest/internal/gtest-string.h",
     "//third_party/googletest/googletest/include/gtest/internal/gtest-tuple.h",
     "//third_party/googletest/googletest/include/gtest/internal/gtest-type-util.h",
-    "//third_party/googletest/googletest/src/gtest-assertion-result.cc",
     "//third_party/googletest/googletest/src/gtest-death-test.cc",
     "//third_party/googletest/googletest/src/gtest-filepath.cc",
     "//third_party/googletest/googletest/src/gtest-internal-inl.h",
