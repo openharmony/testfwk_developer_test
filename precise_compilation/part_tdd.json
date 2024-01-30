@@ -717,7 +717,7 @@
   {
     "name": "resourceschedule_memmgr",
     "parts": "memmgr_plugin",
-    "buildTarget": "resourceschedule/memmgr_plugin:memmgr_plugin_test"
+    "buildTarget": "resourceschedule/memmgr:memmgr_test"
   },
   {
     "name": "third_party_mindspore",
