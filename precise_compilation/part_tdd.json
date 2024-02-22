@@ -747,7 +747,7 @@
   {
     "name": "graphic_graphic_3d",
     "parts": "graphic_3d",
-    "buildTarget": "build_configs/graphic/graphic_3d:graphic_3d_test"
+    "buildTarget": "graphic/graphic_3d:graphic_3d_test"
   },
   {
     "name": "multimedia_media_foundation",
