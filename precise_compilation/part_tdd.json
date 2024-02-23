@@ -675,11 +675,6 @@
     "buildTarget": "barrierfree/accessibility:accessibility_test"
   },
   {
-    "name": "drivers_hdf_core",
-    "parts": "hdf_core",
-    "buildTarget": "hdf/hdf_core:hdf_core_test"
-  },
-  {
     "name": "hiviewdfx_hilog",
     "parts": "hilog",
     "buildTarget": "hiviewdfx/hilog:hilog_test"
