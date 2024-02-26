@@ -50,7 +50,7 @@ def restore_config(device_ip, device_port, device_sn, cfg_path):
 
 
 def attach_pid(device_ip, device_sn, process_str, component_gcda_dict, developer_path,
-               resident_service_path, services_str, root_path, device_port):
+               resident_service_path, services_str, root, device_port):
     """
     1. 在设备里ps -ef | grep SERVICE 获取进程号
     2. kill - '信号' pid
@@ -69,7 +69,7 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict, developer
 
     # 拉取gcda文件
     get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
-                  developer_path, services_str, root_path, device_port)
+                  developer_path, services_str, root, device_port)
 
 
 def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
@@ -110,7 +110,7 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
 
 
 def get_service_list(device_ip, device_sn, system_info_dict, services_component_dict,
-                     component_gcda_dict, developer_path, resident_service_path, root_path, port):
+                     component_gcda_dict, developer_path, resident_service_path, root, port_nu):
 
     service_list = []
     for key, value_list in system_info_dict.items():
@@ -124,7 +124,7 @@ def get_service_list(device_ip, device_sn, system_info_dict, services_component_
             services_list = process_str.split("|")
             for services_str in services_list:
                 attach_pid(device_ip, device_sn, process_str, component_gcda_dict,
-                           developer_path, resident_service_path, services_str, root_path, port)
+                           developer_path, resident_service_path, services_str, root, port_nu)
     return
 
 

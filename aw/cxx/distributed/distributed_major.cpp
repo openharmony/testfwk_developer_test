@@ -255,7 +255,7 @@ bool DistributeTestEnvironment::RunTestCmd(size_t devNo, const std::string &strC
         return breturn;
     }
     // add 2 '\0'
-    size_t rlen = cmdLen + expectValueLen + DST_COMMAND_HEAD_LEN + sizeof(int)*HALF_BUF_LEN + HALF_BUF_LEN;
+    size_t rlen = cmdLen + expectValueLen + DST_COMMAND_HEAD_LEN + sizeof(int) * HALF_BUF_LEN + HALF_BUF_LEN;
     if (rlen <= MAX_BUFF_LEN) {
         auto pCmdTest = reinterpret_cast<DistributedMsg *>(szbuf);
         pCmdTest->cmdTestType = DST_COMMAND_CALL;

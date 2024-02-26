@@ -23,7 +23,12 @@ import shlex
 import subprocess
 import multiprocessing
 import sys
+import stat
+
 from multiprocessing import Process
+
+FLAGS = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 # 子系统json目录
 SYSTEM_JSON = "test/testfwk/developer_test/localCoverage/codeCoverage/subsystem_config.json"
@@ -61,7 +66,7 @@ def execute_command(command, printflag=False):
         cmd_list = shlex.split(command)
         coverage_log_path = os.path.join(
             CODEPATH, "test/testfwk/developer_test/localCoverage", "coverage.log")
-        with open(coverage_log_path, 'a') as fd:
+        with os.fdopen(os.open(coverage_log_path, FLAGS, MODES), 'a') as fd:
             call(cmd_list, printflag, fd, fd)
     except IOError:
         print("Error: Exception occur in open error")

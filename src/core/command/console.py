@@ -363,8 +363,7 @@ class Console(object):
             else:
                 print("The %s command is not supported." % command)
         except (AttributeError, IOError, IndexError, ImportError, NameError,
-                RuntimeError, SystemError, TypeError, ValueError,
-                UnicodeError) as exception:
+                RuntimeError, SystemError, TypeError, ValueError) as exception:
             LOG.exception(exception, exc_info=False)
 
     @classmethod

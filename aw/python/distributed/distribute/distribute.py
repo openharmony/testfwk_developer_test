@@ -21,6 +21,10 @@ import sys
 import re
 import time
 import platform
+import stat
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 # insert src path for loading xdevice modules
 
@@ -284,6 +288,8 @@ class Distribute:
         dev_nodeid_info = re.findall(r"Uuid = (.*?\r\n)", device_info)
         if dev_nodeid_info:
             return str(dev_nodeid_info[0])
+        else:
+            return ""
 
     @staticmethod
     def _query_device_agent_uuid(device):
@@ -296,6 +302,8 @@ class Distribute:
         dev_nodeid_info = re.findall(r"Uuid = (.*?\r\n)", device_info)
         if dev_nodeid_info:
             return str(dev_nodeid_info[0])
+        else:
+            return ""
 
     @staticmethod
     def _write_device_config(device_info, file_path):
@@ -303,10 +311,11 @@ class Distribute:
         final_file = os.path.join(file_dir, file_name.split('.')[0] + ".desc")
         if os.path.exists(final_file):
             os.remove(final_file)
-        with open(file_path, 'w') as file_desc:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as file_desc:
             file_desc.write(device_info)
         os.rename(file_path, final_file)
-
 
 ##############################################################################
 ##############################################################################
