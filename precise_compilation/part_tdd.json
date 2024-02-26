@@ -120,11 +120,6 @@
     "buildTarget": "distributeddatamgr/preferences:preferences_test"
   },
   {
-    "name": "distributeddatamgr_kv_store",
-    "parts": "kv_store",
-    "buildTarget": "distributeddatamgr/kv_store:kv_store_test"
-  },
-  {
     "name": "distributeddatamgr_data_object",
     "parts": "data_object",
     "buildTarget": "distributeddatamgr/data_object:data_object_test"
@@ -277,12 +272,12 @@
   {
     "name": "multimedia_media_foundation",
     "parts": "media_foundation",
-    "buildTarget": "multimedia/media_foundation:media_foundation_test"
+    "buildTarget": "multimedia/media_foundation:media_foundation_test,web/webview:webview_test"
   },
   {
     "name": "multimedia_player_framework",
     "parts": "player_framework",
-    "buildTarget": "multimedia/player_framework:player_framework_test"
+    "buildTarget": "multimedia/player_framework:player_framework_test,web/webview:webview_test"
   },
   {
     "name": "multimedia_av_codec",
@@ -680,11 +675,6 @@
     "buildTarget": "barrierfree/accessibility:accessibility_test"
   },
   {
-    "name": "drivers_hdf_core",
-    "parts": "hdf_core",
-    "buildTarget": "hdf/hdf_core:hdf_core_test"
-  },
-  {
     "name": "hiviewdfx_hilog",
     "parts": "hilog",
     "buildTarget": "hiviewdfx/hilog:hilog_test"
@@ -722,7 +712,7 @@
   {
     "name": "resourceschedule_memmgr",
     "parts": "memmgr_plugin",
-    "buildTarget": "resourceschedule/memmgr_plugin:memmgr_plugin_test"
+    "buildTarget": "resourceschedule/memmgr:memmgr_test"
   },
   {
     "name": "third_party_mindspore",
@@ -741,18 +731,32 @@
   },
   {
     "name": "drivers_peripheral",
+    "parts": "drivers_peripheral_codec",
     "buildTarget": "hdf/drivers_peripheral_light:drivers_peripheral_light_test,hdf/drivers_peripheral_battery:drivers_peripheral_battery_test,hdf/drivers_peripheral_memorytracker:drivers_peripheral_memorytracker_test,hdf/drivers_peripheral_sensor:drivers_peripheral_sensor_test,hdf/drivers_peripheral_audio:drivers_peripheral_audio_test,hdf/drivers_peripheral_codec:drivers_peripheral_codec_test,hdf/drivers_peripheral_usb:drivers_peripheral_usb_test,hdf/drivers_peripheral_motion:drivers_peripheral_motion_test,hdf/drivers_peripheral_input:drivers_peripheral_input_test,hdf/drivers_peripheral_distributed_audio:drivers_peripheral_distributed_audio_test,hdf/drivers_peripheral_distributed_camera:drivers_peripheral_distributed_camera_test,hdf/drivers_peripheral_power:drivers_peripheral_power_test,hdf/drivers_peripheral_display:drivers_peripheral_display_test,hdf/drivers_peripheral_wlan:drivers_peripheral_wlan_test,hdf/drivers_peripheral_thermal:drivers_peripheral_thermal_test,hdf/drivers_peripheral_camera:drivers_peripheral_camera_test"
   },
   {
     "name": "drivers_interface",
+    "parts": "drivers_interface_codec",
     "buildTarget": "hdf/drivers_peripheral_light:drivers_peripheral_light_test,hdf/drivers_peripheral_battery:drivers_peripheral_battery_test,hdf/drivers_peripheral_memorytracker:drivers_peripheral_memorytracker_test,hdf/drivers_peripheral_sensor:drivers_peripheral_sensor_test,hdf/drivers_peripheral_audio:drivers_peripheral_audio_test,hdf/drivers_peripheral_codec:drivers_peripheral_codec_test,hdf/drivers_peripheral_usb:drivers_peripheral_usb_test,hdf/drivers_peripheral_motion:drivers_peripheral_motion_test,hdf/drivers_peripheral_input:drivers_peripheral_input_test,hdf/drivers_peripheral_distributed_audio:drivers_peripheral_distributed_audio_test,hdf/drivers_peripheral_distributed_camera:drivers_peripheral_distributed_camera_test,hdf/drivers_peripheral_power:drivers_peripheral_power_test,hdf/drivers_peripheral_display:drivers_peripheral_display_test,hdf/drivers_peripheral_wlan:drivers_peripheral_wlan_test,hdf/drivers_peripheral_thermal:drivers_peripheral_thermal_test,hdf/drivers_peripheral_camera:drivers_peripheral_camera_test"
   },
   {
     "name": "graphic_graphic_3d",
-    "buildTarget": "build_configs/graphic/graphic_3d:graphic_3d_test"
+    "parts": "graphic_3d",
+    "buildTarget": "graphic/graphic_3d:graphic_3d_test"
   },
   {
     "name": "multimedia_media_foundation",
+    "parts": "media_foundation",
     "buildTarget": "multimedia/media_foundation:media_foundation_test"
+  },
+  {
+      "name":"commonlibrary_rust_ylong_http",
+      "parts":"ylong_http",
+      "buildTarget":"commonlibrary/ylong_http:ylong_http_test"
+  },
+  {
+      "name":"commonlibrary_rust_ylong_runtime",
+      "parts":"ylong_runtime",
+      "buildTarget":"commonlibrary/ylong_runtime:ylong_runtime_test"
   }
 ]
