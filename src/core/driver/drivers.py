@@ -61,6 +61,9 @@ TIME_OUT = 900 * 1000
 JS_TIMEOUT = 10
 CYCLE_TIMES = 30
 
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
+
 
 ##############################################################################
 ##############################################################################
@@ -184,7 +187,7 @@ def _create_empty_result_file(filepath, filename, error_message):
     if filename.endswith(".hap"):
         filename = filename.split(".")[0]
     if not os.path.exists(filepath):
-        with open(filepath, "w", encoding='utf-8') as file_desc:
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -231,7 +234,7 @@ def _sleep_according_to_result(result):
 
 def _create_fuzz_crash_file(filepath, filename):
     if not os.path.exists(filepath):
-        with open(filepath, "w", encoding='utf-8') as file_desc:
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -257,7 +260,7 @@ def _create_fuzz_crash_file(filepath, filename):
 
 def _create_fuzz_pass_file(filepath, filename):
     if not os.path.exists(filepath):
-        with open(filepath, "w", encoding='utf-8') as file_desc:
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as file_desc:
             time_stamp = time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -685,16 +688,29 @@ class CppTestDriver(IDriver):
 
     @staticmethod
     def _alter_init(name):
-        lines = list()
-        with open(name, "r") as f:
-            for line in f:
-                line_strip = line.strip()
-                if not line_strip:
-                    continue
-                if line_strip[0] != "#" and line_strip[0] != "/" and line_strip[0] != "*":
-                    lines.append(line_strip)
-        with open(name, "w") as f:
-            f.writelines(lines)
+        with open(name, "rb") as f:
+            lines = f.read()
+        str_content = lines.decode("utf-8")
+
+        pattern_sharp = '^\s*#.*$(\n|\r\n)'
+        pattern_star = '/\*.*?\*/(\n|\r\n)+'
+        pattern_xml = '<!--[\s\S]*?-->(\n|\r\n)+'
+
+        if re.match(pattern_sharp, str_content, flags=re.M):
+            striped_content = re.sub(pattern_sharp, '', str_content, flags=re.M)
+        elif re.findall(pattern_star, str_content, flags=re.S):
+            striped_content = re.sub(pattern_star, '', str_content, flags=re.S)
+        elif re.findall(pattern_xml, str_content, flags=re.S):
+            striped_content = re.sub(pattern_xml, '', str_content, flags=re.S)
+        else:
+            striped_content = str_content
+
+        striped_bt = striped_content.encode("utf-8")
+        with open(name, "wb") as f:
+            if os.path.exists(name):
+                os.remove(name)
+        with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
+            f.write(striped_bt)
 
     def _push_corpus_cov_if_exist(self, suite_file):
         cov_file = suite_file + "_corpus.tar.gz"
@@ -1091,7 +1107,7 @@ class JSUnitTestDriver(IDriver):
             try:
                 zf_desc.extractall(path=hap_bak_path)
             except RuntimeError as error:
-                print(error)
+                print("Unzip error:", hap_bak_path)
             zf_desc.close()
 
             # verify config.json file
@@ -1130,7 +1146,6 @@ class JSUnitTestDriver(IDriver):
         else:
             print("file %s not exist" % hap_filepath)
         return package_name, ability_name
-
 
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.oh_rust_test)

@@ -143,3 +143,5 @@ class DeployKit(ITestKit):
                 os.path.splitext(original_file)[0], "".join(random_str),
                 os.path.splitext(original_file)[1])
             return shutil.copyfile(original_file, new_temp_tool_path)
+        else:
+            return ""

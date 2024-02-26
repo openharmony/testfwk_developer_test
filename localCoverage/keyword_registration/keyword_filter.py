@@ -20,6 +20,7 @@ import os
 import re
 import time
 import json
+import stat
 import fcntl
 import platform
 import linecache
@@ -27,6 +28,10 @@ import traceback
 from multiprocessing import Pool
 from lxml import html
 from selectolax.parser import HTMLParser
+
+FLAGS_WRITE = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+FLAGS_ADD = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 class CoverageReportPath:
@@ -61,8 +66,9 @@ span.branchnocovupdate
 {
   background-color:#BBBBBB;
 }"""
-        with open(css_file_path, "a+", encoding="utf-8") as file:
-            file.write(text)
+        if os.path.exists(css_file_path):
+            with os.fdopen(os.open(css_file_path, FLAGS_ADD, MODES), 'a+') as file:
+                file.write(text)
 
     def get_statistic_path(self, gcov_file_path: str):
         """
@@ -106,7 +112,7 @@ class KeywordRegistration:
         获取覆盖率文件内容
         """
         if not os.path.exists(file_path):
-            return
+            return ""
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
         return content
@@ -153,7 +159,7 @@ class KeywordRegistration:
         if not content:
             content = self.get_coverage_content(file_path)
         if not content:
-            return
+            return []
         _, file_name = os.path.split(file_path)
         branch_line_list = re.findall(
             r'''<a name="(\d+).*?Branch.*? if \(|
@@ -163,6 +169,8 @@ class KeywordRegistration:
             branch_line_list = [int(line_tuple[0]) if line_tuple[0] else
                                 int(line_tuple[1]) for line_tuple in branch_line_list]
             return branch_line_list
+        else:
+            return []
 
     def get_coverage_lines_by_keyword(self, keyword, content):
         """
@@ -201,7 +209,7 @@ class KeywordRegistration:
                     keyword_branch_list_append(line)
             for key in keyword_branch_list:
                 keyword_line_list_remove(key)
-            return keyword_line_list
+        return keyword_line_list
 
     def code_body_judge(self, line, content):
         """
@@ -261,7 +269,7 @@ class KeywordRegistration:
             while not function_name:
                 loop_count += 1
                 if loop_count > 200:
-                    return
+                    return ""
                 previous_line -= 1
                 tag = get_tag(content, previous_line)
                 tag_text = HTMLParser(tag).text()
@@ -271,7 +279,7 @@ class KeywordRegistration:
                     while previous_line:
                         child_count += 1
                         if child_count > 200:
-                            return
+                            return ""
                         previous_line -= 1
                         html_text = get_tag(content, previous_line)
                         source_code = HTMLParser(html_text).text()[39:].strip()
@@ -285,16 +293,18 @@ class KeywordRegistration:
                             if class_name_list:
                                 function_name_str = class_name_list[0]
                                 if not function_name_str:
-                                    return
+                                    return ""
+
                                 function_name = function_name_str.split()[-1]
                                 return function_name
                         function_name_list = re.findall(r' (.*?)\(', source_code)
                         if function_name_list:
                             function_name_str = function_name_list[0]
                             if not function_name_str:
-                                return
+                                return ""
                             function_name = function_name_str.split()[-1]
                             return function_name
+            return ""
         except (OSError, IndexError, TypeError) as error:
             print(f"覆盖率报告{branch_line}行获取函数名报错, error:{error}",
                   traceback.format_exc())
@@ -325,7 +335,7 @@ class KeywordRegistration:
 
         keyword_index = keyword_source_code.find(keyword)
         if keyword_index == -1:
-            return
+            return ""
 
         try:
             keyword_code = keyword_source_code[:keyword_index + len(keyword)]
@@ -338,6 +348,7 @@ class KeywordRegistration:
             return judge_key
         except (IndexError, ValueError):
             print("获取关键字替代字符失败")
+            return ""
 
     @staticmethod
     def get_branch_data_by_tag(tag_html: str, symbol_status=None):
@@ -460,7 +471,8 @@ class KeywordRegistration:
             if replace_tag in content:
                 content = content.replace(replace_tag, update_tag)
 
-            with open(file_path, "w", encoding="utf-8") as file:
+            os.remove(file_path)
+            with os.fdopen(os.open(file_path, FLAGS_WRITE, MODES), 'w') as file:
                 file.write(content)
 
             # 修改数据统计页面
@@ -565,7 +577,8 @@ class KeywordRegistration:
                     content = content.replace(replace_tag, update_tag)
                 if file_tag in content:
                     content = content.replace(file_tag, update_branch_tag)
-                with open(index_path, "w", encoding="utf-8") as file:
+                os.remove(index_path)
+                with os.fdopen(os.open(index_path, FLAGS_WRITE, MODES), 'w') as file:
                     file.write(content)
                     fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                 time.sleep(1)
@@ -641,7 +654,7 @@ class KeywordRegistration:
                     update_branch_tag = update_branch_tag.replace("> # <", ">   <")
                     update_branch_tag = branch_tag + update_branch_tag
                 except ValueError:
-                    return
+                    return ""
         else:
             line_feed_index = branch_html.find(line_item)
             update_branch_tag = branch_html[:line_feed_index + len(line_item) + 1]
@@ -670,7 +683,7 @@ class KeywordRegistration:
                         branch_tag = branch_tag[line_feed_index + len(line_item) + 1:]
                         line_feed_index = branch_tag.find(line_item)
                     except ValueError:
-                        return
+                        return ""
 
                 branch_tag = branch_tag.replace("> - <", ">   <")
                 update_branch_tag = update_branch_tag.replace("> # <", ">   <")
@@ -704,7 +717,7 @@ class KeywordRegistration:
                         branch_tag_after = branch_tag_after.replace("> - <", ">   <")
                         branch_tag = branch_tag_before + branch_tag_after
                     except ValueError:
-                        return
+                        return ""
                 else:
                     branch_tag = branch_html
                     branch_tag = branch_tag.replace("> - <", ">   <")
@@ -749,7 +762,7 @@ class KeywordRegistration:
                         update_branch_tag += branch_tag
                         branch_html = branch_html[end_index + 5:]
             except (ValueError, TypeError):
-                return
+                return ""
             update_branch_tag += branch_html
         return update_branch_tag
 
@@ -856,12 +869,15 @@ class KeywordRegistration:
                         update_source_code_tag_list)
                     content = content.replace(
                         source_code_tag_html, update_source_code_tag_html)
-            with open(file_path, "w", encoding="utf-8") as new_html:
+            os.remove(file_path)
+            with os.fdopen(os.open(file_path, FLAGS_WRITE, MODES), 'w') as new_html:
                 new_html.write(content)
 
         content = self.get_coverage_content(file_path)
         content = content.replace('> * </span>', '>   </span>')
-        with open(file_path, "w", encoding="utf-8") as new_html:
+        os.remove(file_path)
+
+        with os.fdopen(os.open(file_path, FLAGS_WRITE, MODES), 'w') as new_html:
             new_html.write(content)
 
     def keyword_registration(self, file_path, keyword_list):

@@ -198,7 +198,7 @@ def select_user_input(data_list):
                     exit the frame.")
                 quit()
                 sys.exit(0)
-        return select_item_value, select_item_index
+    return select_item_value, select_item_index
 
 
 # 选择productform

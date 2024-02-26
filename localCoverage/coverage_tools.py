@@ -22,9 +22,13 @@ import sys
 import json
 import shutil
 import subprocess
+import stat
 from shutil import copyfile
 
 from utils import get_product_name, coverage_command
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
 def get_subsystem_config(part_list, developer_path):
@@ -45,7 +49,9 @@ def get_subsystem_config(part_list, developer_path):
                     print("part not in all_subsystem_config.json")
 
         new_json = json.dumps(new_json_text, indent=4)
-        with open(system_info_path, "w") as out_file:
+        if os.path.exists(system_info_path):
+            os.remove(system_info_path)
+        with os.fdopen(os.open(system_info_path, FLAGS, MODES), 'w') as out_file:
             out_file.write(new_json)
     else:
         print("%s not exists.", all_system_info_path)
