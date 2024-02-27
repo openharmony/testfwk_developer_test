@@ -706,9 +706,8 @@ class CppTestDriver(IDriver):
             striped_content = str_content
 
         striped_bt = striped_content.encode("utf-8")
-        with open(name, "wb") as f:
-            if os.path.exists(name):
-                os.remove(name)
+        if os.path.exists(name):
+            os.remove(name)
         with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
             f.write(striped_bt)
 
@@ -1084,8 +1083,6 @@ class JSUnitTestDriver(IDriver):
                         driver_dict = data_dic.get("driver")
                         if driver_dict and "test-timeout" in driver_dict.keys():
                             test_timeout = int(driver_dict["shell-timeout"]) / 1000
-                        else:
-                            return
                     return test_timeout
         except JSONDecodeError:
             return test_timeout

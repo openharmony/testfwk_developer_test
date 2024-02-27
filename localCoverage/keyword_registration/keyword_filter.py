@@ -105,6 +105,7 @@ class KeywordRegistration:
             return keyword_list
         except (FileNotFoundError, AttributeError, FileExistsError):
             print(f"获取报备过滤关键字报错")
+            return []
 
     @staticmethod
     def get_coverage_content(file_path):
@@ -308,6 +309,7 @@ class KeywordRegistration:
         except (OSError, IndexError, TypeError) as error:
             print(f"覆盖率报告{branch_line}行获取函数名报错, error:{error}",
                   traceback.format_exc())
+            return ""
 
     @staticmethod
     def get_branch_line_list(keyword_line: int, branch_line_list: list):
