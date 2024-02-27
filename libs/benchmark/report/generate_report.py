@@ -20,6 +20,10 @@ import json
 import os
 import shutil
 import sys
+import stat
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 SETTING_RED_STYLE = """\033[33;31m%s\033[0m"""
 
@@ -33,8 +37,7 @@ def load_json_data(json_file_path):
                 print("Loading file \"%s\" error" % json_file_path)
                 return {}
         except(IOError, ValueError) as err_msg:
-            print("Error for load_json_data: \"%s\"" %
-                     json_file_path, err_msg)
+            print("Error for load_json_data: ", json_file_path)
     else:
         print("Info: \"%s\" not exist." % json_file_path)
     return json_data
@@ -265,16 +268,16 @@ class BenchmarkReport(object):
                                         len(content_new)]
 
                     try:
-                        with open(os.path.abspath(out_report_file_path), "w") \
-                            as output_fd:
+                        if os.path.exists(os.path.abspath(out_report_file_path)):
+                            os.remove(os.path.abspath(out_report_file_path))
+                        with os.fdopen(os.open(os.path.abspath(out_report_file_path),
+                                               FLAGS, MODES), 'w') as output_fd:
                             content_new = str(content_new)
                             output_fd.write(content_new)
                     except IOError as err_msg:
-                        print("Error5 for open %s failed, with msg %s" %
-                                  (out_report_file_path, err_msg))
+                        print("Error5 for open %s failed:" % out_report_file_path)
             except IOError as err_msg:
-                print("Error6 for open %s failed, with msg %s" %
-                          (tmpl_file_path, err_msg))
+                print("Error6 for open %s failed:" % tmpl_file_path)
 
     def _generate_all_benchmark_detail(self, dest_dir_parh):
         for benchmark_info in self.benchmark_list:
@@ -327,15 +330,15 @@ class BenchmarkReport(object):
                         self._update_report_summary(content_new, detail_info)
 
                     try:
-                        with open(os.path.abspath(out_report_file_path), "w") \
-                            as output_fd:
+                        if os.path.exists(os.path.abspath(out_report_file_path)):
+                            os.remove(os.path.abspath(out_report_file_path))
+                        with os.fdopen(os.open(os.path.abspath(out_report_file_path),
+                                               FLAGS, MODES), 'w') as output_fd:
                             output_fd.write(content_new)
                     except IOError as err_msg:
-                        print("Error5 for open %s failed, with msg %s" %
-                                  (out_report_file_path, err_msg))
+                        print("Error5 for open %s failed:" % out_report_file_path)
             except IOError as err_msg:
-                print("Error6 for open %s failed, with msg %s" %
-                          (report_tmpl_file_path, err_msg))
+                print("Error6 for open %s failed" % report_tmpl_file_path)
 
     def _get_detail_info(self, benchmark_info):
         detail_info = []

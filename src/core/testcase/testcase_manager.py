@@ -296,7 +296,7 @@ class TestCaseManager(object):
     def get_hap_test_driver(cls, hap_file_path):
         data_dic = cls.get_hap_json(hap_file_path)
         if not data_dic:
-            return False
+            return ""
         else:
             if "driver" in data_dic.keys():
                 driver_dict = data_dic.get("driver")
@@ -305,6 +305,9 @@ class TestCaseManager(object):
                     return driver_type
                 else:
                     LOG.error("%s has not set driver." % hap_file_path)
+                    return ""
+            else:
+                return ""
 
     @classmethod
     def get_hap_json(cls, hap_file_path):
@@ -314,6 +317,10 @@ class TestCaseManager(object):
                 with open(json_file_path, 'r') as json_file:
                     data_dic = json.load(json_file)
                     return data_dic
+            else:
+                return {}
+        else:
+            return {}
 
     @classmethod
     def get_hap_part_json(cls, hap_file_path):
@@ -323,13 +330,19 @@ class TestCaseManager(object):
                 with open(json_file_path, 'r') as json_file:
                     data_dic = json.load(json_file)
                     return data_dic
+            else:
+                return {}
+        else:
+            return {}
 
     @classmethod
     def get_part_name_test_file(cls, hap_file_path):
         data_dic = cls.get_hap_part_json(hap_file_path)
         if not data_dic:
-            return False
+            return ""
         else:
             if "part" in data_dic.keys():
                 part_name = data_dic["part"]
                 return part_name
+            else:
+                return ""

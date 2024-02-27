@@ -19,10 +19,15 @@
 import os
 import sys
 import json
+import stat
 import shutil
 
 from core.constants import JsTestConst
 from xdevice import platform_logger
+
+FLAGS_WRITE = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+FLAGS_ADD = os.O_WRONLY | os.O_APPEND | os.O_CREAT
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 LOG = platform_logger("PretreatTargets")
 
@@ -84,14 +89,15 @@ class PretreatTargets(object):
         output_path = self._parse_output_path_in_gn(gn_path)
         if output_path == "":
             LOG.error(" BUILD.gn needs 'module_output_path'")
-            return
+            return False
         os.rename(gn_path, gn_bak_path)
         template_args = {'output_path': output_path, 'suite_name': name}
-        with open(gn_path, 'w') as filehandle:
+        os.remove(gn_path)
+        with os.fdopen(os.open(gn_path, FLAGS_WRITE, MODES), 'w') as filehandle:
             filehandle.write(JsTestConst.BUILD_GN_FILE_TEMPLATE %
                              template_args)
 
-        #copy js hap template to target path
+        # copy js hap template to target path
         shutil.copytree(template_path, os.path.join(target_path, "src"))
         shutil.copy(config_path, os.path.join(target_path, "src", "main"))
         file_name = os.listdir(target_path)
@@ -99,8 +105,8 @@ class PretreatTargets(object):
             if file.endswith(".js"):
                 LOG.info("file: %s" % file)
                 shutil.copy(os.path.join(target_path, file), test_path)
-                with open(os.path.join(test_path, "List.test.js"), 'a') \
-                        as list_data:
+                with os.fdopen(os.open(os.path.join(test_path, "List.test.js"),
+                                       FLAGS_ADD, MODES), 'a') as list_data:
                     list_data.write("require('./%s')\n" % file)
 
         #modify i18n json file
@@ -113,7 +119,8 @@ class PretreatTargets(object):
                 if "TargetName" in line:
                     line = line.replace("TargetName", name)
                 json_data += line
-        with open(i18n_path, 'w') as i18n_file:
+        os.remove(i18n_path)
+        with os.fdopen(os.open(i18n_path, FLAGS_WRITE, MODES), 'w') as i18n_file:
             i18n_file.write(json_data)
         return True
 
