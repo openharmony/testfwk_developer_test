@@ -346,7 +346,7 @@ class BuildTestcases(object):
         self._delete_xts_testcase_dir(para)
         xts_build_command = []
         if para.productform == "rk3568":
-            pass
+            False
         else:
             xts_build_test_command = ["--abi-type", "generic_generic_arm_64only", "--device-type",
                                       get_output_path().split("/")[-1], "--build-variant", "root", "--gn-args",
@@ -357,7 +357,7 @@ class BuildTestcases(object):
                 xts_build_test_command.append(input_subsystem)
             if para.testsuit != "" and len(para.subsystem) == 0:
                 LOG.error("Please specify subsystem.")
-                return
+                return False
             xts_build_command.extend(xts_build_test_command)
             xts_build_command.append("--ccache")
         build_result = self._execute_build_xts_command(para, xts_build_command)

@@ -19,8 +19,12 @@
 import os
 import sys
 import subprocess
+import stat
 
 from xdevice import platform_logger
+
+FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+MODES = stat.S_IWUSR | stat.S_IRUSR
 
 LOG = platform_logger("Gen")
 
@@ -40,7 +44,9 @@ class Gen(object):
         filepath = os.path.join(sys.source_code_root_path, "test",
             "developertest", "libs", "fuzzlib", "fuzzer_list.txt")
         LOG.info("The fuzzer list file path: %s" % filepath)
-        with open(filepath, "w") as gn_file:
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        with os.fdopen(os.open(filepath, FLAGS, MODES), 'w') as gn_file:
             gn_file.truncate(0)
             if fuzzer_list:
                 for target in fuzzer_list:

@@ -39,7 +39,7 @@ struct DistributedCmd {
 };
 using DistributedMsg = DistributedCmd;
 
-#define DST_COMMAND_HEAD_LEN (sizeof(DistributedCmd)- sizeof(int))
+#define DST_COMMAND_HEAD_LEN (sizeof(DistributedCmd) - sizeof(int))
 
 struct DistDevInfo {
     int devNo;
