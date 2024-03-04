@@ -42,7 +42,7 @@ class RunResult():
         self.data = data
         self.payload = {}
 
-        self.crash_info =  {
+        self.crash_info = {
             "run_times": 0,
             "log": "",
             "project": "",
@@ -55,7 +55,6 @@ class RunResult():
             "libscov": {},
             "report_progress": 0
         }
-
 
     def get_log(self):
         return "code :{}, msg: {}".format(self.code, self.data)
