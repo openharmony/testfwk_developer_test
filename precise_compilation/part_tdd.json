@@ -180,11 +180,6 @@
     "buildTarget": "global/resource_management:resource_management_test"
   },
   {
-    "name": "graphic_graphic_2d",
-    "parts": "graphic_2d",
-    "buildTarget": "graphic/graphic_2d:graphic_2d_test"
-  },
-  {
     "name": "hiviewdfx_faultloggerd",
     "parts": "faultloggerd",
     "buildTarget": "hiviewdfx/faultloggerd:faultloggerd_test"
