@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+#
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 import json
 import os
 import shutil
@@ -261,48 +279,6 @@ class OHJSUnitTestDriver(IDriver):
                 shutil.move(self.result, result_save_path)
                 update_xml(request.root.source.source_file, os.path.join(
                     result_save_path, os.path.basename(self.result)))
-
-    def __dry_run_execute__(self, request):
-        LOG.debug("Developer_test Start dry run xdevice JSUnit Test")
-        self.config = request.config
-        self.config.device = request.config.environment.devices[0]
-        config_file = request.root.source.config_file
-        suite_file = request.root.source.source_file
-
-        if not suite_file:
-            raise ParamError(
-                "test source '%s' not exists" %
-                request.root.source.source_string, error_no="00110")
-        LOG.debug("Test case file path: %s" % suite_file)
-        self._dry_run_oh_jsunit(config_file, request)
-
-    def _dry_run_oh_jsunit(self, config_file, request):
-        try:
-            if not os.path.exists(config_file):
-                LOG.error("Error: Test cases don't exist %s." % config_file)
-                raise ParamError(
-                    "Error: Test cases don't exist %s." % config_file,
-                    error_no="00102")
-            json_config = JsonParser(config_file)
-            self.kits = get_kit_instances(json_config,
-                                          self.config.resource_path,
-                                          self.config.testcases_path)
-
-            self._get_driver_config(json_config)
-            self.config.device.connector_command("target mount")
-            do_module_kit_setup(request, self.kits)
-            self.runner = OHJSUnitTestRunner(self.config)
-            self.runner.suites_name = request.get_module_name()
-            # execute test case
-            self._get_runner_config(json_config)
-            oh_jsunit_para_parse(self.runner, self.config.testargs)
-
-            test_to_run = self._collect_test_to_run()
-            LOG.info("Collected suite count is: {}, test count is: {}".
-                     format(len(self.runner.expect_tests_dict.keys()),
-                            len(test_to_run) if test_to_run else 0))
-        finally:
-            do_module_kit_teardown(request)
 
     def _run_oh_jsunit(self, config_file, request):
         try:
