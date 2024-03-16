@@ -788,5 +788,15 @@
         "name": "bundlemanager_ecological_rule_manager",
         "parts": "ecological_rule_manager",
         "buildTarget": "bundlemanager/ecological_rule_manager:ecological_rule_manager_test"
+    },
+    {
+        "name":"security_asset",
+        "parts":"asset",
+        "buildTarget":"security/asset:asset_test,account/os_account:os_account_test"
+    },
+    {
+        "name":"drivers_external_device_manager",
+        "parts":"external_device_manager",
+        "buildTarget":"hdf/external_device_manager:external_device_manager_test"
     }
 ]
