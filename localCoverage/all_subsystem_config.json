@@ -1757,10 +1757,10 @@
       "foundation/resourceschedule/ffrt"
     ]
   },
-  "graphic_chipsetsdk": {
-    "name": "graphic_chipsetsdk",
+  "graphic_surface": {
+    "name": "graphic_surface",
     "path": [
-      "foundation/graphic/graphic_2d/frameworks/surface"
+      "foundation/graphic/graphic_surface/surface"
     ]
   },
   "hilog_featured_lite": {
