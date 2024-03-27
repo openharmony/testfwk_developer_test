@@ -230,15 +230,13 @@ class OHJSUnitTestDriver(IDriver):
     def __execute__(self, request):
         try:
             LOG.debug("Developer_test Start execute OpenHarmony JSUnitTest")
-            self.result = os.path.join(
-                request.config.report_path, "result",
-                '.'.join((request.get_module_name(), "xml")))
             self.config = request.config
             self.config.device = request.config.environment.devices[0]
 
             config_file = request.root.source.config_file
             suite_file = request.root.source.source_file
-
+            result_save_path = get_result_savepath(suite_file, self.config.report_path)
+            self.result = os.path.join(result_save_path, "%s.xml" % request.get_module_name())
             if not suite_file:
                 raise ParamError(
                     "test source '%s' not exists" %
@@ -272,13 +270,13 @@ class OHJSUnitTestDriver(IDriver):
             try:
                 self._handle_logs(request)
             finally:
+                xml_path = os.path.join(
+                    request.config.report_path, "result",
+                    '.'.join((request.get_module_name(), "xml")))
+                shutil.move(xml_path, self.result)
                 self.result = check_result_report(
                     request.config.report_path, self.result, self.error_message)
-                result_save_path = get_result_savepath(
-                    request.root.source.source_file, self.config.report_path)
-                shutil.move(self.result, result_save_path)
-                update_xml(request.root.source.source_file, os.path.join(
-                    result_save_path, os.path.basename(self.result)))
+                update_xml(request.root.source.source_file, self.result)
 
     def _run_oh_jsunit(self, config_file, request):
         try:
