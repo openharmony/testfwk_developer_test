@@ -186,8 +186,6 @@ def make(args,  stdout=None):
     build_script.append(args.build_platform)
     build_script.append("--export-para")
     build_script.append("PYCACHE_ENABLE:true")
-    build_script.append("--export-para")
-    build_script.append("BUILD_AOSP:false")
     print("BUILD_SCRIPT %s" % build_script)
     final_cmd = "%s && %s" % (
         _get_command_string(pre_cmd),
