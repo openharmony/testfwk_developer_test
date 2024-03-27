@@ -97,7 +97,7 @@ class ResourceManager(object):
             if os.path.exists(file_path):
                 tree = ElementTree.parse(file_path)
                 root = tree.getroot()
-                targets = root.getiterator("target")
+                targets = root.iter("target")
                 for target in targets:
                     curr_dic = target.attrib
                     if curr_dic.get("name") == targe_tname or \
