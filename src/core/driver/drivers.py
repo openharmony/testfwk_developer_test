@@ -1167,7 +1167,6 @@ class JSUnitTestDriver(IDriver):
         return package_name, ability_name
 
 
-
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.oh_rust_test)
 class OHRustTestDriver(IDriver):
     def __init__(self):
@@ -1187,7 +1186,6 @@ class OHRustTestDriver(IDriver):
             self.config = request.config
             self.config.device = request.config.environment.devices[0]
             self.config.target_test_path = DEFAULT_TEST_PATH
-
             suite_file = request.root.source.source_file
             LOG.debug("Testsuite filepath:{}".format(suite_file))
 
@@ -1196,9 +1194,8 @@ class OHRustTestDriver(IDriver):
                     request.root.source.source_string))
                 return
 
-            self.result = "{}.xml".format(
-                os.path.join(request.config.report_path,
-                             "result", request.get_module_name()))
+            result_save_path = get_result_savepath(suite_file, self.config.report_path)
+            self.result = os.path.join(result_save_path, "%s.xml" % request.get_module_name())
             self.config.device.set_device_report_path(request.config.report_path)
             self.config.device.device_log_collector.start_hilog_task()
             self._init_oh_rust()
@@ -1215,14 +1212,13 @@ class OHRustTestDriver(IDriver):
                 request.get_module_name(), str(serial).replace(":", "_"))
             self.config.device.device_log_collector.stop_hilog_task(
                 log_tar_file_name, module_name=request.get_module_name())
+            xml_path = os.path.join(
+                request.config.report_path, "result",
+                '.'.join((request.get_module_name(), "xml")))
+            shutil.move(xml_path, self.result)
             self.result = check_result_report(
                 request.config.report_path, self.result, self.error_message)
-            result_save_path = get_result_savepath(
-                request.root.source.source_file, self.config.report_path)
-            shutil.move(self.result, result_save_path)
-            update_xml(request.root.source.source_file,
-                       os.path.join(result_save_path, os.path.basename(self.result)))
-
+            update_xml(request.root.source.source_file, self.result)
 
     def _init_oh_rust(self):
         self.config.device.connector_command("target mount")
