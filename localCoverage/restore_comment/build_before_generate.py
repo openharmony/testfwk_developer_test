@@ -44,7 +44,7 @@ def rewrite_source_file(source_path_list: list):
     """
     源文件加“//LCOV_EXCL_BR_LINE”
     """
-    keys = ["if", "while", "switch", "case", "for", "try", "catch"]
+    keys = ["if", "while", "switch", "case", "try", "catch"]
     if not source_path_list:
         print("no any source file here")
         return

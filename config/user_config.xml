@@ -20,7 +20,7 @@
     <!-- whether compile test version, default false -->
     <version>false</version>
     <!-- whether compile test case, default false -->
-    <testcase>true</testcase>
+    <testcase>false</testcase>
     <!-- whether compile test cpu, default null -->
     <parameter>
       <target_cpu></target_cpu>
