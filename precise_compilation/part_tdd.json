@@ -27,7 +27,7 @@
     {
         "name": "arkui_ace_engine",
         "parts": "ace_engine",
-        "buildTarget": "arkui/ace_engine:ace_engine_test,window/window_manager:window_manager_test,ability/form_fwk:form_fwk_test,build/build_framework:build_framework_test,bundlemanager/bundle_framework:bundle_framework_test,global/resource_management:resource_management_test,ability/ability_runtime:ability_runtime_test,security/dlp_permission_service:dlp_permission_service_test,multimedia/camera_framework:camera_framework_test,multimedia/media_library:media_library_test,startup/appspawn:appspawn_test,ability/form_fwk:form_fwk_test,build/build_framework:build_framework_test,bundlemanager/bundle_framework:bundle_framework_test,global/resource_management:resource_management_test,ability/ability_runtime:ability_runtime_test,window/window_manager:window_manager_test,security/dlp_permission_service:dlp_permission_service_test,multimedia/camera_framework:camera_framework_test,multimedia/media_library:media_library_test,startup/appspawn:appspawn_test"
+        "buildTarget": "arkui/ace_engine:ace_engine_test,window/window_manager:window_manager_test,ability/form_fwk:form_fwk_test,build/build_framework:build_framework_test,bundlemanager/bundle_framework:bundle_framework_test,global/resource_management:resource_management_test,ability/ability_runtime:ability_runtime_test,security/dlp_permission_service:dlp_permission_service_test,multimedia/camera_framework:camera_framework_test,multimedia/media_library:media_library_test,startup/appspawn:appspawn_test,ability/form_fwk:form_fwk_test"
     },
     {
         "name": "arkui_napi",
