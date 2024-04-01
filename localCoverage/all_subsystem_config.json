@@ -1844,7 +1844,7 @@
   "soc_perf": {
     "name": "soc_perf",
     "path": [
-      "foundation/resourceschedule/resource_schedule_service/soc_perf"
+      "foundation/resourceschedule/soc_perf"
     ]
   },
   "surface_lite": {
