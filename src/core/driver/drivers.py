@@ -57,7 +57,7 @@ __all__ = [
 LOG = platform_logger("Drivers")
 DEFAULT_TEST_PATH = "/%s/%s/" % ("data", "test")
 OBJ = "obj"
-
+_ACE_LOG_MARKER = " A0C0D0"
 TIME_OUT = 900 * 1000
 JS_TIMEOUT = 10
 CYCLE_TIMES = 30
@@ -930,7 +930,7 @@ class JSUnitTestDriver(IDriver):
                     actiontime = timeout
                     times = 1
                 device_log_file_open = os.open(device_log_file, os.O_RDONLY, stat.S_IWUSR | stat.S_IRUSR)
-                with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
+                with os.fdopen(device_log_file_open, "r", encoding='cp1252') \
                         as file_read_pipe:
                     for i in range(0, times):
                         if status:
@@ -940,7 +940,7 @@ class JSUnitTestDriver(IDriver):
                         start_time = int(time.time())
                         while True:
                             data = file_read_pipe.readline()
-                            if data.find("JSApp:") != -1 and data.find("[end] run suites end") != -1:
+                            if data.find(_ACE_LOG_MARKER) != -1 and data.find("[end] run suites end") != -1:
                                 LOG.info("execute testcase successfully.")
                                 status = True
                                 break
@@ -981,14 +981,14 @@ class JSUnitTestDriver(IDriver):
                                        stat.S_IWUSR | stat.S_IRUSR)
 
         result_message = ""
-        with os.fdopen(device_log_file_open, "r", encoding='utf-8') \
+        with os.fdopen(device_log_file_open, "r", encoding='cp1252') \
                 as file_read_pipe:
             while True:
                 data = file_read_pipe.readline()
                 if not data:
                     break
                 # only filter JSApp log
-                if data.find("JSApp:") != -1:
+                if data.find("_ACE_LOG_MARKER") != -1:
                     result_message += data
                     if data.find("[end] run suites end") != -1:
                         break
@@ -1094,7 +1094,7 @@ class JSUnitTestDriver(IDriver):
 
     @classmethod
     def _get_json_shell_timeout(cls, json_filepath):
-        test_timeout = 300
+        test_timeout = 0
         try:
             with open(json_filepath, 'r') as json_file:
                 data_dic = json.load(json_file)
