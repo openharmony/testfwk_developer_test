@@ -929,9 +929,8 @@ class JSUnitTestDriver(IDriver):
                 if timeout:
                     actiontime = timeout
                     times = 1
-                device_log_file_open = os.open(device_log_file, os.O_RDONLY, stat.S_IWUSR | stat.S_IRUSR)
-                with os.fdopen(device_log_file_open, "r", encoding='cp1252') \
-                        as file_read_pipe:
+                with open(device_log_file, "r", encoding='utf-8',
+                          errors='ignore') as file_read_pipe:
                     for i in range(0, times):
                         if status:
                             break
@@ -977,12 +976,9 @@ class JSUnitTestDriver(IDriver):
         process_command_ret(result_message, handler)
 
     def read_device_log(self, device_log_file):
-        device_log_file_open = os.open(device_log_file, os.O_RDONLY,
-                                       stat.S_IWUSR | stat.S_IRUSR)
-
         result_message = ""
-        with os.fdopen(device_log_file_open, "r", encoding='cp1252') \
-                as file_read_pipe:
+        with open(device_log_file, "r", encoding='utf-8',
+                  errors='ignore') as file_read_pipe:
             while True:
                 data = file_read_pipe.readline()
                 if not data:
