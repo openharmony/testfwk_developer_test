@@ -57,10 +57,10 @@ __all__ = [
 LOG = platform_logger("Drivers")
 DEFAULT_TEST_PATH = "/%s/%s/" % ("data", "test")
 OBJ = "obj"
-_ACE_LOG_MARKER = " A0C0D0"
+_ACE_LOG_MARKER = " a0c0d0"
 TIME_OUT = 900 * 1000
 JS_TIMEOUT = 10
-CYCLE_TIMES = 30
+CYCLE_TIMES = 50
 
 FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 MODES = stat.S_IWUSR | stat.S_IRUSR
@@ -939,7 +939,7 @@ class JSUnitTestDriver(IDriver):
                         start_time = int(time.time())
                         while True:
                             data = file_read_pipe.readline()
-                            if data.find(_ACE_LOG_MARKER) != -1 and data.find("[end] run suites end") != -1:
+                            if data.lower().find(_ACE_LOG_MARKER) != -1 and data.find("[end] run suites end") != -1:
                                 LOG.info("execute testcase successfully.")
                                 status = True
                                 break
@@ -984,7 +984,7 @@ class JSUnitTestDriver(IDriver):
                 if not data:
                     break
                 # only filter JSApp log
-                if data.find("_ACE_LOG_MARKER") != -1:
+                if data.lower().find(_ACE_LOG_MARKER) != -1:
                     result_message += data
                     if data.find("[end] run suites end") != -1:
                         break
