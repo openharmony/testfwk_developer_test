@@ -83,6 +83,12 @@
       "foundation/graphic/graphic_2d"
     ]
   },
+  "graphic_2d_ext": {
+    "name": "graphic_2d_ext",
+    "path": [
+      "foundation/graphic/graphic_2d_ext"
+    ]
+  },
   "image_framework": {
     "name": "image_framework",
     "path": [
