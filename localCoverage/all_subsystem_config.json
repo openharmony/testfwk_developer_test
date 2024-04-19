@@ -1100,10 +1100,10 @@
       "base/security/dlp_credential_service"
     ]
   },
-  "memmgr": {
-    "name": "memmgr",
+  "memmgr_override": {
+    "name": "memmgr_override",
     "path": [
-      "foundation/resourceschedule/memmgr_plugin"
+      "foundation/resourceschedule/memmgr_override"
     ]
   },
   "frame_aware_sched": {
