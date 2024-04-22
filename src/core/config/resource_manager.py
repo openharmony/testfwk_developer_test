@@ -145,8 +145,6 @@ class ResourceManager(object):
                     dst = dst.rstrip("/") + "/" + dir_name
                 device.execute_shell_command("mkdir -p %s" % dst)
                 device.push_file(src, dst)
-                device.execute_shell_command("hilog -d %s" % (
-                    os.path.join(dst, os.path.basename(src))))
             elif item["name"] == "pull":
                 push_value = item["value"]
                 find_key = "->"
