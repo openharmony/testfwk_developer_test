@@ -711,7 +711,7 @@
     },
     {
         "name": "resourceschedule_memmgr",
-        "parts": "memmgr_plugin",
+        "parts": "memmgr_override",
         "buildTarget": "resourceschedule/memmgr:memmgr_test,ability/form_fwk:form_fwk_test,graphic/graphic_2d:graphic_2d_test,multimedia/image_framework:image_framework_test,window/window_manager:window_manager_test,multimedia/player_framework:player_framework_test,multimedia/camera_framework:camera_framework_test,multimedia/media_library:media_library_test,hiviewdfx/hidumper:hidumper_test"
     },
     {
