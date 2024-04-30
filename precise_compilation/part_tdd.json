@@ -798,5 +798,10 @@
         "name":"drivers_external_device_manager",
         "parts":"external_device_manager",
         "buildTarget":"hdf/external_device_manager:external_device_manager_test"
+    },
+    {
+        "name":"multimedia_image_effect",
+        "parts":"image_effect",
+        "buildTarget":"multimedia/image_effect:image_effect_test"
     }
 ]
