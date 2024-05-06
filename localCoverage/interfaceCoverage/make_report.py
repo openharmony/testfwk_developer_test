@@ -125,7 +125,7 @@ def create_title(reportpath, title_name, summary_list):
     for item in summary_list:
         subsystem = item[0]
         if count < 3:
-            subsystems = subsystems + "、" + subsystem
+            subsystems = "%s、%s" % (subsystems, subsystem)
             count = count + 1
         if subsystem == "Summary":
             nocoverd = item[1] - item[2]
