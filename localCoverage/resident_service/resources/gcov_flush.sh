@@ -16,6 +16,6 @@
 
 SERVER_NAME=$1
 
-ip_addrs=$(pgrep -f $SERVER_NAME)
+ip_addrs=$(pgrep -f $SERVER_NAME | head -n 1)
 echo $ip_addrs
 kill -SIGTTIN $ip_addrs

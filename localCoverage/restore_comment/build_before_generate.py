@@ -68,7 +68,7 @@ def rewrite_source_file(source_path_list: list):
                         break
                     elif " //LCOV_EXCL_BR_LINE" not in line and not line.strip().endswith("\\") \
                             and sign_number == len(keys):
-                        write_fp.write(line.strip("\n").strip("\n\r") + " //LCOV_EXCL_BR_LINE")
+                        write_fp.write("%s //LCOV_EXCL_BR_LINE" % line.strip("\n").strip("\n\r"))
                         write_fp.write("\n")
                         break
                     elif sign_number == len(keys):
