@@ -104,7 +104,6 @@ class KeywordRegistration:
             keyword_list = keyword_dict.get("KEYWORD")
             return keyword_list
         except (FileNotFoundError, AttributeError, FileExistsError):
-            print(f"获取报备过滤关键字报错")
             return []
 
     @staticmethod
@@ -361,7 +360,6 @@ class KeywordRegistration:
                 judge_key = bracket_code.split()[-1]
             return judge_key
         except (IndexError, ValueError):
-            print("获取关键字替代字符失败")
             return ""
 
     @staticmethod
@@ -494,7 +492,7 @@ class KeywordRegistration:
             total_shield_num = origin_total - branch_total
             self.update_statistic(file_path, hit_shield_num, total_shield_num)
         except (IndexError, TypeError, FileNotFoundError):
-            print("修改分支数据失败")
+            pass
 
     def update_statistic(self, file_path, hit_shield_num, total_shield_num):
         """
@@ -597,7 +595,7 @@ class KeywordRegistration:
                     fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                 time.sleep(1)
             except (IndexError, TypeError, FileNotFoundError):
-                print("修改分支统计数据出错")
+                pass
 
     def _check_if_branch_line(self, judge_key, sub_branch_line_list,
                               key_line, content, function_name):
@@ -627,7 +625,7 @@ class KeywordRegistration:
                 else:
                     break
             except (ValueError, KeyError):
-                print("获取关键字if分支行报错", traceback.format_exc())
+                pass
 
         return if_branch_line
 
