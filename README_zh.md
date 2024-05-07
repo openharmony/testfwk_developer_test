@@ -872,7 +872,7 @@ subsystem  # 子系统
 	```
     <option name="shell" value="hilog -d /设备中的二进制文件路径"/>
     // 例如
-    <option name="shell" value="hilog -d /data/test/resource/libc++.z.so"/>
+    <option name="shell" value="hilog -d /data/test/resource/test.z.so"/>
 	```
 3. 在测试用例的编译配置文件中定义resource_config_file进行指引，用来指定对应的资源文件ohos_test.xml
 	```
