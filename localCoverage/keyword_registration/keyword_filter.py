@@ -104,7 +104,6 @@ class KeywordRegistration:
             keyword_list = keyword_dict.get("KEYWORD")
             return keyword_list
         except (FileNotFoundError, AttributeError, FileExistsError):
-            print(f"获取报备过滤关键字报错")
             return []
 
     @staticmethod
@@ -127,20 +126,19 @@ class KeywordRegistration:
         return tag
 
     @staticmethod
-    def get_source_code(tag):
-        etree = html.etree
-        parser = etree.HTMLParser(encoding="utf-8")
-        parser_obj = etree.HTML(tag, parser=parser)
-        source_code = parser_obj.xpath("//span[@class='lineNoCov' or "
-                                       "@class='lineCov' or "
-                                       "@class='linecovupdate' or"
-                                       "@class='linenocovupdate']/text()")
-        if not source_code:
-            index = tag.find(":")
-            source_code = tag[index + 1:].split("</a>")[0]
-
-        if source_code:
-            source_code = "".join(source_code)
+    def get_source_code(html_tag):
+        """
+        获取源码
+        """
+        source_code1 = re.findall(r'Cov.*">(.*?)</span></a>', html_tag)
+        source_code2 = re.findall(r'covupdate.*">(.*?)</span></a>', html_tag)
+        if source_code1:
+            source_code = source_code1[0][13:].strip()
+        elif source_code2:
+            source_code = source_code2[0][13:].strip()
+        else:
+            source_code = HTMLParser(html_tag).text()[39:].strip()
+        
         return source_code
 
     @staticmethod
@@ -267,54 +265,48 @@ class KeywordRegistration:
         previous_line = int(branch_line)
         loop_count = 0
         get_tag = self.get_tag
-        try:
-            while not function_name:
-                loop_count += 1
-                if loop_count > 200:
-                    return ""
+        while not function_name:
+            loop_count += 1
+            if loop_count > 500:
+                return function_name
 
-                previous_line -= 1
-                tag = get_tag(content, previous_line)
-                tag_text = HTMLParser(tag).text()
-                if tag_text[39:].strip().startswith("{"):
-                    left_parentheses_count = right_parentheses_count = 0
-                    child_count = 0
-                    while previous_line:
-                        child_count += 1
-                        if child_count > 200:
-                            return ""
+            previous_line -= 1
+            tag = get_tag(content, previous_line)
+            tag_text = self.get_source_code(tag)
+            if "LOG" in tag_text or tag_text.startswith("//"):
+                continue
+            if tag_text.strip().startswith("{"):
+                child_count = left_parentheses_count = right_parentheses_count = 0
+                while previous_line:
+                    child_count += 1
+                    if child_count > 100:
+                        return function_name
 
-                        previous_line -= 1
-                        html_text = get_tag(content, previous_line)
-                        source_code = HTMLParser(html_text).text()[39:].strip()
-
-                        left_parentheses_count += source_code.count("(")
-                        right_parentheses_count += source_code.count(")")
-                        if not left_parentheses_count == right_parentheses_count:
-                            continue
-                        if " operator" in source_code:
-                            class_name_list = re.findall(r'\((.*?)\)', source_code)
-                            if class_name_list:
-                                function_name_str = class_name_list[0]
-                                if not function_name_str:
-                                    return ""
-
-                                function_name = function_name_str.split()[-1]
-                                return function_name
-
-                        function_name_list = re.findall(r' (.*?)\(', source_code)
-                        if function_name_list:
-                            function_name_str = function_name_list[0]
-                            if not function_name_str:
-                                return ""
-
-                            function_name = function_name_str.split()[-1]
+                    previous_line -= 1
+                    html_text = get_tag(content, previous_line)
+                    source_code = self.get_source_code(html_text)
+                    if "LOG" in source_code or "}" in source_code or source_code.endswith(";"):
+                        break
+                    if source_code.startswith("//"):
+                        continue
+                    if "{" in source_code:
+                        previous_line += 1
+                        break
+                    left_parentheses_count += source_code.count("(")
+                    right_parentheses_count += source_code.count(")")
+                    if not left_parentheses_count == right_parentheses_count:
+                        continue
+                    if " operator" in source_code:
+                        class_name_list = re.findall(r'\((.*?)\)', source_code)
+                        if class_name_list:
+                            function_name = class_name_list[0].strip()
                             return function_name
-            return "" 
-        except (OSError, IndexError, TypeError) as error:
-            print(f"覆盖率报告{branch_line}行获取函数名报错, error:{error}",
-                  traceback.format_exc())
-            return ""
+
+                    function_name_list = re.findall(r' (.*?)\(', source_code)
+                    if function_name_list:
+                        function_name = function_name_list[0].strip()
+                        return function_name
+        return function_name 
 
     @staticmethod
     def get_branch_line_list(keyword_line: int, branch_line_list: list):
@@ -354,7 +346,6 @@ class KeywordRegistration:
                 judge_key = bracket_code.split()[-1]
             return judge_key
         except (IndexError, ValueError):
-            print("获取关键字替代字符失败")
             return ""
 
     @staticmethod
@@ -487,7 +478,7 @@ class KeywordRegistration:
             total_shield_num = origin_total - branch_total
             self.update_statistic(file_path, hit_shield_num, total_shield_num)
         except (IndexError, TypeError, FileNotFoundError):
-            print("修改分支数据失败")
+            pass
 
     def update_statistic(self, file_path, hit_shield_num, total_shield_num):
         """
@@ -590,7 +581,7 @@ class KeywordRegistration:
                     fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                 time.sleep(1)
             except (IndexError, TypeError, FileNotFoundError):
-                print("修改分支统计数据出错")
+                pass
 
     def _check_if_branch_line(self, judge_key, sub_branch_line_list,
                               key_line, content, function_name):
@@ -620,7 +611,7 @@ class KeywordRegistration:
                 else:
                     break
             except (ValueError, KeyError):
-                print("获取关键字if分支行报错", traceback.format_exc())
+                pass
 
         return if_branch_line
 
@@ -930,13 +921,12 @@ class KeywordRegistration:
 
 
 def main(report_path):
-    print("*" * 50, "报备开始", "*" * 50)
     manager = KeywordRegistration(report_path)
     start_time = time.time()
     manager.multiprocessing_registration()
     end_time = time.time()
     times = round(end_time - start_time, 3)
-    print("*" * 50, "报备结束", "*" * 50, "耗时：", times)
+    print("*" * 50, "关键字分支屏蔽结束", "*" * 50, "耗时：", times)
 
 
 if __name__ == '__main__':
