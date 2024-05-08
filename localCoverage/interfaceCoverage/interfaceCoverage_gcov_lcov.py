@@ -304,13 +304,13 @@ def get_covered_result_data(public_interface_func_list, covered_func_list):
         para_list = data_list[3]
         return_val = data_list[4]
         para_string = ""
+        new_list = []
         for index in range(len(para_list)):
             if para_list[index].strip() == "":
                 continue
             curr_para = para_list[index]
-            para_string += curr_para
-            if index < len(para_list) - 1:
-                para_string += ", "
+            new_list.appned(curr_para)
+            para_string = ",".join(new_list)
         fun_string = f"{return_val}' '{func_name}({para_string.strip().strip(',')})"
         fun_string = fun_string.strip()
         fun_string = filter_para_sub_string(fun_string)

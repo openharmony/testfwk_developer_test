@@ -118,7 +118,8 @@ def find_so_source_dest(path: str, subsystem_name: str) -> dict:
 
         source_path = os.path.join(out_path, json_obj["source"])
         if source_path.endswith(".so"):
-            so_dict[source_path] = [tmp for tmp in json_obj["dest"] if tmp.startswith("system/")]
+            so_dict[source_path] = [tmp for tmp in json_obj["dest"] if (
+                    tmp.startswith("system/") or tmp.startswith("vendor/"))]
 
     return so_dict
 
