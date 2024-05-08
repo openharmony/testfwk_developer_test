@@ -265,62 +265,48 @@ class KeywordRegistration:
         previous_line = int(branch_line)
         loop_count = 0
         get_tag = self.get_tag
-        try:
-            while not function_name:
-                loop_count += 1
-                if loop_count > 500:
-                    return ""
+        while not function_name:
+            loop_count += 1
+            if loop_count > 500:
+                return function_name
 
-                previous_line -= 1
-                tag = get_tag(content, previous_line)
-                tag_text = self.get_source_code(tag)
-                if "LOG" in tag_text or tag_text.startswith("//"):
-                    continue
+            previous_line -= 1
+            tag = get_tag(content, previous_line)
+            tag_text = self.get_source_code(tag)
+            if "LOG" in tag_text or tag_text.startswith("//"):
+                continue
+            if tag_text.strip().startswith("{"):
+                child_count = left_parentheses_count = right_parentheses_count = 0
+                while previous_line:
+                    child_count += 1
+                    if child_count > 100:
+                        return function_name
 
-                if tag_text.strip().startswith("{"):
-                    left_parentheses_count = right_parentheses_count = 0
-                    child_count = 0
-                    while previous_line:
-                        child_count += 1
-                        if child_count > 100:
-                            return ""
-
-                        previous_line -= 1
-                        html_text = get_tag(content, previous_line)
-                        source_code = self.get_source_code(html_text)
-                        if "LOG" in source_code or "}" in source_code or source_code.endswith(";"):
-                            break
-
-                        if source_code.startswith("//"):
-                            continue
-                        
-                        if "{" in source_code:
-                            previous_line += 1
-                            break
-
-                        left_parentheses_count += source_code.count("(")
-                        right_parentheses_count += source_code.count(")")
-                        if not left_parentheses_count == right_parentheses_count:
-                            continue
-                        if " operator" in source_code:
-                            class_name_list = re.findall(r'\((.*?)\)', source_code)
-                            if class_name_list:
-                                function_name = class_name_list[0].strip()
-                                if not function_name:
-                                    return ""
-
-                                return function_name
-
-                        function_name_list = re.findall(r' (.*?)\(', source_code)
-                        if function_name_list:
-                            function_name = function_name_list[0].strip()
-                            if not function_name:
-                                return ""
-
+                    previous_line -= 1
+                    html_text = get_tag(content, previous_line)
+                    source_code = self.get_source_code(html_text)
+                    if "LOG" in source_code or "}" in source_code or source_code.endswith(";"):
+                        break
+                    if source_code.startswith("//"):
+                        continue
+                    if "{" in source_code:
+                        previous_line += 1
+                        break
+                    left_parentheses_count += source_code.count("(")
+                    right_parentheses_count += source_code.count(")")
+                    if not left_parentheses_count == right_parentheses_count:
+                        continue
+                    if " operator" in source_code:
+                        class_name_list = re.findall(r'\((.*?)\)', source_code)
+                        if class_name_list:
+                            function_name = class_name_list[0].strip()
                             return function_name
-            return "" 
-        except (OSError, IndexError, TypeError) as error:
-            pass
+
+                    function_name_list = re.findall(r' (.*?)\(', source_code)
+                    if function_name_list:
+                        function_name = function_name_list[0].strip()
+                        return function_name
+        return function_name 
 
     @staticmethod
     def get_branch_line_list(keyword_line: int, branch_line_list: list):
