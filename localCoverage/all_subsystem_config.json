@@ -1319,6 +1319,12 @@
       "foundation/resourceschedule/device_standby"
     ]
   },
+  "device_standby_ext": {
+    "name": "device_standby_ext",
+    "path": [
+      "foundation/resourceschedule/device_standby_ext"
+    ]
+  },
   "distributed_bundle_framework": {
     "name": "distributed_bundle_framework",
     "path": [
