@@ -127,7 +127,7 @@
     {
         "name": "distributeddatamgr_datamgr_service",
         "parts": "datamgr_service",
-        "buildTarget": "distributeddatamgr/datamgr_service:datamgr_service_test"
+        "buildTarget": "distributeddatamgr/datamgr_service:datamgr_service_test,distributeddatamgr/kv_store:kv_store_test"
     },
     {
         "name": "filemanagement_file_api",
