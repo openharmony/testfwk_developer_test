@@ -39,7 +39,7 @@ def get_source_file_list(path):
     return file_path_list
 
 
-def  recover_source_file(source_path_list, keys):
+def recover_source_file(source_path_list, keys):
     if not source_path_list:
         print("no any source file here")
         return
@@ -91,9 +91,13 @@ if __name__ == '__main__':
         root_path,
         "test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
     html_arr_list = get_source_file_list(html_path)
-    recover_source_file(html_arr_list, keys=[" //LCOV_EXCL_BR_LINE"])
 
+    print("[*************   start Recover Source File *************]")
+    recover_source_file(html_arr_list, keys=[" //LCOV_EXCL_BR_LINE"])
+    
     part_info_path = os.path.join(
         root_path,
         "test/testfwk/developer_test/localCoverage/restore_comment/part_config.json")
     recover_cpp_file(part_info_path)
+
+    print("[**************   End Recover Source File **************]")
