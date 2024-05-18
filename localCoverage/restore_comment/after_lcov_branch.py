@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import json
 import os
 import subprocess
 import stat
@@ -69,17 +69,19 @@ def recover_source_file(source_path_list, keys):
 
 def recover_cpp_file(part_name_path):
     try:
-        with open(part_name_path, "r", encoding="utf-8", errors="ignore") as fp:
-            data_dict = json.load(fp)
-        for key, value in data_dict.items():
-            if "path" in value.keys():
-                for path_str in value["path"]:
-                    file_path = os.path.join(root_path, path_str)
-                    if os.path.exists(file_path):
-                        cpp_list = get_source_file_list(file_path)
-                        recover_source_file(cpp_list, keys=[" //LCOV_EXCL_BR_LINE"])
-                    else:
-                        print("The directory does not exist.", file_path)
+        if os.path.exists(part_name_path):
+            with open(part_name_path, "r", encoding="utf-8", errors="ignore") as fp:
+                data_dict = json.load(fp)
+            for key, value in data_dict.items():
+                if "path" in value.keys():
+                    for path_str in value["path"]:
+                        file_path = os.path.join(root_path, path_str)
+                        if os.path.exists(file_path):
+                            cpp_list = get_source_file_list(file_path)
+                            recover_source_file(cpp_list, keys=[" //LCOV_EXCL_BR_LINE"])
+                        else:
+                            print("The directory does not exist.", file_path)
+            os.remove(path)
     except(FileNotFoundError, AttributeError, ValueError, KeyError):
             print("recover LCOV_EXCL_BR_LINE Error")
 
