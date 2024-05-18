@@ -193,9 +193,6 @@ if __name__ == '__main__':
         developer_test_path, "localCoverage/restore_comment/after_lcov_branch.py")
     if os.path.exists(after_lcov_branch_path):
         subprocess.run("python3 %s " % after_lcov_branch_path, shell=True)
-    restore_source_code_path = os.path.join(
-        developer_test_path, "localCoverage/restore_comment/restore_source_code.py")
-    subprocess.run("python3 %s" % restore_source_code_path, shell=True)
 
     print(r"See the code coverage report in: "
           r"/test/testfwk/developer_test/localCoverage/codeCoverage/results/coverage/reports/cxx/html")
