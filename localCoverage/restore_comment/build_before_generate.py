@@ -56,9 +56,9 @@ def rewrite_source_file(source_path_list: list):
         with open(path, "r", encoding="utf-8", errors="ignore") as read_fp:
             code_lines = read_fp.readlines()
         source_dir, suffix_name = os.path.splitext(path)
-        if os.path.exists(f"{source_dir}_bk.{suffix_name}"):
-            os.remove(f"{source_dir}_bk.{suffix_name}")
-        with os.fdopen(os.open(f"{source_dir}_bk.{suffix_name}", FLAGS, MODES), 'w') as write_fp:
+        if os.path.exists(f"{source_dir}_bk{suffix_name}"):
+            os.remove(f"{source_dir}_bk{suffix_name}")
+        with os.fdopen(os.open(f"{source_dir}_bk{suffix_name}", FLAGS, MODES), 'w') as write_fp:
             for line in code_lines:
                 sign_number = 0
                 for key in keys:
@@ -76,7 +76,7 @@ def rewrite_source_file(source_path_list: list):
                         break
 
             os.remove(path)
-            subprocess.Popen("mv %s %s" % (f"{source_dir}_bk.{suffix_name}", path),
+            subprocess.Popen("mv %s %s" % (f"{source_dir}_bk{suffix_name}", path),
                              shell=True).communicate()
     print("[**********  End Rewrite Source File **********]")
 
@@ -89,11 +89,7 @@ def add_lcov(subsystem_config_path):
             if "path" in value.keys():
                 for path_str in value["path"]:
                     file_path = os.path.join(root_path, path_str)
-                    primal_path = f"{file_path}_primal"
                     if os.path.exists(file_path):
-                        if not os.path.exists(primal_path):
-                            subprocess.Popen("cp -r %s %s" % (
-                                file_path, primal_path), shell=True).communicate()
                         source_file_path = get_source_file_list(file_path)
                         rewrite_source_file(source_file_path)
                     else:
