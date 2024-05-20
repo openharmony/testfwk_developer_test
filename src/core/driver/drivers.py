@@ -1221,6 +1221,10 @@ class OHRustTestDriver(IDriver):
     def _init_oh_rust(self):
         self.config.device.connector_command("target mount")
         self.config.device.execute_shell_command(
+            "rm -rf %s" % self.config.target_test_path)
+        self.config.device.execute_shell_command(
+            "mkdir -p %s" % self.config.target_test_path)
+        self.config.device.execute_shell_command(
             "mount -o rw,remount,rw /")
 
     def _run_oh_rust(self, suite_file, request=None):
