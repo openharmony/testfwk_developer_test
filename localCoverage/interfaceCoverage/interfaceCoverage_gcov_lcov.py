@@ -309,7 +309,7 @@ def get_covered_result_data(public_interface_func_list, covered_func_list):
             if para_list[index].strip() == "":
                 continue
             curr_para = para_list[index]
-            new_list.appned(curr_para)
+            new_list.append(curr_para)
             para_string = ",".join(new_list)
         fun_string = f"{return_val}' '{func_name}({para_string.strip().strip(',')})"
         fun_string = fun_string.strip()
