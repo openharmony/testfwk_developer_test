@@ -20,6 +20,7 @@ import os
 import subprocess
 import json
 import stat
+import sys
 
 FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 MODES = stat.S_IWUSR | stat.S_IRUSR
@@ -119,19 +120,23 @@ def get_part_config_json(part_list, system_info_path, part_path):
 
 if __name__ == '__main__':
     part_name_list = []
-    while True:
-        print("For example: run -tp partname\n"
-              "             run -tp partname1 partname2")
+    if sys.argv[1]:
+        part_name_list.append(sys.argv[1])
+        print(part_name_list)
+    else:
+        while True:
+            print("For example: run -tp partname\n"
+                  "             run -tp partname1 partname2")
 
-        # 获取用户输入命令
-        part_name = input("Please enter your command: ")
-        if part_name == "":
-            continue
-        if " -tp " in part_name:
-            part_name_list = part_name.strip().split(" -tp ")[1].split()
-            break
-        else:
-            continue
+            # 获取用户输入命令
+            part_name = input("Please enter your command: ")
+            if part_name == "":
+                continue
+            if " -tp " in part_name:
+                part_name_list = part_name.strip().split(" -tp ")[1].split()
+                break
+            else:
+                continue
 
     current_path = os.getcwd()
     root_path = current_path.split("/test/testfwk/developer_test")[0]
