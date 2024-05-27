@@ -34,7 +34,7 @@ def get_subsystem_config(part_str, developer_path):
                 new_json_text[part_str] = system_text_json[part_str]
             else:
                 print(f"Error: {part_str} not in all_subsystem_config.json")
-            return new_json_text
+        return new_json_text
     else:
         print(f"{all_system_info_path} not exists!")
 
@@ -45,7 +45,7 @@ def get_system_or_vendor(code_path):
         with open(repo_config_path, "r", encoding="utf-8") as fp:
             text_json = json.load(fp)
             if "manifest.filename" in text_json:
-                text = text_json["manifest.filename"]
+                text = text_json["manifest.filename"][0]
                 if text.startswith("system"):
                     return "system"
                 if text.startswith("vendor"):
@@ -74,7 +74,7 @@ def get_bundle_json(part_str, developer_path, code_path):
             command.append("--build-target")
             command.append(part_name)
 
-            if bundle_json["component"]["build"].get["test"]:
+            if bundle_json["component"]["build"].get("test"):
                 test_path = bundle_json["component"]["build"]["test"]
                 test_str = " ".join([i.strip("//") for i in test_path])
                 command.append("--build-target")
@@ -83,7 +83,6 @@ def get_bundle_json(part_str, developer_path, code_path):
             command.append("--gn-args")
             command.append("use_clang_coverage=true")
             print(command)
-
             if subprocess.call(command) == 0:
                 build_result = True
             else:
@@ -112,7 +111,9 @@ if __name__ == '__main__':
     root_path = current_path.split("/test/testfwk/developer_test")[0]
     developer_test_path = os.path.join(root_path, "test/testfwk/developer_test")
     build_before_path = os.path.join(
-        developer_test_path, "localCoverage/restore_comment/build_before_generate.py")
+        developer_test_path,
+        "localCoverage/restore_comment/build_before_generate.py"
+    )
     subprocess.run("python3 %s %s" % (build_before_path, test_part_str), shell=True)
     build_success = get_bundle_json(test_part_str, developer_test_path, root_path)
     if build_success:

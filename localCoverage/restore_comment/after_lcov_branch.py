@@ -81,7 +81,7 @@ def recover_cpp_file(part_name_path):
                             recover_source_file(cpp_list, keys=[" //LCOV_EXCL_BR_LINE"])
                         else:
                             print("The directory does not exist.", file_path)
-        os.remove(part_name_path)
+            os.remove(part_name_path)
     except(FileNotFoundError, AttributeError, ValueError, KeyError):
         print("recover LCOV_EXCL_BR_LINE Error")
 
