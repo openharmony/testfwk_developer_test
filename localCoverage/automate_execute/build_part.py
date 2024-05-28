@@ -37,6 +37,7 @@ def get_subsystem_config(part_str, developer_path):
         return new_json_text
     else:
         print(f"{all_system_info_path} not exists!")
+        return {}
 
 
 def get_system_or_vendor(code_path):
@@ -52,6 +53,7 @@ def get_system_or_vendor(code_path):
                     return "vendor"
     else:
         print(f"Error: {repo_config_path} not exist!")
+        return ""
 
 
 def get_bundle_json(part_str, developer_path, code_path):
@@ -92,6 +94,7 @@ def get_bundle_json(part_str, developer_path, code_path):
 
         else:
             print(f"{bundle_json_path}不存在，不能获取编译参数，请检查该部件的bundle.json文件！")
+            return False
 
 
 def execute_case(developer_test, part_name):
