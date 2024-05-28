@@ -41,10 +41,10 @@ def update_lcovrc():
     subprocess.call(["sudo", "echo", ""])
     file_path = "/etc/lcovrc"
     os.chmod(file_path, 0o777)
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         txt = f.read()
     txt = txt.replace("lcov_branch_coverage = 0", "lcov_branch_coverage = 1")
-    with open(file_path, "w") as f1:
+    with open(file_path, "w", encoding="utf-8") as f1:
         f1.write(txt)
 
 
