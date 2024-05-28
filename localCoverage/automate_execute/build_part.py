@@ -51,9 +51,11 @@ def get_system_or_vendor(code_path):
                     return "system"
                 if text.startswith("vendor"):
                     return "vendor"
+            else:
+                return "blue"
     else:
         print(f"Error: {repo_config_path} not exist!")
-        return ""
+        return "Error"
 
 
 def get_bundle_json(part_str, developer_path, code_path):
@@ -62,10 +64,13 @@ def get_bundle_json(part_str, developer_path, code_path):
     if system_or_vendor == "system":
         command = ["./build_system.sh", "--abi-type", "generic_generic_arm_64only", "--device-type",
                    "hisi_all_phone_standard", "--ccache", "--build-variant", "root"]
-    else:
+    elif system_or_vendor == "system":
         command = ["./build_vendor.sh", "--abi-type", "generic_generic_arm_64only", "--device-type",
                    "general_8425L_phone_standard", "--ccache", "--build-variant", "root",
                    "--gn-args", "uefi_enable=true"]
+    else:
+        command = ["./build.sh", "--product-name", "rk3568", "--ccache"]
+
     if part_json.get(part_str):
         bundle_json_path = os.path.join(code_path, part_json[part_str]["path"][0], "bundle.json")
         if os.path.exists(bundle_json_path):
