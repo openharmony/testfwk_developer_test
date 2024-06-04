@@ -120,7 +120,7 @@ def get_part_config_json(part_list, system_info_path, part_path):
 
 if __name__ == '__main__':
     part_name_list = []
-    if sys.argv[1]:
+    if len(sys.argv) == 2:
         part_name_list.append(sys.argv[1])
         print(part_name_list)
     else:
