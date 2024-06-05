@@ -63,11 +63,11 @@ def get_bundle_json(part_str, developer_path, code_path):
     system_or_vendor = get_system_or_vendor(code_path)
     if system_or_vendor == "system":
         command = ["./build_system.sh", "--abi-type", "generic_generic_arm_64only", "--device-type",
-                   "hisi_all_phone_standard", "--ccache", "--build-variant", "root"]
+                   "general_all_phone_standard", "--ccache", "--build-variant", "root"]
     elif system_or_vendor == "system":
         command = ["./build_vendor.sh", "--abi-type", "generic_generic_arm_64only", "--device-type",
                    "general_8425L_phone_standard", "--ccache", "--build-variant", "root",
-                   "--gn-args", "uefi_enable=true"]
+                   "--gn-args", "uefi_enable=true", "--gn-args", "USE_HM_KERNEL=true"]
     else:
         command = ["./build.sh", "--product-name", "rk3568", "--ccache"]
 
