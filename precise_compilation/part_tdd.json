@@ -803,5 +803,10 @@
         "name":"multimedia_image_effect",
         "parts":"image_effect",
         "buildTarget":"multimedia/image_effect:image_effect_test"
+    },
+    {
+        "name":"bundlemanager_app_domain_verify",
+        "parts":"app_domain_verify",
+        "buildTarget":"bundlemanager/app_domain_verify:app_domain_verify_test"
     }
 ]
