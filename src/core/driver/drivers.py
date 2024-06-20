@@ -579,11 +579,18 @@ class CppTestDriver(IDriver):
             self._run_gtest(suite_file)
 
         finally:
+            log_path = get_result_savepath(request.root.source.source_file, request.config.report_path)
+            suit_name = os.path.basename(request.root.source.source_file)
+            xml_path = os.path.join(log_path, f"{suit_name}.xml")
+            if not os.path.exists(xml_path):
+                _create_empty_result_file(xml_path, suit_name, "ERROR")
+                update_xml(request.root.source.source_file, xml_path)
             serial = "{}_{}".format(str(request.config.device.__get_serial__()), time.time_ns())
             log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
                 ":", "_"))
             self.config.device.device_log_collector.stop_hilog_task(
                 log_tar_file_name, module_name=request.get_module_name())
+
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
