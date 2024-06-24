@@ -12,7 +12,7 @@
     {
         "name": "ability_form_fwk",
         "parts": "form_fwk",
-        "buildTarget": "ability/form_fwk:form_fwk_test,ability/dmsfwk:dmsfwk_test"
+        "buildTarget": "ability/form_fwk:form_fwk_test,ability/ability_runtime:ability_runtime_test,arkui/ace_engine:ace_engine_test,ability/dmsfwk:dmsfwk_test,location/location:location_test"
     },
     {
         "name": "ability_idl_tool",
@@ -20,9 +20,24 @@
         "buildTarget": "ability/idl_tool:idl_tool_test"
     },
     {
+        "name": "accesscontrol_sandbox_manager",
+        "parts": "sandbox_manager",
+        "buildTarget": "accesscontrol/sandbox_manager:sandbox_manager_test,filemanagement/app_file_service:app_file_service_test"
+    },
+    {
         "name": "account_os_account",
         "parts": "os_account",
-        "buildTarget": "account/os_account:os_account_test,ability/form_fwk:form_fwk_test,developtools/hiprofiler:hiprofiler_test,distributedhardware/device_manager:device_manager_test,distributeddatamgr/pasteboard:pasteboard_test,print/print_fwk:print_fwk_test,communication/wifi:wifi_test,security/huks:huks_test,bundlemanager/bundle_framework:bundle_framework_test,hiviewdfx/hiview:hiview_test,communication/netmanager_ext:netmanager_ext_test,resourceschedule/device_usage_statistics:device_usage_statistics_test,security/dlp_permission_service:dlp_permission_service_test,communication/dsoftbus:dsoftbus_test,useriam/user_auth_framework:user_auth_framework_test,theme/wallpaper_mgr:wallpaper_mgr_test,notification/common_event_service:common_event_service_test,barrierfree/accessibility:accessibility_test,ability/dmsfwk:dmsfwk_test,powermgr/battery_statistics:battery_statistics_test,filemanagement/user_file_service:user_file_service_test,resourceschedule/work_scheduler:work_scheduler_test,filemanagement/file_api:file_api_test,usb/usb_manager:usb_manager_test,location/location:location_test,multimedia/camera_framework:camera_framework_test,security/device_auth:device_auth_test,inputmethod/imf:imf_test,customization/enterprise_device_management:enterprise_device_management_test,bundlemanager/distributed_bundle_framework:distributed_bundle_framework_test,startup/appspawn:appspawn_test,distributeddatamgr/datamgr_service:datamgr_service_test,bundlemanager/bundle_tool:bundle_tool_test,filemanagement/storage_service:storage_service_test,resourceschedule/background_task_mgr:background_task_mgr_test,security/certificate_manager:certificate_manager_test,notification/distributed_notification_service:distributed_notification_service_test,theme/screenlock_mgr:screenlock_mgr_test"
+        "buildTarget": "account/os_account:os_account_test,ability/ability_runtime:ability_runtime_test,barrierfree/accessibility:accessibility_test,arkui/ace_engine:ace_engine_test,bundlemanager/app_domain_verify:app_domain_verify_test,startup/appspawn:appspawn_test,security/appverify:appverify_test,security/asset:asset_test,multimedia/audio_framework:audio_framework_test,resourceschedule/background_task_mgr:background_task_mgr_test,powermgr/battery_statistics:battery_statistics_test,bundlemanager/bundle_framework:bundle_framework_test,bundlemanager/bundle_tool:bundle_tool_test,telephony/call_manager:call_manager_test,multimedia/camera_framework:camera_framework_test,security/certificate_manager:certificate_manager_test,notification/common_event_service:common_event_service_test,distributeddatamgr/datamgr_service:datamgr_service_test,security/device_auth:device_auth_test,distributedhardware/device_manager:device_manager_test,resourceschedule/device_usage_statistics:device_usage_statistics_test,filemanagement/dfs_service:dfs_service_test,bundlemanager/distributed_bundle_framework:distributed_bundle_framework_test,notification/distributed_notification_service:distributed_notification_service_test,security/dlp_permission_service:dlp_permission_service_test,ability/dmsfwk:dmsfwk_test,communication/dsoftbus:dsoftbus_test,customization/enterprise_device_management:enterprise_device_management_test,hdf/external_device_manager:external_device_manager_test,filemanagement/file_api:file_api_test,ability/form_fwk:form_fwk_test,developtools/hiprofiler:hiprofiler_test,hiviewdfx/hiview:hiview_test,security/huks:huks_test,inputmethod/imf:imf_test,location/location:location_test,resourceschedule/memmgr:memmgr_test,communication/netmanager_base:netmanager_base_test,communication/netmanager_ext:netmanager_ext_test,distributeddatamgr/pasteboard:pasteboard_test,powermgr/power_manager:power_manager_test,print/print_fwk:print_fwk_test,request/request:request_test,resourceschedule/resource_schedule_service:resource_schedule_service_test,theme/screenlock_mgr:screenlock_mgr_test,security/security_guard:security_guard_test,filemanagement/storage_service:storage_service_test,usb/usb_manager:usb_manager_test,useriam/user_auth_framework:user_auth_framework_test,filemanagement/user_file_service:user_file_service_test,theme/wallpaper_mgr:wallpaper_mgr_test,communication/wifi:wifi_test,resourceschedule/work_scheduler:work_scheduler_test"
+    },
+    {
+        "name": "advertising_oaid",
+        "parts": "oaid",
+        "buildTarget": "advertising/oaid:oaid_test"
+    },
+    {
+        "name": "ai_intelligent_voice_framework",
+        "parts": "intelligent_voice_framework",
+        "buildTarget": "ai/intelligent_voice_framework:intelligent_voice_framework_test"
     },
     {
         "name": "arkui_ace_engine",
@@ -33,6 +48,16 @@
         "name": "arkui_napi",
         "parts": "napi",
         "buildTarget": "arkui/napi:napi_test,ability/form_fwk:form_fwk_test,graphic/graphic_2d:graphic_2d_test,communication/netstack:netstack_test,hiviewdfx/hisysevent:hisysevent_test,build/build_framework:build_framework_test,developtools/hiprofiler:hiprofiler_test,distributedhardware/device_manager:device_manager_test,startup/init:init_test,distributeddatamgr/pasteboard:pasteboard_test,communication/netmanager_base:netmanager_base_test,print/print_fwk:print_fwk_test,communication/wifi:wifi_test,security/huks:huks_test,arkcompiler/runtime_core:runtime_core_test,bundlemanager/bundle_framework:bundle_framework_test,advertising/oaid:oaid_test,filemanagement/app_file_service:app_file_service_test,multimedia/image_framework:image_framework_test,global/resource_management:resource_management_test,hiviewdfx/hiview:hiview_test,communication/netmanager_ext:netmanager_ext_test,resourceschedule/device_usage_statistics:device_usage_statistics_test,window/window_manager:window_manager_test,multimedia/audio_framework:audio_framework_test,security/dlp_permission_service:dlp_permission_service_test,multimodalinput/input:input_test,telephony/sms_mms:sms_mms_test,distributeddatamgr/relational_store:relational_store_test,request/request:request_test,multimedia/player_framework:player_framework_test,useriam/user_auth_framework:user_auth_framework_test,sensors/sensor:sensor_test,theme/wallpaper_mgr:wallpaper_mgr_test,developtools/hiperf:hiperf_test,notification/common_event_service:common_event_service_test,barrierfree/accessibility:accessibility_test,security/access_token:access_token_test,ability/dmsfwk:dmsfwk_test,powermgr/battery_statistics:battery_statistics_test,commonlibrary/ets_utils:ets_utils_test,filemanagement/user_file_service:user_file_service_test,xts/device_attest:device_attest_test,powermgr/power_manager:power_manager_test,account/os_account:os_account_test,resourceschedule/work_scheduler:work_scheduler_test,distributeddatamgr/kv_store:kv_store_test,hiviewdfx/hichecker:hichecker_test,msdp/device_status:device_status_test,filemanagement/file_api:file_api_test,usb/usb_manager:usb_manager_test,location/location:location_test,multimedia/camera_framework:camera_framework_test,distributeddatamgr/udmf:udmf_test,testfwk/arkxtest:arkxtest_test,security/certificate_framework:certificate_framework_test,distributeddatamgr/preferences:preferences_test,inputmethod/imf:imf_test,distributeddatamgr/data_share:data_share_test,customization/enterprise_device_management:enterprise_device_management_test,hiviewdfx/hitrace:hitrace_test,multimedia/media_library:media_library_test,communication/ipc:ipc_test,bundlemanager/distributed_bundle_framework:distributed_bundle_framework_test,global/i18n:i18n_test,powermgr/thermal_manager:thermal_manager_test,updater/update_service:update_service_test,customization/config_policy:config_policy_test,powermgr/battery_manager:battery_manager_test,multimedia/av_session:av_session_test,distributeddatamgr/data_object:data_object_test,security/crypto_framework:crypto_framework_test,telephony/call_manager:call_manager_test,multimedia/drm_framework:drm_framework_test,filemanagement/storage_service:storage_service_test,ai/intelligent_voice_framework:intelligent_voice_framework_test,sensors/miscdevice:miscdevice_test,resourceschedule/background_task_mgr:background_task_mgr_test,thirdparty/mindspore:mindspore_test,telephony/cellular_data:cellular_data_test,hiviewdfx/hiappevent:hiappevent_test,telephony/state_registry:state_registry_test,developtools/syscap_codec:syscap_codec_test,distributedhardware/distributed_hardware_fwk:distributed_hardware_fwk_test,arkui/ui_appearance:ui_appearance_test,security/certificate_manager:certificate_manager_test,telephony/telephony_data:telephony_data_test,applications/calendar_data:calendar_data_test,web/webview:webview_test,notification/distributed_notification_service:distributed_notification_service_test,telephony/core_service:core_service_test,powermgr/display_manager:display_manager_test,theme/screenlock_mgr:screenlock_mgr_test,resourceschedule/device_standby:device_standby_test,time/time_service:time_service_test,notification/eventhandler:eventhandler_test"
+    },
+    {
+        "name": "arkui_ui_lite",
+        "parts": "ui_lite",
+        "buildTarget": "startup/appspawn:appspawn_test,powermgr/battery_manager:battery_manager_test,updater/updater:updater_test"
+    },
+    {
+        "name": "build",
+        "parts": "build_framework",
+        "buildTarget": "build/build_framework:build_framework_test,sensors/sensor:sensor_test"
     },
     {
         "name": "bundlemanager_bundle_framework",
@@ -57,7 +82,7 @@
     {
         "name": "communication_netstack",
         "parts": "netstack",
-        "buildTarget": "communication/netstack:netstack_test,telephony/sms_mms:sms_mms_test,request/request:request_test"
+        "buildTarget": "communication/netstack:netstack_test,arkui/ace_engine:ace_engine_test,bundlemanager/app_domain_verify:app_domain_verify_test,request/request:request_test,telephony/sms_mms:sms_mms_test,web/webview:webview_test,communication/wifi:wifi_test"
     },
     {
         "name": "communication_dsoftbus",
@@ -100,9 +125,34 @@
         "buildTarget": "customization/enterprise_device_management:enterprise_device_management_test,web/webview:webview_test"
     },
     {
+        "name": "developtools_bytrace",
+        "parts": "bytrace",
+        "buildTarget": "graphic/graphic_surface:graphic_surface_test"
+    },
+    {
         "name": "developtools_hdc",
         "parts": "hdc",
         "buildTarget": "developtools/hdc:hdc_test"
+    },
+    {
+        "name": "developtools_hiperf",
+        "parts": "hiperf",
+        "buildTarget": "developtools/hiperf:hiperf_test,hiviewdfx/hiview:hiview_test"
+    },
+    {
+        "name": "developtools_hiprofiler",
+        "parts": "hiprofiler",
+        "buildTarget": "developtools/hiprofiler:hiprofiler_test,resourceschedule/ffrt:ffrt_test,hiviewdfx/hiview:hiview_test,startup/init:init_test,communication/netstack:netstack_test"
+    },
+    {
+        "name": "developtools_syscap_codec",
+        "parts": "syscap_codec",
+        "buildTarget": "developtools/syscap_codec:syscap_codec_test,bundlemanager/bundle_framework:bundle_framework_test,deviceprofile/device_info_manager:device_info_manager_test,xts/device_attest:device_attest_test"
+    },
+    {
+        "name": "deviceprofile_device_info_manager",
+        "parts": "device_info_manager",
+        "buildTarget": "deviceprofile/device_info_manager:device_info_manager_test,bundlemanager/bundle_framework:bundle_framework_test,distributedhardware/device_manager:device_manager_test,msdp/device_status:device_status_test,filemanagement/dfs_service:dfs_service_test,ability/dmsfwk:dmsfwk_test,communication/dsoftbus:dsoftbus_test,distributeddatamgr/pasteboard:pasteboard_test"
     },
     {
         "name": "distributeddatamgr_relational_store",
@@ -157,7 +207,7 @@
     {
         "name": "ability_dmsfwk",
         "parts": "dmsfwk",
-        "buildTarget": "ability/dmsfwk:dmsfwk_test,deviceprofile/device_info_manager:device_info_manager_test"
+        "buildTarget": "ability/dmsfwk:dmsfwk_test,distributeddatamgr/data_object:data_object_test,deviceprofile/device_info_manager:device_info_manager_test,ability/dmsfwk:dmsfwk_test"
     },
     {
         "name": "systemabilitymgr_safwk",
@@ -290,6 +340,11 @@
         "buildTarget": "multimodalinput/input:input_test,graphic/graphic_2d:graphic_2d_test,distributeddatamgr/pasteboard:pasteboard_test,hiviewdfx/hiview:hiview_test,window/window_manager:window_manager_test,multimedia/audio_framework:audio_framework_test,multimedia/player_framework:player_framework_test,resourceschedule/resource_schedule_service:resource_schedule_service_test,barrierfree/accessibility:accessibility_test,distributedhardware/distributed_screen:distributed_screen_test,ability/dmsfwk:dmsfwk_test,powermgr/power_manager:power_manager_test,msdp/device_status:device_status_test,testfwk/arkxtest:arkxtest_test,inputmethod/imf:imf_test,multimedia/av_session:av_session_test,web/webview:webview_test,resourceschedule/device_standby:device_standby_test"
     },
     {
+        "name": "multimedia_ringtone_library",
+        "parts": "ringtone_library",
+        "buildTarget": "multimedia/ringtone_library:ringtone_library_test,multimedia/player_framework:player_framework_test"
+    },
+    {
         "name": "notification_common_event_service",
         "parts": "common_event_service",
         "buildTarget": "notification/common_event_service:common_event_service_test,ability/form_fwk:form_fwk_test,distributedhardware/device_manager:device_manager_test,distributeddatamgr/pasteboard:pasteboard_test,communication/netmanager_base:netmanager_base_test,print/print_fwk:print_fwk_test,communication/wifi:wifi_test,security/huks:huks_test,bundlemanager/bundle_framework:bundle_framework_test,filemanagement/app_file_service:app_file_service_test,hiviewdfx/hiview:hiview_test,communication/netmanager_ext:netmanager_ext_test,resourceschedule/device_usage_statistics:device_usage_statistics_test,window/window_manager:window_manager_test,security/dlp_permission_service:dlp_permission_service_test,multimodalinput/input:input_test,telephony/sms_mms:sms_mms_test,distributeddatamgr/relational_store:relational_store_test,communication/dsoftbus:dsoftbus_test,request/request:request_test,useriam/user_auth_framework:user_auth_framework_test,theme/wallpaper_mgr:wallpaper_mgr_test,resourceschedule/resource_schedule_service:resource_schedule_service_test,barrierfree/accessibility:accessibility_test,security/access_token:access_token_test,ability/dmsfwk:dmsfwk_test,powermgr/battery_statistics:battery_statistics_test,filemanagement/user_file_service:user_file_service_test,powermgr/power_manager:power_manager_test,account/os_account:os_account_test,resourceschedule/work_scheduler:work_scheduler_test,distributeddatamgr/kv_store:kv_store_test,msdp/device_status:device_status_test,filemanagement/file_api:file_api_test,usb/usb_manager:usb_manager_test,location/location:location_test,multimedia/camera_framework:camera_framework_test,testfwk/arkxtest:arkxtest_test,distributeddatamgr/preferences:preferences_test,security/device_auth:device_auth_test,inputmethod/imf:imf_test,distributeddatamgr/data_share:data_share_test,customization/enterprise_device_management:enterprise_device_management_test,multimedia/media_library:media_library_test,bundlemanager/distributed_bundle_framework:distributed_bundle_framework_test,global/i18n:i18n_test,powermgr/thermal_manager:thermal_manager_test,powermgr/battery_manager:battery_manager_test,distributeddatamgr/data_object:data_object_test,startup/appspawn:appspawn_test,distributeddatamgr/datamgr_service:datamgr_service_test,telephony/call_manager:call_manager_test,telephony/cellular_call:cellular_call_test,bundlemanager/bundle_tool:bundle_tool_test,filemanagement/storage_service:storage_service_test,ai/intelligent_voice_framework:intelligent_voice_framework_test,resourceschedule/background_task_mgr:background_task_mgr_test,telephony/cellular_data:cellular_data_test,telephony/state_registry:state_registry_test,security/certificate_manager:certificate_manager_test,systemabilitymgr/samgr:samgr_test,web/webview:webview_test,notification/distributed_notification_service:distributed_notification_service_test,telephony/core_service:core_service_test,theme/screenlock_mgr:screenlock_mgr_test,resourceschedule/device_standby:device_standby_test,time/time_service:time_service_test"
@@ -298,6 +353,11 @@
         "name": "notification_eventhandler",
         "parts": "eventhandler",
         "buildTarget": "notification/eventhandler:eventhandler_test,ability/form_fwk:form_fwk_test,graphic/graphic_2d:graphic_2d_test,build/build_framework:build_framework_test,distributedhardware/device_manager:device_manager_test,security/security_component_manager:security_component_manager_test,distributeddatamgr/pasteboard:pasteboard_test,communication/netmanager_base:netmanager_base_test,print/print_fwk:print_fwk_test,communication/wifi:wifi_test,bundlemanager/bundle_framework:bundle_framework_test,hiviewdfx/hicollie:hicollie_test,communication/netmanager_ext:netmanager_ext_test,resourceschedule/device_usage_statistics:device_usage_statistics_test,window/window_manager:window_manager_test,multimedia/audio_framework:audio_framework_test,multimodalinput/input:input_test,telephony/sms_mms:sms_mms_test,graphic/graphic_surface:graphic_surface_test,request/request:request_test,multimedia/player_framework:player_framework_test,sensors/sensor:sensor_test,theme/wallpaper_mgr:wallpaper_mgr_test,notification/common_event_service:common_event_service_test,resourceschedule/resource_schedule_service:resource_schedule_service_test,barrierfree/accessibility:accessibility_test,security/access_token:access_token_test,ability/dmsfwk:dmsfwk_test,deviceprofile/device_info_manager:device_info_manager_test,xts/device_attest:device_attest_test,account/os_account:os_account_test,resourceschedule/work_scheduler:work_scheduler_test,msdp/device_status:device_status_test,filemanagement/file_api:file_api_test,usb/usb_manager:usb_manager_test,resourceschedule/frame_aware_sched:frame_aware_sched_test,location/location:location_test,distributedhardware/distributed_input:distributed_input_test,inputmethod/imf:imf_test,customization/enterprise_device_management:enterprise_device_management_test,multimedia/media_library:media_library_test,hiviewdfx/hidumper:hidumper_test,global/i18n:i18n_test,distributedhardware/distributed_audio:distributed_audio_test,multimedia/av_session:av_session_test,telephony/call_manager:call_manager_test,telephony/cellular_call:cellular_call_test,distributedhardware/distributed_camera:distributed_camera_test,ai/intelligent_voice_framework:intelligent_voice_framework_test,resourceschedule/background_task_mgr:background_task_mgr_test,telephony/cellular_data:cellular_data_test,hiviewdfx/hiappevent:hiappevent_test,telephony/state_registry:state_registry_test,distributedhardware/distributed_hardware_fwk:distributed_hardware_fwk_test,security/certificate_manager:certificate_manager_test,systemabilitymgr/samgr:samgr_test,security/code_signature:code_signature_test,web/webview:webview_test,notification/distributed_notification_service:distributed_notification_service_test,telephony/core_service:core_service_test,theme/screenlock_mgr:screenlock_mgr_test,resourceschedule/device_standby:device_standby_test,resourceschedule/soc_perf:soc_perf_test,time/time_service:time_service_test"
+    },
+    {
+        "name": "ostest_wukong",
+        "parts": "wukong",
+        "buildTarget": "ostest/wukong:wukong_test"
     },
     {
         "name": "powermgr_battery_manager",
@@ -323,6 +383,11 @@
         "name": "powermgr_battery_statistics",
         "parts": "battery_statistics",
         "buildTarget": "powermgr/battery_statistics:battery_statistics_test,hiviewdfx/hiview:hiview_test"
+    },
+    {
+        "name": "print_print_fwk",
+        "parts": "print_fwk",
+        "buildTarget": "print/print_fwk:print_fwk_test,web/webview:webview_test"
     },
     {
         "name": "security_appverify",
@@ -368,6 +433,11 @@
         "name": "security_code_signature",
         "parts": "code_signature",
         "buildTarget": "security/code_signature:code_signature_test,bundlemanager/bundle_framework:bundle_framework_test,startup/appspawn:appspawn_test"
+    },
+    {
+        "name": "security_security_guard",
+        "parts": "security_guard",
+        "buildTarget": "security/security_guard:security_guard_test,security/certificate_manager:certificate_manager_test,customization/enterprise_device_management:enterprise_device_management_test,account/os_account:os_account_test,print/print_fwk:print_fwk_test"
     },
     {
         "name": "useriam_pin_auth",
@@ -515,6 +585,11 @@
         "buildTarget": "sensors/sensor:sensor_test,graphic/graphic_2d:graphic_2d_test,window/window_manager:window_manager_test,multimedia/audio_framework:audio_framework_test,powermgr/power_manager:power_manager_test,msdp/device_status:device_status_test,multimedia/camera_framework:camera_framework_test,powermgr/display_manager:display_manager_test,resourceschedule/device_standby:device_standby_test"
     },
     {
+        "name": "sensors_start",
+        "parts": "start",
+        "buildTarget": "multimodalinput/input:input_test"
+    },
+    {
         "name": "usb_usb_manager",
         "parts": "usb_manager",
         "buildTarget": "usb/usb_manager:usb_manager_test,print/print_fwk:print_fwk_test,communication/netmanager_ext:netmanager_ext_test,customization/enterprise_device_management:enterprise_device_management_test"
@@ -528,11 +603,6 @@
         "name": "deviceprofile_device_info_manager",
         "parts": "device_info_manager",
         "buildTarget": "deviceprofile/device_info_manager:device_info_manager_test,distributedhardware/device_manager:device_manager_test,distributeddatamgr/pasteboard:pasteboard_test,bundlemanager/bundle_framework:bundle_framework_test,communication/dsoftbus:dsoftbus_test,ability/dmsfwk:dmsfwk_test,msdp/device_status:device_status_test"
-    },
-    {
-        "name": "developtools_hiperf",
-        "parts": "hiperf",
-        "buildTarget": "developtools/hiperf:hiperf_test,hiviewdfx/hiview:hiview_test"
     },
     {
         "name": "resourceschedule_resource_schedule_service",
@@ -572,17 +642,42 @@
     {
         "name": "msdp_device_status",
         "parts": "device_status",
-        "buildTarget": "msdp/device_status:device_status_test"
+        "buildTarget": "msdp/device_status:device_status_test,window/window_manager:window_manager_test"
     },
     {
-        "name": "developtools_syscap_codec",
-        "parts": "syscap_codec",
-        "buildTarget": "developtools/syscap_codec:syscap_codec_test,bundlemanager/bundle_framework:bundle_framework_test,deviceprofile/device_info_manager:device_info_manager_test,xts/device_attest:device_attest_test"
-    },
-    {
-        "name": "thirdparty_mindspore",
+        "name": "third_party_mindspore",
         "parts": "mindspore",
         "buildTarget": "thirdparty/mindspore:mindspore_test,ai/neural_network_runtime:neural_network_runtime_test"
+    },
+    {
+        "name": "third_party_vulkan-headers",
+        "parts": "vulkan-headers",
+        "buildTarget": "graphic/graphic_2d:graphic_2d_test,graphic/graphic_3d:graphic_3d_test"
+    },
+    {
+        "name": "third_party_vulkan-loader",
+        "parts": "vulkan-loader",
+        "buildTarget": "graphic/graphic_2d:graphic_2d_test"
+    },
+    {
+        "name": "third_party_bounds_checking_function",
+        "parts": "bounds_checking_function",
+        "buildTarget": "security/access_token:access_token_test,arkui/ace_engine:ace_engine_test,startup/appspawn:appspawn_test,multimedia/audio_framework:audio_framework_test,multimedia/av_codec:av_codec_test,bundlemanager/bundle_framework:bundle_framework_test,security/certificate_manager:certificate_manager_test,security/code_signature:code_signature_test,customization/config_policy:config_policy_test,security/crypto_framework:crypto_framework_test,distributeddatamgr/data_object:data_object_test,security/device_auth:device_auth_test,distributedhardware/device_manager:device_manager_test,communication/dhcp:dhcp_test,distributedhardware/distributed_hardware_fwk:distributed_hardware_fwk_test,hdf/drivers_peripheral_audio:drivers_peripheral_audio_test,hdf/drivers_peripheral_camera:drivers_peripheral_camera_test,hdf/drivers_peripheral_codec:drivers_peripheral_codec_test,communication/dsoftbus:dsoftbus_test,customization/enterprise_device_management:enterprise_device_management_test,arkcompiler/ets_frontend:ets_frontend_test,arkcompiler/ets_runtime:ets_runtime_test,commonlibrary/ets_utils:ets_utils_test,hiviewdfx/faultloggerd:faultloggerd_test,resourceschedule/ffrt:ffrt_test,filemanagement/file_api:file_api_test,resourceschedule/frame_aware_sched:frame_aware_sched_test,graphic/graphic_2d:graphic_2d_test,graphic/graphic_surface:graphic_surface_test,developtools/hdc:hdc_test,hiviewdfx/hilog:hilog_test,developtools/hiprofiler:hiprofiler_test,hiviewdfx/hisysevent:hisysevent_test,hiviewdfx/hitrace:hitrace_test,hiviewdfx/hiview:hiview_test,security/huks:huks_test,ability/idl_tool:idl_tool_test,multimedia/image_effect:image_effect_test,startup/init:init_test,multimodalinput/input:input_test,communication/ipc:ipc_test,multimedia/media_foundation:media_foundation_test,thirdparty/mindspore:mindspore_test,sensors/miscdevice:miscdevice_test,arkui/napi:napi_test,communication/netmanager_base:netmanager_base_test,communication/netmanager_ext:netmanager_ext_test,account/os_account:os_account_test,multimedia/player_framework:player_framework_test,global/resource_management:resource_management_test,telephony/ril_adapter:ril_adapter_test,arkcompiler/runtime_core:runtime_core_test,security/selinux_adapter:selinux_adapter_test,castplus/sharing_framework:sharing_framework_test,filemanagement/storage_service:storage_service_test,updater/sys_installer:sys_installer_test,developtools/syscap_codec:syscap_codec_test,arkcompiler/toolchain:toolchain_test,updater/update_service:update_service_test,updater/updater:updater_test,usb/usb_manager:usb_manager_test,communication/wifi:wifi_test,window/window_manager:window_manager_test,thirdparty/wpa_supplicant:wpa_supplicant_test"
+    },
+    {
+        "name": "third_party_libuv",
+        "parts": "libuv",
+        "buildTarget": "ability/ability_runtime:ability_runtime_test,arkui/ace_engine:ace_engine_test,multimedia/audio_framework:audio_framework_test,telephony/call_manager:call_manager_test,distributeddatamgr/data_object:data_object_test,distributeddatamgr/data_share:data_share_test,arkcompiler/ets_runtime:ets_runtime_test,graphic/graphic_2d:graphic_2d_test,developtools/hdc:hdc_test,startup/init:init_test,communication/ipc:ipc_test,arkui/napi:napi_test,communication/netmanager_base:netmanager_base_test,distributeddatamgr/pasteboard:pasteboard_test,multimedia/player_framework:player_framework_test,request/request:request_test,arkcompiler/toolchain:toolchain_test,updater/updater:updater_test"
+    },
+    {
+        "name": "third_party_musl",
+        "parts": "musl",
+        "buildTarget": "thirdparty/musl:musl_test"
+    },
+    {
+        "name": "third_party_wpa_supplicant",
+        "parts": "wpa_supplicant",
+        "buildTarget": "thirdparty/wpa_supplicant:wpa_supplicant_test,hdf/drivers_peripheral_wlan:drivers_peripheral_wlan_test"
     },
     {
         "name": "web_webview",
@@ -655,14 +750,14 @@
         "buildTarget": "resourceschedule/qos_manager:qos_manager_test,graphic/graphic_2d:graphic_2d_test,multimedia/av_codec:av_codec_test,multimedia/player_framework:player_framework_test"
     },
     {
+        "name": "frame_aware_sched",
+        "parts": "frame_aware_sched",
+        "buildTarget": "resourceschedule/frame_aware_sched:frame_aware_sched_test,arkui/ace_engine:ace_engine_test,graphic/graphic_2d:graphic_2d_test,resourceschedule/qos_manager:qos_manager_test,resourceschedule/resource_schedule_service:resource_schedule_service_test,window/window_manager:window_manager_test"
+    },
+    {
         "name": "communication_bluetooth_service_override",
         "parts": "bluetooth_service_override",
         "buildTarget": "communication/bluetooth_service_override:bluetooth_service_override_test"
-    },
-    {
-        "name": "ai_intelligent_voice_framework",
-        "parts": "intelligent_voice_framework",
-        "buildTarget": "ai/intelligent_voice_framework:intelligent_voice_framework_test"
     },
     {
         "name": "graphic_graphic_surface",
@@ -740,6 +835,11 @@
         "buildTarget": "hdf/drivers_peripheral_light:drivers_peripheral_light_test,hdf/drivers_peripheral_battery:drivers_peripheral_battery_test,hdf/drivers_peripheral_memorytracker:drivers_peripheral_memorytracker_test,hdf/drivers_peripheral_sensor:drivers_peripheral_sensor_test,hdf/drivers_peripheral_audio:drivers_peripheral_audio_test,hdf/drivers_peripheral_codec:drivers_peripheral_codec_test,hdf/drivers_peripheral_usb:drivers_peripheral_usb_test,hdf/drivers_peripheral_motion:drivers_peripheral_motion_test,hdf/drivers_peripheral_input:drivers_peripheral_input_test,hdf/drivers_peripheral_distributed_audio:drivers_peripheral_distributed_audio_test,hdf/drivers_peripheral_distributed_camera:drivers_peripheral_distributed_camera_test,hdf/drivers_peripheral_power:drivers_peripheral_power_test,hdf/drivers_peripheral_display:drivers_peripheral_display_test,hdf/drivers_peripheral_wlan:drivers_peripheral_wlan_test,hdf/drivers_peripheral_thermal:drivers_peripheral_thermal_test,hdf/drivers_peripheral_camera:drivers_peripheral_camera_test,multimedia/image_framework:image_framework_test,multimedia/av_codec:av_codec_test,hdf/drivers_peripheral_codec:drivers_peripheral_codec_test,multimedia/camera_framework:camera_framework_test"
     },
     {
+        "name": "drivers_hdf_core",
+        "parts": "hdf_core",
+        "buildTarget": "hdf/hdf_core:hdf_core_test,multimedia/audio_framework:audio_framework_test,multimedia/av_codec:av_codec_test,powermgr/battery_manager:battery_manager_test,communication/bluetooth_service:bluetooth_service_test,build/build_framework:build_framework_test,multimedia/camera_framework:camera_framework_test,telephony/core_service:core_service_test,distributedhardware/distributed_audio:distributed_audio_test,distributedhardware/distributed_camera:distributed_camera_test,hdf/drivers_peripheral_audio:drivers_peripheral_audio_test,hdf/drivers_peripheral_battery:drivers_peripheral_battery_test,hdf/drivers_peripheral_camera:drivers_peripheral_camera_test,hdf/drivers_peripheral_codec:drivers_peripheral_codec_test,hdf/drivers_peripheral_display:drivers_peripheral_display_test,hdf/drivers_peripheral_distributed_audio:drivers_peripheral_distributed_audio_test,hdf/drivers_peripheral_distributed_camera:drivers_peripheral_distributed_camera_test,hdf/drivers_peripheral_face_auth:drivers_peripheral_face_auth_test,hdf/drivers_peripheral_fingerprint_auth:drivers_peripheral_fingerprint_auth_test,hdf/drivers_peripheral_huks:drivers_peripheral_huks_test,hdf/drivers_peripheral_input:drivers_peripheral_input_test,hdf/drivers_peripheral_light:drivers_peripheral_light_test,hdf/drivers_peripheral_memorytracker:drivers_peripheral_memorytracker_test,hdf/drivers_peripheral_motion:drivers_peripheral_motion_test,hdf/drivers_peripheral_partitionslot:drivers_peripheral_partitionslot_test,hdf/drivers_peripheral_pin_auth:drivers_peripheral_pin_auth_test,hdf/drivers_peripheral_power:drivers_peripheral_power_test,hdf/drivers_peripheral_sensor:drivers_peripheral_sensor_test,hdf/drivers_peripheral_thermal:drivers_peripheral_thermal_test,hdf/drivers_peripheral_usb:drivers_peripheral_usb_test,hdf/drivers_peripheral_user_auth:drivers_peripheral_user_auth_test,hdf/drivers_peripheral_vibrator:drivers_peripheral_vibrator_test,hdf/drivers_peripheral_wlan:drivers_peripheral_wlan_test,multimedia/drm_framework:drm_framework_test,graphic/graphic_2d:graphic_2d_test,hiviewdfx/hidumper:hidumper_test,multimedia/image_framework:image_framework_test,multimodalinput/input:input_test,ai/intelligent_voice_framework:intelligent_voice_framework_test,location/location:location_test,multimedia/media_foundation:media_foundation_test,thirdparty/mindspore:mindspore_test,ai/neural_network_runtime:neural_network_runtime_test,multimedia/player_framework:player_framework_test,powermgr/power_manager:power_manager_test,telephony/ril_adapter:ril_adapter_test,security/security_guard:security_guard_test,powermgr/thermal_manager:thermal_manager_test,useriam/user_auth_framework:user_auth_framework_test,communication/wifi:wifi_test,thirdparty/wpa_supplicant:wpa_supplicant_test"
+    },
+    {
         "name": "graphic_graphic_3d",
         "parts": "graphic_3d",
         "buildTarget": "graphic/graphic_3d:graphic_3d_test"
@@ -758,6 +858,16 @@
         "name": "commonlibrary_rust_ylong_runtime",
         "parts": "ylong_runtime",
         "buildTarget": "commonlibrary/ylong_runtime:ylong_runtime_test,request/request:request_test,commonlibrary/ylong_http:ylong_http_test,communication/ipc:ipc_test"
+    },
+    {
+        "name": "commonlibrary_ylong_json",
+        "parts": "ylong_json",
+        "buildTarget": "security/code_signature:code_signature_test"
+    },
+    {
+        "name": "communication_bluetooth",
+        "parts": "bluetooth",
+        "buildTarget": "multimedia/audio_framework:audio_framework_test,multimedia/av_session:av_session_test,powermgr/battery_statistics:battery_statistics_test,communication/bluetooth_service:bluetooth_service_test,telephony/call_manager:call_manager_test,distributedhardware/device_manager:device_manager_test,communication/dsoftbus:dsoftbus_test,customization/enterprise_device_management:enterprise_device_management_test,location/location:location_test,communication/netmanager_ext:netmanager_ext_test,resourceschedule/resource_schedule_service:resource_schedule_service_test,systemabilitymgr/samgr:samgr_test"
     },
     {
         "name": "distributeddatamgr_kv_store",
@@ -790,6 +900,16 @@
         "buildTarget": "bundlemanager/ecological_rule_manager:ecological_rule_manager_test"
     },
     {
+        "name": "castplus_cast_engine",
+        "parts": "cast_engine",
+        "buildTarget": "multimedia/av_session:av_session_test"
+    },
+    {
+        "name": "castplus_sharing_framework",
+        "parts": "sharing_framework",
+        "buildTarget": "castplus/sharing_framework:sharing_framework_test"
+    },
+    {
         "name":"security_asset",
         "parts":"asset",
         "buildTarget":"security/asset:asset_test,account/os_account:os_account_test"
@@ -802,7 +922,7 @@
     {
         "name":"multimedia_image_effect",
         "parts":"image_effect",
-        "buildTarget":"multimedia/image_effect:image_effect_test"
+        "buildTarget":"multimedia/image_effect:image_effect_test,multimedia/media_library:media_library_test"
     },
     {
         "name":"bundlemanager_app_domain_verify",
