@@ -136,6 +136,8 @@ def push_coverage_so(so_dict: dict):
     for device in device_sn_list:
         cmd = "shell mount -o rw,remount /"
         hdc_command(device_ip, device_port, device, cmd)
+        cmd_mount = "target mount"
+        hdc_command(device_ip, device_port, device, cmd_mount)
         for source_path, dest_paths in so_dict.items():
             if not os.path.exists(source_path):
                 logger("{} not exist.".format(source_path), "ERROR")
