@@ -38,6 +38,8 @@ def restore_config(device_ip, device_port, device_sn, cfg_path):
     """
     remount_cmd = "shell mount -o rw,remount /"
     hdc_command(device_ip, device_port, device_sn, remount_cmd)
+    remount_cmd_mount = "target mount"
+    hdc_command(device_ip, device_port, device_sn, remount_cmd_mount)
     origin_foundation = os.path.join(cfg_path, "foundation_origin.json")
     restore_foundation_cmd = "file send {} /system/profile/foundation.json".format(origin_foundation)
     hdc_command(device_ip, device_port, device_sn, restore_foundation_cmd)
@@ -59,6 +61,7 @@ def attach_pid(device_ip, device_sn, process_str, component_gcda_dict, developer
     print("%s shell chmod 777 /data/gcov -R" % hdc_str)
     coverage_command("%s shell chmod 777 /data/gcov -R" % hdc_str)
     coverage_command("%s shell mount -o rw,remount /" % hdc_str)
+    coverage_command("%s target mount" % hdc_str)
     local_sh_path = os.path.join(resident_service_path, "resources", "gcov_flush.sh")
     coverage_command("dos2unix %s" % local_sh_path)
     print("%s file send %s %s" % (hdc_str, local_sh_path, "/data/"))
