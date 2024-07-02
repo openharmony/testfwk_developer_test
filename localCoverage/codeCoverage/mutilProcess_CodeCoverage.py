@@ -202,7 +202,7 @@ def gen_subsystem_trace_info(subsystem, data_dir, test_dir, lcovrc_path):
 def cut_info(subsystem, test_dir):
     trace_file = os.path.join(
         CODEPATH, REPORT_PATH, "single_test",
-        test_dir,  f"{subsystem}_output.info"
+        test_dir, f"{subsystem}_output.info"
     )
     output_name = os.path.join(
         CODEPATH, REPORT_PATH, "single_test",

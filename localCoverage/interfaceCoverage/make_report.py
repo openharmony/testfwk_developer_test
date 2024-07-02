@@ -16,20 +16,19 @@
 # limitations under the License.
 #
 
-
+import os
 import sys
+import stat
 import datetime
 from importlib import reload
+
 reload(sys)
-import os
-import stat
 
 FLAGS_WRITE = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 FLAGS_ADD = os.O_WRONLY | os.O_APPEND | os.O_CREAT
 MODES = stat.S_IWUSR | stat.S_IRUSR
 
-
-html_head = """
+HTML_HEAD = """
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -75,12 +74,12 @@ html_head = """
     </style>
 </head>
 """
-html_body_start = """
+HTML_BODY_START = """
 <body>"""
 
-html_body_ended = """
+HTML_BODY_ENDED = """
 </body>"""
-html_ended = """
+HTML_ENDED = """
 </html>"""
 
 
@@ -97,8 +96,8 @@ def create_html_start(reportpath):
         if os.path.exists(reportpath):
             os.remove(reportpath)
         with os.fdopen(os.open(reportpath, FLAGS_WRITE, MODES), 'w') as report:
-            report.write(html_head)
-            report.write(html_body_start)
+            report.write(HTML_HEAD)
+            report.write(HTML_BODY_START)
     except(IOError, ValueError):
         print("Error for create html start ",)
 
@@ -244,7 +243,7 @@ def create_table_test(reportpath, subsystem_name, datalist, total_count, covered
 def create_html_ended(reportpath):
     try:
         with os.fdopen(os.open(reportpath, FLAGS_ADD, MODES), 'a') as report:
-            report.write(html_body_ended)
-            report.write(html_ended)
+            report.write(HTML_BODY_ENDED)
+            report.write(HTML_ENDED)
     except(IOError, ValueError):
         print("Error for create html end")

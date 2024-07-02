@@ -186,7 +186,7 @@ REPORT_CSS_TEMPLATE = """
 
 
 def render_tbody(data):
-    res  = ""
+    res = ""
     for row in data:
         row_line = "<tr>"
         for row_td in row:

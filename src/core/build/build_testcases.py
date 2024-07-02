@@ -110,6 +110,109 @@ class BuildTestcases(object):
         if os.path.exists(xts_testcase_out_dir):
             shutil.rmtree(xts_testcase_out_dir)
 
+    def build_fuzz_testcases(self, para):
+        self._delete_testcase_dir(para.productform)
+        helper_path = os.path.join("..", "libs", "fuzzlib", "fuzzer_helper.py")
+        command = [sys.executable, helper_path, 'make',
+                   'make_temp_test', para.productform]
+        if subprocess.call(command, shell=False) == 0:
+            build_result = True
+        else:
+            build_result = False
+        self._merge_testcase_dir(para.productform)
+        return build_result
+
+    # 编译测试用例（编译命令拼接）
+    def build_testcases(self, productform, target):
+        command = []
+        if self.is_build_example:
+            command.append("--gn-args")
+            command.append("build_example=true")
+        if isinstance(target, list):
+            for test in target:
+                command.append("--build-target")
+                command.append(test + "_test")
+        elif isinstance(target, str):
+            for test in target.split(','):
+                command.append("--build-target")
+                command.append(test)
+
+        if productform == "rk3568":
+            pass
+        else:
+            command.append("--abi-type")
+            command.append("generic_generic_arm_64only")
+            command.append("--device-type")
+            command.append(get_output_path().split("/")[-1])
+            command.append("--build-variant")
+            command.append("root")
+        command.append("--ccache")
+        self._delete_testcase_dir(productform)
+        build_result = self._execute_build_command(productform, command)
+        self._merge_testcase_dir(productform)
+        return build_result
+
+    # 编译XTS测试用例
+    def build_xts_testcases(self, para):
+        self._delete_xts_testcase_dir(para)
+        xts_build_command = []
+        if para.productform == "rk3568":
+            False
+        else:
+            xts_build_test_command = ["--abi-type", "generic_generic_arm_64only", "--device-type",
+                                      get_output_path().split("/")[-1], "--build-variant", "root", "--gn-args",
+                                      "build_xts=true", "--export-para", "xts_suitename:" + para.testtype[0]]
+            if len(para.subsystem) > 0:
+                input_subsystem = ",".join(para.subsystem)
+                xts_build_test_command.append("--build-target")
+                xts_build_test_command.append(input_subsystem)
+                return False
+            if para.testsuit != "" and len(para.subsystem) == 0:
+                LOG.error("Please specify subsystem.")
+                return False
+            xts_build_command.extend(xts_build_test_command)
+            xts_build_command.append("--ccache")
+        build_result = self._execute_build_xts_command(para, xts_build_command)
+        return build_result
+
+
+    def build_deps_files(self, productform):
+        command = ["--ccache", "--gn-args", "pycache_enable=true", "--gn-args",
+                   "check_deps=true", "--build-only-gn"]
+        if productform == "rk3568":
+            pass
+        else:
+            command.append("--abi-type")
+            command.append("generic_generic_arm_64only")
+            command.append("--device-type")
+            command.append(get_output_path().split("/")[-1])
+            command.append("--build-variant")
+            command.append("root")
+        return self._execute_build_deps_files_command(productform, command)
+
+    # 部件间依赖关系预处理，生成part_deps_info.json
+    def build_part_deps(self, para):
+        build_part_deps_result = self._execute_build_part_deps_command(para)
+        return build_part_deps_result
+
+    def build_gn_file(self, productform):
+        command = []
+        if self.is_build_example:
+            command.append("--gn-args")
+            command.append("build_example=true")
+        command.append("--build-only-gn")
+        command.append("--gn-args")
+        command.append(BUILD_TARGET_PLATFORM % productform)
+        return self._execute_build_command(productform, command)
+
+    def build_version(self, productform):
+        command = []
+        command.append("--build-target")
+        command.append("make_all")
+        command.append("--gn-args")
+        command.append(BUILD_TARGET_PLATFORM % productform)
+        return self._execute_build_command(productform, command)
+    
     def _delete_testcase_dir(self, productform):
         if is_open_source_product(productform):
             package_out_dir = os.path.join(
@@ -298,109 +401,6 @@ class BuildTestcases(object):
 
         os.chdir(current_path)
         return build_result
-
-    def build_fuzz_testcases(self, para):
-        self._delete_testcase_dir(para.productform)
-        helper_path = os.path.join("..", "libs", "fuzzlib", "fuzzer_helper.py")
-        command = [sys.executable, helper_path, 'make',
-                   'make_temp_test', para.productform]
-        if subprocess.call(command, shell=False) == 0:
-            build_result = True
-        else:
-            build_result = False
-        self._merge_testcase_dir(para.productform)
-        return build_result
-
-    # 编译测试用例（编译命令拼接）
-    def build_testcases(self, productform, target):
-        command = []
-        if self.is_build_example:
-            command.append("--gn-args")
-            command.append("build_example=true")
-        if isinstance(target, list):
-            for test in target:
-                command.append("--build-target")
-                command.append(test + "_test")
-        elif isinstance(target, str):
-            for test in target.split(','):
-                command.append("--build-target")
-                command.append(test)
-
-        if productform == "rk3568":
-            pass
-        else:
-            command.append("--abi-type")
-            command.append("generic_generic_arm_64only")
-            command.append("--device-type")
-            command.append(get_output_path().split("/")[-1])
-            command.append("--build-variant")
-            command.append("root")
-        command.append("--ccache")
-        self._delete_testcase_dir(productform)
-        build_result = self._execute_build_command(productform, command)
-        self._merge_testcase_dir(productform)
-        return build_result
-
-    # 编译XTS测试用例
-    def build_xts_testcases(self, para):
-        self._delete_xts_testcase_dir(para)
-        xts_build_command = []
-        if para.productform == "rk3568":
-            False
-        else:
-            xts_build_test_command = ["--abi-type", "generic_generic_arm_64only", "--device-type",
-                                      get_output_path().split("/")[-1], "--build-variant", "root", "--gn-args",
-                                      "build_xts=true", "--export-para", "xts_suitename:" + para.testtype[0]]
-            if len(para.subsystem) > 0:
-                input_subsystem = ",".join(para.subsystem)
-                xts_build_test_command.append("--build-target")
-                xts_build_test_command.append(input_subsystem)
-                return False
-            if para.testsuit != "" and len(para.subsystem) == 0:
-                LOG.error("Please specify subsystem.")
-                return False
-            xts_build_command.extend(xts_build_test_command)
-            xts_build_command.append("--ccache")
-        build_result = self._execute_build_xts_command(para, xts_build_command)
-        return build_result
-
-
-    def build_deps_files(self, productform):
-        command = ["--ccache", "--gn-args", "pycache_enable=true", "--gn-args",
-                   "check_deps=true", "--build-only-gn"]
-        if productform == "rk3568":
-            pass
-        else:
-            command.append("--abi-type")
-            command.append("generic_generic_arm_64only")
-            command.append("--device-type")
-            command.append(get_output_path().split("/")[-1])
-            command.append("--build-variant")
-            command.append("root")
-        return self._execute_build_deps_files_command(productform, command)
-
-    # 部件间依赖关系预处理，生成part_deps_info.json
-    def build_part_deps(self, para):
-        build_part_deps_result = self._execute_build_part_deps_command(para)
-        return build_part_deps_result
-
-    def build_gn_file(self, productform):
-        command = []
-        if self.is_build_example:
-            command.append("--gn-args")
-            command.append("build_example=true")
-        command.append("--build-only-gn")
-        command.append("--gn-args")
-        command.append(BUILD_TARGET_PLATFORM % productform)
-        return self._execute_build_command(productform, command)
-
-    def build_version(self, productform):
-        command = []
-        command.append("--build-target")
-        command.append("make_all")
-        command.append("--gn-args")
-        command.append(BUILD_TARGET_PLATFORM % productform)
-        return self._execute_build_command(productform, command)
 
 ##############################################################################
 ##############################################################################

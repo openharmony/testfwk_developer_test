@@ -539,6 +539,31 @@ class CppTestDriver(IDriver):
     config = None
     result = ""
 
+    @staticmethod
+    def _alter_init(name):
+        with open(name, "rb") as f:
+            lines = f.read()
+        str_content = lines.decode("utf-8")
+
+        pattern_sharp = '^\s*#.*$(\n|\r\n)'
+        pattern_star = '/\*.*?\*/(\n|\r\n)+'
+        pattern_xml = '<!--[\s\S]*?-->(\n|\r\n)+'
+
+        if re.match(pattern_sharp, str_content, flags=re.M):
+            striped_content = re.sub(pattern_sharp, '', str_content, flags=re.M)
+        elif re.findall(pattern_star, str_content, flags=re.S):
+            striped_content = re.sub(pattern_star, '', str_content, flags=re.S)
+        elif re.findall(pattern_xml, str_content, flags=re.S):
+            striped_content = re.sub(pattern_xml, '', str_content, flags=re.S)
+        else:
+            striped_content = str_content
+
+        striped_bt = striped_content.encode("utf-8")
+        if os.path.exists(name):
+            os.remove(name)
+        with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
+            f.write(striped_bt)
+
     def __check_environment__(self, device_options):
         if len(device_options) == 1 and device_options[0].label is None:
             return True
@@ -714,31 +739,6 @@ class CppTestDriver(IDriver):
                                               resource_dir,
                                               self.config.device)
 
-    @staticmethod
-    def _alter_init(name):
-        with open(name, "rb") as f:
-            lines = f.read()
-        str_content = lines.decode("utf-8")
-
-        pattern_sharp = '^\s*#.*$(\n|\r\n)'
-        pattern_star = '/\*.*?\*/(\n|\r\n)+'
-        pattern_xml = '<!--[\s\S]*?-->(\n|\r\n)+'
-
-        if re.match(pattern_sharp, str_content, flags=re.M):
-            striped_content = re.sub(pattern_sharp, '', str_content, flags=re.M)
-        elif re.findall(pattern_star, str_content, flags=re.S):
-            striped_content = re.sub(pattern_star, '', str_content, flags=re.S)
-        elif re.findall(pattern_xml, str_content, flags=re.S):
-            striped_content = re.sub(pattern_xml, '', str_content, flags=re.S)
-        else:
-            striped_content = str_content
-
-        striped_bt = striped_content.encode("utf-8")
-        if os.path.exists(name):
-            os.remove(name)
-        with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
-            f.write(striped_bt)
-
     def _push_corpus_cov_if_exist(self, suite_file):
         corpus_path = suite_file.split("fuzztest")[-1].strip(os.sep)
         cov_file = os.path.join(
@@ -837,6 +837,124 @@ class JSUnitTestDriver(IDriver):
         # log
         self.hilog = None
         self.hilog_proc = None
+
+    @staticmethod
+    def _get_acts_test_para(testcase,
+                            testlevel,
+                            testtype,
+                            target_test_path,
+                            suite_file,
+                            filename):
+        if "actstest" == testtype[0]:
+            test_para = (" --actstest_out_format=json"
+                         " --actstest_out=%s%s.json") % (
+                            target_test_path, filename)
+            return test_para
+
+        if "" != testcase and "" == testlevel:
+            test_para = "%s=%s" % (GTestConst.exec_acts_para_filter, testcase)
+        elif "" == testcase and "" != testlevel:
+            level_para = get_level_para_string(testlevel)
+            test_para = "%s=%s" % (GTestConst.exec_acts_para_level, level_para)
+        else:
+            test_para = ""
+        return test_para
+
+    @staticmethod
+    def _get_hats_test_para(testcase,
+                            testlevel,
+                            testtype,
+                            target_test_path,
+                            suite_file,
+                            filename):
+        if "hatstest" == testtype[0]:
+            test_hats_para = (" --hatstest_out_format=json"
+                         " --hatstest_out=%s%s.json") % (
+                            target_test_path, filename)
+            return test_hats_para
+
+        if "" != testcase and "" == testlevel:
+            test_hats_para = "%s=%s" % (GTestConst.exec_para_filter, testcase)
+        elif "" == testcase and "" != testlevel:
+            level_para = get_level_para_string(testlevel)
+            test_hats_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
+        else:
+            test_hats_para = ""
+        return test_hats_para
+
+    @classmethod
+    def _get_json_shell_timeout(cls, json_filepath):
+        test_timeout = 0
+        try:
+            with open(json_filepath, 'r') as json_file:
+                data_dic = json.load(json_file)
+                if not data_dic:
+                    return test_timeout
+                else:
+                    if "driver" in data_dic.keys():
+                        driver_dict = data_dic.get("driver")
+                        if driver_dict and "test-timeout" in driver_dict.keys():
+                            test_timeout = int(driver_dict["shell-timeout"]) / 1000
+                    return test_timeout
+        except JSONDecodeError:
+            return test_timeout
+        finally:
+            print(" get json shell timeout finally")
+
+    @staticmethod
+    def _get_package_and_ability_name(hap_filepath):
+        package_name = ""
+        ability_name = ""
+        if os.path.exists(hap_filepath):
+            filename = os.path.basename(hap_filepath)
+
+            # unzip the hap file
+            hap_bak_path = os.path.abspath(os.path.join(
+                os.path.dirname(hap_filepath),
+                "%s.bak" % filename))
+            zf_desc = zipfile.ZipFile(hap_filepath)
+            try:
+                zf_desc.extractall(path=hap_bak_path)
+            except RuntimeError as error:
+                print("Unzip error: ", hap_bak_path)
+            zf_desc.close()
+
+            # verify config.json file
+            app_profile_path = os.path.join(hap_bak_path, "config.json")
+            if not os.path.exists(app_profile_path):
+                print("file %s not exist" % app_profile_path)
+                return package_name, ability_name
+
+            if os.path.isdir(app_profile_path):
+                print("%s is a folder, and not a file" % app_profile_path)
+                return package_name, ability_name
+
+            # get package_name and ability_name value
+            load_dict = {}
+            with open(app_profile_path, 'r') as load_f:
+                load_dict = json.load(load_f)
+            profile_list = load_dict.values()
+            for profile in profile_list:
+                package_name = profile.get("package")
+                if not package_name:
+                    continue
+                abilities = profile.get("abilities")
+                for abilitie in abilities:
+                    abilities_name = abilitie.get("name")
+                    if abilities_name.startswith("."):
+                        ability_name = package_name + abilities_name[
+                                                      abilities_name.find("."):]
+                    else:
+                        ability_name = abilities_name
+                    break
+                break
+
+            # delete hap_bak_path
+            if os.path.exists(hap_bak_path):
+                shutil.rmtree(hap_bak_path)
+        else:
+            print("file %s not exist" % hap_filepath)
+        return package_name, ability_name
 
     def __check_environment__(self, device_options):
         pass
@@ -1052,124 +1170,6 @@ class JSUnitTestDriver(IDriver):
             "bm uninstall -n %s" % package_name)
         _sleep_according_to_result(return_message)
         return return_message
-
-    @staticmethod
-    def _get_acts_test_para(testcase,
-                            testlevel,
-                            testtype,
-                            target_test_path,
-                            suite_file,
-                            filename):
-        if "actstest" == testtype[0]:
-            test_para = (" --actstest_out_format=json"
-                         " --actstest_out=%s%s.json") % (
-                            target_test_path, filename)
-            return test_para
-
-        if "" != testcase and "" == testlevel:
-            test_para = "%s=%s" % (GTestConst.exec_acts_para_filter, testcase)
-        elif "" == testcase and "" != testlevel:
-            level_para = get_level_para_string(testlevel)
-            test_para = "%s=%s" % (GTestConst.exec_acts_para_level, level_para)
-        else:
-            test_para = ""
-        return test_para
-
-    @staticmethod
-    def _get_hats_test_para(testcase,
-                            testlevel,
-                            testtype,
-                            target_test_path,
-                            suite_file,
-                            filename):
-        if "hatstest" == testtype[0]:
-            test_hats_para = (" --hatstest_out_format=json"
-                         " --hatstest_out=%s%s.json") % (
-                            target_test_path, filename)
-            return test_hats_para
-
-        if "" != testcase and "" == testlevel:
-            test_hats_para = "%s=%s" % (GTestConst.exec_para_filter, testcase)
-        elif "" == testcase and "" != testlevel:
-            level_para = get_level_para_string(testlevel)
-            test_hats_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
-        else:
-            test_hats_para = ""
-        return test_hats_para
-
-    @classmethod
-    def _get_json_shell_timeout(cls, json_filepath):
-        test_timeout = 0
-        try:
-            with open(json_filepath, 'r') as json_file:
-                data_dic = json.load(json_file)
-                if not data_dic:
-                    return test_timeout
-                else:
-                    if "driver" in data_dic.keys():
-                        driver_dict = data_dic.get("driver")
-                        if driver_dict and "test-timeout" in driver_dict.keys():
-                            test_timeout = int(driver_dict["shell-timeout"]) / 1000
-                    return test_timeout
-        except JSONDecodeError:
-            return test_timeout
-        finally:
-            print(" get json shell timeout finally")
-
-    @staticmethod
-    def _get_package_and_ability_name(hap_filepath):
-        package_name = ""
-        ability_name = ""
-        if os.path.exists(hap_filepath):
-            filename = os.path.basename(hap_filepath)
-
-            # unzip the hap file
-            hap_bak_path = os.path.abspath(os.path.join(
-                os.path.dirname(hap_filepath),
-                "%s.bak" % filename))
-            zf_desc = zipfile.ZipFile(hap_filepath)
-            try:
-                zf_desc.extractall(path=hap_bak_path)
-            except RuntimeError as error:
-                print("Unzip error: ", hap_bak_path)
-            zf_desc.close()
-
-            # verify config.json file
-            app_profile_path = os.path.join(hap_bak_path, "config.json")
-            if not os.path.exists(app_profile_path):
-                print("file %s not exist" % app_profile_path)
-                return package_name, ability_name
-
-            if os.path.isdir(app_profile_path):
-                print("%s is a folder, and not a file" % app_profile_path)
-                return package_name, ability_name
-
-            # get package_name and ability_name value
-            load_dict = {}
-            with open(app_profile_path, 'r') as load_f:
-                load_dict = json.load(load_f)
-            profile_list = load_dict.values()
-            for profile in profile_list:
-                package_name = profile.get("package")
-                if not package_name:
-                    continue
-                abilities = profile.get("abilities")
-                for abilitie in abilities:
-                    abilities_name = abilitie.get("name")
-                    if abilities_name.startswith("."):
-                        ability_name = package_name + abilities_name[
-                                                      abilities_name.find("."):]
-                    else:
-                        ability_name = abilities_name
-                    break
-                break
-
-            # delete hap_bak_path
-            if os.path.exists(hap_bak_path):
-                shutil.rmtree(hap_bak_path)
-        else:
-            print("file %s not exist" % hap_filepath)
-        return package_name, ability_name
 
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.oh_rust_test)

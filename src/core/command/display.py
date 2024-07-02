@@ -201,7 +201,6 @@ def select_user_input(data_list):
     return select_item_value, select_item_index
 
 
-
 # 选择productform
 def select_productform():
     select_value = "phone"
