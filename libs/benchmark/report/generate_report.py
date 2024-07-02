@@ -27,6 +27,7 @@ MODES = stat.S_IWUSR | stat.S_IRUSR
 
 SETTING_RED_STYLE = """\033[33;31m%s\033[0m"""
 
+
 def load_json_data(json_file_path):
     json_data = {}
     if os.path.isfile(json_file_path):
@@ -68,6 +69,7 @@ def get_file_list_by_postfix(path, postfix, filter_jar=""):
                 file_list.append(file_path)
     return file_list
 
+
 class BenchmarkReport(object):
     SUBSYSTEM_SUMMARY = "OHOS_SUBSYSTEM_SUMMARY"
     ENABLE_LINK = "OHOS_ENABLE_PASSCASE_LINK"
@@ -88,24 +90,7 @@ class BenchmarkReport(object):
         self.sbs_mdl_summary_list = []
         self.benchmark_list = []
         self._init_default_item()
-
-    def _init_default_item(self):
-        self.default_item.append("Subsystem")
-        self.default_item.append("Module")
-        self.default_item.append("Testsuit")
-        self.default_item.append("Benchmark")
-        self.default_item.append("Mode")
-        self.default_item.append("RunType")
-        self.default_item.append("TestTargetName")
-        self.default_item.append("TestTargetMethod")
-        self.default_item.append("Repetitions")
-        self.default_item.append("RepetitionIndex")
-        self.default_item.append("Threads")
-        self.default_item.append("Iterations")
-        self.default_item.append("Score")
-        self.default_item.append("CpuTime")
-        self.max_index = len(self.default_item) + 1000
-
+    
     def generate_benchmark(self, args):
         if args is None or len(args) <= 2:
             print(SETTING_RED_STYLE %
@@ -128,6 +113,23 @@ class BenchmarkReport(object):
         self._get_benchmark_result_data(src_path)
         self._generate_benchmark_summary_report(os.path.abspath(dest_path))
         self._generate_all_benchmark_detail(os.path.abspath(dest_path))
+
+    def _init_default_item(self):
+        self.default_item.append("Subsystem")
+        self.default_item.append("Module")
+        self.default_item.append("Testsuit")
+        self.default_item.append("Benchmark")
+        self.default_item.append("Mode")
+        self.default_item.append("RunType")
+        self.default_item.append("TestTargetName")
+        self.default_item.append("TestTargetMethod")
+        self.default_item.append("Repetitions")
+        self.default_item.append("RepetitionIndex")
+        self.default_item.append("Threads")
+        self.default_item.append("Iterations")
+        self.default_item.append("Score")
+        self.default_item.append("CpuTime")
+        self.max_index = len(self.default_item) + 1000
 
     def _remove_iterations(self, mdl_summary_list):
         final_mdl_summary = []

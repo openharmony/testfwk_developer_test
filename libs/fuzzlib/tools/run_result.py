@@ -56,9 +56,6 @@ class RunResult():
             "report_progress": 0
         }
 
-    def get_log(self):
-        return "code :{}, msg: {}".format(self.code, self.data)
-
     @staticmethod
     def filter_log(log_str):
         ansi_escape = re.compile(r'''
@@ -74,6 +71,9 @@ class RunResult():
         ''', re.VERBOSE)
         result = ansi_escape.sub('', log_str)
         return result
+
+    def get_log(self):
+        return "code :{}, msg: {}".format(self.code, self.data)
 
     def analysis(self, result, outdir):
         pass

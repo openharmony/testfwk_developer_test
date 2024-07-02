@@ -47,6 +47,137 @@ FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
 
 
 class TestCaseManager(object):
+    @classmethod
+    def get_valid_suite_file(cls, test_case_out_path, suite_file, options):
+        partlist = options.partname_list
+        testmodule = options.testmodule
+        testsuit = options.testsuit
+
+        if not suite_file.startswith(test_case_out_path):
+            return False
+
+        if testsuit != "":
+            short_name, _ = os.path.splitext(os.path.basename(suite_file))
+            testsuit_list = testsuit.split(',')
+            for test in testsuit_list:
+                if short_name.startswith(test) or \
+                        testsuit.startswith(short_name):
+                    return True
+            return False
+
+        is_valid_status = False
+        suitfile_subpath = suite_file.replace(test_case_out_path, "")
+        suitfile_subpath = suitfile_subpath.strip(os.sep)
+        if len(partlist) == 0:
+            if testmodule != "":
+                temp_list = suitfile_subpath.split(os.sep)
+                if len(temp_list) > 2 and testmodule == temp_list[1]:
+                    is_valid_status = True
+            else:
+                is_valid_status = True
+        else:
+            for partname in partlist:
+                if testmodule != "":
+                    if suitfile_subpath.startswith(
+                            partname + os.sep + testmodule + os.sep):
+                        is_valid_status = True
+                        break
+                else:
+                    if suitfile_subpath.startswith(partname + os.sep):
+                        is_valid_status = True
+                        break
+        return is_valid_status
+
+    @classmethod
+    def check_python_test_file(cls, suite_file):
+        if suite_file.endswith(".py"):
+            filename = os.path.basename(suite_file)
+            if filename.startswith("test_"):
+                return True
+        return False
+
+    @classmethod
+    def check_hap_test_file(cls, hap_file_path):
+        try:
+            if hap_file_path.endswith(".hap"):
+                json_file_path = hap_file_path.replace(".hap", ".json")
+                if os.path.exists(json_file_path):
+                    with open(json_file_path, 'r') as json_file:
+                        data_dic = json.load(json_file)
+                        if not data_dic:
+                            return False
+                        else:
+                            if "kits" in data_dic.keys():
+                                kits_list = data_dic.get("kits")
+                                if len(kits_list) > 0:
+                                    for kits_dict in kits_list:
+                                        if "test-file-name" not in kits_dict.keys():
+                                            continue
+                                        else:
+                                            return True
+                                else:
+                                    return False
+            return False
+        except JSONDecodeError:
+            return False
+        finally:
+            print(" check hap test file finally")
+
+    @classmethod
+    def get_hap_test_driver(cls, hap_file_path):
+        data_dic = cls.get_hap_json(hap_file_path)
+        if not data_dic:
+            return ""
+        else:
+            if "driver" in data_dic.keys():
+                driver_dict = data_dic.get("driver")
+                if bool(driver_dict):
+                    driver_type = driver_dict.get("type")
+                    return driver_type
+                else:
+                    LOG.error("%s has not set driver." % hap_file_path)
+                    return ""
+            else:
+                return ""
+
+    @classmethod
+    def get_hap_json(cls, hap_file_path):
+        if hap_file_path.endswith(".hap"):
+            json_file_path = hap_file_path.replace(".hap", ".json")
+            if os.path.exists(json_file_path):
+                with open(json_file_path, 'r') as json_file:
+                    data_dic = json.load(json_file)
+                    return data_dic
+            else:
+                return {}
+        else:
+            return {}
+
+    @classmethod
+    def get_hap_part_json(cls, hap_file_path):
+        if hap_file_path.endswith(".hap"):
+            json_file_path = hap_file_path.replace(".hap", ".moduleInfo")
+            if os.path.exists(json_file_path):
+                with open(json_file_path, 'r') as json_file:
+                    data_dic = json.load(json_file)
+                    return data_dic
+            else:
+                return {}
+        else:
+            return {}
+
+    @classmethod
+    def get_part_name_test_file(cls, hap_file_path):
+        data_dic = cls.get_hap_part_json(hap_file_path)
+        if not data_dic:
+            return ""
+        else:
+            if "part" in data_dic.keys():
+                part_name = data_dic["part"]
+                return part_name
+            else:
+                return ""
+    
     def get_test_files(self, test_case_path, options):
         LOG.info("test case path: " + test_case_path)
         LOG.info("test type list: " + str(options.testtype))
@@ -219,134 +350,3 @@ class TestCaseManager(object):
                 if self.get_hap_test_driver(xts_suite_file) == "JSUnitTest":
                     xts_suit_file_dic.get("JST").append(xts_suite_file)
         return xts_suit_file_dic
-
-    @classmethod
-    def get_valid_suite_file(cls, test_case_out_path, suite_file, options):
-        partlist = options.partname_list
-        testmodule = options.testmodule
-        testsuit = options.testsuit
-
-        if not suite_file.startswith(test_case_out_path):
-            return False
-
-        if testsuit != "":
-            short_name, _ = os.path.splitext(os.path.basename(suite_file))
-            testsuit_list = testsuit.split(',')
-            for test in testsuit_list:
-                if short_name.startswith(test) or \
-                        testsuit.startswith(short_name):
-                    return True
-            return False
-
-        is_valid_status = False
-        suitfile_subpath = suite_file.replace(test_case_out_path, "")
-        suitfile_subpath = suitfile_subpath.strip(os.sep)
-        if len(partlist) == 0:
-            if testmodule != "":
-                temp_list = suitfile_subpath.split(os.sep)
-                if len(temp_list) > 2 and testmodule == temp_list[1]:
-                    is_valid_status = True
-            else:
-                is_valid_status = True
-        else:
-            for partname in partlist:
-                if testmodule != "":
-                    if suitfile_subpath.startswith(
-                            partname + os.sep + testmodule + os.sep):
-                        is_valid_status = True
-                        break
-                else:
-                    if suitfile_subpath.startswith(partname + os.sep):
-                        is_valid_status = True
-                        break
-        return is_valid_status
-
-    @classmethod
-    def check_python_test_file(cls, suite_file):
-        if suite_file.endswith(".py"):
-            filename = os.path.basename(suite_file)
-            if filename.startswith("test_"):
-                return True
-        return False
-
-    @classmethod
-    def check_hap_test_file(cls, hap_file_path):
-        try:
-            if hap_file_path.endswith(".hap"):
-                json_file_path = hap_file_path.replace(".hap", ".json")
-                if os.path.exists(json_file_path):
-                    with open(json_file_path, 'r') as json_file:
-                        data_dic = json.load(json_file)
-                        if not data_dic:
-                            return False
-                        else:
-                            if "kits" in data_dic.keys():
-                                kits_list = data_dic.get("kits")
-                                if len(kits_list) > 0:
-                                    for kits_dict in kits_list:
-                                        if "test-file-name" not in kits_dict.keys():
-                                            continue
-                                        else:
-                                            return True
-                                else:
-                                    return False
-            return False
-        except JSONDecodeError:
-            return False
-        finally:
-            print(" check hap test file finally")
-
-    @classmethod
-    def get_hap_test_driver(cls, hap_file_path):
-        data_dic = cls.get_hap_json(hap_file_path)
-        if not data_dic:
-            return ""
-        else:
-            if "driver" in data_dic.keys():
-                driver_dict = data_dic.get("driver")
-                if bool(driver_dict):
-                    driver_type = driver_dict.get("type")
-                    return driver_type
-                else:
-                    LOG.error("%s has not set driver." % hap_file_path)
-                    return ""
-            else:
-                return ""
-
-    @classmethod
-    def get_hap_json(cls, hap_file_path):
-        if hap_file_path.endswith(".hap"):
-            json_file_path = hap_file_path.replace(".hap", ".json")
-            if os.path.exists(json_file_path):
-                with open(json_file_path, 'r') as json_file:
-                    data_dic = json.load(json_file)
-                    return data_dic
-            else:
-                return {}
-        else:
-            return {}
-
-    @classmethod
-    def get_hap_part_json(cls, hap_file_path):
-        if hap_file_path.endswith(".hap"):
-            json_file_path = hap_file_path.replace(".hap", ".moduleInfo")
-            if os.path.exists(json_file_path):
-                with open(json_file_path, 'r') as json_file:
-                    data_dic = json.load(json_file)
-                    return data_dic
-            else:
-                return {}
-        else:
-            return {}
-
-    @classmethod
-    def get_part_name_test_file(cls, hap_file_path):
-        data_dic = cls.get_hap_part_json(hap_file_path)
-        if not data_dic:
-            return ""
-        else:
-            if "part" in data_dic.keys():
-                part_name = data_dic["part"]
-                return part_name
-            else:
-                return ""

@@ -246,8 +246,7 @@ def get_para_sub_string(content):
     parentheses_list_left = []
     parentheses_list_right = []
 
-    for index in range(len(content)):
-        char = content[index]
+    for index, char in enumerate(content):
         if "<" == char:
             if 0 == len(parentheses_list_left):
                 start_index = index

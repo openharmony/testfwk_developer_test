@@ -32,6 +32,23 @@ class DeviceManager:
         self.tv_device_list = []
         self.watch_device_list = []
         self.make_device_list(result_path)
+    
+    @staticmethod
+    def get_device_info_list(result):
+        device_info_list = []
+        tmp_path = os.path.join(result, "temp")
+        device_info_file_path = os.path.join(tmp_path, 
+                                             "device_info_file.txt")
+
+        if os.path.exists(device_info_file_path):
+            with open(device_info_file_path, "r") as file_handle:
+                lines = file_handle.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    line = line.strip()
+                    temp = line.split(",")
+                    device_info_list.append(temp)
+        return device_info_list
 
     def make_device_adapter(self, device_info_list, device_name):
         device = DeviceShell(self.is_hdc, device_sn=device_info_list[0],
@@ -70,23 +87,6 @@ class DeviceManager:
                 self.watch_device_list.append(device)
                 setattr(self, device.name, device)
         return
-
-    @staticmethod
-    def get_device_info_list(result):
-        device_info_list = []
-        tmp_path = os.path.join(result, "temp")
-        device_info_file_path = os.path.join(tmp_path, 
-                                             "device_info_file.txt")
-
-        if os.path.exists(device_info_file_path):
-            with open(device_info_file_path, "r") as file_handle:
-                lines = file_handle.readlines()
-                for line in lines:
-                    line = line.replace("\n", "")
-                    line = line.strip()
-                    temp = line.split(",")
-                    device_info_list.append(temp)
-        return device_info_list
 
 ##############################################################################
 ##############################################################################

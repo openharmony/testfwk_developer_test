@@ -122,6 +122,45 @@ class DeviceShell:
 
         return device_para
 
+    @classmethod
+    def execute_command(cls, command, print_flag=True, timeout=900):
+        try:
+            if print_flag:
+                print("command: " + command)
+            if subprocess.call(command, shell=True, timeout=timeout) == 0:
+                print("results: successed")
+                return True
+        except Exception as error:
+            print("Exception: %s" % str(error))
+        print("results: failed")
+        return False
+
+    @classmethod
+    def execute_command_with_output(cls, command, print_flag=True):
+        if print_flag:
+            print("command: " + command)
+
+        proc = subprocess.Popen(command,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                shell=True)
+
+        result = ""
+        try:
+            data, _ = proc.communicate()
+            if isinstance(data, bytes):
+                result = data.decode('utf-8', 'ignore')
+        finally:
+            proc.stdout.close()
+            proc.stderr.close()
+        return result if result else data
+
+    @classmethod
+    def check_path_legal(cls, path):
+        if path and " " in path:
+            return "\"%s\"" % path
+        return path
+        
     def remount(self):
         if self.conn_type:
             remount = "target mount"
@@ -185,19 +224,6 @@ class DeviceShell:
             command,
             QUOTATION_MARKS))
 
-    @classmethod
-    def execute_command(cls, command, print_flag=True, timeout=900):
-        try:
-            if print_flag:
-                print("command: " + command)
-            if subprocess.call(command, shell=True, timeout=timeout) == 0:
-                print("results: successed")
-                return True
-        except Exception as error:
-            print("Exception: %s" % str(error))
-        print("results: failed")
-        return False
-
     def shell_with_output(self, command=""):
         return self.execute_command_with_output("%s %s shell %s%s%s" % (
             HDC_TOOLS,
@@ -205,29 +231,4 @@ class DeviceShell:
             QUOTATION_MARKS,
             command,
             QUOTATION_MARKS))
-
-    @classmethod
-    def execute_command_with_output(cls, command, print_flag=True):
-        if print_flag:
-            print("command: " + command)
-
-        proc = subprocess.Popen(command,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                shell=True)
-
-        result = ""
-        try:
-            data, _ = proc.communicate()
-            if isinstance(data, bytes):
-                result = data.decode('utf-8', 'ignore')
-        finally:
-            proc.stdout.close()
-            proc.stderr.close()
-        return result if result else data
-
-    @classmethod
-    def check_path_legal(cls, path):
-        if path and " " in path:
-            return "\"%s\"" % path
-        return path
+    
