@@ -237,7 +237,7 @@ class Run(object):
         #打印历史记录
         if options.historylist:
             print("The latest command history is: %d" % len(self.history_cmd_list))
-            for index, cmd_record in  enumerate(self.history_cmd_list):
+            for index, cmd_record in enumerate(self.history_cmd_list):
                 print("%d. [%s] - [%s]::[%s]" % (index + 1, cmd_record["time"], 
                       cmd_record["raw_cmd"], cmd_record["result"]))
             return
