@@ -66,9 +66,6 @@ FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 MODES = stat.S_IWUSR | stat.S_IRUSR
 
 
-##############################################################################
-##############################################################################
-
 class CollectingOutputReceiver:
     def __init__(self):
         self.output = ""
@@ -310,9 +307,6 @@ def _create_fuzz_result_file(filepath, filename, error_message):
     return
 
 
-##############################################################################
-##############################################################################
-
 class ResultManager(object):
     def __init__(self, testsuit_path, config):
         self.testsuite_path = testsuit_path
@@ -526,8 +520,6 @@ class ResultManager(object):
             os.rmdir(benchmark_dir)
         return benchmark_dir
 
-##############################################################################
-##############################################################################
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.cpp_test)
 class CppTestDriver(IDriver):
@@ -537,31 +529,6 @@ class CppTestDriver(IDriver):
     # test driver config
     config = None
     result = ""
-
-    @staticmethod
-    def _alter_init(name):
-        with open(name, "rb") as f:
-            lines = f.read()
-        str_content = lines.decode("utf-8")
-
-        pattern_sharp = '^\s*#.*$(\n|\r\n)'
-        pattern_star = '/\*.*?\*/(\n|\r\n)+'
-        pattern_xml = '<!--[\s\S]*?-->(\n|\r\n)+'
-
-        if re.match(pattern_sharp, str_content, flags=re.M):
-            striped_content = re.sub(pattern_sharp, '', str_content, flags=re.M)
-        elif re.findall(pattern_star, str_content, flags=re.S):
-            striped_content = re.sub(pattern_star, '', str_content, flags=re.S)
-        elif re.findall(pattern_xml, str_content, flags=re.S):
-            striped_content = re.sub(pattern_xml, '', str_content, flags=re.S)
-        else:
-            striped_content = str_content
-
-        striped_bt = striped_content.encode("utf-8")
-        if os.path.exists(name):
-            os.remove(name)
-        with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
-            f.write(striped_bt)
 
     def __check_environment__(self, device_options):
         if len(device_options) == 1 and device_options[0].label is None:
@@ -615,6 +582,30 @@ class CppTestDriver(IDriver):
             self.config.device.device_log_collector.stop_hilog_task(
                 log_tar_file_name, module_name=request.get_module_name())
 
+    @staticmethod
+    def _alter_init(name):
+        with open(name, "rb") as f:
+            lines = f.read()
+        str_content = lines.decode("utf-8")
+
+        pattern_sharp = '^\s*#.*$(\n|\r\n)'
+        pattern_star = '/\*.*?\*/(\n|\r\n)+'
+        pattern_xml = '<!--[\s\S]*?-->(\n|\r\n)+'
+
+        if re.match(pattern_sharp, str_content, flags=re.M):
+            striped_content = re.sub(pattern_sharp, '', str_content, flags=re.M)
+        elif re.findall(pattern_star, str_content, flags=re.S):
+            striped_content = re.sub(pattern_star, '', str_content, flags=re.S)
+        elif re.findall(pattern_xml, str_content, flags=re.S):
+            striped_content = re.sub(pattern_xml, '', str_content, flags=re.S)
+        else:
+            striped_content = str_content
+
+        striped_bt = striped_content.encode("utf-8")
+        if os.path.exists(name):
+            os.remove(name)
+        with os.fdopen(os.open(name, FLAGS, MODES), 'wb') as f:
+            f.write(striped_bt)
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
@@ -817,8 +808,6 @@ class CppTestDriver(IDriver):
 
         return test_para
 
-##############################################################################
-##############################################################################
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.jsunit_test)
 class JSUnitTestDriver(IDriver):
@@ -835,6 +824,71 @@ class JSUnitTestDriver(IDriver):
         # log
         self.hilog = None
         self.hilog_proc = None
+    
+    def __check_environment__(self, device_options):
+        pass
+
+    def __check_config__(self, config):
+        pass
+
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
+
+    def __execute__(self, request):
+        try:
+            LOG.info("developer_test driver")
+            self.config = request.config
+            self.config.target_test_path = DEFAULT_TEST_PATH
+            self.config.device = request.config.environment.devices[0]
+
+            suite_file = request.root.source.source_file
+            result_save_path = get_result_savepath(suite_file, self.config.report_path)
+            self.result = os.path.join(result_save_path, "%s.xml" % request.get_module_name())
+            if not suite_file:
+                LOG.error("test source '%s' not exists" %
+                          request.root.source.source_string)
+                return
+
+            if not self.config.device:
+                result = ResultManager(suite_file, self.config)
+                result.set_is_coverage(False)
+                result.make_empty_result_file(
+                    "No test device is found")
+                return
+
+            package_name, ability_name = self._get_package_and_ability_name(
+                suite_file)
+            self.package_name = package_name
+            self.ability_name = ability_name
+            self.config.test_hap_out_path = \
+                "/data/data/%s/files/" % self.package_name
+            self.config.device.connector_command("shell hilog -r")
+
+            self.hilog = get_device_log_file(
+                request.config.report_path,
+                request.config.device.__get_serial__() + "_" + request.
+                get_module_name(),
+                "device_hilog")
+
+            hilog_open = os.open(self.hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+                                 0o755)
+
+            with os.fdopen(hilog_open, "a") as hilog_file_pipe:
+                self.config.device.device_log_collector.add_log_address(None, self.hilog)
+                _, self.hilog_proc = self.config.device.device_log_collector.\
+                    start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
+                self._init_jsunit_test()
+                self._run_jsunit(suite_file, self.hilog)
+                hilog_file_pipe.flush()
+                self.generate_console_output(self.hilog, request)
+                xml_path = os.path.join(
+                    request.config.report_path, "result",
+                    '.'.join((request.get_module_name(), "xml")))
+                shutil.move(xml_path, self.result)
+                update_xml(suite_file, self.result)
+        finally:
+            self.config.device.device_log_collector.remove_log_address(None, self.hilog)
+            self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
 
     @staticmethod
     def _get_acts_test_para(testcase,
@@ -953,71 +1007,6 @@ class JSUnitTestDriver(IDriver):
         else:
             print("file %s not exist" % hap_filepath)
         return package_name, ability_name
-
-    def __check_environment__(self, device_options):
-        pass
-
-    def __check_config__(self, config):
-        pass
-
-    def __result__(self):
-        return self.result if os.path.exists(self.result) else ""
-
-    def __execute__(self, request):
-        try:
-            LOG.info("developer_test driver")
-            self.config = request.config
-            self.config.target_test_path = DEFAULT_TEST_PATH
-            self.config.device = request.config.environment.devices[0]
-
-            suite_file = request.root.source.source_file
-            result_save_path = get_result_savepath(suite_file, self.config.report_path)
-            self.result = os.path.join(result_save_path, "%s.xml" % request.get_module_name())
-            if not suite_file:
-                LOG.error("test source '%s' not exists" %
-                          request.root.source.source_string)
-                return
-
-            if not self.config.device:
-                result = ResultManager(suite_file, self.config)
-                result.set_is_coverage(False)
-                result.make_empty_result_file(
-                    "No test device is found")
-                return
-
-            package_name, ability_name = self._get_package_and_ability_name(
-                suite_file)
-            self.package_name = package_name
-            self.ability_name = ability_name
-            self.config.test_hap_out_path = \
-                "/data/data/%s/files/" % self.package_name
-            self.config.device.connector_command("shell hilog -r")
-
-            self.hilog = get_device_log_file(
-                request.config.report_path,
-                request.config.device.__get_serial__() + "_" + request.
-                get_module_name(),
-                "device_hilog")
-
-            hilog_open = os.open(self.hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
-                                 0o755)
-
-            with os.fdopen(hilog_open, "a") as hilog_file_pipe:
-                self.config.device.device_log_collector.add_log_address(None, self.hilog)
-                _, self.hilog_proc = self.config.device.device_log_collector.\
-                    start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
-                self._init_jsunit_test()
-                self._run_jsunit(suite_file, self.hilog)
-                hilog_file_pipe.flush()
-                self.generate_console_output(self.hilog, request)
-                xml_path = os.path.join(
-                    request.config.report_path, "result",
-                    '.'.join((request.get_module_name(), "xml")))
-                shutil.move(xml_path, self.result)
-                update_xml(suite_file, self.result)
-        finally:
-            self.config.device.device_log_collector.remove_log_address(None, self.hilog)
-            self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
 
     def generate_console_output(self, device_log_file, request):
         result_message = self.read_device_log(device_log_file)
@@ -1222,6 +1211,9 @@ class OHRustTestDriver(IDriver):
             self.result = check_result_report(
                 request.config.report_path, self.result, self.error_message)
             update_xml(request.root.source.source_file, self.result)
+    
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
 
     def _init_oh_rust(self):
         self.config.device.connector_command("target mount")
@@ -1270,6 +1262,3 @@ class OHRustTestDriver(IDriver):
             result.obtain_coverage_data()
         resource_manager.process_cleaner_data(resource_data_dict, resource_dir,
                                               self.config.device)
-
-    def __result__(self):
-        return self.result if os.path.exists(self.result) else ""
