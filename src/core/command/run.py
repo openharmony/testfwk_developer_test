@@ -156,7 +156,7 @@ class Run(object):
         current_raw_cmd = ",".join(list(map(str, options.current_raw_cmd.split(" "))))
         if options.coverage and platform.system() != "Windows":
             if not options.pullgcda:
-                push_cov_path = os.path.join(sys.framework_root_dir, "localCoverage/push_coverage_so/push_coverage.py")
+                push_cov_path = os.path.join(sys.framework_root_dir, "local_coverage/push_coverage_so/push_coverage.py")
                 if os.path.exists(push_cov_path):
                     if str(options.testpart) == "[]" and str(options.subsystem) == "[]":
                         LOG.info("No subsystem or part input. Not push coverage so.")
@@ -174,7 +174,7 @@ class Run(object):
                 else:
                     print(f"{push_cov_path} not exists.")
 
-            init_gcov_path = os.path.join(sys.framework_root_dir, "localCoverage/resident_service/init_gcov.py")
+            init_gcov_path = os.path.join(sys.framework_root_dir, "local_coverage/resident_service/init_gcov.py")
             if os.path.exists(init_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (
                     init_gcov_path, current_raw_cmd), shell=True)
@@ -405,14 +405,14 @@ class Run(object):
 
         if options.coverage and platform.system() != "Windows":
             pull_service_gcov_path = os.path.join(
-                sys.framework_root_dir, "localCoverage/resident_service/pull_service_gcda.py")
+                sys.framework_root_dir, "local_coverage/resident_service/pull_service_gcda.py")
             if os.path.exists(pull_service_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (pull_service_gcov_path, current_raw_cmd), shell=True)
             else:
                 print(f"{pull_service_gcov_path} not exists.")
 
             if not options.pullgcda:
-                cov_main_file_path = os.path.join(sys.framework_root_dir, "localCoverage/coverage_tools.py")
+                cov_main_file_path = os.path.join(sys.framework_root_dir, "local_coverage/coverage_tools.py")
                 testpart = ",".join(list(map(str, options.partname_list)))
                 if os.path.exists(cov_main_file_path):
                     subprocess.run("python3 %s testpart=%s" % (
