@@ -88,18 +88,6 @@ class DisplayOutputReceiver:
         self.output = ""
         self.unfinished_line = ""
 
-    def _process_output(self, output, end_mark="\n"):
-        content = output
-        if self.unfinished_line:
-            content = "".join((self.unfinished_line, content))
-            self.unfinished_line = ""
-        lines = content.split(end_mark)
-        if content.endswith(end_mark):
-            return lines[:-1]
-        else:
-            self.unfinished_line = lines[-1]
-            return lines[:-1]
-
     def __read__(self, output):
         self.output = "%s%s" % (self.output, output)
         lines = self._process_output(output)
@@ -113,6 +101,18 @@ class DisplayOutputReceiver:
 
     def __done__(self, result_code="", message=""):
         pass
+
+    def _process_output(self, output, end_mark="\n"):
+        content = output
+        if self.unfinished_line:
+            content = "".join((self.unfinished_line, content))
+            self.unfinished_line = ""
+        lines = content.split(end_mark)
+        if content.endswith(end_mark):
+            return lines[:-1]
+        else:
+            self.unfinished_line = lines[-1]
+            return lines[:-1]
 
 
 @dataclass
@@ -381,32 +381,6 @@ class ResultManager(object):
 
         return result_file_path
 
-    def _obtain_fuzz_corpus(self):
-        command = f"cd {DEFAULT_TEST_PATH}; tar czf {self.testsuite_name}_corpus.tar.gz corpus;"
-        self.config.device.execute_shell_command(command)
-        result_save_path = get_result_savepath(self.testsuite_path, self.result_rootpath)
-        LOG.info(f"fuzz_dir = {result_save_path}")
-        self.device.pull_file(f"{DEFAULT_TEST_PATH}/{self.testsuite_name}_corpus.tar.gz", result_save_path)
-
-    def _obtain_benchmark_result(self):
-        benchmark_root_dir = os.path.abspath(
-            os.path.join(self.result_rootpath, "benchmark"))
-        benchmark_dir = os.path.abspath(
-            os.path.join(benchmark_root_dir,
-                         self.get_result_sub_save_path(),
-                         self.testsuite_name))
-
-        if not os.path.exists(benchmark_dir):
-            os.makedirs(benchmark_dir)
-
-        LOG.info("benchmark_dir = %s" % benchmark_dir)
-        self.device.pull_file(os.path.join(self.device_testpath,
-                                           "%s.json" % self.testsuite_name), benchmark_dir)
-        if not os.path.exists(os.path.join(benchmark_dir,
-                                           "%s.json" % self.testsuite_name)):
-            os.rmdir(benchmark_dir)
-        return benchmark_dir
-
     def get_result_sub_save_path(self):
         find_key = os.sep + "benchmark" + os.sep
         file_dir, _ = os.path.split(self.testsuite_path)
@@ -525,7 +499,32 @@ class ResultManager(object):
                 if target_name != OBJ:
                     subprocess.Popen("mv %s %s" % (os.path.join(cxx_cov_path, target_name),
                                                    os.path.join(cxx_cov_path, OBJ)), shell=True).communicate()
+    
+    def _obtain_fuzz_corpus(self):
+        command = f"cd {DEFAULT_TEST_PATH}; tar czf {self.testsuite_name}_corpus.tar.gz corpus;"
+        self.config.device.execute_shell_command(command)
+        result_save_path = get_result_savepath(self.testsuite_path, self.result_rootpath)
+        LOG.info(f"fuzz_dir = {result_save_path}")
+        self.device.pull_file(f"{DEFAULT_TEST_PATH}/{self.testsuite_name}_corpus.tar.gz", result_save_path)
 
+    def _obtain_benchmark_result(self):
+        benchmark_root_dir = os.path.abspath(
+            os.path.join(self.result_rootpath, "benchmark"))
+        benchmark_dir = os.path.abspath(
+            os.path.join(benchmark_root_dir,
+                         self.get_result_sub_save_path(),
+                         self.testsuite_name))
+
+        if not os.path.exists(benchmark_dir):
+            os.makedirs(benchmark_dir)
+
+        LOG.info("benchmark_dir = %s" % benchmark_dir)
+        self.device.pull_file(os.path.join(self.device_testpath,
+                                           "%s.json" % self.testsuite_name), benchmark_dir)
+        if not os.path.exists(os.path.join(benchmark_dir,
+                                           "%s.json" % self.testsuite_name)):
+            os.rmdir(benchmark_dir)
+        return benchmark_dir
 
 ##############################################################################
 ##############################################################################
@@ -818,7 +817,6 @@ class CppTestDriver(IDriver):
 
         return test_para
 
-
 ##############################################################################
 ##############################################################################
 
@@ -1021,6 +1019,64 @@ class JSUnitTestDriver(IDriver):
             self.config.device.device_log_collector.remove_log_address(None, self.hilog)
             self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
 
+    def generate_console_output(self, device_log_file, request):
+        result_message = self.read_device_log(device_log_file)
+
+        report_name = request.get_module_name()
+        parsers = get_plugin(
+            Plugin.PARSER, CommonParserType.jsunit)
+        if parsers:
+            parsers = parsers[:1]
+        for listener in request.listeners:
+            listener.device_sn = self.config.device.device_sn
+        parser_instances = []
+
+        for parser in parsers:
+            parser_instance = parser.__class__()
+            parser_instance.suites_name = report_name
+            parser_instance.suite_name = report_name
+            parser_instance.listeners = request.listeners
+            parser_instances.append(parser_instance)
+        handler = ShellHandler(parser_instances)
+        process_command_ret(result_message, handler)
+
+    def read_device_log(self, device_log_file):
+        result_message = ""
+        with open(device_log_file, "r", encoding='utf-8',
+                  errors='ignore') as file_read_pipe:
+            while True:
+                data = file_read_pipe.readline()
+                if not data:
+                    break
+                # only filter JSApp log
+                if data.lower().find(_ACE_LOG_MARKER) != -1:
+                    result_message += data
+                    if data.find("[end] run suites end") != -1:
+                        break
+        return result_message
+
+    def start_hap_execute(self):
+        try:
+            command = "aa start -d 123 -a %s.MainAbility -b %s" \
+                      % (self.package_name, self.package_name)
+            self.start_time = time.time()
+            result_value = self.config.device.execute_shell_command(
+                command, timeout=TIME_OUT)
+
+            if "success" in str(result_value).lower():
+                LOG.info("execute %s's testcase success. result value=%s"
+                         % (self.package_name, result_value))
+            else:
+                LOG.info("execute %s's testcase failed. result value=%s"
+                         % (self.package_name, result_value))
+
+            _sleep_according_to_result(result_value)
+            return_message = result_value
+        except (ExecuteTerminate, DeviceError) as exception:
+            return_message = exception.args
+
+        return return_message
+
     def _init_jsunit_test(self):
         self.config.device.connector_command("target mount")
         self.config.device.execute_shell_command(
@@ -1081,42 +1137,6 @@ class JSUnitTestDriver(IDriver):
 
         resource_manager.process_cleaner_data(resource_data_dic, resource_dir, self.config.device)
 
-    def generate_console_output(self, device_log_file, request):
-        result_message = self.read_device_log(device_log_file)
-
-        report_name = request.get_module_name()
-        parsers = get_plugin(
-            Plugin.PARSER, CommonParserType.jsunit)
-        if parsers:
-            parsers = parsers[:1]
-        for listener in request.listeners:
-            listener.device_sn = self.config.device.device_sn
-        parser_instances = []
-
-        for parser in parsers:
-            parser_instance = parser.__class__()
-            parser_instance.suites_name = report_name
-            parser_instance.suite_name = report_name
-            parser_instance.listeners = request.listeners
-            parser_instances.append(parser_instance)
-        handler = ShellHandler(parser_instances)
-        process_command_ret(result_message, handler)
-
-    def read_device_log(self, device_log_file):
-        result_message = ""
-        with open(device_log_file, "r", encoding='utf-8',
-                  errors='ignore') as file_read_pipe:
-            while True:
-                data = file_read_pipe.readline()
-                if not data:
-                    break
-                # only filter JSApp log
-                if data.lower().find(_ACE_LOG_MARKER) != -1:
-                    result_message += data
-                    if data.find("[end] run suites end") != -1:
-                        break
-        return result_message
-
     def _execute_hapfile_jsunittest(self):
         _unlock_screen(self.config.device)
         _unlock_device(self.config.device)
@@ -1142,28 +1162,6 @@ class JSUnitTestDriver(IDriver):
 
         _sleep_according_to_result(return_code)
         return return_code
-
-    def start_hap_execute(self):
-        try:
-            command = "aa start -d 123 -a %s.MainAbility -b %s" \
-                      % (self.package_name, self.package_name)
-            self.start_time = time.time()
-            result_value = self.config.device.execute_shell_command(
-                command, timeout=TIME_OUT)
-
-            if "success" in str(result_value).lower():
-                LOG.info("execute %s's testcase success. result value=%s"
-                         % (self.package_name, result_value))
-            else:
-                LOG.info("execute %s's testcase failed. result value=%s"
-                         % (self.package_name, result_value))
-
-            _sleep_according_to_result(result_value)
-            return_message = result_value
-        except (ExecuteTerminate, DeviceError) as exception:
-            return_message = exception.args
-
-        return return_message
 
     def _uninstall_hap(self, package_name):
         return_message = self.config.device.execute_shell_command(
