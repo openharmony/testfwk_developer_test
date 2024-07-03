@@ -111,7 +111,7 @@ def execute_code_cov_tools(developer_path):
     coverage_command("dos2unix %s" % llvm_gcov_path)
     coverage_command("chmod 777 %s" % llvm_gcov_path)
     tools_path = os.path.join(
-        developer_path, "local_coverage/code_coverage/mutilProcess_CodeCoverage.py"
+        developer_path, "local_coverage/code_coverage/multiprocess_code_coverage.py"
     )
     coverage_command("python3 %s" % tools_path)
 
@@ -150,7 +150,7 @@ def execute_interface_cov_tools(partname_str, developer_path):
 
     interface_path = os.path.join(
         developer_path,
-        "local_coverage/interface_coverage/interfaceCoverage_gcov_lcov.py"
+        "local_coverage/interface_coverage/interface_coverage_gcov_lcov.py"
     )
     subprocess.run("python3 %s %s" % (interface_path, partname_str), shell=True)
 
