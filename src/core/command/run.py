@@ -331,7 +331,7 @@ class Run(object):
             if not check_ditributetest_environment():
                 return
 
-            output_test = get_test_case(test_dict.get("CXX", None)
+            output_test = get_test_case(test_dict.get("CXX", None))
             if not output_test:
                 return
 

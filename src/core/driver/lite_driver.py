@@ -124,7 +124,7 @@ class LiteUnitTest(IDriver):
             return
         self.log.info("lite device execute request success")
 
-     def __result__(self):
+    def __result__(self):
         pass
 
     def show_help_info(self):
@@ -160,6 +160,7 @@ class LiteUnitTest(IDriver):
             if status:
                 self.log.info("execute mount command success")
                 return
+
             self.log.info("try mount %d" % (i + 2))
             _, status, _ = self.lite_device.execute_command_with_timeout(
                 self.mnt_cmd, case_type=DeviceTestType.lite_cpp_test,
@@ -178,6 +179,7 @@ class LiteUnitTest(IDriver):
         if self.nfs_dir == "":
             self.log.error("no configure for nfs directory")
             return False
+
         self._mount_nfs_server()
         _, status, _ = \
             self.lite_device.execute_command_with_timeout("cd /{}".format(
@@ -186,6 +188,7 @@ class LiteUnitTest(IDriver):
         if not status:
             self.log.error("pre execute command failed")
             return False
+
         self.log.info("pre execute command success")
         return True
 
@@ -217,6 +220,7 @@ class LiteUnitTest(IDriver):
         if status:
             self.log.info("test case result:\n %s" % case_result)
             return
+
         self.log.error("failed case: %s" % test_case)
 
     def _get_test_para(self, testcase, testlevel):
@@ -238,6 +242,7 @@ class LiteUnitTest(IDriver):
         if request.config is None:
             self.log.error("test config is null")
             return False
+
         report_path = request.config.report_path
         test_result = os.path.join(report_path, "result")
         test_case = request.root.source.source_file
@@ -269,6 +274,7 @@ class LiteUnitTest(IDriver):
             self.log.error("file %s not exist." % result_file)
             self._clear_nfs_space()
             return False
+
         file_name = os.path.basename(result_file)
         final_result = os.path.join(test_result, file_name)
         shutil.copyfile(result_file,
@@ -301,6 +307,7 @@ class LiteUnitTest(IDriver):
                 timeout=5, receiver=None)
             if xml_file in result:
                 return True
+                
             time.sleep(5)
         return False
 
