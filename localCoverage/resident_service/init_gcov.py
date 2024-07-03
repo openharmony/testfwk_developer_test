@@ -74,7 +74,7 @@ def modify_init_file(developer_path, hdc_str):
         return
     print("%s shell mount -o rw,remount / > /dev/null 2>&1" % hdc_str)
     coverage_command("%s shell mount -o rw,remount / > /dev/null 2>&1" % hdc_str)
-    print(""%s target mount" % hdc_str)
+    print("%s target mount" % hdc_str)
     coverage_command("%s target mount" % hdc_str)
     print("%s file send %s %s" % (hdc_str, cfg_file_path, "/etc/"))
     coverage_command("%s file send %s %s" % (hdc_str, cfg_file_path, "/etc/"))
