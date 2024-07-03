@@ -100,14 +100,16 @@ def get_file_list_by_postfix(path, postfix, filter_jar=""):
     for dirs in os.walk(path):
         files = get_file_list(find_path=dirs[0], postfix=postfix)
         for file_path in files:
-            if "" != file_path and -1 == file_path.find(__file__):
-                pos = file_path.rfind(os.sep)
-                file_name = file_path[pos + 1:]
-                file_path = os.path.join(dirs[0], file_path)
-                if filter_jar != "" and file_name == filter_jar:
-                    print("Skipped %s" % file_path)
-                    continue
-                file_list.append(file_path)
+            if "" == file_path or -1 != file_path.find(__file__):
+                continue
+
+            pos = file_path.rfind(os.sep)
+            file_name = file_path[pos + 1:]
+            file_path = os.path.join(dirs[0], file_path)
+            if filter_jar != "" and file_name == filter_jar:
+                print("Skipped %s" % file_path)
+                continue
+            file_list.append(file_path)
     return file_list
 
 
@@ -192,16 +194,18 @@ def get_sdk_interface_func_list(part_name):
         return interface_func_list
 
     sdk_path = os.path.join(CODEPATH, "out", product_name, sub_path)
-    if os.path.exists(sdk_path):
-        file_list = get_file_list_by_postfix(sdk_path, ".h")
-        for file in file_list:
-            try:
-                if is_need_to_be_parsed(file):
-                    interface_func_list += get_pubilc_func_list_from_headfile(file)
-            except Exception:
-                print("get interface error ", sdk_path)
-    else:
+    if not os.path.exists(sdk_path):
         print("Error: %s is not exist." % sdk_path)
+        return interface_func_list
+
+    file_list = get_file_list_by_postfix(sdk_path, ".h")
+    for file in file_list:
+        try:
+            if is_need_to_be_parsed(file):
+                interface_func_list += get_pubilc_func_list_from_headfile(file)
+        except Exception:
+            print("get interface error ", sdk_path)
+        
     return interface_func_list
 
 
@@ -220,23 +224,27 @@ def get_covered_function_list(part_name):
     covered_function_list = []
     file_name = f"{part_name}_strip.info"
     file_path = os.path.join(SUB_SYSTEM_INFO_PATH, file_name)
-    if os.path.exists(file_path):
-        with open(file_path, "r") as fd:
-            for line in fd:
-                if line.startswith("FNDA:"):
-                    sub_line_string = line[len("FNDA:"):].replace("\n", "").strip()
-                    temp_list = sub_line_string.split(",")
-                    if len(temp_list) == 2 and int(temp_list[0]) != 0:
-                        func_info = get_function_info_string(temp_list[1])
-                        after_func_info = func_info.decode("utf-8")
-                        if "" == after_func_info:
-                            continue
-                        after_func_info = after_func_info.replace("\n", "")
-                        if after_func_info == temp_list[1] and after_func_info.startswith("_"):
-                            continue
-                        covered_function_list.append(after_func_info)
-    else:
+    if not os.path.exists(file_path):
+        return covered_function_list
+
+    with open(file_path, "r") as fd:
         pass
+
+    for line in fd:
+        if not line.startswith("FNDA:"):
+            continue
+
+        sub_line_string = line[len("FNDA:"):].replace("\n", "").strip()
+        temp_list = sub_line_string.split(",")
+        if len(temp_list) == 2 and int(temp_list[0]) != 0:
+            func_info = get_function_info_string(temp_list[1])
+            after_func_info = func_info.decode("utf-8")
+            if "" == after_func_info:
+                continue
+            after_func_info = after_func_info.replace("\n", "")
+            if after_func_info == temp_list[1] and after_func_info.startswith("_"):
+                continue
+            covered_function_list.append(after_func_info)
     return covered_function_list
 
 
@@ -304,10 +312,10 @@ def get_covered_result_data(public_interface_func_list, covered_func_list):
         return_val = data_list[4]
         para_string = ""
         new_list = []
-        for index in range(len(para_list)):
-            if para_list[index].strip() == "":
+        for curr_para in para_list:
+            if curr_para.strip() == "":
                 continue
-            curr_para = para_list[index]
+
             new_list.append(curr_para)
             para_string = ",".join(new_list)
         fun_string = f"{return_val}' '{func_name}({para_string.strip().strip(',')})"

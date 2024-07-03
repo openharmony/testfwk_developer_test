@@ -74,7 +74,7 @@ def get_bundle_json(part_str, developer_path, code_path):
         return False
 
     if part_json.get(part_str):
-        bundle_json_path = os.path.join(code_path, part_json[part_str]["path"][0], "bundle.json")
+        bundle_json_path = os.path.join(code_path, part_json.get(part_str, {}).get("path", [""])[0], "bundle.json")
         if os.path.exists(bundle_json_path):
             with open(bundle_json_path, "r", encoding="utf-8") as bundle_json_text:
                 bundle_json = json.load(bundle_json_text)
