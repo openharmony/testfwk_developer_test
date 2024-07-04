@@ -33,63 +33,6 @@ class ResourceManager(object):
     def __init__(self):
         pass
 
-    def get_resource_data_dic(self, testsuit_filepath):
-        resource_dir = ""
-        data_dic = {}
-
-        target_name, _ = self._get_file_name_extension(testsuit_filepath)
-        xml_filepath = self.get_resource_xml_file_path(testsuit_filepath)
-        if not os.path.exists(xml_filepath):
-            return data_dic, resource_dir
-
-        data_dic = self.get_resource_data(xml_filepath, target_name)
-        resource_dir = os.path.abspath(os.path.dirname(xml_filepath))
-        return data_dic, resource_dir
-
-    def get_resource_data(self, xml_filepath, target_name):
-        data_dic = {}
-        if os.path.exists(xml_filepath):
-            data_dic = self._parse_resource_test_xml_file(
-                xml_filepath, target_name)
-        return data_dic
-
-    def _parse_resource_test_xml_file(self, filepath, targetname):
-        data_dic = {}
-
-        node = self.find_node_by_target(filepath, targetname)
-        if node:
-            target_attrib_list = []
-            target_attrib_list.append(node.attrib)
-            environment_data_list = []
-            env_node = node.find("environment")
-            if env_node:
-                environment_data_list.append(env_node.attrib)
-                for element in env_node.findall("device"):
-                    environment_data_list.append(element.attrib)
-                    for option_element in element.findall("option"):
-                        environment_data_list.append(option_element.attrib)
-
-            preparer_data_list = []
-            pre_node = node.find("preparer")
-            if pre_node:
-                preparer_data_list.append(pre_node.attrib)
-                for element in pre_node.findall("option"):
-                    preparer_data_list.append(element.attrib)
-
-            cleaner_data_list = []
-            clr_node = node.find("cleaner")
-            if clr_node:
-                cleaner_data_list.append(clr_node.attrib)
-                for element in clr_node.findall("option"):
-                    cleaner_data_list.append(element.attrib)
-
-            data_dic["nodeattrib"] = target_attrib_list
-            data_dic["environment"] = environment_data_list
-            data_dic["preparer"] = preparer_data_list
-            data_dic["cleaner"] = cleaner_data_list
-
-        return data_dic
-
     @staticmethod
     def find_node_by_target(file_path, targe_tname):
         node = None
@@ -109,9 +52,6 @@ class ResourceManager(object):
                       xml_exception.args)
         return node
 
-    ##########################################################################
-    ##########################################################################
-
     @classmethod
     def _get_file_name_extension(cls, filepath):
         _, fullname = os.path.split(filepath)
@@ -127,64 +67,7 @@ class ResourceManager(object):
             if len(dir_name_list) > 1:
                 dir_name = dir_name_list[-1]
         return dir_name
-
-    def process_resource_file(self, resource_dir, preparer_list, device):
-        for item in preparer_list:
-            if "name" not in item.keys():
-                continue
-
-            if item["name"] == "push":
-                push_value = item["value"]
-                find_key = "->"
-                pos = push_value.find(find_key)
-                src = os.path.join(resource_dir, push_value[0:pos].strip())
-                dst = push_value[pos + len(find_key):len(push_value)].strip()
-                src = src.replace("/", os.sep)
-                dir_name = self.get_dir_name(src)
-                if dir_name != "":
-                    dst = dst.rstrip("/") + "/" + dir_name
-                device.execute_shell_command("mkdir -p %s" % dst)
-                device.push_file(src, dst)
-            elif item["name"] == "pull":
-                push_value = item["value"]
-                find_key = "->"
-                pos = push_value.find(find_key)
-                src = os.path.join(resource_dir, push_value[0:pos].strip())
-                dst = push_value[pos + len(find_key):len(push_value)].strip()
-                device.pull_file(src, dst)
-            elif item["name"] == "shell":
-                command = item["value"].strip()
-                device.execute_shell_command(command)
-            else:
-                command = item["name"] + " " + item["value"]
-                command = command.strip()
-                device.connector_command(command)
-
-    def lite_process_resource_file(self, resource_dir, preparer_list):
-        for item in preparer_list:
-            if "name" not in item.keys():
-                continue
-
-            if item["name"] == "push":
-                copy_value = item["value"]
-                find_key = "->"
-                pos = copy_value.find(find_key)
-                src = os.path.join(resource_dir, copy_value[0:pos].strip())
-                dst = copy_value[pos + len(find_key):len(copy_value)].strip()
-                shutil.copy(src, dst)
-
-            elif item["name"] == "pull":
-                copy_value = item["value"]
-                find_key = "->"
-                pos = copy_value.find(find_key)
-                src = os.path.join(resource_dir, copy_value[0:pos].strip())
-                dst = copy_value[pos + len(find_key):len(copy_value)].strip()
-                shutil.copyfile(dst, src)
-            else:
-                command = item["name"] + " " + item["value"]
-                command = command.strip()
-                self.lite_device.execute_command_with_timeout(command, case_type=DeviceTestType.lite_cpp_test)
-
+    
     @classmethod
     def get_env_data(cls, environment_list):
         env_data_dic = {}
@@ -253,6 +136,123 @@ class ResourceManager(object):
                 if "timeout" in node_item_dic:
                     curr_timeout = node_item_dic["timeout"]
         return curr_timeout
+
+    def get_resource_data_dic(self, testsuit_filepath):
+        resource_dir = ""
+        data_dic = {}
+
+        target_name, _ = self._get_file_name_extension(testsuit_filepath)
+        xml_filepath = self.get_resource_xml_file_path(testsuit_filepath)
+        if not os.path.exists(xml_filepath):
+            return data_dic, resource_dir
+
+        data_dic = self.get_resource_data(xml_filepath, target_name)
+        resource_dir = os.path.abspath(os.path.dirname(xml_filepath))
+        return data_dic, resource_dir
+
+    def get_resource_data(self, xml_filepath, target_name):
+        data_dic = {}
+        if os.path.exists(xml_filepath):
+            data_dic = self._parse_resource_test_xml_file(
+                xml_filepath, target_name)
+        return data_dic
+
+    def _parse_resource_test_xml_file(self, filepath, targetname):
+        data_dic = {}
+
+        node = self.find_node_by_target(filepath, targetname)
+        if node:
+            target_attrib_list = []
+            target_attrib_list.append(node.attrib)
+            environment_data_list = []
+            env_node = node.find("environment")
+            if env_node:
+                environment_data_list.append(env_node.attrib)
+                for element in env_node.findall("device"):
+                    environment_data_list.append(element.attrib)
+                    for option_element in element.findall("option"):
+                        environment_data_list.append(option_element.attrib)
+
+            preparer_data_list = []
+            pre_node = node.find("preparer")
+            if pre_node:
+                preparer_data_list.append(pre_node.attrib)
+                for element in pre_node.findall("option"):
+                    preparer_data_list.append(element.attrib)
+
+            cleaner_data_list = []
+            clr_node = node.find("cleaner")
+            if clr_node:
+                cleaner_data_list.append(clr_node.attrib)
+                for element in clr_node.findall("option"):
+                    cleaner_data_list.append(element.attrib)
+
+            data_dic["nodeattrib"] = target_attrib_list
+            data_dic["environment"] = environment_data_list
+            data_dic["preparer"] = preparer_data_list
+            data_dic["cleaner"] = cleaner_data_list
+
+        return data_dic
+
+    ##########################################################################
+    ##########################################################################
+
+    def process_resource_file(self, resource_dir, preparer_list, device):
+        for item in preparer_list:
+            if "name" not in item.keys():
+                continue
+
+            if item["name"] == "push":
+                push_value = item["value"]
+                find_key = "->"
+                pos = push_value.find(find_key)
+                src = os.path.join(resource_dir, push_value[0:pos].strip())
+                dst = push_value[pos + len(find_key):len(push_value)].strip()
+                src = src.replace("/", os.sep)
+                dir_name = self.get_dir_name(src)
+                if dir_name != "":
+                    dst = dst.rstrip("/") + "/" + dir_name
+                device.execute_shell_command("mkdir -p %s" % dst)
+                device.push_file(src, dst)
+            elif item["name"] == "pull":
+                push_value = item["value"]
+                find_key = "->"
+                pos = push_value.find(find_key)
+                src = os.path.join(resource_dir, push_value[0:pos].strip())
+                dst = push_value[pos + len(find_key):len(push_value)].strip()
+                device.pull_file(src, dst)
+            elif item["name"] == "shell":
+                command = item["value"].strip()
+                device.execute_shell_command(command)
+            else:
+                command = item["name"] + " " + item["value"]
+                command = command.strip()
+                device.connector_command(command)
+
+    def lite_process_resource_file(self, resource_dir, preparer_list):
+        for item in preparer_list:
+            if "name" not in item.keys():
+                continue
+
+            if item["name"] == "push":
+                copy_value = item["value"]
+                find_key = "->"
+                pos = copy_value.find(find_key)
+                src = os.path.join(resource_dir, copy_value[0:pos].strip())
+                dst = copy_value[pos + len(find_key):len(copy_value)].strip()
+                shutil.copy(src, dst)
+
+            elif item["name"] == "pull":
+                copy_value = item["value"]
+                find_key = "->"
+                pos = copy_value.find(find_key)
+                src = os.path.join(resource_dir, copy_value[0:pos].strip())
+                dst = copy_value[pos + len(find_key):len(copy_value)].strip()
+                shutil.copyfile(dst, src)
+            else:
+                command = item["name"] + " " + item["value"]
+                command = command.strip()
+                self.lite_device.execute_command_with_timeout(command, case_type=DeviceTestType.lite_cpp_test)
 
     def get_environment_data(self, data_dic):
         env_data_dic = {}
