@@ -123,20 +123,11 @@ class OHJSUnitTestRunner:
             self.finished_observer.notify_task_finished()
         self.retry_times -= 1
 
-    def _get_shell_handler(self, listener):
-        parsers = get_plugin(Plugin.PARSER, CommonParserType.oh_jsunit)
-        if parsers:
-            parsers = parsers[:1]
-        parser_instances = []
-        for parser in parsers:
-            parser_instance = parser.__class__()
-            parser_instance.suites_name = self.suites_name
-            parser_instance.listeners = listener
-            parser_instance.runner = self
-            parser_instances.append(parser_instance)
-            self.finished_observer = parser_instance
-        handler = ShellHandler(parser_instances)
-        return handler
+    def get_oh_test_runner_path(self):
+        if self.compile_mode == "esmodule":
+            return "/ets/testrunner/OpenHarmonyTestRunner"
+        else:
+            return "OpenHarmonyTestRunner"
 
     def add_arg(self, name, value):
         if not name or not value:
@@ -157,6 +148,21 @@ class OHJSUnitTestRunner:
             else:
                 args_commands = "%s -s %s %s " % (args_commands, key, value)
         return args_commands
+    
+    def _get_shell_handler(self, listener):
+        parsers = get_plugin(Plugin.PARSER, CommonParserType.oh_jsunit)
+        if parsers:
+            parsers = parsers[:1]
+        parser_instances = []
+        for parser in parsers:
+            parser_instance = parser.__class__()
+            parser_instance.suites_name = self.suites_name
+            parser_instance.listeners = listener
+            parser_instance.runner = self
+            parser_instances.append(parser_instance)
+            self.finished_observer = parser_instance
+        handler = ShellHandler(parser_instances)
+        return handler
 
     def _get_run_command(self):
         command = ""
@@ -190,12 +196,6 @@ class OHJSUnitTestRunner:
                                                   self.get_args_command())
 
         return command
-
-    def get_oh_test_runner_path(self):
-        if self.compile_mode == "esmodule":
-            return "/ets/testrunner/OpenHarmonyTestRunner"
-        else:
-            return "OpenHarmonyTestRunner"
 
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.oh_jsunit_test)
@@ -277,6 +277,9 @@ class OHJSUnitTestDriver(IDriver):
                 self.result = check_result_report(
                     request.config.report_path, self.result, self.error_message)
                 update_xml(request.root.source.source_file, self.result)
+
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
 
     def _run_oh_jsunit(self, config_file, request):
         try:
@@ -501,7 +504,3 @@ class OHJSUnitTestDriver(IDriver):
             stop_catch_device_log(self.log_proc)
         self.config.device.device_log_collector.\
             stop_catch_device_log(self.hilog_proc)
-
-    def __result__(self):
-        return self.result if os.path.exists(self.result) else ""
-

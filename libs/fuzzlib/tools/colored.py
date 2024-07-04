@@ -56,6 +56,26 @@ class Colored(object):
         self.log_project = log_project
         self.log_date = time.strftime("%Y%m%d%H%M%S", time.localtime())
 
+    @staticmethod
+    def get_fuzz_log_dir():
+        return Colored.LOG_DIR
+
+    @staticmethod
+    def log_task_init(project):
+        Colored.LOG_TO_FILE = True
+        Colored.LOG_PROJECT = project
+        Colored.LOG_DATE = time.strftime("%Y%m%d%H%M%S", time.localtime())
+
+        if not os.path.exists(Colored.LOG_DIR):
+            os.mkdir(Colored.LOG_DIR)
+
+        project_log_dir = Colored.get_fuzz_project_log_dir()
+        if not os.path.exists(project_log_dir):
+            os.mkdir(project_log_dir)
+
+        current_project_log_dir = Colored.get_fuzz_current_project_log_dir()
+        if not os.path.exists(current_project_log_dir):
+            os.mkdir(current_project_log_dir)
 
     def start_log_file(self):
         self.is_log_file = True
@@ -100,7 +120,7 @@ class Colored(object):
                 Colored.RESET
             )
         else:
-            msg =  '{}{}{}'.format(
+            msg = '{}{}{}'.format(
                 getattr(Colored, color),
                 s,
                 Colored.RESET
@@ -137,25 +157,3 @@ class Colored(object):
     def simple_print(self, s):
         self.loghook(s)
         print(s)
-
-
-    @staticmethod
-    def get_fuzz_log_dir():
-        return Colored.LOG_DIR
-
-    @staticmethod
-    def log_task_init(project):
-        Colored.LOG_TO_FILE = True
-        Colored.LOG_PROJECT = project
-        Colored.LOG_DATE = time.strftime("%Y%m%d%H%M%S", time.localtime())
-
-        if not os.path.exists(Colored.LOG_DIR):
-            os.mkdir(Colored.LOG_DIR)
-
-        project_log_dir = Colored.get_fuzz_project_log_dir()
-        if not os.path.exists(project_log_dir):
-            os.mkdir(project_log_dir)
-
-        current_project_log_dir = Colored.get_fuzz_current_project_log_dir()
-        if not os.path.exists(current_project_log_dir):
-            os.mkdir(current_project_log_dir)
