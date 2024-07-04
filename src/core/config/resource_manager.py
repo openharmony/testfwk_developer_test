@@ -34,6 +34,35 @@ class ResourceManager(object):
         pass
 
     @staticmethod
+    def get_resource_xml_file_path(test_suit_file_path):
+        current_dir = os.path.dirname(test_suit_file_path)
+        while True:
+            if current_dir.endswith(os.sep + "tests"):
+                current_dir = ""
+                break
+            if current_dir == "/" or current_dir.endswith(":\\"):
+                current_dir = ""
+                break
+            if os.path.exists(os.path.join(current_dir, "resource")):
+                break
+            current_dir = os.path.dirname(current_dir)
+
+        if current_dir != "":
+            xml_filepath = os.path.join(
+                current_dir,
+                "resource",
+                ConfigFileConst.RESOURCECONFIG_FILEPATH)
+            if not os.path.exists(xml_filepath):
+                xml_filepath = os.path.join(
+                    current_dir,
+                    "resource",
+                    ConfigFileConst.CASE_RESOURCE_FILEPATH)
+        else:
+            xml_filepath = ""
+        LOG.info("xml_filepath = %s" % xml_filepath)
+        return xml_filepath
+
+    @staticmethod
     def find_node_by_target(file_path, targe_tname):
         node = None
         try:
@@ -96,35 +125,6 @@ class ResourceManager(object):
         LOG.debug("get environment data finish")
         return env_data_dic
 
-    @staticmethod
-    def get_resource_xml_file_path(test_suit_file_path):
-        current_dir = os.path.dirname(test_suit_file_path)
-        while True:
-            if current_dir.endswith(os.sep + "tests"):
-                current_dir = ""
-                break
-            if current_dir == "/" or current_dir.endswith(":\\"):
-                current_dir = ""
-                break
-            if os.path.exists(os.path.join(current_dir, "resource")):
-                break
-            current_dir = os.path.dirname(current_dir)
-
-        if current_dir != "":
-            xml_filepath = os.path.join(
-                current_dir,
-                "resource",
-                ConfigFileConst.RESOURCECONFIG_FILEPATH)
-            if not os.path.exists(xml_filepath):
-                xml_filepath = os.path.join(
-                    current_dir,
-                    "resource",
-                    ConfigFileConst.CASE_RESOURCE_FILEPATH)
-        else:
-            xml_filepath = ""
-        LOG.info("xml_filepath = %s" % xml_filepath)
-        return xml_filepath
-
     @classmethod
     def get_nodeattrib_data(cls, data_dic):
         curr_timeout = ""
@@ -155,43 +155,6 @@ class ResourceManager(object):
         if os.path.exists(xml_filepath):
             data_dic = self._parse_resource_test_xml_file(
                 xml_filepath, target_name)
-        return data_dic
-
-    def _parse_resource_test_xml_file(self, filepath, targetname):
-        data_dic = {}
-
-        node = self.find_node_by_target(filepath, targetname)
-        if node:
-            target_attrib_list = []
-            target_attrib_list.append(node.attrib)
-            environment_data_list = []
-            env_node = node.find("environment")
-            if env_node:
-                environment_data_list.append(env_node.attrib)
-                for element in env_node.findall("device"):
-                    environment_data_list.append(element.attrib)
-                    for option_element in element.findall("option"):
-                        environment_data_list.append(option_element.attrib)
-
-            preparer_data_list = []
-            pre_node = node.find("preparer")
-            if pre_node:
-                preparer_data_list.append(pre_node.attrib)
-                for element in pre_node.findall("option"):
-                    preparer_data_list.append(element.attrib)
-
-            cleaner_data_list = []
-            clr_node = node.find("cleaner")
-            if clr_node:
-                cleaner_data_list.append(clr_node.attrib)
-                for element in clr_node.findall("option"):
-                    cleaner_data_list.append(element.attrib)
-
-            data_dic["nodeattrib"] = target_attrib_list
-            data_dic["environment"] = environment_data_list
-            data_dic["preparer"] = preparer_data_list
-            data_dic["cleaner"] = cleaner_data_list
-
         return data_dic
 
     ##########################################################################
@@ -282,7 +245,43 @@ class ResourceManager(object):
             cleaner_list = data_dic["cleaner"]
             self.process_resource_file(resource_dir, cleaner_list, device)
         return
+    
+    def _parse_resource_test_xml_file(self, filepath, targetname):
+        data_dic = {}
 
+        node = self.find_node_by_target(filepath, targetname)
+        if node:
+            target_attrib_list = []
+            target_attrib_list.append(node.attrib)
+            environment_data_list = []
+            env_node = node.find("environment")
+            if env_node:
+                environment_data_list.append(env_node.attrib)
+                for element in env_node.findall("device"):
+                    environment_data_list.append(element.attrib)
+                    for option_element in element.findall("option"):
+                        environment_data_list.append(option_element.attrib)
+
+            preparer_data_list = []
+            pre_node = node.find("preparer")
+            if pre_node:
+                preparer_data_list.append(pre_node.attrib)
+                for element in pre_node.findall("option"):
+                    preparer_data_list.append(element.attrib)
+
+            cleaner_data_list = []
+            clr_node = node.find("cleaner")
+            if clr_node:
+                cleaner_data_list.append(clr_node.attrib)
+                for element in clr_node.findall("option"):
+                    cleaner_data_list.append(element.attrib)
+
+            data_dic["nodeattrib"] = target_attrib_list
+            data_dic["environment"] = environment_data_list
+            data_dic["preparer"] = preparer_data_list
+            data_dic["cleaner"] = cleaner_data_list
+
+        return data_dic
 
 ##############################################################################
 ##############################################################################

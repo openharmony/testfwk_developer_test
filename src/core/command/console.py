@@ -80,6 +80,21 @@ class Console(object):
             exist_list.extend(value_list)
             parse_result[key] = exist_list
         return parse_result
+
+    @staticmethod
+    def _parse_combination_param(combination_value):
+        # sample: size:xxx1;exclude-annotation:xxx
+        parse_result = {}
+        key_value_pairs = str(combination_value).split(";")
+        for key_value_pair in key_value_pairs:
+            key, value = key_value_pair.split(":", 1)
+            if not value:
+                raise ParamError("'%s' no value" % key)
+            value_list = str(value).split(",")
+            exist_list = parse_result.get(key, [])
+            exist_list.extend(value_list)
+            parse_result[key] = exist_list
+        return parse_result
         
     @classmethod
     def _params_post_processing(self, options):
@@ -295,22 +310,6 @@ class Console(object):
                     para_list.insert(index + 1, "retry_previous_command")
             elif param == "-->":
                 para_list[index] = "!%s" % param
-
-    @staticmethod
-    def _parse_combination_param(combination_value):
-        # sample: size:xxx1;exclude-annotation:xxx
-        parse_result = {}
-        key_value_pairs = str(combination_value).split(";")
-        for key_value_pair in key_value_pairs:
-            key, value = key_value_pair.split(":", 1)
-            if not value:
-                raise ParamError("'%s' no value" % key)
-            value_list = str(value).split(",")
-            exist_list = parse_result.get(key, [])
-            exist_list.extend(value_list)
-            parse_result[key] = exist_list
-        return parse_result
-
 
     @classmethod
     def _process_command_version(cls, para_list):
