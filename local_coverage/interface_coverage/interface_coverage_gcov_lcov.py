@@ -228,19 +228,20 @@ def get_covered_function_list(part_name):
         return covered_function_list
 
     with open(file_path, "r") as fd:
-        pass
+        for line in fd:
+            if not line.startswith("FNDA:"):
+                continue
 
-    for line in fd:
-        if not line.startswith("FNDA:"):
-            continue
+            sub_line_string = line[len("FNDA:"):].replace("\n", "").strip()
+            temp_list = sub_line_string.split(",")
+            if len(temp_list) != 2 or int(temp_list[0]) == 0:
+                continue
 
-        sub_line_string = line[len("FNDA:"):].replace("\n", "").strip()
-        temp_list = sub_line_string.split(",")
-        if len(temp_list) == 2 and int(temp_list[0]) != 0:
             func_info = get_function_info_string(temp_list[1])
             after_func_info = func_info.decode("utf-8")
             if "" == after_func_info:
                 continue
+                
             after_func_info = after_func_info.replace("\n", "")
             if after_func_info == temp_list[1] and after_func_info.startswith("_"):
                 continue
