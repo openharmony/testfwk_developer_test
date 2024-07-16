@@ -254,14 +254,17 @@ class Distribute:
 
         if self.hdc_tools != "hdc":
             if self._query_device_uuid(self.major) != '':
-                device_uuid_list += self._query_device_uuid(self.major) + ","
+                device_uuid_list = "{}{},".format(
+                    device_uuid_list, self._query_device_uuid(self.major))
 
             if self._query_device_ip(device) != "":
-                agent_ip_list += self._query_device_ip(device) + ","
+                agent_ip_list = "{}{},".format(
+                    agent_ip_list, self._query_device_ip(device))
 
             for agent in self.agent_list:
                 if self._query_device_uuid(agent):
-                    device_uuid_list += self._query_device_uuid(agent) + ","
+                    device_uuid_list = "{}{},".format(
+                        device_uuid_list, self._query_device_uuid(agent))
 
             config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
                                                   device_uuid_list)
@@ -270,14 +273,17 @@ class Distribute:
             self._write_device_config(config_info, config_agent_file)
         else:
             if self._query_device_agent_uuid(self.major):
-                device_uuid_list += self._query_device_agent_uuid(self.major) + ","
+                device_uuid_list = "{}{},".format(
+                    device_uuid_list, self._query_device_agent_uuid(self.major))
 
             if self._query_device_hdc_ip(device):
-                agent_ip_list += self._query_device_hdc_ip(device) + ","
+                agent_ip_list = "{}{},".format(
+                    agent_ip_list, self._query_device_hdc_ip(device))
 
             for agent in self.agent_list:
                 if self._query_device_agent_uuid(agent):
-                    device_uuid_list += self._query_device_agent_uuid(agent) + ","
+                    device_uuid_list = "{}{},".format(
+                        device_uuid_list, self._query_device_agent_uuid(agent))
 
             config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
                                                   device_uuid_list)
@@ -291,12 +297,14 @@ class Distribute:
 
         if self.hdc_tools != "hdc":
             if self._query_device_uuid(self.major) != "NoneTyple":
-                device_uuid_list += self._query_device_uuid(self.major) + ","
+                device_uuid_list = "{}{},".format(
+                    device_uuid_list, self._query_device_uuid(self.major))
 
             for agent in self.agent_list:
                 if self._query_device_ip(agent) != "" and self._query_device_uuid(agent) != "":
-                    agent_ip_list += self._query_device_ip(agent) + ","
-                    device_uuid_list += self._query_device_uuid(agent) + ","
+                    agent_ip_list = "{}{},".format(agent_ip_list, self._query_device_ip(agent))
+                    device_uuid_list = "{}{},".format(
+                        device_uuid_list, self._query_device_uuid(agent))
 
             config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
                                                   device_uuid_list)
@@ -305,12 +313,14 @@ class Distribute:
             self._write_device_config(config_info, config_major_file)
         else:
             if self._query_device_major_uuid(self.major):
-                device_uuid_list += self._query_device_major_uuid(self.major) + ","
+                device_uuid_list = "{}{},".format(
+                    device_uuid_list, self._query_device_major_uuid(self.major))
 
             for agent in self.agent_list:
                 if self._query_device_major_uuid(agent):
-                    agent_ip_list += self._query_device_hdc_ip(agent) + ","
-                    device_uuid_list += self._query_device_major_uuid(agent) + ","
+                    agent_ip_list = "{}{},".format(agent_ip_list, self._query_device_hdc_ip(agent))
+                    device_uuid_list = "{}{},".format(
+                        device_uuid_list, self._query_device_major_uuid(agent))
             config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
                                                   device_uuid_list)
 
