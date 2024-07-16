@@ -72,9 +72,11 @@ class RunResult():
         result = ansi_escape.sub('', log_str)
         return result
 
+    # 获取日志
     def get_log(self):
         return "code :{}, msg: {}".format(self.code, self.data)
 
+    # 分析结果
     def analysis(self, result, outdir):
         pass
 

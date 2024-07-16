@@ -316,10 +316,3 @@ run -t FUZZ -ss developer_test -tm calculator
   ```
   details_report.html
   ```
-
-  最新测试报告
-
-  ```
-  reports/latest
-  ```
-
