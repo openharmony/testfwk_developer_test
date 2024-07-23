@@ -1966,5 +1966,11 @@
     "path": [
       "vendor/huawei/base/update/sys_installer_ext"
     ]
+  },
+  "game_accelerate_schedule": {
+    "name": "game_accelerate_schedule",
+    "path": [
+      "vendor/huawei/foundation/graphics_game/game_accelerate_schedule"
+    ]
   }
 }
