@@ -124,6 +124,23 @@ class LiteUnitTest(IDriver):
             return
         self.log.info("lite device execute request success")
 
+    def __result__(self):
+        pass
+
+    def show_help_info(self):
+        """
+        show help info.
+        """
+        self.log.info("this is test driver for cpp test")
+        return
+
+    def show_driver_info(self):
+        """
+        show driver info.
+        """
+        self.log.info("this is test driver for cpp test")
+        return
+
     def _mount_nfs_server(self):
         #before execute each suits bin, mount nfs
         self.mnt_cmd = "mount {}".format(UserConfigManager().get_user_config(
@@ -287,23 +304,6 @@ class LiteUnitTest(IDriver):
             time.sleep(5)
         return False
 
-    def show_help_info(self):
-        """
-        show help info.
-        """
-        self.log.info("this is test driver for cpp test")
-        return
-
-    def show_driver_info(self):
-        """
-        show driver info.
-        """
-        self.log.info("this is test driver for cpp test")
-        return
-
-    def __result__(self):
-        pass
-
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.ctest_lite)
 class CTestDriver(IDriver):
@@ -364,6 +364,9 @@ class CTestDriver(IDriver):
                                               self.result,
                                               self.error_message,
                                               report_name)
+    
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
 
     def _run_ctest(self, source=None, request=None):
         if not source:
@@ -435,10 +438,6 @@ class CTestDriver(IDriver):
         reset_cmd = [int(item, 16) for item in reset_cmd]
         return reset_cmd
 
-    def __result__(self):
-        return self.result if os.path.exists(self.result) else ""
-
-
 
 @Plugin(type=Plugin.DRIVER, id=DeviceTestType.jsunit_test_lite)
 class JSUnitTestLiteDriver(IDriver):
@@ -457,23 +456,7 @@ class JSUnitTestLiteDriver(IDriver):
 
     def __check_config__(self, config):
         pass
-
-    def _get_driver_config(self, json_config):
-        bundle_name = get_config_value('bundle-name',
-                                       json_config.get_driver(), False)
-        if not bundle_name:
-            raise ParamError("Can't find bundle-name in config file.",
-                             error_no="00108")
-        else:
-            self.config.bundle_name = bundle_name
-
-        ability = get_config_value('ability',
-                                   json_config.get_driver(), False)
-        if not ability:
-            self.config.ability = "default"
-        else:
-            self.config.ability = ability
-
+    
     def __execute__(self, request):
         try:
             LOG.debug("Start execute xdevice extension JSUnit Test")
@@ -536,6 +519,25 @@ class JSUnitTestLiteDriver(IDriver):
 
             self.config.device.close()
 
+    def __result__(self):
+        return self.result if os.path.exists(self.result) else ""
+        
+    def _get_driver_config(self, json_config):
+        bundle_name = get_config_value('bundle-name',
+                                       json_config.get_driver(), False)
+        if not bundle_name:
+            raise ParamError("Can't find bundle-name in config file.",
+                             error_no="00108")
+        else:
+            self.config.bundle_name = bundle_name
+
+        ability = get_config_value('ability',
+                                   json_config.get_driver(), False)
+        if not ability:
+            self.config.ability = "default"
+        else:
+            self.config.ability = ability
+    
     def _run_jsunit(self, request):
         parser_instances = []
         parsers = get_plugin(Plugin.PARSER, ParserType.jsuit_test_lite)
@@ -563,6 +565,3 @@ class JSUnitTestLiteDriver(IDriver):
             file_name.write("{}{}".format(
                 "\n".join(result.split("\n")[0:-1]), "\n"))
             file_name.flush()
-
-    def __result__(self):
-        return self.result if os.path.exists(self.result) else ""
