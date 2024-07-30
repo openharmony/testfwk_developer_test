@@ -1301,8 +1301,8 @@
       "base/security/certificate_framework"
     ]
   },
-  "contacts_data_hap": {
-    "name": "contacts_data_hap",
+  "contacts_data": {
+    "name": "contacts_data",
     "path": [
       "applications/standard/contacts_data"
     ]
