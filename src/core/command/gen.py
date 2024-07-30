@@ -28,7 +28,22 @@ MODES = stat.S_IWUSR | stat.S_IRUSR
 
 LOG = platform_logger("Gen")
 
+
 class Gen(object):
+    @classmethod
+    def fuzz_dir_generation(cls, options):
+        helper_path = os.path.join("..", "libs", "fuzzlib", "fuzzer_helper.py")
+        fuzz_path = os.path.join(sys.source_code_root_path, options.dirpath)
+        LOG.info("fuzz_path = %s" % fuzz_path)
+        if not os.path.exists(fuzz_path):
+            os.makedirs(fuzz_path)
+            LOG.info("make folder %s" % fuzz_path)
+
+        command = [sys.executable, helper_path, 'generate',
+                   options.fuzzername, fuzz_path]
+        LOG.info("command %s" % command)
+        subprocess.call(command, shell=False)
+        
     def process_command_gen(self, options):
         if (len(options.testtype) != 1) or (options.dirpath == "") or \
                 (options.fuzzername == ""):
@@ -53,16 +68,4 @@ class Gen(object):
                     if target:
                         gn_file.write("\"%s\",\n" % target)
 
-    @classmethod
-    def fuzz_dir_generation(cls, options):
-        helper_path = os.path.join("..", "libs", "fuzzlib", "fuzzer_helper.py")
-        fuzz_path = os.path.join(sys.source_code_root_path, options.dirpath)
-        LOG.info("fuzz_path = %s" % fuzz_path)
-        if not os.path.exists(fuzz_path):
-            os.makedirs(fuzz_path)
-            LOG.info("make folder %s" % fuzz_path)
-
-        command = [sys.executable, helper_path, 'generate',
-                   options.fuzzername, fuzz_path]
-        LOG.info("command %s" % command)
-        subprocess.call(command, shell=False)
+    

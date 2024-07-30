@@ -166,7 +166,7 @@ def generate(args):
 
 
 #complie fuzzer project
-def make(args,  stdout=None):
+def make(args, stdout=None):
     """make fuzzer module."""
     color_logger = Colored.get_project_logger()
 

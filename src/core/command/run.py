@@ -49,15 +49,11 @@ class Run(object):
 
     history_cmd_list = []
     
-    @classmethod
-    def get_history(self):
-        return self.history_cmd_list
-
     def process_command_run(self, command, options):
         current_raw_cmd = ",".join(list(map(str, options.current_raw_cmd.split(" "))))
         if options.coverage and platform.system() != "Windows":
             if not options.pullgcda:
-                push_cov_path = os.path.join(sys.framework_root_dir, "localCoverage/push_coverage_so/push_coverage.py")
+                push_cov_path = os.path.join(sys.framework_root_dir, "local_coverage/push_coverage_so/push_coverage.py")
                 if os.path.exists(push_cov_path):
                     if str(options.testpart) == "[]" and str(options.subsystem) == "[]":
                         LOG.info("No subsystem or part input. Not push coverage so.")
@@ -75,7 +71,7 @@ class Run(object):
                 else:
                     print(f"{push_cov_path} not exists.")
 
-            init_gcov_path = os.path.join(sys.framework_root_dir, "localCoverage/resident_service/init_gcov.py")
+            init_gcov_path = os.path.join(sys.framework_root_dir, "local_coverage/resident_service/init_gcov.py")
             if os.path.exists(init_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (
                     init_gcov_path, current_raw_cmd), shell=True)
@@ -138,10 +134,9 @@ class Run(object):
         #打印历史记录
         if options.historylist:
             print("The latest command history is: %d" % len(self.history_cmd_list))
-            for index in range(0, len(self.history_cmd_list)):
-                cmd_record = self.history_cmd_list[index]
+            for index, cmd_record in enumerate(self.history_cmd_list):
                 print("%d. [%s] - [%s]::[%s]" % (index + 1, cmd_record["time"], 
-                      cmd_record["raw_cmd"], cmd_record["result"]))
+                    cmd_record["raw_cmd"], cmd_record["result"]))
             return
         #重新运行历史里的一条命令
         if options.runhistory > 0:
@@ -233,7 +228,7 @@ class Run(object):
             if not check_ditributetest_environment():
                 return
 
-            output_test = get_test_case(test_dict["CXX"])
+            output_test = get_test_case(test_dict.get("CXX", None))
             if not output_test:
                 return
 
@@ -300,14 +295,14 @@ class Run(object):
 
         if options.coverage and platform.system() != "Windows":
             pull_service_gcov_path = os.path.join(
-                sys.framework_root_dir, "localCoverage/resident_service/pull_service_gcda.py")
+                sys.framework_root_dir, "local_coverage/resident_service/pull_service_gcda.py")
             if os.path.exists(pull_service_gcov_path):
                 subprocess.run("python3 %s command_str=%s" % (pull_service_gcov_path, current_raw_cmd), shell=True)
             else:
                 print(f"{pull_service_gcov_path} not exists.")
 
             if not options.pullgcda:
-                cov_main_file_path = os.path.join(sys.framework_root_dir, "localCoverage/coverage_tools.py")
+                cov_main_file_path = os.path.join(sys.framework_root_dir, "local_coverage/coverage_tools.py")
                 testpart = ",".join(list(map(str, options.partname_list)))
                 if os.path.exists(cov_main_file_path):
                     subprocess.run("python3 %s testpart=%s" % (
@@ -315,9 +310,13 @@ class Run(object):
                 else:
                     print(f"{cov_main_file_path} not exists.")
         return
+    
+    ##############################################################
+    ##############################################################
 
-    ##############################################################
-    ##############################################################
+    @classmethod
+    def get_history(self):
+        return self.history_cmd_list
 
     @classmethod
     def get_target_out_path(cls, product_form):
@@ -329,33 +328,6 @@ class Run(object):
                 product_form)
         target_out_path = os.path.abspath(target_out_path)
         return target_out_path
-
-    @classmethod
-    def _build_test_cases(cls, options):
-        if options.coverage:
-            LOG.info("Coverage testing, no need to compile testcases")
-            return True
-
-        is_build_testcase = UserConfigManager().get_user_config_flag(
-            "build", "testcase")
-        project_root_path = sys.source_code_root_path
-        if is_build_testcase and project_root_path != "":
-            from core.build.build_manager import BuildManager
-            build_manager = BuildManager()
-            return build_manager.build_testcases(project_root_path, options)
-        else:
-            return True
-
-    @classmethod
-    def _check_test_dictionary(cls, test_dictionary):
-        is_valid_status = False
-        key_list = sorted(test_dictionary.keys())
-        for key in key_list:
-            file_list = test_dictionary[key]
-            if len(file_list) > 0:
-                is_valid_status = True
-                break
-        return is_valid_status
 
     @classmethod
     def get_tests_out_path(cls, product_form):
@@ -417,6 +389,33 @@ class Run(object):
         external_deps_path_list = TestCaseManager().get_part_deps_files(external_deps_path, testpart)
         return external_deps_path_list
         
+    @classmethod
+    def _build_test_cases(cls, options):
+        if options.coverage:
+            LOG.info("Coverage testing, no need to compile testcases")
+            return True
+
+        is_build_testcase = UserConfigManager().get_user_config_flag(
+            "build", "testcase")
+        project_root_path = sys.source_code_root_path
+        if is_build_testcase and project_root_path != "":
+            from core.build.build_manager import BuildManager
+            build_manager = BuildManager()
+            return build_manager.build_testcases(project_root_path, options)
+        else:
+            return True
+
+    @classmethod
+    def _check_test_dictionary(cls, test_dictionary):
+        is_valid_status = False
+        key_list = sorted(test_dictionary.keys())
+        for key in key_list:
+            file_list = test_dictionary[key]
+            if len(file_list) > 0:
+                is_valid_status = True
+                break
+        return is_valid_status
+
     def get_xts_test_dict(self, options):
         # 获取XTS测试用例编译结果路径
         xts_test_case_path = self.get_xts_tests_out_path(options.productform, options.testtype)
@@ -435,5 +434,4 @@ class Run(object):
 
         test_dict = TestCaseManager().get_test_files(test_case_path, options)
         return test_dict
-
-
+    

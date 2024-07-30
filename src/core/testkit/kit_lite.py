@@ -63,6 +63,56 @@ class DeployKit(ITestKit):
                   "burn_file:{}".format(self.timeout, self.burn_file)
             raise ParamError(msg, error_no="00108")
 
+     def __setup__(self, device, **kwargs):
+        """
+        Execute reset command on the device by cmd serial port and then upload
+        patch file by deploy tool.
+        Parameters:
+            device: the instance of LocalController with one or more
+                    ComController
+        """
+        args = kwargs
+        source_file = args.get("source_file", None)
+        self._reset(device)
+        self._send_file(device, source_file)
+
+    def __teardown__(self, device):
+        pass
+    
+    def copy_file_as_temp(self, original_file, str_length):
+        """
+        To obtain a random string with specified length
+        Parameters:
+            original_file : the original file path
+            str_length: the length of random string
+        """
+        if os.path.isfile(original_file):
+            random_str = random.sample(string.ascii_letters + string.digits,
+                                       str_length)
+            new_temp_tool_path = '{}_{}{}'.format(
+                os.path.splitext(original_file)[0], "".join(random_str),
+                os.path.splitext(original_file)[1])
+            return shutil.copyfile(original_file, new_temp_tool_path)
+        else:
+            return ""
+     def copy_file_as_temp(self, original_file, str_length):
+        """
+        To obtain a random string with specified length
+        Parameters:
+            original_file : the original file path
+            str_length: the length of random string
+        """
+        if os.path.isfile(original_file):
+            random_str = random.sample(string.ascii_letters + string.digits,
+                                       str_length)
+            new_temp_tool_path = '{}_{}{}'.format(
+                os.path.splitext(original_file)[0], "".join(random_str),
+                os.path.splitext(original_file)[1])
+            return shutil.copyfile(original_file, new_temp_tool_path)
+        else:
+            return ""
+
+
     def _reset(self, device):
         cmd_com = device.device.com_dict.get(ComType.cmd_com)
         try:
@@ -112,36 +162,3 @@ class DeployKit(ITestKit):
             device.device_allocation_state = DeviceAllocationState.unusable
             raise LiteDeviceError("%s port set_up wifiiot failed" %
                                   deploy_serial_port, error_no="00402")
-
-    def __setup__(self, device, **kwargs):
-        """
-        Execute reset command on the device by cmd serial port and then upload
-        patch file by deploy tool.
-        Parameters:
-            device: the instance of LocalController with one or more
-                    ComController
-        """
-        args = kwargs
-        source_file = args.get("source_file", None)
-        self._reset(device)
-        self._send_file(device, source_file)
-
-    def __teardown__(self, device):
-        pass
-
-    def copy_file_as_temp(self, original_file, str_length):
-        """
-        To obtain a random string with specified length
-        Parameters:
-            original_file : the original file path
-            str_length: the length of random string
-        """
-        if os.path.isfile(original_file):
-            random_str = random.sample(string.ascii_letters + string.digits,
-                                       str_length)
-            new_temp_tool_path = '{}_{}{}'.format(
-                os.path.splitext(original_file)[0], "".join(random_str),
-                os.path.splitext(original_file)[1])
-            return shutil.copyfile(original_file, new_temp_tool_path)
-        else:
-            return ""
