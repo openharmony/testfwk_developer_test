@@ -29,6 +29,7 @@ from _core.logger import platform_logger
 __all__ = ["BenchmarkReporter"]
 LOG = platform_logger("BenchmarkReporter")
 
+
 @Plugin(type=Plugin.REPORTER, id=TestType.benchmark)
 class BenchmarkReporter(IReporter):
 

@@ -38,6 +38,25 @@ LOG = platform_logger("BuildManager")
 ##############################################################################
 
 class BuildManager(object):
+    @classmethod
+    def build_version(cls, project_root_path, product_form):
+        if BuildTestcases(project_root_path).build_version(product_form):
+            LOG.info("The version compiled successfully.")
+            build_result = True
+        else:
+            LOG.info("The version compilation failed, please modify.")
+            build_result = False
+        return build_result
+
+    @classmethod
+    def build_gn_file(cls, project_root_path, product_form):
+        if BuildTestcases(project_root_path).build_gn_file(product_form):
+            LOG.info("The gn compiled successfully.")
+            build_result = True
+        else:
+            LOG.info("The gn compilation failed, please modify.")
+            build_result = False
+        return build_result
 
     @classmethod
     def _make_gn_file(cls, filepath, target_list):
@@ -119,7 +138,51 @@ class BuildManager(object):
         else:
             LOG.info("Test case compilation failed, please modify.")
         return build_result
+    
+    def build_testcases(self, project_root_path, param):
+        if not os.path.exists(project_root_path):
+            LOG.error("%s is not exists." % project_root_path)
+            return False
+        
+        LOG.info("--------------------------------------------------")
+        LOG.info("Building parameter:")
+        LOG.info("productform   = %s" % param.productform)
+        LOG.info("testtype      = %s" % str(param.testtype))
+        LOG.info("partname_list = %s" % str(param.partname_list))
+        LOG.info("testmodule    = %s" % param.testmodule)
+        LOG.info("testsuit      = %s" % param.testsuit)
+        LOG.info("testcase      = %s" % param.testcase)
+        LOG.info("--------------------------------------------------")
 
+        LOG.info("")
+        LOG.info("**************************************************")
+        LOG.info("*************** Start build testcases ************")
+        LOG.info("**************************************************")
+        LOG.info("")
+
+        build_xts_result = True
+        build_result = True
+        if "partdeps" == param.partdeps:
+            LOG.info("**********************Start prebuild testcases****************************")
+            build_deps_files_result = self._compile_deps_files(project_root_path, param)
+            if build_deps_files_result:
+                self._compile_part_deps(project_root_path, param)
+                
+        if "acts" in param.testtype or "hats" in param.testtype or "hits" in param.testtype:
+            LOG.info("**********************Start build xts testcases****************************")
+            build_xts_result = self._compile_xts_test_cases(project_root_path, param)
+        else:
+            LOG.info("**********************Start build subsystem testcases****************************")
+            build_result = self._compile_testcases(project_root_path, param)
+
+        LOG.info("")
+        LOG.info("**************************************************")
+        LOG.info("*************** Ended build testcases ************")
+        LOG.info("**************************************************")
+        LOG.info("")
+
+        return build_result and build_xts_result 
+    
     # 编译入口
     def _compile_testcases(self, project_root_path, para):
         # 获取所有支持的产品，3.1Release版本为["DAYU","Hi3516DV300","ohos-arm64","ohos-sdk","rk3568"]
@@ -190,71 +253,6 @@ class BuildManager(object):
         self._make_gn_file(build_cfg_filepath, [])
 
         return build_result
-
-    @classmethod
-    def build_version(cls, project_root_path, product_form):
-        if BuildTestcases(project_root_path).build_version(product_form):
-            LOG.info("The version compiled successfully.")
-            build_result = True
-        else:
-            LOG.info("The version compilation failed, please modify.")
-            build_result = False
-        return build_result
-
-    @classmethod
-    def build_gn_file(cls, project_root_path, product_form):
-        if BuildTestcases(project_root_path).build_gn_file(product_form):
-            LOG.info("The gn compiled successfully.")
-            build_result = True
-        else:
-            LOG.info("The gn compilation failed, please modify.")
-            build_result = False
-        return build_result
-
-    def build_testcases(self, project_root_path, param):
-        if not os.path.exists(project_root_path):
-            LOG.error("%s is not exists." % project_root_path)
-            return False
-        
-        LOG.info("--------------------------------------------------")
-        LOG.info("Building parameter:")
-        LOG.info("productform   = %s" % param.productform)
-        LOG.info("testtype      = %s" % str(param.testtype))
-        LOG.info("partname_list = %s" % str(param.partname_list))
-        LOG.info("testmodule    = %s" % param.testmodule)
-        LOG.info("testsuit      = %s" % param.testsuit)
-        LOG.info("testcase      = %s" % param.testcase)
-        LOG.info("--------------------------------------------------")
-
-        LOG.info("")
-        LOG.info("**************************************************")
-        LOG.info("*************** Start build testcases ************")
-        LOG.info("**************************************************")
-        LOG.info("")
-
-        build_xts_result = True
-        build_result = True
-        if "partdeps" == param.partdeps:
-            LOG.info("**********************Start prebuild testcases****************************")
-            build_deps_files_result = self._compile_deps_files(project_root_path, param)
-            if build_deps_files_result:
-                self._compile_part_deps(project_root_path, param)
-                
-        if "acts" in param.testtype or "hats" in param.testtype or "hits" in param.testtype:
-            LOG.info("**********************Start build xts testcases****************************")
-            build_xts_result = self._compile_xts_test_cases(project_root_path, param)
-        else:
-            LOG.info("**********************Start build subsystem testcases****************************")
-            build_result = self._compile_testcases(project_root_path, param)
-
-        LOG.info("")
-        LOG.info("**************************************************")
-        LOG.info("*************** Ended build testcases ************")
-        LOG.info("**************************************************")
-        LOG.info("")
-
-        return build_result and build_xts_result 
-
 
 ##############################################################################
 ##############################################################################

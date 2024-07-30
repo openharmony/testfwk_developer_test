@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 import sys
 import os
 import time
@@ -42,6 +43,12 @@ class Colored(object):
 
     PROJECT_LOGGER_MAP = {}
 
+    def __init__(self, log_project="default"):
+        self.is_debug = True
+        self.is_log_file = False
+        self.log_project = log_project
+        self.log_date = time.strftime("%Y%m%d%H%M%S", time.localtime())
+
     @staticmethod
     def get_project_logger(log_project="default"):
         if log_project in Colored.PROJECT_LOGGER_MAP:
@@ -49,95 +56,6 @@ class Colored(object):
         logger = Colored(log_project)
         Colored.PROJECT_LOGGER_MAP[log_project] = logger
         return logger
-
-    def __init__(self, log_project="default"):
-        self.is_debug = True
-        self.is_log_file = False
-        self.log_project = log_project
-        self.log_date = time.strftime("%Y%m%d%H%M%S", time.localtime())
-
-
-    def start_log_file(self):
-        self.is_log_file = True
-        if not os.path.exists(Colored.LOG_DIR):
-            os.mkdir(Colored.LOG_DIR)
-
-        project_log_dir = self.get_fuzz_project_log_dir()
-        if not os.path.exists(project_log_dir):
-            os.mkdir(project_log_dir)
-
-        current_project_log_dir = self.get_fuzz_current_project_log_dir()
-        if not os.path.exists(current_project_log_dir):
-            os.mkdir(current_project_log_dir)
-
-
-    def get_fuzz_project_log_dir(self):
-        return os.path.join(Colored.LOG_DIR, self.log_project)
-
-    def get_fuzz_current_project_log_dir(self):
-        return os.path.join(Colored.LOG_DIR, self.log_project, self.log_date)
-
-    def get_fuzz_current_project_log_path(self):
-        return os.path.join(self.get_fuzz_current_project_log_dir(), "run.log")
-
-    def loghook(self, msg):
-        if self.is_log_file:
-            run_log = os.path.join(
-                self.get_fuzz_current_project_log_dir(),
-                "run.log"
-            )
-            with os.fdopen(os.open(run_log, FLAGS, MODES), 'ab') as f:
-                f.write(msg + "\n")
-
-
-    def color_str(self, color, s, tag=None):
-        msg = ""
-        if tag:
-            msg = '{}{}{}{}'.format(
-                getattr(Colored, color),
-                tag,
-                s,
-                Colored.RESET
-            )
-        else:
-            msg =  '{}{}{}'.format(
-                getattr(Colored, color),
-                s,
-                Colored.RESET
-            )
-        self.loghook(msg)
-        return msg
-
-    def red(self, s):
-        print(self.color_str('RED', s, "[ERROR] "))
-
-
-    def green(self, s):
-        if self.is_debug:
-            print(self.color_str('GREEN', s, "[INFO] "))
-
-
-    def yellow(self, s):
-        print(self.color_str('YELLOW', s, "[WARNING] "))
-
-
-    def blue(self, s):
-        return self.color_str('BLUE', s)
-
-    def fuchsia(self, s):
-        return self.color_str('FUCHSIA', s)
-
-    def cyan(s):
-        return self.color_str('CYAN', s)
-
-    def white(self, s):
-        print(self.color_str('WHITE', s))
-
-
-    def simple_print(self, s):
-        self.loghook(s)
-        print(s)
-
 
     @staticmethod
     def get_fuzz_log_dir():
@@ -159,3 +77,78 @@ class Colored(object):
         current_project_log_dir = Colored.get_fuzz_current_project_log_dir()
         if not os.path.exists(current_project_log_dir):
             os.mkdir(current_project_log_dir)
+
+    def start_log_file(self):
+        self.is_log_file = True
+        if not os.path.exists(Colored.LOG_DIR):
+            os.mkdir(Colored.LOG_DIR)
+
+        project_log_dir = self.get_fuzz_project_log_dir()
+        if not os.path.exists(project_log_dir):
+            os.mkdir(project_log_dir)
+
+        current_project_log_dir = self.get_fuzz_current_project_log_dir()
+        if not os.path.exists(current_project_log_dir):
+            os.mkdir(current_project_log_dir)
+
+    def get_fuzz_project_log_dir(self):
+        return os.path.join(Colored.LOG_DIR, self.log_project)
+
+    def get_fuzz_current_project_log_dir(self):
+        return os.path.join(Colored.LOG_DIR, self.log_project, self.log_date)
+
+    def get_fuzz_current_project_log_path(self):
+        return os.path.join(self.get_fuzz_current_project_log_dir(), "run.log")
+
+    def loghook(self, msg):
+        if self.is_log_file:
+            run_log = os.path.join(
+                self.get_fuzz_current_project_log_dir(),
+                "run.log"
+            )
+            with os.fdopen(os.open(run_log, FLAGS, MODES), 'ab') as f:
+                f.write(msg + "\n")
+
+    def color_str(self, color, s, tag=None):
+        msg = ""
+        if tag:
+            msg = '{}{}{}{}'.format(
+                getattr(Colored, color),
+                tag,
+                s,
+                Colored.RESET
+            )
+        else:
+            msg = '{}{}{}'.format(
+                getattr(Colored, color),
+                s,
+                Colored.RESET
+            )
+        self.loghook(msg)
+        return msg
+
+    def red(self, s):
+        print(self.color_str('RED', s, "[ERROR] "))
+
+    def green(self, s):
+        if self.is_debug:
+            print(self.color_str('GREEN', s, "[INFO] "))
+
+    def yellow(self, s):
+        print(self.color_str('YELLOW', s, "[WARNING] "))
+
+    def blue(self, s):
+        return self.color_str('BLUE', s)
+
+    def fuchsia(self, s):
+        return self.color_str('FUCHSIA', s)
+
+    def cyan(s):
+        return self.color_str('CYAN', s)
+
+    def white(self, s):
+        print(self.color_str('WHITE', s))
+
+    def simple_print(self, s):
+        self.loghook(s)
+        print(s)
