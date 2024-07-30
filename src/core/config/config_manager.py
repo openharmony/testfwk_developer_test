@@ -175,6 +175,17 @@ class UserConfigManager(object):
                 self.filepath = os.path.abspath(
                     os.path.join(CONFIG_PATH, config_file))
 
+    @classmethod
+    def content_strip(cls, content):
+        return content.strip()
+
+    @classmethod
+    def _verify_duplicate(cls, items):
+        if len(set(items)) != len(items):
+            LOG.warning("find duplicate sn config, configuration incorrect")
+            return False
+        return True
+
     def get_user_config_list(self, tag_name):
         data_dic = {}
         try:
@@ -188,25 +199,6 @@ class UserConfigManager(object):
         except ET.ParseError as xml_exception:
             LOG.error(("Parse %s fail!" % self.filepath) + xml_exception.args)
         return data_dic
-
-    @classmethod
-    def content_strip(cls, content):
-        return content.strip()
-
-    @classmethod
-    def _verify_duplicate(cls, items):
-        if len(set(items)) != len(items):
-            LOG.warning("find duplicate sn config, configuration incorrect")
-            return False
-        return True
-
-    def _handle_str(self, content):
-        config_list = map(self.content_strip, content.split(';'))
-        config_list = [item for item in config_list if item]
-        if config_list:
-            if not self._verify_duplicate(config_list):
-                return []
-        return config_list
 
     def get_sn_list(self):
         sn_select_list = []
@@ -280,6 +272,14 @@ class UserConfigManager(object):
         if testcase_path != "":
             testcase_path = os.path.abspath(testcase_path)
         return testcase_path
+    
+    def _handle_str(self, content):
+        config_list = map(self.content_strip, content.split(';'))
+        config_list = [item for item in config_list if item]
+        if config_list:
+            if not self._verify_duplicate(config_list):
+                return []
+        return config_list
 
 
 class BuildConfigManager(object):

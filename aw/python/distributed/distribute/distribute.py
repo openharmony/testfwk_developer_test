@@ -85,40 +85,6 @@ class Distribute:
         self.agent_list = agent_list
         self.hdc_tools = hdc_tools
 
-    def exec_agent(self, device, target_name, result_path, options):
-        driver = get_current_driver(device, target_name, self.hdc_tools)
-        if driver is None:
-            print("Error: driver is None.")
-            return False
-
-        resource_dir = get_resource_dir(self.suite_dir, device.name)
-
-        self._make_agent_desc_file(device)
-        device.push_file(os.path.join(self.suite_dir, "agent.desc"),
-                         device.test_path)
-        device.push_file(os.path.join(resource_dir, target_name),
-                         device.test_path)
-
-        suite_path = os.path.join(self.suite_dir, target_name)
-        driver.execute(suite_path, result_path, options, background=True)
-        return self._check_thread(device, target_name)
-
-    def exec_major(self, device, target_name, result_path, options):
-        driver = get_current_driver(device, target_name, self.hdc_tools)
-        if driver is None:
-            print("Error: driver is None.")
-            return False
-
-        resource_dir = get_resource_dir(self.suite_dir, device.name)
-        self._make_major_desc_file()
-        device.push_file(os.path.join(self.suite_dir, "major.desc"),
-                         device.test_path)
-        device.push_file(os.path.join(resource_dir, target_name),
-                         device.test_path)
-
-        suite_path = os.path.join(self.suite_dir, target_name)
-        return driver.execute(suite_path, result_path, options, background=False)
-
     @staticmethod
     def pull_result(device, source_path, result_save_path):
         _, file_name = os.path.split(source_path)
@@ -140,75 +106,6 @@ class Distribute:
                 print("thread info: %s" % output)
                 break
         return True if checksum < 100 else False
-
-    def _make_agent_desc_file(self, device):
-        agent_ip_list = ""
-        device_uuid_list = ""
-
-        if self.hdc_tools != "hdc":
-            if self._query_device_uuid(self.major) != '':
-                device_uuid_list += self._query_device_uuid(self.major) + ","
-
-            if self._query_device_ip(device) != "":
-                agent_ip_list += self._query_device_ip(device) + ","
-
-            for agent in self.agent_list:
-                if self._query_device_uuid(agent):
-                    device_uuid_list += self._query_device_uuid(agent) + ","
-
-            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
-                                                  device_uuid_list)
-
-            config_agent_file = os.path.join(self.suite_dir, "agent.desc")
-            self._write_device_config(config_info, config_agent_file)
-        else:
-            if self._query_device_agent_uuid(self.major):
-                device_uuid_list += self._query_device_agent_uuid(self.major) + ","
-
-            if self._query_device_hdc_ip(device):
-                agent_ip_list += self._query_device_hdc_ip(device) + ","
-
-            for agent in self.agent_list:
-                if self._query_device_agent_uuid(agent):
-                    device_uuid_list += self._query_device_agent_uuid(agent) + ","
-
-            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
-                                                  device_uuid_list)
-
-            config_agent_file = os.path.join(self.suite_dir, "agent.desc")
-            self._write_device_config(config_info, config_agent_file)
-
-    def _make_major_desc_file(self):
-        agent_ip_list = ""
-        device_uuid_list = ""
-
-        if self.hdc_tools != "hdc":
-            if self._query_device_uuid(self.major) != "NoneTyple":
-                device_uuid_list += self._query_device_uuid(self.major) + ","
-
-            for agent in self.agent_list:
-                if self._query_device_ip(agent) != "" and self._query_device_uuid(agent) != "":
-                    agent_ip_list += self._query_device_ip(agent) + ","
-                    device_uuid_list += self._query_device_uuid(agent) + ","
-
-            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
-                                                  device_uuid_list)
-
-            config_major_file = os.path.join(self.suite_dir, "major.desc")
-            self._write_device_config(config_info, config_major_file)
-        else:
-            if self._query_device_major_uuid(self.major):
-                device_uuid_list += self._query_device_major_uuid(self.major) + ","
-
-            for agent in self.agent_list:
-                if self._query_device_major_uuid(agent):
-                    agent_ip_list += self._query_device_hdc_ip(agent) + ","
-                    device_uuid_list += self._query_device_major_uuid(agent) + ","
-            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
-                                                  device_uuid_list)
-
-            config_major_file = os.path.join(self.suite_dir, "major.desc")
-            self._write_device_config(config_info, config_major_file)
 
     @staticmethod
     def _query_device_ip(device):
@@ -316,6 +213,109 @@ class Distribute:
         with os.fdopen(os.open(file_path, FLAGS, MODES), 'w') as file_desc:
             file_desc.write(device_info)
         os.rename(file_path, final_file)
+    
+    def exec_agent(self, device, target_name, result_path, options):
+        driver = get_current_driver(device, target_name, self.hdc_tools)
+        if driver is None:
+            print("Error: driver is None.")
+            return False
+
+        resource_dir = get_resource_dir(self.suite_dir, device.name)
+
+        self._make_agent_desc_file(device)
+        device.push_file(os.path.join(self.suite_dir, "agent.desc"),
+                         device.test_path)
+        device.push_file(os.path.join(resource_dir, target_name),
+                         device.test_path)
+
+        suite_path = os.path.join(self.suite_dir, target_name)
+        driver.execute(suite_path, result_path, options, background=True)
+        return self._check_thread(device, target_name)
+
+    def exec_major(self, device, target_name, result_path, options):
+        driver = get_current_driver(device, target_name, self.hdc_tools)
+        if driver is None:
+            print("Error: driver is None.")
+            return False
+
+        resource_dir = get_resource_dir(self.suite_dir, device.name)
+        self._make_major_desc_file()
+        device.push_file(os.path.join(self.suite_dir, "major.desc"),
+                         device.test_path)
+        device.push_file(os.path.join(resource_dir, target_name),
+                         device.test_path)
+
+        suite_path = os.path.join(self.suite_dir, target_name)
+        return driver.execute(suite_path, result_path, options, background=False)
+
+    def _make_agent_desc_file(self, device):
+        agent_ip_list = ""
+        device_uuid_list = ""
+
+        if self.hdc_tools != "hdc":
+            if self._query_device_uuid(self.major) != '':
+                device_uuid_list += self._query_device_uuid(self.major) + ","
+
+            if self._query_device_ip(device) != "":
+                agent_ip_list += self._query_device_ip(device) + ","
+
+            for agent in self.agent_list:
+                if self._query_device_uuid(agent):
+                    device_uuid_list += self._query_device_uuid(agent) + ","
+
+            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
+                                                  device_uuid_list)
+
+            config_agent_file = os.path.join(self.suite_dir, "agent.desc")
+            self._write_device_config(config_info, config_agent_file)
+        else:
+            if self._query_device_agent_uuid(self.major):
+                device_uuid_list += self._query_device_agent_uuid(self.major) + ","
+
+            if self._query_device_hdc_ip(device):
+                agent_ip_list += self._query_device_hdc_ip(device) + ","
+
+            for agent in self.agent_list:
+                if self._query_device_agent_uuid(agent):
+                    device_uuid_list += self._query_device_agent_uuid(agent) + ","
+
+            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
+                                                  device_uuid_list)
+
+            config_agent_file = os.path.join(self.suite_dir, "agent.desc")
+            self._write_device_config(config_info, config_agent_file)
+
+    def _make_major_desc_file(self):
+        agent_ip_list = ""
+        device_uuid_list = ""
+
+        if self.hdc_tools != "hdc":
+            if self._query_device_uuid(self.major) != "NoneTyple":
+                device_uuid_list += self._query_device_uuid(self.major) + ","
+
+            for agent in self.agent_list:
+                if self._query_device_ip(agent) != "" and self._query_device_uuid(agent) != "":
+                    agent_ip_list += self._query_device_ip(agent) + ","
+                    device_uuid_list += self._query_device_uuid(agent) + ","
+
+            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
+                                                  device_uuid_list)
+
+            config_major_file = os.path.join(self.suite_dir, "major.desc")
+            self._write_device_config(config_info, config_major_file)
+        else:
+            if self._query_device_major_uuid(self.major):
+                device_uuid_list += self._query_device_major_uuid(self.major) + ","
+
+            for agent in self.agent_list:
+                if self._query_device_major_uuid(agent):
+                    agent_ip_list += self._query_device_hdc_ip(agent) + ","
+                    device_uuid_list += self._query_device_major_uuid(agent) + ","
+            config_info = DEVICE_INFO_TEMPLATE % (agent_ip_list, "8888",
+                                                  device_uuid_list)
+
+            config_major_file = os.path.join(self.suite_dir, "major.desc")
+            self._write_device_config(config_info, config_major_file)
 
 ##############################################################################
 ##############################################################################

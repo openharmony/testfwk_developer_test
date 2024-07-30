@@ -56,10 +56,6 @@ class RunResult():
             "report_progress": 0
         }
 
-
-    def get_log(self):
-        return "code :{}, msg: {}".format(self.code, self.data)
-
     @staticmethod
     def filter_log(log_str):
         ansi_escape = re.compile(r'''
@@ -76,6 +72,9 @@ class RunResult():
         result = ansi_escape.sub('', log_str)
         return result
 
+    def get_log(self):
+        return "code :{}, msg: {}".format(self.code, self.data)
+
     def analysis(self, result, outdir):
         pass
 
@@ -87,6 +86,7 @@ class RunResult():
                 f.write(RunResult.filter_log(render_detail(self.crash_info)))
             else:
                 f.write(RunResult.filter_log(self.crash_info["backtrace"]))
+    
 
 
 if __name__ == "__main__":

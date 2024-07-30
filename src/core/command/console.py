@@ -66,69 +66,6 @@ class Console(object):
     def __init__(self):
         pass
 
-    def handler_ctrl_c(self, signalnum, frame):
-        pass
-
-    def handler_ctrl_z(self, signalnum, frame):
-        pass
-
-    def console(self, args):
-        """
-        Main xDevice console providing user with the interface to interact
-        """
-        EnvironmentManager()
-        if args is None or len(args) < 2:
-            self.wizard_dic = show_wizard_mode()
-            print(self.wizard_dic)
-            if self._build_version(self.wizard_dic["productform"]):
-                self._console()
-            else:
-                LOG.error("Build version failed, exit test framework.")
-        else:
-            self.command_parser(" ".join(args[1:]))
-
-    # 命令执行总入口
-    def _console(self):
-        if platform.system() != 'Windows':
-            signal.signal(signal.SIGTSTP, self.handler_ctrl_z)  # ctrl+x linux
-        signal.signal(signal.SIGINT, self.handler_ctrl_c)  # ctrl+c
-
-        while True:
-            try:
-                # 获取用户命令输入
-                usr_input = input(">>> ")
-                if usr_input == "":
-                    continue
-                # 用户输入命令解析
-                self.command_parser(usr_input)
-            except SystemExit:
-                LOG.info("Program exit normally!")
-                return
-            except (IOError, EOFError, KeyboardInterrupt) as error:
-                LOG.exception("Input Error: %s" % error)
-    
-    @staticmethod
-    def _parse_combination_param(combination_value):
-        # sample: size:xxx1;exclude-annotation:xxx
-        parse_result = {}
-        key_value_pairs = str(combination_value).split(";")
-        for key_value_pair in key_value_pairs:
-            key, value = key_value_pair.split(":", 1)
-            if not value:
-                raise ParamError("'%s' no value" % key)
-            value_list = str(value).split(",")
-            exist_list = parse_result.get(key, [])
-            exist_list.extend(value_list)
-            parse_result[key] = exist_list
-        return parse_result
-        
-    @classmethod
-    def _params_post_processing(self, options):
-        # params post-processing
-        if options.testargs:
-            test_args = self._parse_combination_param(options.testargs)
-            setattr(options, ConfigConst.testargs, test_args)
-
     # 参数解析方法
     @classmethod
     def argument_parser(cls, para_list):
@@ -323,48 +260,27 @@ class Console(object):
 
         return options, unparsed, valid_param
 
-    def command_parser(self, args):
-        try:
-            # 将用户输入的指令按空格拆分成字符串数组
-            para_list = args.split()
-            options, _, valid_param = self.argument_parser(para_list)
-            if options is None or not valid_param:
-                LOG.warning("options is None.")
-                return
-
-            # 根据命令行的命令选择不同的方法执行
-            command = options.action
-            if command == "":
-                LOG.warning("action is empty.")
-                return
-
-            if "productform" in self.wizard_dic.keys():
-                productform = self.wizard_dic["productform"]
-                options.productform = productform
-            else:
-                productform = options.productform
-
-            if command.startswith(ToolCommandType.TOOLCMD_KEY_HELP):
-                self._process_command_help(para_list)
-            elif command.startswith(ToolCommandType.TOOLCMD_KEY_SHOW):
-                self._process_command_show(para_list, productform)
-            elif command.startswith(ToolCommandType.TOOLCMD_KEY_GEN):
-                self._process_command_gen(command, options)
-            elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
-                # 保存原始控制命令
-                options.current_raw_cmd = args
-                self._process_command_run(command, options)
-            elif command.startswith(ToolCommandType.TOOLCMD_KEY_QUIT):
-                self._process_command_quit(command)
-            elif command.startswith(ToolCommandType.TOOLCMD_KEY_LIST):
-                self._process_command_device(command)
-            elif command.startswith(ToolCommandType.TOOLCMD_KEY_VERSION):
-                self._process_command_version(command)
-            else:
-                print("The %s command is not supported." % command)
-        except (AttributeError, IOError, IndexError, ImportError, NameError,
-                RuntimeError, SystemError, TypeError, ValueError) as exception:
-            LOG.exception(exception, exc_info=False)
+    @staticmethod
+    def _parse_combination_param(combination_value):
+        # sample: size:xxx1;exclude-annotation:xxx
+        parse_result = {}
+        key_value_pairs = str(combination_value).split(";")
+        for key_value_pair in key_value_pairs:
+            key, value = key_value_pair.split(":", 1)
+            if not value:
+                raise ParamError("'%s' no value" % key)
+            value_list = str(value).split(",")
+            exist_list = parse_result.get(key, [])
+            exist_list.extend(value_list)
+            parse_result[key] = exist_list
+        return parse_result
+        
+    @classmethod
+    def _params_post_processing(self, options):
+        # params post-processing
+        if options.testargs:
+            test_args = self._parse_combination_param(options.testargs)
+            setattr(options, ConfigConst.testargs, test_args)
 
     @classmethod
     def _params_pre_processing(cls, para_list):
@@ -395,12 +311,10 @@ class Console(object):
             parse_result[key] = exist_list
         return parse_result
 
-
     @classmethod
     def _process_command_version(cls, para_list):
         display_version_info(para_list)
         return
-
 
     @classmethod
     def _process_command_help(cls, para_list):
@@ -476,7 +390,91 @@ class Console(object):
                 build_result = build_manager.build_version(project_root_path,
                                                            product_form)
         return build_result
+    
+    def handler_ctrl_c(self, signalnum, frame):
+        pass
 
+    def handler_ctrl_z(self, signalnum, frame):
+        pass
+
+    def console(self, args):
+        """
+        Main xDevice console providing user with the interface to interact
+        """
+        EnvironmentManager()
+        if args is None or len(args) < 2:
+            self.wizard_dic = show_wizard_mode()
+            print(self.wizard_dic)
+            if self._build_version(self.wizard_dic["productform"]):
+                self._console()
+            else:
+                LOG.error("Build version failed, exit test framework.")
+        else:
+            self.command_parser(" ".join(args[1:]))
+    
+    def command_parser(self, args):
+        try:
+            # 将用户输入的指令按空格拆分成字符串数组
+            para_list = args.split()
+            options, _, valid_param = self.argument_parser(para_list)
+            if options is None or not valid_param:
+                LOG.warning("options is None.")
+                return
+
+            # 根据命令行的命令选择不同的方法执行
+            command = options.action
+            if command == "":
+                LOG.warning("action is empty.")
+                return
+
+            if "productform" in self.wizard_dic.keys():
+                productform = self.wizard_dic["productform"]
+                options.productform = productform
+            else:
+                productform = options.productform
+
+            if command.startswith(ToolCommandType.TOOLCMD_KEY_HELP):
+                self._process_command_help(para_list)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_SHOW):
+                self._process_command_show(para_list, productform)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_GEN):
+                self._process_command_gen(command, options)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_RUN):
+                # 保存原始控制命令
+                options.current_raw_cmd = args
+                self._process_command_run(command, options)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_QUIT):
+                self._process_command_quit(command)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_LIST):
+                self._process_command_device(command)
+            elif command.startswith(ToolCommandType.TOOLCMD_KEY_VERSION):
+                self._process_command_version(command)
+            else:
+                print("The %s command is not supported." % command)
+        except (AttributeError, IOError, IndexError, ImportError, NameError,
+                RuntimeError, SystemError, TypeError, ValueError) as exception:
+            LOG.exception(exception, exc_info=False)
+
+    # 命令执行总入口
+    def _console(self):
+        if platform.system() != 'Windows':
+            signal.signal(signal.SIGTSTP, self.handler_ctrl_z)  # ctrl+x linux
+        signal.signal(signal.SIGINT, self.handler_ctrl_c)  # ctrl+c
+
+        while True:
+            try:
+                # 获取用户命令输入
+                usr_input = input(">>> ")
+                if usr_input == "":
+                    continue
+                # 用户输入命令解析
+                self.command_parser(usr_input)
+            except SystemExit:
+                LOG.info("Program exit normally!")
+                return
+            except (IOError, EOFError, KeyboardInterrupt) as error:
+                LOG.exception("Input Error: %s" % error)
+    
 
 @dataclass
 class ConfigConst(object):

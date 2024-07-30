@@ -94,19 +94,6 @@ class KeywordRegistration:
         self.keyword_file_path = os.path.normcase(
             os.path.join(os.path.dirname(__file__), "keyword.json"))
 
-    def get_keyword_info(self):
-        """
-        获取报备关键字信息
-        """
-        try:
-            with open(self.keyword_file_path, "r") as file:
-                keyword_dict = json.load(file)
-            keyword_list = keyword_dict.get("KEYWORD")
-            return keyword_list
-        except (FileNotFoundError, AttributeError, FileExistsError):
-            print(f"获取报备过滤关键字报错")
-            return []
-
     @staticmethod
     def get_coverage_content(file_path):
         """
@@ -151,6 +138,176 @@ class KeywordRegistration:
             if item in tag:
                 replace_item = (item + "Update").lower()
                 tag = tag.replace(item, replace_item)
+        return tag
+
+    @staticmethod
+    def get_branch_line_list(keyword_line: int, branch_line_list: list):
+        """
+        获取大于关键字行号的所有分支行号
+        """
+        if keyword_line in branch_line_list:
+            index = branch_line_list.index(keyword_line)
+            branch_line_list = branch_line_list[index:]
+        else:
+            for line in branch_line_list:
+                if line > keyword_line:
+                    index = branch_line_list.index(line)
+                    branch_line_list = branch_line_list[index:]
+                    break
+        return branch_line_list
+
+    @staticmethod
+    def get_keyword_judge_char(keyword, keyword_source_code):
+        """
+        获取关键字替代字符
+        """
+        if "&" in keyword:
+            keyword = keyword.replace("&", "<")
+
+        keyword_index = keyword_source_code.find(keyword)
+        if keyword_index == -1:
+            return ""
+
+        try:
+            keyword_code = keyword_source_code[:keyword_index + len(keyword)]
+            if " = " in keyword_code:
+                judge_key = keyword_code.split(" = ")[0].split()[-1]
+            else:
+                bracket_index = keyword_code.find("(")
+                bracket_code = keyword_code[:bracket_index]
+                judge_key = bracket_code.split()[-1]
+            return judge_key
+        except (IndexError, ValueError):
+            print("获取关键字替代字符失败")
+            return ""
+
+    @staticmethod
+    def get_branch_data_by_tag(tag_html: str, symbol_status=None):
+        """
+        根据前端标签获取分支数据
+        """
+        if symbol_status:
+            key = r"#+\-*"
+        else:
+            key = r"#+\-"
+        branch_line_list = re.findall(rf"> ([{key}]) </span>", tag_html)
+
+        return branch_line_list
+
+    @staticmethod
+    def get_judge_condition_index(judge_key: str, source_code: str):
+        """
+        获取判断条件索引
+        """
+        keyword_index_list = []
+        keyword_index_list_append = keyword_index_list.append
+
+        condition_str_list = re.split(rf"\|\||&&", source_code)
+        for index, code_str in enumerate(condition_str_list):
+            if judge_key in code_str:
+                keyword_index_list_append(index)
+        return keyword_index_list, condition_str_list
+
+    @staticmethod
+    def update_source_code_tag(html_tag: str):
+        replace_item_list = ["lineNum", "lineCov", "lineNoCov"]
+
+        for item in replace_item_list:
+            if item in html_tag:
+                replace_item = (item + "Update").lower()
+                html_tag = html_tag.replace(item, replace_item)
+
+        return html_tag
+
+    @staticmethod
+    def _branch_replace(branch):
+        """
+        分支符号替换
+        """
+        if branch == "#":
+            branch = "> # <"
+        elif branch == "+":
+            branch = "> + <"
+        elif branch == "*":
+            branch = "> * <"
+        else:
+            branch = "> - <"
+        return branch
+
+    @staticmethod
+    def _single_condition_modify_html(branch_html, branch_list):
+        """
+        单条件修改代码块html
+        """
+        line_item = '<span class="lineNum">         </span>'
+        line_feed_index = branch_html.find(line_item)
+        if line_feed_index == -1:
+            if "+" in branch_list:
+                update_branch_tag = branch_html.replace("> - <", ">   <")
+                update_branch_tag = update_branch_tag.replace("> # <", ">   <")
+            else:
+                try:
+                    first_branch = branch_list[0]
+                    first_branch = "> " + first_branch + " <"
+                    first_branch_index = branch_html.find(first_branch)
+                    branch_tag = branch_html[:first_branch_index + 5]
+                    update_branch_tag = branch_html[first_branch_index + 5:]
+                    update_branch_tag = update_branch_tag.replace("> - <", ">   <")
+                    update_branch_tag = update_branch_tag.replace("> # <", ">   <")
+                    update_branch_tag = branch_tag + update_branch_tag
+                except ValueError:
+                    return ""
+        else:
+            line_feed_index = branch_html.find(line_item)
+            update_branch_tag = branch_html[:line_feed_index + len(line_item) + 1]
+            if "-" not in branch_list and "+" not in branch_list:
+                del_count = update_branch_tag.count("> # <")
+                update_branch_tag = update_branch_tag.replace("> # <", ">   <", del_count - 1)
+            else:
+                update_branch_tag = update_branch_tag.replace("> - <", ">   <")
+                update_branch_tag = update_branch_tag.replace("> # <", ">   <")
+            branch_tag = branch_html[line_feed_index + len(line_item) + 1:]
+            line_feed_index = branch_tag.find(line_item)
+            if line_feed_index == -1:
+                branch_tag = branch_tag.replace("> - <", ">   <")
+                branch_tag = branch_tag.replace("> # <", ">   <")
+                update_branch_tag += branch_tag
+            else:
+                loop_count = 0
+                while line_feed_index + 1:
+                    loop_count += 1
+                    if loop_count > 200:
+                        continue
+                    try:
+                        update_branch_tag += branch_tag[:line_feed_index + len(line_item) + 1]
+                        update_branch_tag = update_branch_tag.replace("> - <", ">   <")
+                        update_branch_tag = update_branch_tag.replace("> # <", ">   <")
+                        branch_tag = branch_tag[line_feed_index + len(line_item) + 1:]
+                        line_feed_index = branch_tag.find(line_item)
+                    except ValueError:
+                        return ""
+
+                branch_tag = branch_tag.replace("> - <", ">   <")
+                update_branch_tag = update_branch_tag.replace("> # <", ">   <")
+                update_branch_tag += branch_tag
+        return update_branch_tag
+
+    @staticmethod
+    def modify_tag_style(tag, rate):
+        """
+        修改标签样式
+        """
+        if 75 <= rate < 90:
+            tag = tag.replace("headerCovTableEntryLo", "headerCovTableEntryMed")
+            tag = tag.replace("coverPerLo", "coverPerMed")
+            tag = tag.replace("coverNumLo", "coverNumMed")
+        elif rate >= 90:
+            tag = tag.replace("headerCovTableEntryLo", "headerCovTableEntryHi")
+            tag = tag.replace("headerCovTableEntryMed", "headerCovTableEntryHi")
+            tag = tag.replace("coverPerLo", "coverPerHi")
+            tag = tag.replace("coverNumLo", "coverNumHi")
+            tag = tag.replace("coverPerMed", "coverPerHi")
+            tag = tag.replace("coverNumMed", "coverNumHi")
         return tag
 
     def get_coverage_lines_by_branch(self, file_path, content=None):
@@ -311,85 +468,6 @@ class KeywordRegistration:
                   traceback.format_exc())
             return ""
 
-    @staticmethod
-    def get_branch_line_list(keyword_line: int, branch_line_list: list):
-        """
-        获取大于关键字行号的所有分支行号
-        """
-        if keyword_line in branch_line_list:
-            index = branch_line_list.index(keyword_line)
-            branch_line_list = branch_line_list[index:]
-        else:
-            for line in branch_line_list:
-                if line > keyword_line:
-                    index = branch_line_list.index(line)
-                    branch_line_list = branch_line_list[index:]
-                    break
-        return branch_line_list
-
-    @staticmethod
-    def get_keyword_judge_char(keyword, keyword_source_code):
-        """
-        获取关键字替代字符
-        """
-        if "&" in keyword:
-            keyword = keyword.replace("&", "<")
-
-        keyword_index = keyword_source_code.find(keyword)
-        if keyword_index == -1:
-            return ""
-
-        try:
-            keyword_code = keyword_source_code[:keyword_index + len(keyword)]
-            if " = " in keyword_code:
-                judge_key = keyword_code.split(" = ")[0].split()[-1]
-            else:
-                bracket_index = keyword_code.find("(")
-                bracket_code = keyword_code[:bracket_index]
-                judge_key = bracket_code.split()[-1]
-            return judge_key
-        except (IndexError, ValueError):
-            print("获取关键字替代字符失败")
-            return ""
-
-    @staticmethod
-    def get_branch_data_by_tag(tag_html: str, symbol_status=None):
-        """
-        根据前端标签获取分支数据
-        """
-        if symbol_status:
-            key = r"#+\-*"
-        else:
-            key = r"#+\-"
-        branch_line_list = re.findall(rf"> ([{key}]) </span>", tag_html)
-
-        return branch_line_list
-
-    @staticmethod
-    def get_judge_condition_index(judge_key: str, source_code: str):
-        """
-        获取判断条件索引
-        """
-        keyword_index_list = []
-        keyword_index_list_append = keyword_index_list.append
-
-        condition_str_list = re.split(rf"\|\||&&", source_code)
-        for index, code_str in enumerate(condition_str_list):
-            if judge_key in code_str:
-                keyword_index_list_append(index)
-        return keyword_index_list, condition_str_list
-
-    @staticmethod
-    def update_source_code_tag(html_tag: str):
-        replace_item_list = ["lineNum", "lineCov", "lineNoCov"]
-
-        for item in replace_item_list:
-            if item in html_tag:
-                replace_item = (item + "Update").lower()
-                html_tag = html_tag.replace(item, replace_item)
-
-        return html_tag
-
     def get_break_line_tag(self, content, origin_branch_html, branch_line):
         """
         获取分支换行的判断条件源码tag
@@ -408,24 +486,6 @@ class KeywordRegistration:
             origin_branch_html += next_line_tag
             loop_count += 1
         return origin_branch_html
-
-    @staticmethod
-    def modify_tag_style(tag, rate):
-        """
-        修改标签样式
-        """
-        if 75 <= rate < 90:
-            tag = tag.replace("headerCovTableEntryLo", "headerCovTableEntryMed")
-            tag = tag.replace("coverPerLo", "coverPerMed")
-            tag = tag.replace("coverNumLo", "coverNumMed")
-        elif rate >= 90:
-            tag = tag.replace("headerCovTableEntryLo", "headerCovTableEntryHi")
-            tag = tag.replace("headerCovTableEntryMed", "headerCovTableEntryHi")
-            tag = tag.replace("coverPerLo", "coverPerHi")
-            tag = tag.replace("coverNumLo", "coverNumHi")
-            tag = tag.replace("coverPerMed", "coverPerHi")
-            tag = tag.replace("coverNumMed", "coverNumHi")
-        return tag
 
     def update_coverage_ratio_tag(self, file_path):
         """
@@ -618,79 +678,6 @@ class KeywordRegistration:
                 print("获取关键字if分支行报错", traceback.format_exc())
 
         return if_branch_line
-
-    @staticmethod
-    def _branch_replace(branch):
-        """
-        分支符号替换
-        """
-        if branch == "#":
-            branch = "> # <"
-        elif branch == "+":
-            branch = "> + <"
-        elif branch == "*":
-            branch = "> * <"
-        else:
-            branch = "> - <"
-        return branch
-
-    @staticmethod
-    def _single_condition_modify_html(branch_html, branch_list):
-        """
-        单条件修改代码块html
-        """
-        line_item = '<span class="lineNum">         </span>'
-        line_feed_index = branch_html.find(line_item)
-        if line_feed_index == -1:
-            if "+" in branch_list:
-                update_branch_tag = branch_html.replace("> - <", ">   <")
-                update_branch_tag = update_branch_tag.replace("> # <", ">   <")
-            else:
-                try:
-                    first_branch = branch_list[0]
-                    first_branch = "> " + first_branch + " <"
-                    first_branch_index = branch_html.find(first_branch)
-                    branch_tag = branch_html[:first_branch_index + 5]
-                    update_branch_tag = branch_html[first_branch_index + 5:]
-                    update_branch_tag = update_branch_tag.replace("> - <", ">   <")
-                    update_branch_tag = update_branch_tag.replace("> # <", ">   <")
-                    update_branch_tag = branch_tag + update_branch_tag
-                except ValueError:
-                    return ""
-        else:
-            line_feed_index = branch_html.find(line_item)
-            update_branch_tag = branch_html[:line_feed_index + len(line_item) + 1]
-            if "-" not in branch_list and "+" not in branch_list:
-                del_count = update_branch_tag.count("> # <")
-                update_branch_tag = update_branch_tag.replace("> # <", ">   <", del_count - 1)
-            else:
-                update_branch_tag = update_branch_tag.replace("> - <", ">   <")
-                update_branch_tag = update_branch_tag.replace("> # <", ">   <")
-            branch_tag = branch_html[line_feed_index + len(line_item) + 1:]
-            line_feed_index = branch_tag.find(line_item)
-            if line_feed_index == -1:
-                branch_tag = branch_tag.replace("> - <", ">   <")
-                branch_tag = branch_tag.replace("> # <", ">   <")
-                update_branch_tag += branch_tag
-            else:
-                loop_count = 0
-                while line_feed_index + 1:
-                    loop_count += 1
-                    if loop_count > 200:
-                        continue
-                    try:
-                        update_branch_tag += branch_tag[:line_feed_index + len(line_item) + 1]
-                        update_branch_tag = update_branch_tag.replace("> - <", ">   <")
-                        update_branch_tag = update_branch_tag.replace("> # <", ">   <")
-                        branch_tag = branch_tag[line_feed_index + len(line_item) + 1:]
-                        line_feed_index = branch_tag.find(line_item)
-                    except ValueError:
-                        return ""
-
-                branch_tag = branch_tag.replace("> - <", ">   <")
-                update_branch_tag = update_branch_tag.replace("> # <", ">   <")
-                update_branch_tag += branch_tag
-        return update_branch_tag
 
     def _multi_condition_modify_html(self, branch_html, branch_length,
                                      condition_str_list, judge_index_list):
