@@ -75,7 +75,7 @@ def get_subsystem_config_info():
         with open(subsystem_config_filepath, 'r') as f:
             data = json.load(f)
         if not data:
-                print("subsystem config file error.")
+            print("subsystem config file error.")
         for value in data.values():
             subsystem_name = value.get('name')
             subsystem_dir = value.get('dir')
