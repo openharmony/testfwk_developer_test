@@ -2,7 +2,7 @@
   "system_info_dict": {
     "window": ["wms"],
     "security": ["huks_service", "dlp_permission", "accesstoken_ser|privacy_service|token_sync_ser", "dlp_credential_"],
-    "multimedia": ["media_lite","av_session"],
+    "multimedia": ["media_lite","av_session", "camera_framework"],
     "resourceschedule": ["device_usage_st", "resource_schedu", "bgtaskmgr_servi"],
     "account": ["accountmgr"],
     "telephony": ["telephony|riladapter_host"],
@@ -70,6 +70,7 @@
     "wallpaper_servi": ["wallpaper_mgr"],
     "hilogd|hidumper_service": ["hiviewdfx"],
     "dinput": ["distributed_input"],
+    "camera_service": ["camera_framework"],
     "softbus_server": [
       "BusCenterHeartbeatSdkTest", "BusCenterMetaNodeSdkTest", "BusCenterSdkTest",
       "BusCenterServerTest", "ClientBusCenterMgrTest", "ClientBusMangerTest", "SetDataChangeTest"
@@ -110,6 +111,7 @@
     "power": ["obj/base/powermgr"],
     "com.ohos.medialibrary.medialibrarydata": ["obj/foundation/distributeddatamgr/data_share"],
     "dinput": ["obj/foundation/distributedhardware/distributed_input"],
-    "softbus_server": ["obj/foundation/communication/dsoftbus"]
+    "softbus_server": ["obj/foundation/communication/dsoftbus"],
+    "camera_service": ["obj/foundation/multimedia/camera_framework"]
   }
 }
