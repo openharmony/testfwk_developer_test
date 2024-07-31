@@ -47,8 +47,110 @@ LOG = platform_logger("Run")
 
 class Run(object):
 
-    history_cmd_list = []
+    history_cmd_list = []    
     
+    @classmethod
+    def get_history(self):
+        return self.history_cmd_list
+
+    @classmethod
+    def get_target_out_path(cls, product_form):
+        target_out_path = UserConfigManager().get_test_cases_dir()
+        if target_out_path == "":
+            target_out_path = os.path.join(
+                get_build_output_path(product_form),
+                "packages",
+                product_form)
+        target_out_path = os.path.abspath(target_out_path)
+        return target_out_path
+
+    @classmethod
+    def get_tests_out_path(cls, product_form):
+        testcase_path = UserConfigManager().get_test_cases_dir()
+        if testcase_path == "":
+            all_product_list = scan_support_product()
+            if product_form in all_product_list:
+                if is_open_source_product(product_form):
+                    testcase_path = os.path.abspath(os.path.join(
+                        get_build_output_path(product_form),
+                        "tests"))
+                else:
+                    testcase_path = os.path.abspath(os.path.join(
+                        get_build_output_path(product_form),
+                        "tests"))
+            else:
+                testcase_path = os.path.join(
+                    get_build_output_path(product_form), "tests")
+        LOG.info("testcase_path=%s" % testcase_path)
+        return testcase_path
+
+    @classmethod
+    def get_xts_tests_out_path(cls, product_form, testtype):
+        xts_testcase_path = UserConfigManager().get_test_cases_dir()
+        if xts_testcase_path == "":
+            xts_testcase_path = os.path.abspath(os.path.join(
+                get_build_output_path(product_form),
+                "suites",
+                testtype[0],
+                "testcases"))
+        LOG.info("xts_testcase_path=%s" % xts_testcase_path)
+        return xts_testcase_path
+
+    @classmethod
+    def get_external_deps_out_path(cls, product_form):
+        external_deps_path = os.path.abspath(os.path.join(
+            get_build_output_path(product_form),
+            "part_deps_info",
+            "part_deps_info.json"))
+        LOG.info("external_deps_path=%s" % external_deps_path)
+        return external_deps_path
+
+    @classmethod
+    def get_coverage_outpath(cls, options):
+        coverage_out_path = ""
+        if options.coverage:
+            coverage_out_path = get_build_output_path(options.productform)
+            if coverage_out_path == "":
+                coverage_out_path = UserConfigManager().get_user_config(
+                    "coverage").get("outpath", "")
+            if coverage_out_path == "":
+                LOG.error("Coverage test: coverage_outpath is empty.")
+        return coverage_out_path
+
+    @classmethod
+    def get_part_deps_list(cls, productform, testpart):
+        #获取预处理部件间依赖的编译结果路径
+        external_deps_path = cls.get_external_deps_out_path(productform)
+        external_deps_path_list = TestCaseManager().get_part_deps_files(external_deps_path, testpart)
+        return external_deps_path_list
+        
+    @classmethod
+    def _build_test_cases(cls, options):
+        if options.coverage:
+            LOG.info("Coverage testing, no need to compile testcases")
+            return True
+
+        is_build_testcase = UserConfigManager().get_user_config_flag(
+            "build", "testcase")
+        project_root_path = sys.source_code_root_path
+        if is_build_testcase and project_root_path != "":
+            from core.build.build_manager import BuildManager
+            build_manager = BuildManager()
+            return build_manager.build_testcases(project_root_path, options)
+        else:
+            return True
+
+    @classmethod
+    def _check_test_dictionary(cls, test_dictionary):
+        is_valid_status = False
+        key_list = sorted(test_dictionary.keys())
+        for key in key_list:
+            file_list = test_dictionary[key]
+            if len(file_list) > 0:
+                is_valid_status = True
+                break
+        return is_valid_status
+
     def process_command_run(self, command, options):
         current_raw_cmd = ",".join(list(map(str, options.current_raw_cmd.split(" "))))
         if options.coverage and platform.system() != "Windows":
@@ -310,111 +412,6 @@ class Run(object):
                 else:
                     print(f"{cov_main_file_path} not exists.")
         return
-    
-    ##############################################################
-    ##############################################################
-
-    @classmethod
-    def get_history(self):
-        return self.history_cmd_list
-
-    @classmethod
-    def get_target_out_path(cls, product_form):
-        target_out_path = UserConfigManager().get_test_cases_dir()
-        if target_out_path == "":
-            target_out_path = os.path.join(
-                get_build_output_path(product_form),
-                "packages",
-                product_form)
-        target_out_path = os.path.abspath(target_out_path)
-        return target_out_path
-
-    @classmethod
-    def get_tests_out_path(cls, product_form):
-        testcase_path = UserConfigManager().get_test_cases_dir()
-        if testcase_path == "":
-            all_product_list = scan_support_product()
-            if product_form in all_product_list:
-                if is_open_source_product(product_form):
-                    testcase_path = os.path.abspath(os.path.join(
-                        get_build_output_path(product_form),
-                        "tests"))
-                else:
-                    testcase_path = os.path.abspath(os.path.join(
-                        get_build_output_path(product_form),
-                        "tests"))
-            else:
-                testcase_path = os.path.join(
-                    get_build_output_path(product_form), "tests")
-        LOG.info("testcase_path=%s" % testcase_path)
-        return testcase_path
-
-    @classmethod
-    def get_xts_tests_out_path(cls, product_form, testtype):
-        xts_testcase_path = UserConfigManager().get_test_cases_dir()
-        if xts_testcase_path == "":
-            xts_testcase_path = os.path.abspath(os.path.join(
-                get_build_output_path(product_form),
-                "suites",
-                testtype[0],
-                "testcases"))
-        LOG.info("xts_testcase_path=%s" % xts_testcase_path)
-        return xts_testcase_path
-
-    @classmethod
-    def get_external_deps_out_path(cls, product_form):
-        external_deps_path = os.path.abspath(os.path.join(
-            get_build_output_path(product_form),
-            "part_deps_info",
-            "part_deps_info.json"))
-        LOG.info("external_deps_path=%s" % external_deps_path)
-        return external_deps_path
-
-    @classmethod
-    def get_coverage_outpath(cls, options):
-        coverage_out_path = ""
-        if options.coverage:
-            coverage_out_path = get_build_output_path(options.productform)
-            if coverage_out_path == "":
-                coverage_out_path = UserConfigManager().get_user_config(
-                    "coverage").get("outpath", "")
-            if coverage_out_path == "":
-                LOG.error("Coverage test: coverage_outpath is empty.")
-        return coverage_out_path
-
-    @classmethod
-    def get_part_deps_list(cls, productform, testpart):
-        #获取预处理部件间依赖的编译结果路径
-        external_deps_path = cls.get_external_deps_out_path(productform)
-        external_deps_path_list = TestCaseManager().get_part_deps_files(external_deps_path, testpart)
-        return external_deps_path_list
-        
-    @classmethod
-    def _build_test_cases(cls, options):
-        if options.coverage:
-            LOG.info("Coverage testing, no need to compile testcases")
-            return True
-
-        is_build_testcase = UserConfigManager().get_user_config_flag(
-            "build", "testcase")
-        project_root_path = sys.source_code_root_path
-        if is_build_testcase and project_root_path != "":
-            from core.build.build_manager import BuildManager
-            build_manager = BuildManager()
-            return build_manager.build_testcases(project_root_path, options)
-        else:
-            return True
-
-    @classmethod
-    def _check_test_dictionary(cls, test_dictionary):
-        is_valid_status = False
-        key_list = sorted(test_dictionary.keys())
-        for key in key_list:
-            file_list = test_dictionary[key]
-            if len(file_list) > 0:
-                is_valid_status = True
-                break
-        return is_valid_status
 
     def get_xts_test_dict(self, options):
         # 获取XTS测试用例编译结果路径
