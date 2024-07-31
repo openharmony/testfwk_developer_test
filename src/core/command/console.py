@@ -382,21 +382,6 @@ class Console(object):
     def handler_ctrl_z(self, signalnum, frame):
         pass
 
-    def console(self, args):
-        """
-        Main xDevice console providing user with the interface to interact
-        """
-        EnvironmentManager()
-        if args is None or len(args) < 2:
-            self.wizard_dic = show_wizard_mode()
-            print(self.wizard_dic)
-            if self._build_version(self.wizard_dic["productform"]):
-                self._console()
-            else:
-                LOG.error("Build version failed, exit test framework.")
-        else:
-            self.command_parser(" ".join(args[1:]))
-    
     def command_parser(self, args):
         try:
             # 将用户输入的指令按空格拆分成字符串数组
@@ -440,6 +425,21 @@ class Console(object):
                 RuntimeError, SystemError, TypeError, ValueError) as exception:
             LOG.exception(exception, exc_info=False)
 
+    def console(self, args):
+        """
+        Main xDevice console providing user with the interface to interact
+        """
+        EnvironmentManager()
+        if args is None or len(args) < 2:
+            self.wizard_dic = show_wizard_mode()
+            print(self.wizard_dic)
+            if self._build_version(self.wizard_dic["productform"]):
+                self._console()
+            else:
+                LOG.error("Build version failed, exit test framework.")
+        else:
+            self.command_parser(" ".join(args[1:]))
+    
     # 命令执行总入口
     def _console(self):
         if platform.system() != 'Windows':
