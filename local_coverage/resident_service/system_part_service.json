@@ -2,7 +2,7 @@
   "system_info_dict": {
     "window": ["wms"],
     "security": ["huks_service", "dlp_permission", "accesstoken_ser|privacy_service|token_sync_ser", "dlp_credential_"],
-    "multimedia": ["media_lite","av_session", "camera_framework"],
+    "multimedia": ["media_lite","av_session", "camera_service"],
     "resourceschedule": ["device_usage_st", "resource_schedu", "bgtaskmgr_servi"],
     "account": ["accountmgr"],
     "telephony": ["telephony|riladapter_host"],
