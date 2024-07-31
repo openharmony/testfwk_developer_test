@@ -66,6 +66,21 @@ class Console(object):
     def __init__(self):
         pass
 
+    @staticmethod
+    def _parse_combination_param(combination_value):
+        # sample: size:xxx1;exclude-annotation:xxx
+        parse_result = {}
+        key_value_pairs = str(combination_value).split(";")
+        for key_value_pair in key_value_pairs:
+            key, value = key_value_pair.split(":", 1)
+            if not value:
+                raise ParamError("'%s' no value" % key)
+            value_list = str(value).split(",")
+            exist_list = parse_result.get(key, [])
+            exist_list.extend(value_list)
+            parse_result[key] = exist_list
+        return parse_result
+
     # 参数解析方法
     @classmethod
     def argument_parser(cls, para_list):
@@ -259,21 +274,6 @@ class Console(object):
             LOG.warning("Parameter parsing systemexit exception.")
 
         return options, unparsed, valid_param
-
-    @staticmethod
-    def _parse_combination_param(combination_value):
-        # sample: size:xxx1;exclude-annotation:xxx
-        parse_result = {}
-        key_value_pairs = str(combination_value).split(";")
-        for key_value_pair in key_value_pairs:
-            key, value = key_value_pair.split(":", 1)
-            if not value:
-                raise ParamError("'%s' no value" % key)
-            value_list = str(value).split(",")
-            exist_list = parse_result.get(key, [])
-            exist_list.extend(value_list)
-            parse_result[key] = exist_list
-        return parse_result
         
     @classmethod
     def _params_post_processing(self, options):
@@ -295,21 +295,6 @@ class Console(object):
                     para_list.insert(index + 1, "retry_previous_command")
             elif param == "-->":
                 para_list[index] = "!%s" % param
-
-    @staticmethod
-    def _parse_combination_param(combination_value):
-        # sample: size:xxx1;exclude-annotation:xxx
-        parse_result = {}
-        key_value_pairs = str(combination_value).split(";")
-        for key_value_pair in key_value_pairs:
-            key, value = key_value_pair.split(":", 1)
-            if not value:
-                raise ParamError("'%s' no value" % key)
-            value_list = str(value).split(",")
-            exist_list = parse_result.get(key, [])
-            exist_list.extend(value_list)
-            parse_result[key] = exist_list
-        return parse_result
 
     @classmethod
     def _process_command_version(cls, para_list):
@@ -397,21 +382,6 @@ class Console(object):
     def handler_ctrl_z(self, signalnum, frame):
         pass
 
-    def console(self, args):
-        """
-        Main xDevice console providing user with the interface to interact
-        """
-        EnvironmentManager()
-        if args is None or len(args) < 2:
-            self.wizard_dic = show_wizard_mode()
-            print(self.wizard_dic)
-            if self._build_version(self.wizard_dic["productform"]):
-                self._console()
-            else:
-                LOG.error("Build version failed, exit test framework.")
-        else:
-            self.command_parser(" ".join(args[1:]))
-    
     def command_parser(self, args):
         try:
             # 将用户输入的指令按空格拆分成字符串数组
@@ -455,6 +425,21 @@ class Console(object):
                 RuntimeError, SystemError, TypeError, ValueError) as exception:
             LOG.exception(exception, exc_info=False)
 
+    def console(self, args):
+        """
+        Main xDevice console providing user with the interface to interact
+        """
+        EnvironmentManager()
+        if args is None or len(args) < 2:
+            self.wizard_dic = show_wizard_mode()
+            print(self.wizard_dic)
+            if self._build_version(self.wizard_dic["productform"]):
+                self._console()
+            else:
+                LOG.error("Build version failed, exit test framework.")
+        else:
+            self.command_parser(" ".join(args[1:]))
+    
     # 命令执行总入口
     def _console(self):
         if platform.system() != 'Windows':

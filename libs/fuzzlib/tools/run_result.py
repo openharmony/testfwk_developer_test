@@ -42,7 +42,7 @@ class RunResult():
         self.data = data
         self.payload = {}
 
-        self.crash_info =  {
+        self.crash_info = {
             "run_times": 0,
             "log": "",
             "project": "",
