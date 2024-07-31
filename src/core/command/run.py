@@ -48,6 +48,7 @@ LOG = platform_logger("Run")
 class Run(object):
 
     history_cmd_list = []    
+    
     @classmethod
     def get_history(self):
         return self.history_cmd_list
