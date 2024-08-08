@@ -36,7 +36,7 @@ ohos_static_library("distributedtest_lib") {
   } else {
     external_deps = [
       "c_utils:utils",
-      "googletest:gtest"
+      "googletest:gtest",
       "hilog:libhilog",
     ]
   }
