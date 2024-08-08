@@ -13,20 +13,15 @@
 
 import("//build/ohos.gni")
 
-config("performance_test_config") {
-  include_dirs = [
-    ".",
-    "//commonlibrary/c_utils/base/include",
-  ]
-}
-
 ohos_static_library("performance_test_static") {
   testonly = true
   sources = [ "perf.cpp" ]
-  deps = [ "//third_party/googletest:gtest" ]
-  public_deps = [ "//third_party/libxml2:libxml2" ]
-  public_configs = [ ":performance_test_config" ]
+  include_dirs = [ "." ]
   subsystem_name = "testfwk"
   part_name = "developer_test"
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gtest",
+    "libxml2:libxml2",
+  ]
 }
