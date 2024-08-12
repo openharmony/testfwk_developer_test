@@ -218,8 +218,8 @@ def cut_info(subsystem, test_dir):
     cmd = "lcov --remove {} {} -o {}".format(trace_file, remove, output_name)
     execute_command(cmd)
     delete_empty_info_file(output_name)
-	
-	
+
+
 def delete_empty_info_file(filename):
     if os.path.exists(filename) and os.stat(filename).st_size == 0:
         print(f"empty file {filename} deleted")
