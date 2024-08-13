@@ -98,7 +98,7 @@ def modify_faultloggerd_file(developer_path, hdc_str):
     if os.path.exists(cfg_file_path):
         with open(cfg_file_path, "r") as fp:
             json_data = json.load(fp)
-        if json_data.get("jobs"):
+        if json_data.get("jobs") and json_data["jobs"][0]["name"] != "pre-init":
             json_data["jobs"].insert(0, {
                 "name": "pre-init",
                 "cmds": [
