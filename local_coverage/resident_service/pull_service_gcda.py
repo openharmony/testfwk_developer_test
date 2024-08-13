@@ -108,8 +108,8 @@ def get_gcda_file(device_ip, device_sn, process_str, component_gcda_dict,
         coverage_command("tar -zxf %s -C %s > /dev/null 2>&1" % (
             local_tar, local_gcda_path))
         coverage_command("rm -rf %s" % local_tar)
-        print("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"))
-        coverage_command("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"))
+    print("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"))
+    coverage_command("%s shell rm -fr %s" % (hdc_str, f"/data/gcov{home_path}"))
 
 
 def get_service_list(device_ip, device_sn, system_info_dict, services_component_dict,
