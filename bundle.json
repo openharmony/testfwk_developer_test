@@ -28,7 +28,6 @@
           ],
       "inner_kits": [
         {
-          "type": "so",
           "name": "//test/testfwk/developer_test/aw/cxx/distributed:distributedtest_lib",
           "header":{
               "header_base":[
@@ -45,7 +44,6 @@
           }
         },
         {
-          "type": "so",
           "name": "//test/testfwk/developer_test/aw/cxx/hwext:performance_test_static",
           "header":{
               "header_base": "//test/testfwk/developer_test/aw/cxx/hwext",
