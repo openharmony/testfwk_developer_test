@@ -974,6 +974,12 @@
       "base/customization/enterprise_device_management"
     ]
   },
+  "enterprise_device_management_ext": {
+    "name": "enterprise_device_management_ext",
+    "path": [
+      "vendor/huawei/base/customization/enterprise_device_management"
+    ]
+  },
   "config_policy": {
     "name": "config_policy",
     "path": [
