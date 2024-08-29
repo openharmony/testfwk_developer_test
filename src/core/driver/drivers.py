@@ -183,6 +183,19 @@ def update_xml(suite_file, result_xml):
             line = path_text.readline().replace("//", "").strip()
         tree = ET.parse(result_xml)
         tree.getroot().attrib["path"] = line
+        tree.getroot().attrib["name"] = os.path.basename(suite_file.split(".")[0])
+
+        test_suit = os.path.basename(result_xml).split(".")[0]
+        log_path = os.path.abspath(result_xml).split("result")[0]
+        crash_path = os.path.join(log_path, "log", test_suit)
+        all_items = os.listdir(crash_path)
+
+        # 筛选以crash开头的目录
+        matching_dirs = [os.path.join(crash_path, item) for item in all_items if
+                         os.path.isdir(os.path.join(crash_path, item))
+                         and item.startswith(f"crash_log_{test_suit}")]
+        if len(matching_dirs) >= 1:
+            tree.getroot().attrib["is_crash"] = "1"
         tree.write(result_xml)
 
 
@@ -203,7 +216,7 @@ def _create_empty_result_file(filepath, filename, error_message):
             file_desc.write(
                 '<testsuites tests="0" failures="0" '
                 'disabled="0" errors="0" timestamp="%s" '
-                'time="0" name="AllTests">\n' % time_stamp)
+                'time="0" name="%s" unavailable="1">\n' % (time_stamp, filename))
             file_desc.write(
                 '  <testsuite name="%s" tests="0" failures="0" '
                 'disabled="0" errors="0" time="0.0" '
@@ -248,9 +261,9 @@ def _create_fuzz_crash_file(filepath, filename):
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             file_desc.write(
-                '<testsuites disabled="0" name="AllTests" '
+                '<testsuites disabled="0" name="%s" '
                 'time="300" timestamp="%s" errors="0" '
-                'failures="1" tests="1">\n' % time_stamp)
+                'failures="1" tests="1">\n' % (filename, time_stamp))
             file_desc.write(
                 '  <testsuite disabled="0" name="%s" time="300" '
                 'errors="0" failures="1" tests="1">\n' % filename)
@@ -274,9 +287,9 @@ def _create_fuzz_pass_file(filepath, filename):
                                        time.localtime())
             file_desc.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             file_desc.write(
-                '<testsuites disabled="0" name="AllTests" '
+                '<testsuites disabled="0" name="%s" '
                 'time="300" timestamp="%s" errors="0" '
-                'failures="0" tests="1">\n' % time_stamp)
+                'failures="0" tests="1">\n' % (filename, time_stamp))
             file_desc.write(
                 '  <testsuite disabled="0" name="%s" time="300" '
                 'errors="0" failures="0" tests="1">\n' % filename)
@@ -575,12 +588,12 @@ class CppTestDriver(IDriver):
             xml_path = os.path.join(log_path, f"{suit_name}.xml")
             if not os.path.exists(xml_path):
                 _create_empty_result_file(xml_path, suit_name, "ERROR")
-                update_xml(request.root.source.source_file, xml_path)
             serial = "{}_{}".format(str(request.config.device.__get_serial__()), time.time_ns())
             log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
                 ":", "_"))
             self.config.device.device_log_collector.stop_hilog_task(
                 log_tar_file_name, module_name=request.get_module_name())
+            update_xml(request.root.source.source_file, xml_path)
 
     @staticmethod
     def _alter_init(name):
@@ -723,7 +736,6 @@ class CppTestDriver(IDriver):
             self.result = result.get_test_results_hidelog(return_message)
         else:
             self.result = result.get_test_results(return_message)
-        update_xml(suite_file, self.result)
 
         resource_manager.process_cleaner_data(resource_data_dic,
                                               resource_dir,
@@ -885,10 +897,10 @@ class JSUnitTestDriver(IDriver):
                     request.config.report_path, "result",
                     '.'.join((request.get_module_name(), "xml")))
                 shutil.move(xml_path, self.result)
-                update_xml(suite_file, self.result)
         finally:
             self.config.device.device_log_collector.remove_log_address(None, self.hilog)
             self.config.device.device_log_collector.stop_catch_device_log(self.hilog_proc)
+            update_xml(request.root.source.source_file, self.result)
 
     @staticmethod
     def _get_acts_test_para(testcase,

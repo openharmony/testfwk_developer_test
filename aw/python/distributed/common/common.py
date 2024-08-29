@@ -92,7 +92,7 @@ def create_empty_result_file(savepath, filename, message=""):
             file_desc.write(
                 '<testsuites tests="0" failures="0" '
                 'disabled="0" errors="0" timestamp="%s" '
-                'time="0" name="AllTests">\n' % time_stamp)
+                'time="0" name="%s" unavailable="1">\n' % (time_stamp, filename))
             file_desc.write(
                 '  <testsuite name="%s" tests="0" failures="0" '
                 'disabled="0" errors="0" time="0.0" '
