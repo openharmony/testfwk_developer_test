@@ -30,8 +30,8 @@ from core.constants import SchedulerType
 from xdevice import Plugin
 from xdevice import get_plugin
 from xdevice import platform_logger
-from xdevice import Scheduler
 from xdevice import DeviceTestType
+from xdevice import Binder
 from core.utils import get_build_output_path
 from core.utils import scan_support_product
 from core.utils import is_lite_product
@@ -279,6 +279,7 @@ class Run(object):
                             break
             test_targets["class"] = fail_list
             setattr(options, "testargs", test_targets)
+            setattr(options, "scheduler", "Scheduler")
             print("retry option:", options)
             if has_failed_case > 0:
                 if not self._build_test_cases(options):
@@ -344,7 +345,7 @@ class Run(object):
             os.makedirs(log_path, exist_ok=True)
             os.makedirs(tmp_path, exist_ok=True)
 
-            Scheduler.start_task_log(log_path)
+            Binder.get_runtime_log().start_task_log(log_path)
             make_device_info_file(tmp_path)
 
             for case in output_test:
@@ -356,12 +357,12 @@ class Run(object):
                 manager.tearDown()
 
             make_reports(result_rootpath, start_time)
-            Scheduler.stop_task_logcat()
+            Binder.get_runtime_log().stop_task_logcat()
         else:
             options.testdict = test_dict
             options.target_outpath = self.get_target_out_path(
                 options.productform)
-
+            setattr(options, "scheduler", "Scheduler")
             scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
                                    plugin_id=SchedulerType.SCHEDULER)[0]
             if scheduler is None:
@@ -373,10 +374,10 @@ class Run(object):
                 if is_lite_product(options.productform,
                                    sys.source_code_root_path):
                     if options.productform.find("wifiiot") != -1:
-                        scheduler.update_test_type_in_source(".bin",
-                            DeviceTestType.ctest_lite)
-                        scheduler.update_ext_type_in_source("BIN",
-                            DeviceTestType.ctest_lite)
+                        Binder.get_tdd_config().update_test_type_in_source(
+                            ".bin", DeviceTestType.ctest_lite)
+                        Binder.get_tdd_config().update_ext_type_in_source(
+                            "BIN", DeviceTestType.ctest_lite)
                     else:
                         print("productform is not wifiiot")
                 scheduler.exec_command(command, options)

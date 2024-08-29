@@ -426,7 +426,7 @@ class CTestDriver(IDriver):
         kit_instances = get_kit_instances(json_config,
                                           request.config.resource_path,
                                           request.config.testcases_path)
-        from xdevice import Scheduler
+        from xdevice import Binder
 
         for (kit_instance, kit_info) in zip(kit_instances,
                                             json_config.get_kits()):
@@ -436,7 +436,7 @@ class CTestDriver(IDriver):
                 self.file_name = get_config_value(
                     'burn_file', kit_info)[0].split("\\")[-1].split(".")[0]
             reset_cmd = kit_instance.burn_command
-            if not Scheduler.is_execute:
+            if not Binder.is_executing():
                 raise ExecuteTerminate("ExecuteTerminate", error_no="00300")
 
             kit_instance.__setup__(self.config.device,
@@ -499,9 +499,9 @@ class JSUnitTestLiteDriver(IDriver):
 
             self._get_driver_config(json_config)
 
-            from xdevice import Scheduler
+            from xdevice import Binder
             for kit in self.kits:
-                if not Scheduler.is_execute:
+                if not Binder.is_executing():
                     raise ExecuteTerminate("ExecuteTerminate",
                                            error_no="00300")
                 if kit.__class__.__name__ == CKit.liteinstall:
