@@ -27,8 +27,8 @@ from core.common import is_open_source_product
 from core.utils import get_file_list_by_postfix
 from core.config.config_manager import FilterConfigManager
 from xdevice import platform_logger
-from xdevice import Scheduler
 from xdevice import DeviceTestType
+from xdevice import Binder
 
 LOG = platform_logger("TestcaseManager")
 
@@ -285,7 +285,8 @@ class TestCaseManager(object):
                     suite_file_dictionary.get("PYT").append(suite_file)
                 elif suffix_name == "":
                     if file_name.startswith("rust_"):
-                        Scheduler.update_test_type_in_source("OHRust", DeviceTestType.oh_rust_test)
+                        Binder.get_tdd_config().update_test_type_in_source(
+                            "OHRust", DeviceTestType.oh_rust_test)
                         suite_file_dictionary.get("OHRust").append(suite_file)
                     else:
                         suite_file_dictionary.get("CXX").append(suite_file)
