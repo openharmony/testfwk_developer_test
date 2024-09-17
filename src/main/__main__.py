@@ -19,6 +19,7 @@
 import sys
 from main import Console
 from xdevice import platform_logger
+from xdevice.__main__ import check_report_template
 
 LOG = platform_logger("main")
 
@@ -26,6 +27,8 @@ LOG = platform_logger("main")
 def main_process():
     LOG.info("************* Developer Test Framework Starting **************")
     console = Console()
+    if not check_report_template():
+        return
     console.console(sys.argv)
     LOG.info("************* Developer Test Framework Finished **************")
 
