@@ -27,8 +27,7 @@ LOG = platform_logger("main")
 def main_process():
     LOG.info("************* Developer Test Framework Starting **************")
     console = Console()
-    if not check_report_template():
-        return
+    check_report_template()
     console.console(sys.argv)
     LOG.info("************* Developer Test Framework Finished **************")
 
