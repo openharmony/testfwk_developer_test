@@ -858,20 +858,6 @@
       "third_party/ninja"
     ]
   },
-  "hits": {
-    "name": "hits",
-    "path": [
-      "drivers/peripheral/adapter/activity_recognition",
-      "drivers/peripheral/adapter/audio",
-      "drivers/peripheral/adapter/camera",
-      "drivers/peripheral/adapter/gralloc",
-      "drivers/peripheral/adapter/hwc",
-      "drivers/peripheral/adapter/input",
-      "drivers/peripheral/adapter/motion",
-      "drivers/peripheral/adapter/sensor",
-      "drivers/peripheral/adapter/thermal"
-    ]
-  },
   "hdf_core": {
     "name": "hdf_core",
     "path": [
