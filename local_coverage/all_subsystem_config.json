@@ -858,8 +858,8 @@
       "third_party/ninja"
     ]
   },
-  "hidl_adapter": {
-    "name": "hidl_adapter",
+  "hits": {
+    "name": "hits",
     "path": [
       "drivers/peripheral/adapter/activity_recognition",
       "drivers/peripheral/adapter/audio",
