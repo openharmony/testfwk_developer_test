@@ -56,7 +56,7 @@
     "inputmethod_ser": ["imf"],
     "hdf_devmgr|input_host|audio_host|sample_host|fingerprint_auth_host|user_auth_host|pin_auth_host|face_auth_host|nfc_host|codec_host|wifi_host|motion_host|sensor_host|riladapter_host|hwc_host|gralloc_host|camera_host|usb_host|blue_host|audio_hdi_server_host|power_host|a2dp_host|location_host|dcamera_host|daudio_host": [
       "drivers_peripheral_battery", "drivers_peripheral_motion", "drivers_peripheral_sensor",
-      "drivers_peripheral_thermal", "hdf_core", "hidl_adapter","drivers_peripheral_input",
+      "drivers_peripheral_thermal", "hdf_core", "drivers_peripheral_input",
       "drivers_peripheral_power"
     ],
     "ans": ["distributed_notification_service"],
