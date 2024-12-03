@@ -125,7 +125,7 @@ class LiteUnitTest(IDriver):
         self.log.info("lite device execute request success")
 
     def __result__(self):
-        pass
+        return ""
 
     def show_help_info(self):
         """
