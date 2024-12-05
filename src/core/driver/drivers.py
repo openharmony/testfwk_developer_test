@@ -591,9 +591,11 @@ class CppTestDriver(IDriver):
             serial = "{}_{}".format(str(request.config.device.__get_serial__()), time.time_ns())
             log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
                 ":", "_"))
-            self.config.device.device_log_collector.stop_hilog_task(
-                log_tar_file_name, module_name=request.get_module_name())
-            update_xml(request.root.source.source_file, xml_path)
+            try:
+                self.config.device.device_log_collector.stop_hilog_task(
+                    log_tar_file_name, module_name=request.get_module_name())
+            finally:
+                update_xml(request.root.source.source_file, xml_path)
 
     @staticmethod
     def _alter_init(name):
@@ -1214,15 +1216,17 @@ class OHRustTestDriver(IDriver):
                                     time.time_ns())
             log_tar_file_name = "{}_{}".format(
                 request.get_module_name(), str(serial).replace(":", "_"))
-            self.config.device.device_log_collector.stop_hilog_task(
-                log_tar_file_name, module_name=request.get_module_name())
-            xml_path = os.path.join(
-                request.config.report_path, "result",
-                '.'.join((request.get_module_name(), "xml")))
-            shutil.move(xml_path, self.result)
-            self.result = check_result_report(
-                request.config.report_path, self.result, self.error_message)
-            update_xml(request.root.source.source_file, self.result)
+            try:
+                self.config.device.device_log_collector.stop_hilog_task(
+                    log_tar_file_name, module_name=request.get_module_name())
+            finally:
+                xml_path = os.path.join(
+                    request.config.report_path, "result",
+                    '.'.join((request.get_module_name(), "xml")))
+                shutil.move(xml_path, self.result)
+                update_xml(request.root.source.source_file, self.result)
+                self.result = check_result_report(
+                    request.config.report_path, self.result, self.error_message)
     
     def __result__(self):
         return self.result if os.path.exists(self.result) else ""
