@@ -19,7 +19,13 @@
 import sys
 from main import Console
 from xdevice import platform_logger
-from xdevice.__main__ import check_report_template
+try:
+    from xdevice.__main__ import check_report_template
+    is_check_report_template = True
+except ImprotError:
+    is_check_report_template = False
+
+
 
 LOG = platform_logger("main")
 
