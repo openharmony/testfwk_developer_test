@@ -78,10 +78,12 @@ class TestCaseManager(object):
         else:
             for partname in partlist:
                 if testmodule != "":
-                    if suitfile_subpath.startswith(
-                            partname + os.sep + testmodule + os.sep):
-                        is_valid_status = True
-                        break
+                    module_list = testmodule.split(",")
+                    for module in module_list:
+                        if suitfile_subpath.startswith(
+                            partname + os.sep + module + os.sep):
+                            is_valid_status = True
+                            break
                 else:
                     if suitfile_subpath.startswith(partname + os.sep):
                         is_valid_status = True
