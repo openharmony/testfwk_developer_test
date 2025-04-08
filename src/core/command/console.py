@@ -260,7 +260,7 @@ class Console(object):
                                 help="Specify part deps",
                                 choices=["partdeps"]
                                 )
-            parser.add_argument("-hg", "--hilog",
+            parser.add_argument("-hg", "--hilogswitch",
                                 action="store",
                                 type=str,
                                 dest="hilog",
