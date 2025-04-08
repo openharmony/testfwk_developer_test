@@ -260,6 +260,13 @@ class Console(object):
                                 help="Specify part deps",
                                 choices=["partdeps"]
                                 )
+            parser.add_argument("-hg", "--hilogswitch",
+                                action="store",
+                                type=str,
+                                dest="hilogswitch",
+                                default=True,
+                                help="The console does not print operation hilog logs"
+                                )
 
             # 解析部分命令行参数，会返回一个由两个条目构成的元组，其中包含带成员的命名空间（options）和剩余参数字符串的列表（unparsed）
             cls._params_pre_processing(para_list)
