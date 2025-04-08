@@ -579,7 +579,7 @@ class CppTestDriver(IDriver):
                 return
                 
             self.config.device.set_device_report_path(request.config.report_path)
-            if request.config.hilog:
+            if request.config.hilogswitch:
                 self.config.device.device_log_collector.start_hilog_task()
             self._init_gtest()
             self._run_gtest(suite_file)
@@ -594,7 +594,7 @@ class CppTestDriver(IDriver):
             log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
                 ":", "_"))
             try:
-                if request.config.hilog:
+                if request.config.hilogswitch:
                     self.config.device.device_log_collector.stop_hilog_task(
                         log_tar_file_name, module_name=request.get_module_name())
             finally:
