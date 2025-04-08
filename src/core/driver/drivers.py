@@ -577,8 +577,10 @@ class CppTestDriver(IDriver):
                 result.make_empty_result_file(
                     "No test device is found. ")
                 return
+                
             self.config.device.set_device_report_path(request.config.report_path)
-            self.config.device.device_log_collector.start_hilog_task()
+            if not request.config.hilog:
+                self.config.device.device_log_collector.start_hilog_task()
             self._init_gtest()
             self._run_gtest(suite_file)
 
@@ -592,8 +594,9 @@ class CppTestDriver(IDriver):
             log_tar_file_name = "{}_{}".format(request.get_module_name(), str(serial).replace(
                 ":", "_"))
             try:
-                self.config.device.device_log_collector.stop_hilog_task(
-                    log_tar_file_name, module_name=request.get_module_name())
+                if not request.config.hilog:
+                    self.config.device.device_log_collector.stop_hilog_task(
+                        log_tar_file_name, module_name=request.get_module_name())
             finally:
                 update_xml(request.root.source.source_file, xml_path)
 
