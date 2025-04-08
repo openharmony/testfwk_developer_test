@@ -263,7 +263,7 @@ class Console(object):
             parser.add_argument("-hg", "--hilogswitch",
                                 action="store",
                                 type=str,
-                                dest="hilog",
+                                dest="hilogswitch",
                                 default=True,
                                 help="The console does not print operation hilog logs"
                                 )
