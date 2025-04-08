@@ -264,7 +264,7 @@ class Console(object):
                                 action="store",
                                 type=str,
                                 dest="hilog",
-                                default=False,
+                                default=True,
                                 help="The console does not print operation hilog logs"
                                 )
 
