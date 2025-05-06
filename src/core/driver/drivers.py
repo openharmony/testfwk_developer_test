@@ -645,7 +645,8 @@ class CppTestDriver(IDriver):
                                         self.config.testtype,
                                         self.config.target_test_path,
                                         suite_file,
-                                        filename)
+                                        filename,
+                                        self.config.iteration)
 
         # execute testcase
         if not self.config.coverage:
@@ -794,7 +795,8 @@ class CppTestDriver(IDriver):
                        testtype,
                        target_test_path,
                        suite_file,
-                       filename):
+                       filename,
+                       iteration):
         if "benchmark" == testtype[0]:
             test_para = (" --benchmark_out_format=json"
                          " --benchmark_out=%s%s.json") % (
@@ -806,6 +808,8 @@ class CppTestDriver(IDriver):
         elif "" == testcase and "" != testlevel:
             level_para = get_level_para_string(testlevel)
             test_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
+        elif iteration != "":
+            test_para = f" --gtest_repeat={iteration}"
         else:
             test_para = ""
 
