@@ -142,6 +142,13 @@ class Console(object):
                                 default=0,
                                 help="Specify number of times that a test is executed"
                                 )
+            parser.add_argument("-iter", "--iteration",
+                                action="store",
+                                type=int,
+                                dest="iteration",
+                                default="",
+                                help="Number of iterations"
+                                )
             parser.add_argument("-hl", "--historylist",
                                 action='store_true',
                                 dest="historylist",
