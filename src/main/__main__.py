@@ -22,7 +22,7 @@ from xdevice import platform_logger
 try:
     from xdevice.__main__ import check_report_template
     is_check_report_template = True
-except ImprotError:
+except ImportError:
     is_check_report_template = False
 
 

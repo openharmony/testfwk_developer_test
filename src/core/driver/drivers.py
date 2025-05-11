@@ -808,10 +808,11 @@ class CppTestDriver(IDriver):
         elif "" == testcase and "" != testlevel:
             level_para = get_level_para_string(testlevel)
             test_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
-        elif iteration != "":
-            test_para = f" --gtest_repeat={iteration}"
         else:
             test_para = ""
+
+        if iteration:
+            test_para += f" --gtest_repeat={iteration}"
 
         if "fuzztest" == testtype[0]:
             cfg_list = FuzzerConfigManager(os.path.join(get_fuzzer_path(

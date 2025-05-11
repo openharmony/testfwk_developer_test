@@ -146,7 +146,7 @@ class Console(object):
                                 action="store",
                                 type=int,
                                 dest="iteration",
-                                default=1,
+                                default=0,
                                 help="Number of iterations"
                                 )
             parser.add_argument("-hl", "--historylist",
