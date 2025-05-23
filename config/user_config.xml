@@ -28,10 +28,8 @@
   </build>
   <environment>
     <!-- reserved field, configure devices that support HDC connection -->
-    <device type="usb-hdc">
-      <ip></ip>
-      <port></port>
-      <sn></sn>
+    <device type="usb-hdc" label="ohos">
+      <info ip="" port="" sn="" alias="" />
     </device>
     <!-- configure devices that support serial connection -->
     <device type="com" label="ipcamera">
