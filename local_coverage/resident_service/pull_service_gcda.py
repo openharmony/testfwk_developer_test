@@ -19,7 +19,7 @@
 import os
 import sys
 
-from public_method import get_server_dict, get_config_ip, get_sn_list
+from public_method import get_server_dict, get_config_ip_info, get_sn_list
 
 
 def _init_sys_config():
@@ -148,17 +148,22 @@ if __name__ == '__main__':
     # 获取子系统部件与服务的关系
     system_dict, services_dict, component_dict = get_server_dict(command_str)
 
-    ip, port, sn = get_config_ip(os.path.join(developer_test_path, "config/user_config.xml"))
-    if not port:
-        port = "8710"
-    device_sn_list = []
-    if sn:
-        device_sn_list.extend(sn.replace(" ", "").split(";"))
-    else:
-        device_sn_list = get_sn_list("hdc -s %s:%s list targets" % (ip, port))
+    ip_list, port_list, sn_list = get_config_ip_info(os.path.join(developer_test_path, "config/user_config.xml"))
+    if not port_list:
+        port_list = ["8710"] * len(ip_list)
+    # sn_list = []
+    # if sn:
+    #     sn_list.extend(sn.replace(" ", "").split(";"))
+    # else:
+    #     sn_list = get_sn_list("hdc -s %s:%s list targets" % (ip, port))
+    if not sn_list:
+        for i in range(list(ip_list)):
+            ip = ip_list[i]
+            port = port_list[i]
+            sn_list.extend(get_sn_list("hdc -s %s:%s list targets" % (ip, port)))
 
-    if ip and len(device_sn_list) >= 1 and len(system_dict.keys()) >= 1:
-        for sn_str in device_sn_list:
+    if ip and len(sn_list) >= 1 and len(system_dict.keys()) >= 1:
+        for sn_str in sn_list:
             get_service_list(ip, sn_str, system_dict, services_dict, component_dict,
                              developer_test_path, service_path, root_path, port)
             restore_config(ip, port, sn_str, config_path)
