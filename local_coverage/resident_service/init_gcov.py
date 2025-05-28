@@ -364,5 +364,5 @@ if __name__ == '__main__':
     system_dict, _, _ = get_server_dict(command_str)
 
     # 修改设备init.cfg, faultloggerd.cfg等文件
-    modify_cfg_xml_file(developer_test_path, ip_list, sn_list,
-                        system_dict, home_paths, port_list)
+    modify_cfg_xml_file(developer_test_path, ip, sn_list,
+                        system_dict, home_paths, port)
