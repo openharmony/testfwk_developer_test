@@ -45,6 +45,32 @@ def get_config_ip(filepath):
     return ip_config, port, sn
 
 
+def get_config_ip_info(filepath):
+    ip_config_list = []
+    sn_list = []
+    port_list = []
+    try:
+        data_dic = {}
+        if os.path.exists(filepath):
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+            for node in root.findall("environment/device"):
+                if node.attrib["type"] != "usb-hdc":
+                    continue
+                for sub in node:
+                    data_dic[sub.tag] = sub.text if sub.text else ""
+
+                for sub in node:
+                    if sub.tag == "info":
+                        ip_config = sub.attrib["ip"] if sub.attrib["ip"] else ""
+                        port = sub.attrib["port"] if sub.attrib["port"] else ""
+                        sn = sub.attrib["sn"] if sub.attrib["sn"] else ""
+    except ET.ParseError as xml_exception:
+        print("occurs exception:{}".format(xml_exception.args))
+
+    return ip_config, port, sn
+
+
 def get_sn_list(command):
     device_sn_list = []
     # 执行查询设备sn号命令并获取执行结果
