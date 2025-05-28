@@ -157,8 +157,8 @@ if __name__ == '__main__':
     else:
         device_sn_list = get_sn_list("hdc -s %s:%s list targets" % (ip, port))
 
-    if ip and len(device_sn_list) >= 1 and len(system_dict.keys()) >= 1:
-        for sn_str in device_sn_list:
+    if ip and len(sn_list) >= 1 and len(system_dict.keys()) >= 1:
+        for sn_str in sn_list:
             get_service_list(ip, sn_str, system_dict, services_dict, component_dict,
                              developer_test_path, service_path, root_path, port)
             restore_config(ip, port, sn_str, config_path)

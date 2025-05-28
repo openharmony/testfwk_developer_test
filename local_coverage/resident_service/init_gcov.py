@@ -315,27 +315,30 @@ def split_foundation_services(developer_path, system_info_dict, home_path, hdc_d
     return
 
 
-def modify_cfg_xml_file(developer_path, device_ip, device_sn_list,
-                        system_info_dict, home_path, device_port):
-    if device_ip and len(device_sn_list) >= 1:
-        for device_sn_str in device_sn_list:
-            hdc_str = "hdc -s %s:%s -t %s" % (device_ip, device_port, device_sn_str)
-            hdc_dict = {"device_ip": device_ip, "device_port": device_port, "device_sn_str": device_sn_str}
-            modify_init_file(developer_path, hdc_str)
-            modify_faultloggerd_file(
-                developer_path, hdc_str)
-            # 推送服务对应的配置文件
-            split_foundation_services(developer_path, system_info_dict, home_path, hdc_dict)
-            logger("{} shell reboot".format(hdc_str), "INFO")
-            coverage_command("%s shell reboot > /dev/null 2>&1" % hdc_str)
-            while True:
-                after_sn_list = get_sn_list("hdc -s %s:%s list targets" % (device_ip, device_port))
-                time.sleep(10)
-                if device_sn_str in after_sn_list:
-                    break
-            coverage_command("%s shell getenforce" % hdc_str)
-    else:
-        logger("user_config.xml device ip not config", "ERROR")
+def modify_cfg_xml_file(developer_path, device_ip_list, device_sn_list,
+                        system_info_dict, home_path, device_port_list):
+    for i in range(len(device_ip_list)):
+        device_ip = device_ip_list[i]
+        device_port = device_port_list[i]
+        if device_ip and len(device_sn_list) >= 1:
+            for device_sn_str in device_sn_list:
+                hdc_str = "hdc -s %s:%s -t %s" % (device_ip, device_port, device_sn_str)
+                hdc_dict = {"device_ip": device_ip, "device_port": device_port, "device_sn_str": device_sn_str}
+                modify_init_file(developer_path, hdc_str)
+                modify_faultloggerd_file(
+                    developer_path, hdc_str)
+                # 推送服务对应的配置文件
+                split_foundation_services(developer_path, system_info_dict, home_path, hdc_dict)
+                logger("{} shell reboot".format(hdc_str), "INFO")
+                coverage_command("%s shell reboot > /dev/null 2>&1" % hdc_str)
+                while True:
+                    after_sn_list = get_sn_list("hdc -s %s:%s list targets" % (device_ip, device_port))
+                    time.sleep(10)
+                    if device_sn_str in after_sn_list:
+                        break
+                coverage_command("%s shell getenforce" % hdc_str)
+        else:
+            logger("user_config.xml device ip not config", "ERROR")
 
 
 if __name__ == '__main__':
@@ -364,5 +367,5 @@ if __name__ == '__main__':
     system_dict, _, _ = get_server_dict(command_str)
 
     # 修改设备init.cfg, faultloggerd.cfg等文件
-    modify_cfg_xml_file(developer_test_path, ip, sn_list,
-                        system_dict, home_paths, port)
+    modify_cfg_xml_file(developer_test_path, ip_list, sn_list,
+                        system_dict, home_paths, port_list)
