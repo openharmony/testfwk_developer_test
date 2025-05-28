@@ -46,29 +46,28 @@ def get_config_ip(filepath):
 
 
 def get_config_ip_info(filepath):
-    ip_config_list = []
-    sn_list = []
-    port_list = []
+    ip_config = ""
+    sn = ""
+    port = ""
     try:
         data_dic = {}
-        if os.path.exists(filepath):
-            tree = ET.parse(filepath)
-            root = tree.getroot()
-            for node in root.findall("environment/device"):
-                if node.attrib["type"] != "usb-hdc":
+        if not os.path.exists(filepath):
+            return ip_config, port, sn
+        tree = ET.parse(filepath)
+        root = tree.getroot()
+        for node in root.findall("environment/device"):
+            if node.attrib["type"] != "usb-hdc":
+                continue
+            for sub in node:
+                if sub.tag != "info":
                     continue
-                for sub in node:
-                    data_dic[sub.tag] = sub.text if sub.text else ""
-
-                for sub in node:
-                    if sub.tag == "info":
-                        ip_config = sub.attrib["ip"] if sub.attrib["ip"] else ""
-                        port = sub.attrib["port"] if sub.attrib["port"] else ""
-                        sn = sub.attrib["sn"] if sub.attrib["sn"] else ""
+                ip_config = sub.attrib["ip"]
+                port = sub.attrib["port"]
+                sn = sub.attrib["sn"]
     except ET.ParseError as xml_exception:
         print("occurs exception:{}".format(xml_exception.args))
-
-    return ip_config, port, sn
+    finally:
+        return ip_config, port, sn
 
 
 def get_sn_list(command):
