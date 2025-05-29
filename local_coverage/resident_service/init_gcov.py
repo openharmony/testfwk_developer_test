@@ -23,7 +23,7 @@ import json
 import sys
 import time
 import xml.etree.ElementTree as ET
-from public_method import get_server_dict, get_config_ip, get_sn_list
+from public_method import get_server_dict, get_config_ip_info, get_sn_list
 import stat
 
 FLAGS = os.O_WRONLY | os.O_CREAT | os.O_EXCL
@@ -351,7 +351,7 @@ if __name__ == '__main__':
     home_paths = '/'.join(root_path.split("/")[:3])
 
     # 获取user_config中的device ip
-    ip, port, sn = get_config_ip(os.path.join(developer_test_path, "config/user_config.xml"))
+    ip, port, sn = get_config_ip_info(os.path.join(developer_test_path, "config/user_config.xml"))
     if not port:
         port = "8710"
     sn_list = []
