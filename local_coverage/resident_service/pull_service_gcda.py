@@ -19,7 +19,7 @@
 import os
 import sys
 
-from public_method import get_server_dict, get_config_ip, get_sn_list
+from public_method import get_server_dict, get_config_ip_info, get_sn_list
 
 
 def _init_sys_config():
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     # 获取子系统部件与服务的关系
     system_dict, services_dict, component_dict = get_server_dict(command_str)
 
-    ip, port, sn = get_config_ip(os.path.join(developer_test_path, "config/user_config.xml"))
+    ip, port, sn = get_config_ip_info(os.path.join(developer_test_path, "config/user_config.xml"))
     if not port:
         port = "8710"
     device_sn_list = []

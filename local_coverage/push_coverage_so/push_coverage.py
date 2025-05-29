@@ -152,7 +152,7 @@ if __name__ == "__main__":
     current_path = os.path.abspath(os.path.dirname(__name__))
 
     _init_sys_config()
-    from local_coverage.resident_service.public_method import get_config_ip, get_sn_list
+    from local_coverage.resident_service.public_method import get_config_ip_info, get_sn_list
     from local_coverage.utils import get_product_name, hdc_command, tree_find_file_endswith,\
                                     json_parse, logger, is_elffile
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     developer_path = os.path.join(root_path, "test", "testfwk", "developer_test")
 
     # 获取远程映射相关hdc参数
-    device_ip, device_port, device_sn_strs = get_config_ip(os.path.join(developer_path, "config", "user_config.xml"))
+    device_ip, device_port, device_sn_strs = get_config_ip_info(os.path.join(developer_path, "config", "user_config.xml"))
     if not device_port:
         device_port = "8710"
     if not device_sn_strs:
