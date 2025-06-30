@@ -20,36 +20,36 @@ import sys
 import json
 import subprocess
 
-es2PandaPath = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
-arkLinkPath = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
-arkPath = "arkcompiler/runtime_core/static_core/out/bin/ark"
-etsStdLibPath = "arkcompiler/runtime_core/static_core/out/plugins/ets/etsstdlib.abc"
-configPath = "arkcompiler/runtime_core/static_core/out/bin/arktsconfig.json"
-hypiumPath = "test/testfwk/arkxtest/jsunit/src_static/"
+ES2PANDAPATH = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
+ARKLINKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
+ARKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark"
+ETSSTDLIBPATH = "arkcompiler/runtime_core/static_core/out/plugins/ets/etsstdlib.abc"
+CONFIGPATH = "arkcompiler/runtime_core/static_core/out/bin/arktsconfig.json"
+HYPIUMPATH = "test/testfwk/arkxtest/jsunit/src_static/"
 
 
-def build_tools(compileFileList):
+def build_tools(compile_fileList):
     """
     编译工具类
     """
     
-    absEs2PandaPath = get_path_code_dircetory(es2PandaPath)
-    absTestPath = os.getcwd()
+    abs_es2panda_Path = get_path_code_dircetory(ES2PANDAPATH)
+    abs_test_path = os.getcwd()
     
     # 1. 创建输出目录
-    outputDir = os.path.join(absTestPath, "out")
-    os.makedirs(outputDir, exist_ok = True)
+    output_dir = os.path.join(abs_test_path, "out")
+    os.makedirs(output_dir, exist_ok = True)
     
     # 逐个执行编译命令
-    for ets_file in compileFileList:
+    for ets_file in compile_fileList:
         try:
             # 获取文件名(不带路径)
-            file_name = os.path.basename(ets_file)
+            file_name = os.path.base_name(ets_file)
             base_name = os.path.splitext(file_name)[0]
-            output_file_path = os.path.join(outputDir, f"{base_name}.abc")
+            output_filepath = os.path.join(output_dir, f"{base_name}.abc")
             
             # 构造编译命令
-            command = [absEs2PandaPath, ets_file, "--output", output_file_path]
+            command = [abs_es2panda_Path, ets_file, "--output", output_filepath]
             
             # 执行命令并获取输出
             result = subprocess.run(
@@ -61,7 +61,7 @@ def build_tools(compileFileList):
             )
             
             # 成功编译
-            print(f"成功编译'{ets_file}', 输出路径： {output_file_path}")
+            print(f"成功编译'{ets_file}', 输出路径： {output_filepath}")
             
         except Exception as e:
             print(f"'{ets_file}'编译失败")
@@ -107,19 +107,19 @@ def write_arktsconfig_file():
     file_map = {}
     for ets_file in ets_files:
         module_name = os.path.splitext(ets_file)[0]
-        relative_path = os.path.join(current_dir,ets_file)
+        relative_path = os.path.join(current_dir, ets_file)
         abs_path = get_path_code_dircetory(relative_path)
         file_map[module_name] = [abs_path]
         
     # 3. 定位要写入的 arktsconfig.json文件
-    abs_config_path = get_path_code_dircetory(configPath)
+    abs_config_path = get_path_code_dircetory(CONFIGPATH)
     
     # 4. 读取并更新配置
     try:
         with open(abs_config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     except FileNotFoundError:
-        config = {"compilerOptions": { "baseUrl":"/code/arkcompiler/runtime_core/static_core", "paths": {} }}
+        config = { "compilerOptions": { "baseUrl": "/code/arkcompiler/runtime_core/static_core", "paths": {} }}
         
     # 5. 更新配置中的paths(保留之前的配置项)
     config.setdefault("compilerOptions", {})
@@ -136,10 +136,10 @@ def build_ets_files():
     """
     编译hypium、tools、测试用例文件
     """
-    absHypiumPath = get_path_code_dircetory(hypiumPath)
+    abs_hypium_path = get_path_code_dircetory(HYPIUMPATH)
     
     files_to_compile = []
-    for root, dirs, files in os.walk(absHypiumPath):
+    for root, dirs, files in os.walk(abs_hypium_path):
         if "testAbility" in dirs:
             dirs.remove("testAbility")
         if "testrunner" in dirs:
@@ -159,10 +159,10 @@ def build_ets_files():
     ets_files = [os.path.join(current_dir, f) for f in os.listdir(current_dir) if f.endswith('.ets')]
     build_tools(ets_files)
     
-    absTestPath = os.getcwd()
+    abs_test_path = os.getcwd()
     test_files = []
     
-    for root, dirs, files in os.walk(absTestPath):
+    for root, dirs, files in os.walk(abs_test_path):
         for file in files:
             if file.endswith(".ets"):
                 file_abs_path = os.path.join(root, file)
@@ -171,37 +171,48 @@ def build_ets_files():
     
 
 def collect_abc_files(res_file_name):
-    """
-    收集所有需要链接的.abc文件路径（包括out目录和src.json中配置的路径）
-    返回: abc文件路径列表
-    """
-    absOutPath = os.path.join(os.getcwd(), "out")
+    abs_out_path = os.path.join(os.getcwd(), "out")
     abc_files = []
 
     # 1. 收集out目录下的.abc文件
-    out_files = [os.path.join("./out", f) 
-                for f in os.listdir(absOutPath) 
-                if f.endswith('.abc')]
-    abc_files.extend(out_files)
+    if os.path.exists(abs_out_path):
+        out_files = [
+            os.path.join("./out", f)
+            for f in os.listdir(abs_out_path)
+            if f.endswith('.abc')
+        ]
+        abc_files.extend(out_files)
 
     # 2. 收集src.json中配置的.abc文件
+    abc_files.extend(load_abc_from_src_json())
+
+    return abc_files
+
+
+def load_abc_from_src_json():
+    abc_files = []
     src_json_path = os.path.join(os.getcwd(), "src.json")
+
+    if not os.path.exists(src_json_path):
+        print(f"提示: 配置文件 {src_json_path} 未找到，跳过src.json收集")
+        return abc_files
+
     try:
         with open(src_json_path, 'r') as f:
             src_data = json.load(f)
-            for path in src_data.get("src_path", []):
-                if os.path.isfile(path) and path.endswith('.abc'):
-                    abc_files.append(path)
-                else:
-                    print(f"警告: 路径 {path} 不存在或不是.abc文件，已跳过")
-    
-    except FileNotFoundError:
-        print(f"提示: 配置文件 {src_json_path} 未找到，跳过src.json收集")
     except json.JSONDecodeError:
         print(f"错误: 配置文件 {src_json_path} JSON格式错误")
+        return abc_files
     except Exception as e:
         print(f"读取src.json时发生意外错误: {str(e)}")
-        
+        return abc_files
+
+    for path in src_data.get("src_path", []):
+        if os.path.isfile(path) and path.endswith('.abc'):
+            abc_files.append(path)
+        else:
+            print(f"警告: 路径 {path} 不存在或不是.abc文件，已跳过")
+
     return abc_files
 
 
@@ -209,7 +220,7 @@ def link_abc_files(res_file_name):
     """
     链接所有abc文件生成最终的test.abc
     """
-    absArkLinkPath = get_path_code_dircetory(arkLinkPath)
+    abs_arklink_path = get_path_code_dircetory(ARKLINKPATH)
     abc_files = collect_abc_files(res_file_name)
     
     if not abc_files:
@@ -217,7 +228,7 @@ def link_abc_files(res_file_name):
         return
 
     command = [
-        absArkLinkPath,
+        abs_arklink_path,
         f"--output={res_file_name}.abc",
         "--",
         *abc_files
@@ -245,13 +256,13 @@ def run_test(res_file_name):
     """
     执行生成的abc文件并生成报告日志
     """
-    absArkPath = get_path_code_dircetory(arkPath)
-    absEtsStdLibPath = get_path_code_dircetory(etsStdLibPath)
+    abs_ark_path = get_path_code_dircetory(ARKPATH)
+    abs_etsstdlib_path = get_path_code_dircetory(ETSSTDLIBPATH)
     tests_dir_name = res_file_name
     log_file = os.path.join(os.getcwd(), f"{tests_dir_name}.log")
     command = [
-        absArkPath,
-        f"--boot-panda-files={absEtsStdLibPath}",
+        abs_ark_path,
+        f"--boot-panda-files={abs_etsstdlib_path}",
         f"--load-runtimes=ets",
         f"{tests_dir_name}.abc",
         f"OpenHarmonyTestRunner/ETSGLOBAL::main"
