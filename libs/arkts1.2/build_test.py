@@ -28,12 +28,12 @@ CONFIGPATH = "arkcompiler/runtime_core/static_core/out/bin/arktsconfig.json"
 HYPIUMPATH = "test/testfwk/arkxtest/jsunit/src_static/"
 
 
-def build_tools(compile_fileList):
+def build_tools(compile_filelist):
     """
     编译工具类
     """
     
-    abs_es2panda_Path = get_path_code_dircetory(ES2PANDAPATH)
+    abs_es2panda_path = get_path_code_dircetory(ES2PANDAPATH)
     abs_test_path = os.getcwd()
     
     # 1. 创建输出目录
@@ -41,7 +41,7 @@ def build_tools(compile_fileList):
     os.makedirs(output_dir, exist_ok = True)
     
     # 逐个执行编译命令
-    for ets_file in compile_fileList:
+    for ets_file in compile_filelist:
         try:
             # 获取文件名(不带路径)
             file_name = os.path.base_name(ets_file)
@@ -49,7 +49,7 @@ def build_tools(compile_fileList):
             output_filepath = os.path.join(output_dir, f"{base_name}.abc")
             
             # 构造编译命令
-            command = [abs_es2panda_Path, ets_file, "--output", output_filepath]
+            command = [abs_es2panda_path, ets_file, "--output", output_filepath]
             
             # 执行命令并获取输出
             result = subprocess.run(
@@ -119,7 +119,7 @@ def write_arktsconfig_file():
         with open(abs_config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     except FileNotFoundError:
-        config = { "compilerOptions": { "baseUrl": "/code/arkcompiler/runtime_core/static_core", "paths": {} }}
+        config = { "compilerOptions": { "baseUrl": "/code/arkcompiler/runtime_core/static_core", "paths": {} } }
         
     # 5. 更新配置中的paths(保留之前的配置项)
     config.setdefault("compilerOptions", {})
