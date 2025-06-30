@@ -1,3 +1,20 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+#
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 import os
 import sys
 import json
@@ -7,20 +24,21 @@ es2PandaPath = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
 arkLinkPath = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
 arkPath = "arkcompiler/runtime_core/static_core/out/bin/ark"
 etsStdLibPath = "arkcompiler/runtime_core/static_core/out/plugins/ets/etsstdlib.abc"
-configPath = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
-hypiumPath = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
+configPath = "arkcompiler/runtime_core/static_core/out/bin/arktsconfig.json"
+hypiumPath = "test/testfwk/arkxtest/jsunit/src_static/"
+
 
 def build_tools(compileFileList):
     """
     编译工具类
     """
     
-    absEs2PandaPath = get_path_code_dir(es2PandaPath)
+    absEs2PandaPath = get_path_code_dircetory(es2PandaPath)
     absTestPath = os.getcwd()
     
     # 1. 创建输出目录
-    output_dir = os.path.join(absTestPath, "out")
-    os.makedirs(output_dir, exist_ok = True)
+    outputDir = os.path.join(absTestPath, "out")
+    os.makedirs(outputDir, exist_ok = True)
     
     # 逐个执行编译命令
     for ets_file in compileFileList:
@@ -28,7 +46,7 @@ def build_tools(compileFileList):
             # 获取文件名(不带路径)
             file_name = os.path.basename(ets_file)
             base_name = os.path.splitext(file_name)[0]
-            output_file_path = os.path.join(output_dir, f"{base_name}.abc")
+            output_file_path = os.path.join(outputDir, f"{base_name}.abc")
             
             # 构造编译命令
             command = [absEs2PandaPath, ets_file, "--output", output_file_path]
@@ -58,8 +76,8 @@ def get_path_code_dircetory(after_dir):
     current_dir = os.path.dirname(current_path)
     
     # 查找 /code/ 目录的位置
-    code_maker = "/code/"
-    code_index = current_dir.find(code_maker)
+    code_marker = "/code/"
+    code_index = current_dir.find(code_marker)
     
     if code_index == -1:
         raise FileNotFoundError(
@@ -67,7 +85,7 @@ def get_path_code_dircetory(after_dir):
         )
     
     # 提取code路径 (包含code目录本身)
-    code_base = current_dir[:code_index + len(code_maker)]
+    code_base = current_dir[:code_index + len(code_marker)]
     
     # 拼接用户传入路径
     full_path = os.path.join(code_base, after_dir)
@@ -98,17 +116,17 @@ def write_arktsconfig_file():
     
     # 4. 读取并更新配置
     try:
-        with open(abs_config_path, 'r', encoding='utf-8' ) as f:
+        with open(abs_config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     except FileNotFoundError:
-        config = {"compilerOptions": {"baseUrl":"/code/arkcompiler/runtime_core/static_core","paths":{}}}
+        config = {"compilerOptions": { "baseUrl":"/code/arkcompiler/runtime_core/static_core", "paths": {} }}
         
     # 5. 更新配置中的paths(保留之前的配置项)
-    config.setdefault("compilerOptions",{})
-    config["compilerOptions"].setdefault("paths",{})
+    config.setdefault("compilerOptions", {})
+    config["compilerOptions"].setdefault("paths", {})
     config["compilerOptions"]["paths"].update(file_map)
     
-    with open(abs_config_path, 'w', encoding='utf-8' ) as f:
+    with open(abs_config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
     
     print(f"已成功更新 {abs_config_path}")
@@ -162,14 +180,14 @@ def link_abc_files(res_file_name):
     tests_dir_name = res_file_name
     
     abc_files = []
-    
-    out_files = [os.path.join("./out",f) for f in os.listdir(absOutPath) if f.endswith('.abc')]
+
+    out_files = [os.path.join("./out", f) for f in os.listdir(absOutPath) if fabc')]
     abc_files.extend(out_files)
-    
-    src_json_path  = os.path.join(os.getcwd(), "src.json")
-    
+
+    src_json_path = os.path.join(os.getcwd(), "src.json")
+
     try:
-        with open(src_json_path, 'r') as f:
+        with open(src_json_path, 'r'):
             src_data = json.load(f)
             src_paths = src_data.get("src_path", [])
             
