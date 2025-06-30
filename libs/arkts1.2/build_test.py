@@ -119,8 +119,8 @@ def write_arktsconfig_file():
         with open(abs_config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
     except FileNotFoundError:
-        config = { "compilerOptions": { "baseUrl": "/code/arkcompiler/runtime_core/static_core", "paths": {} } }
-        
+        config = { "compilerOptions": { "baseUrl": "/code/arkcompiler/runtime_core/static_core", "paths": {} }}
+
     # 5. 更新配置中的paths(保留之前的配置项)
     config.setdefault("compilerOptions", {})
     config["compilerOptions"].setdefault("paths", {})
