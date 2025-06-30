@@ -170,70 +170,75 @@ def build_ets_files():
     build_tools(test_files)
     
 
+def collect_abc_files(res_file_name):
+    """
+    收集所有需要链接的.abc文件路径（包括out目录和src.json中配置的路径）
+    返回: abc文件路径列表
+    """
+    absOutPath = os.path.join(os.getcwd(), "out")
+    abc_files = []
+
+    # 1. 收集out目录下的.abc文件
+    out_files = [os.path.join("./out", f) 
+                for f in os.listdir(absOutPath) 
+                if f.endswith('.abc')]
+    abc_files.extend(out_files)
+
+    # 2. 收集src.json中配置的.abc文件
+    src_json_path = os.path.join(os.getcwd(), "src.json")
+    try:
+        with open(src_json_path, 'r') as f:
+            src_data = json.load(f)
+            for path in src_data.get("src_path", []):
+                if os.path.isfile(path) and path.endswith('.abc'):
+                    abc_files.append(path)
+                else:
+                    print(f"警告: 路径 {path} 不存在或不是.abc文件，已跳过")
+    
+    except FileNotFoundError:
+        print(f"提示: 配置文件 {src_json_path} 未找到，跳过src.json收集")
+    except json.JSONDecodeError:
+        print(f"错误: 配置文件 {src_json_path} JSON格式错误")
+    except Exception as e:
+        print(f"读取src.json时发生意外错误: {str(e)}")
+        
+    return abc_files
+
+
 def link_abc_files(res_file_name):
     """
     链接所有abc文件生成最终的test.abc
     """
-    
     absArkLinkPath = get_path_code_dircetory(arkLinkPath)
-    absOutPath = os.path.join(os.getcwd(), "out")
-    tests_dir_name = res_file_name
+    abc_files = collect_abc_files(res_file_name)
     
-    abc_files = []
+    if not abc_files:
+        print("终止: 没有找到可连接的.abc文件")
+        return
 
-    out_files = [os.path.join("./out", f) for f in os.listdir(absOutPath) if fabc')]
-    abc_files.extend(out_files)
-
-    src_json_path = os.path.join(os.getcwd(), "src.json")
-
+    command = [
+        absArkLinkPath,
+        f"--output={res_file_name}.abc",
+        "--",
+        *abc_files
+    ]
+    
+    print(f"执行命令: {' '.join(command)}")
+    
     try:
-        with open(src_json_path, 'r'):
-            src_data = json.load(f)
-            src_paths = src_data.get("src_path", [])
-            
-            for path in src_paths:
-                full_path = path
-                
-                if os.path.isfile(full_path) and full_path.endswith('.abc'):
-                    abc_files.append(full_path)
-                else:
-                    print(f"路径{full_path} 不存在或不是.abc文件，跳过处理。")
-    
-    except FileNotFoundError:
-        print(f"文件 {src_json_path} 未找到，跳过处理")
-    except json.JSONDecodeError:
-        print(f"文件 {src_json_path} 格式错误无法解析")
-    except Exception as e:
-        print(f"读取 src.json 时发生错误: {e}")
+        result = subprocess.run(
+            command,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        print("状态: 链接成功\n输出:", result.stdout.strip())
         
-    if abc_files:
-        command = [
-            absArkLinkPath,
-            f"--output={tests_dir_name}.abc",
-            "--",
-            *abc_files
-        ]
-        
-        print(f"执行命令 {command}")
-        
-        try:
-            result = subprocess.run(
-                command,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-            
-            print("命令执行成功")
-            print(result.stdout.strip())
-            
-        except subprocess.CalledProcessError as e:
-            print("命令执行失败")
-            print(f"错误信息 {e.stderr.strip()}")
-            
-    else:
-        print("没有找到可连接的.abc文件")
+    except subprocess.CalledProcessError as e:
+        print("错误: 链接失败")
+        print("错误详情:", e.stderr.strip())
+        raise  # 可以选择抛出异常或处理错误
         
 
 def run_test(res_file_name):
