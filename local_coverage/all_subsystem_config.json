@@ -191,6 +191,12 @@
       "foundation/communication/dsoftbus"
     ]
   },
+  "dsoftbus_service_ext": {
+    "name": "dsoftbus_service_ext",
+    "path": [
+      "vendor/huawei/foundation/communication/dsoftbus_service_ext"
+    ]
+  },
   "device_manager": {
     "name": "device_manager",
     "path": [
