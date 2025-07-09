@@ -60,8 +60,7 @@ class TestCaseManager(object):
             short_name, _ = os.path.splitext(os.path.basename(suite_file))
             testsuit_list = testsuit.split(',')
             for test in testsuit_list:
-                if short_name.startswith(test) or \
-                        testsuit.startswith(short_name):
+                if short_name == test:
                     return True
             return False
 
@@ -70,9 +69,7 @@ class TestCaseManager(object):
         suitfile_subpath = suitfile_subpath.strip(os.sep)
         if len(partlist) == 0:
             if testmodule != "":
-                temp_list = suitfile_subpath.split(os.sep)
-                if len(temp_list) > 2 and testmodule == temp_list[1]:
-                    is_valid_status = True
+                is_valid_status = False
             else:
                 is_valid_status = True
         else:
