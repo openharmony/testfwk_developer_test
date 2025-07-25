@@ -199,9 +199,21 @@ def update_xml(suite_file, result_xml):
         tree.write(result_xml)
 
 
+def remove_color_codes(text):
+    """
+    color ascii to utf-8 return
+    Args:
+         text:
+        
+    Returns:
+
+    """
+    text.encode('unicode_escape').decode('utf-8')
+
+
 # all testsuit common Unavailable test result xml
 def _create_empty_result_file(filepath, filename, error_message):
-    error_message = str(error_message)
+    error_message = remove_color_codes(error_message)
     error_message = error_message.replace("\"", "")
     error_message = error_message.replace("<", "")
     error_message = error_message.replace(">", "")
