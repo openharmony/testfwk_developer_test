@@ -201,14 +201,14 @@ def update_xml(suite_file, result_xml):
 
 def remove_color_codes(text):
     """
-    color ascii to utf-8 return
+    color ascii to utf-8
     Args:
          text:
         
     Returns:
 
     """
-    text.encode('unicode_escape').decode('utf-8')
+    return text.encode('unicode_escape').decode('utf-8')
 
 
 # all testsuit common Unavailable test result xml
