@@ -1244,8 +1244,8 @@
     {
         "name": "third_party_sqlite",
         "parts": "sqlite",
-        "selfTarget": "security/access_token:access_token_test,security/asset:asset_test,communication/dsoftbus:dsoftbus_test,communication/netmanager_base:netmanager_base_test,account/os_account:os_account_test,distributeddatamgr/relational_store:relational_store_test",
-        "buildTarget": "security/access_token:access_token_test,security/asset:asset_test,communication/dsoftbus:dsoftbus_test,communication/netmanager_base:netmanager_base_test,account/os_account:os_account_test,distributeddatamgr/relational_store:relational_store_test"
+        "selfTarget": "thirdparty/sqlite:sqlite_test,distributeddatamgr/kv_store:kv_store_test,security/access_token:access_token_test,security/asset:asset_test,communication/dsoftbus:dsoftbus_test,communication/netmanager_base:netmanager_base_test,account/os_account:os_account_test,distributeddatamgr/relational_store:relational_store_test",
+        "buildTarget": "thirdparty/sqlite:sqlite_test,distributeddatamgr/kv_store:kv_store_test,security/access_token:access_token_test,security/asset:asset_test,communication/dsoftbus:dsoftbus_test,communication/netmanager_base:netmanager_base_test,account/os_account:os_account_test,distributeddatamgr/relational_store:relational_store_test"
     },
     {
         "name": "third_party_wpa_supplicant",
