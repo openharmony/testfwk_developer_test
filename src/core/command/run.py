@@ -42,6 +42,7 @@ from core.testcase.testcase_manager import TestCaseManager
 from core.config.config_manager import UserConfigManager
 from core.config.parse_parts_config import ParsePartsConfig
 from core.config.resource_manager import ResourceManager
+from core.arkts_tdd.arkts_tdd_execute.arkts_tdd_build import run_test
 
 LOG = platform_logger("Run")
 
@@ -362,25 +363,46 @@ class Run(object):
             options.testdict = test_dict
             options.target_outpath = self.get_target_out_path(
                 options.productform)
-            setattr(options, "scheduler", "Scheduler")
-            scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
-                                   plugin_id=SchedulerType.SCHEDULER)[0]
-            if scheduler is None:
-                LOG.error("Can not find the scheduler plugin.")
+            if "arktstdd" in options.testtype:
+                local_time = time.localtime()
+                create_time = time.strftime('%Y-%m-%d-%H-%M-%S', local_time)
+                result_rootpath = os.path.join(sys.framework_root_dir, "reports", create_time)
+                log_path = os.path.join(result_rootpath, "log")
+                os.makedirs(log_path, exist_ok=True)
+
+                options.result_rootpath = result_rootpath
+                options.log_path = log_path
+
+                test_case_path = self.get_tests_out_path(options.productform)
+                if not os.path.exists(test_case_path):
+                    LOG.error("%s is not exist." % test_case_path)
+                    return {}
+
+                Binder.get_runtime_log().start_task_log(log_path)
+
+                options.testcases_path = os.path.join(test_case_path, options.testtype[0])
+                run_test(options)
+                Binder.get_runtime_log().stop_task_logcat()
             else:
-                options.testcases_path = self.get_tests_out_path(options.productform)
-                options.resource_path = os.path.abspath(os.path.join(
-                    sys.framework_root_dir, "..", "resource"))
-                if is_lite_product(options.productform,
-                                   sys.source_code_root_path):
-                    if options.productform.find("wifiiot") != -1:
-                        Binder.get_tdd_config().update_test_type_in_source(
-                            ".bin", DeviceTestType.ctest_lite)
-                        Binder.get_tdd_config().update_ext_type_in_source(
-                            "BIN", DeviceTestType.ctest_lite)
-                    else:
-                        print("productform is not wifiiot")
-                scheduler.exec_command(command, options)
+                setattr(options, "scheduler", "Scheduler")
+                scheduler = get_plugin(plugin_type=Plugin.SCHEDULER,
+                                       plugin_id=SchedulerType.SCHEDULER)[0]
+                if scheduler is None:
+                    LOG.error("Can not find the scheduler plugin.")
+                else:
+                    options.testcases_path = self.get_tests_out_path(options.productform)
+                    options.resource_path = os.path.abspath(os.path.join(
+                        sys.framework_root_dir, "..", "resource"))
+                    if is_lite_product(options.productform,
+                                       sys.source_code_root_path):
+                        if options.productform.find("wifiiot") != -1:
+                            Binder.get_tdd_config().update_test_type_in_source(
+                                ".bin", DeviceTestType.ctest_lite)
+                            Binder.get_tdd_config().update_ext_type_in_source(
+                                "BIN", DeviceTestType.ctest_lite)
+                        else:
+                            print("productform is not wifiiot")
+                    scheduler.exec_command(command, options)
         if need_record_history:
             #读文件获取运行结果
             from xdevice import Variables
