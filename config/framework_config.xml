@@ -58,8 +58,8 @@
             desc="benchmark"
             timeout="300" />
     <option name="ARKTSTDD"
- 	    desc="arktstdd"
- 	    timeout="900" />
+            desc="arktstdd"
+            timeout="900" />
     <option name="ALL"
             desc="ALL" />
   </test_category>
