@@ -376,7 +376,7 @@ class Run(object):
                 test_case_path = self.get_tests_out_path(options.productform)
                 if not os.path.exists(test_case_path):
                     LOG.error("%s is not exist." % test_case_path)
-                    return {}
+                    return
 
                 Binder.get_runtime_log().start_task_log(log_path)
 

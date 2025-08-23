@@ -26,6 +26,7 @@ HYPIUMPATH = "test/testfwk/arkxtest/jsunit/src_static/"
 TOOLSPATH = "test/testfwk/developer_test/libs/arkts1.2"
 ARKLINKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
 
+
 def get_path_code_directory(after_dir):
     """
     拼接绝对路径工具类
@@ -39,6 +40,7 @@ def get_path_code_directory(after_dir):
     full_path = os.path.join(root_path, after_dir)
 
     return full_path
+
 
 def run_command(command):
     try:
@@ -57,6 +59,7 @@ def run_command(command):
     except Exception as e:
         print(f"发生错误: {e}")
 
+
 def create_soft_link(target_path, link_path):
     try:
         print(f'{"*" * 35}开始创建软连接{"*" * 35}')
@@ -64,6 +67,7 @@ def create_soft_link(target_path, link_path):
         print(f'{"*" * 35}成功创建软链接：{link_path} -> {target_path}{"*" * 35}')
     except OSError as e:
         print(f'创建软连接失败：{e}')
+
 
 def run_toolchain_build():
     static_core_path = get_path_code_directory(STATICCOREPATH)
@@ -79,7 +83,7 @@ def run_toolchain_build():
         except OSError as e:
             print(f"删除文件时出错: {e}")
 
-    relative_path = os.path.relpath(target_path,os.path.dirname(link_path))
+    relative_path = os.path.relpath(target_path, os.path.dirname(link_path))
     # 创建软链接ln -s ../../../ets_frontend/ets2panda es2panda
     create_soft_link(relative_path, link_path)
 
@@ -97,6 +101,7 @@ def run_toolchain_build():
     for command in command_list:
         run_command(command)
 
+
 # 删除目录下的特定文件
 def delete_specific_files(directory, target_extension):
     """
@@ -108,13 +113,15 @@ def delete_specific_files(directory, target_extension):
     """
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file == target_extension:
-                file_path = os.path.join(root, file)
-                try:
-                    os.remove(file_path)
-                    print(f"已删除文件：{file_path}")
-                except Exception as e:
-                    print(f"删除文件 {file_path} 时出错：{str(e)}")
+            if file != target_extension:
+                continue
+            file_path = os.path.join(root, file)
+            try:
+                os.remove(file_path)
+                print(f"已删除文件：{file_path}")
+            except Exception as e:
+                print(f"删除文件 {file_path} 时出错：{str(e)}")
+
 
 # 删除某个目录下所有的文件和文件夹
 def remove_directory_contents(dir_path):
@@ -223,7 +230,6 @@ def build_tools(compile_filelist, hypium_output_dir):
         link_abc_files(output_dir)
 
 
-
 def collect_abc_files(output_dir):
     abc_files = []
 
@@ -237,6 +243,7 @@ def collect_abc_files(output_dir):
         abc_files.extend(out_files)
 
     return abc_files
+
 
 def build_ets_files(hypium_output_dir):
     # 将当前目录下的 .ets文件生成 file_map, 并追加写入 arktsconfig.json
@@ -316,19 +323,19 @@ def link_abc_files(output_dir):
 
 
 def main():
-     # 工具链编译
-     static_core_path = get_path_code_directory(STATICCOREPATH)
-     #清空上次编译结果
-     remove_directory_contents(os.path.join(static_core_path, "out"))
-     run_toolchain_build()
-     third_party_path = os.path.join(static_core_path, "third_party")
-     #删除third_party路径下的bundle.json防止编译出错
-     delete_specific_files(third_party_path, 'bundle.json')
-     # hypium编译
-     arktstest_output_path = 'out/generic_generic_arm_64only/general_all_phone_standard/tests/arktstdd/hypium'
-     hypium_output_dir = get_path_code_directory(arktstest_output_path)
-     build_ets_files(hypium_output_dir)
+    # 工具链编译
+    static_core_path = get_path_code_directory(STATICCOREPATH)
+    #清空上次编译结果
+    remove_directory_contents(os.path.join(static_core_path, "out"))
+    run_toolchain_build()
+    third_party_path = os.path.join(static_core_path, "third_party")
+    #删除third_party路径下的bundle.json防止编译出错
+    delete_specific_files(third_party_path, 'bundle.json')
+    # hypium编译
+    arktstest_output_path = 'out/generic_generic_arm_64only/general_all_phone_standard/tests/arktstdd/hypium'
+    hypium_output_dir = get_path_code_directory(arktstest_output_path)
+    build_ets_files(hypium_output_dir)
 
 
 if __name__ == '__main__':
-    main()        
+    main()  
