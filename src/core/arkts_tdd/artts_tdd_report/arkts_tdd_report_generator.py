@@ -1,8 +1,26 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+#
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 import datetime
 import xml.etree.ElementTree as ET
 from xdevice import platform_logger
 
 LOG = platform_logger("arkts_tdd_report_generator")
+
 
 class ResultConstruction(object):
     def __init__(self):
@@ -46,46 +64,45 @@ class ResultConstruction(object):
         testsuites.set("test_type", "OHJSUnitTest")
 
         for key, value in self.testsuite_summary.items():
-            if type(value) is dict:
-                testsuite = ET.SubElement(testsuites, "testsuite")
-                case_detail = value['case_detail']
-                fail_count = 0
-                for detail in case_detail:
-                    if detail['testcaseResult'] == 'fail':
-                        fail_count += 1
+            if not isinstance(value, dict):
+                continue
+            testsuite = ET.SubElement(testsuites, "testsuite")
+            case_detail = value['case_detail']
+            fail_count = 0
+            for detail in case_detail:
+                if detail['testcaseResult'] == 'fail':
+                    fail_count += 1
 
-                testsuite.set("name", key)
-                testsuite.set("time", str(float(value['testsuite_consuming']) / 1000))
-                testsuite.set("errors", "0")
-                testsuite.set("disabled", "0")
-                testsuite.set("failures", str(fail_count))
-                testsuite.set("ignored", "0")
-                testsuite.set("tests", value['testsuiteCaseNum'])
-                testsuite.set("report", "")
+            testsuite.set("name", key)
+            testsuite.set("time", str(float(value['testsuite_consuming']) / 1000))
+            testsuite.set("errors", "0")
+            testsuite.set("disabled", "0")
+            testsuite.set("failures", str(fail_count))
+            testsuite.set("ignored", "0")
+            testsuite.set("tests", value['testsuiteCaseNum'])
+            testsuite.set("report", "")
 
-                case_detail = value['case_detail']
-                for detail in case_detail:
-                    testcase = ET.SubElement(testsuite, "testcase")
-                    testcase.set("name", detail['case_name'])
-                    testcase.set("status", "run")
-                    testcase.set("time", str(float(detail['testcaseConsuming']) / 1000))
-                    testcase.set("classname", key)
+            case_detail = value['case_detail']
+            for detail in case_detail:
+                testcase = ET.SubElement(testsuite, "testcase")
+                testcase.set("name", detail['case_name'])
+                testcase.set("status", "run")
+                testcase.set("time", str(float(detail['testcaseConsuming']) / 1000))
+                testcase.set("classname", key)
 
-                    if detail['testcaseResult'] is not None:
-                        testcase.set("result", "completed")
+                if detail['testcaseResult'] is not None:
+                    testcase.set("result", "completed")
 
-                    testcase.set("level", "1")
+                testcase.set("level", "1")
 
-                    if detail['testcaseResult'] == 'fail':
-                        failure = ET.SubElement(testcase, "failure")
-                        failure.set("message", detail['testcaseFailDetail'])
-                        failure.set("type", "")
-                        failure.text = detail['testcaseFailDetail']
+                if detail['testcaseResult'] == 'fail':
+                    failure = ET.SubElement(testcase, "failure")
+                    failure.set("message", detail['testcaseFailDetail'])
+                    failure.set("type", "")
+                    failure.text = detail['testcaseFailDetail']
         self.indent(testsuites)
 
         # 将 ElementTree 写入 XML 文件
         tree = ET.ElementTree(testsuites)
-        tree.write(suite_result_file, encoding="UTF-8",
-                   xml_declaration=True,
-                   short_empty_elements=True)
+        tree.write(suite_result_file, encoding="UTF-8", xml_declaration=True, short_empty_elements=True)
         LOG.info(f"XML 文件已生成: {suite_result_file}")
