@@ -29,21 +29,19 @@ class ResultConstruction(object):
         self.end_time = None
         self.suite_file_name = None
 
-    # 美化 XML 格式 (可选)
-    def indent(self, elem, level=0):
-        i = "\n" + level * "  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level + 1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
+    def format_xml(self, elem_node, level=0):
+        if len(elem_node):
+            if not elem_node.text or not elem_node.text.strip():
+                elem_node.text = "\n" + level * "    "
+            if not elem_node.tail or not elem_node.tail.strip():
+                elem_node.tail = "\n" + level * "  "
+            for elem in elem_node:
+                self.format_xml(elem, level + 1)
+            if not elem_node.tail or not elem_node.tail.strip():
+                elem_node.tail = "\n" + level * "  "
         else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
+            if level and (not elem_node.tail or not elem_node.tail.strip()):
+                elem_node.tail = "\n" + level * "  "
 
     def node_construction(self, suite_result_file):
         # 创建根元素
@@ -100,7 +98,7 @@ class ResultConstruction(object):
                     failure.set("message", detail['testcaseFailDetail'])
                     failure.set("type", "")
                     failure.text = detail['testcaseFailDetail']
-        self.indent(testsuites)
+        self.format_xml(testsuites)
 
         # 将 ElementTree 写入 XML 文件
         tree = ET.ElementTree(testsuites)

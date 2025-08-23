@@ -104,18 +104,11 @@ def run_toolchain_build():
 
 # 删除目录下的特定文件
 def delete_specific_files(directory, target_extension):
-    """
-    删除指定目录及其子目录下所有指定扩展名的文件。
-
-    参数:
-        directory (str): 要搜索的目录路径
-        target_extension (str): 要删除的文件扩展名，例如 ".log"
-    """
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if file != target_extension:
+    for root_path, _, file_names in os.walk(directory):
+        for file_name in file_names:
+            if file_name != target_extension:
                 continue
-            file_path = os.path.join(root, file)
+            file_path = os.path.join(root_path, file_name)
             try:
                 os.remove(file_path)
                 print(f"已删除文件：{file_path}")
@@ -126,17 +119,15 @@ def delete_specific_files(directory, target_extension):
 # 删除某个目录下所有的文件和文件夹
 def remove_directory_contents(dir_path):
     print(f'dir_path:{dir_path}')
-    # os.walk会得到dir_path下各个后代文件夹和其中的文件的三元组列表
     if dir_path is not None:
-        for root, dirs, files in os.walk(dir_path, topdown=False):
+        for root_path, dir_paths, file_names in os.walk(dir_path, topdown=False):
             # 第一步：删除文件
-            for name in files:
-                os.remove(os.path.join(root, name))  # 删除文件
+            for file_name in file_names:
+                os.remove(os.path.join(root_path, file_name))
             # 第二步：删除空文件夹
-            for name in dirs:
-                os.rmdir(os.path.join(root, name))  # 删除一个空目录
+            for name in dir_paths:
+                os.rmdir(os.path.join(root_path, name))
 
-        # 加这段代码，最外层文件夹也一起删除
         if os.path.exists(dir_path):
             print(f'删除路径：{dir_path}')
             os.rmdir(dir_path)
