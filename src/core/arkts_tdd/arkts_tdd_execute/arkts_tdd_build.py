@@ -74,7 +74,7 @@ def run_test(options):
     exec_info.host_info = ""
     exec_info.test_time = test_time
     exec_info.log_path = log_path
-    exec_info.platform = "HarmonyOS"
+    exec_info.platform = ""
     exec_info.execute_time = ""
 
     result_report = ResultReporter()
