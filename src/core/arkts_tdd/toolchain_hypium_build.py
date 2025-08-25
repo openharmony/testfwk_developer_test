@@ -45,7 +45,8 @@ def get_path_code_directory(after_dir):
 def run_command(command):
     try:
         print(f'{"*" * 35}开始执行命令：{command}{"*" * 35}')
-        result = subprocess.run(command, shell=True,
+        command_list = command.split(" ")
+        result = subprocess.run(command_list,
                                 capture_output=True, text=True, check=True)
         if result.returncode == 0:
             print("命令执行成功")

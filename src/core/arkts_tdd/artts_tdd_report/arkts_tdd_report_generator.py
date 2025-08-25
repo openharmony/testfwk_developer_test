@@ -43,9 +43,7 @@ class ResultConstruction(object):
             if level and (not elem_node.tail or not elem_node.tail.strip()):
                 elem_node.tail = "\n" + level * "  "
 
-    def node_construction(self, suite_result_file):
-        # 创建根元素
-        testsuites = ET.Element("testsuites")
+    def set_testsuites_element(self, testsuites):
         testsuites.set("name", self.suite_file_name)
         testsuites.set("timestamp", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         testsuites.set("time", str(float(self.testsuite_summary['taskconsuming']) / 1000))
@@ -60,6 +58,11 @@ class ResultConstruction(object):
         testsuites.set("repeat", "1")  # ?
         testsuites.set("round", "1")  # ?
         testsuites.set("test_type", "OHJSUnitTest")
+
+    def node_construction(self, suite_result_file):
+        # 创建根元素
+        testsuites = ET.Element("testsuites")
+        self.set_testsuites_element(testsuites)
 
         for key, value in self.testsuite_summary.items():
             if not isinstance(value, dict):
