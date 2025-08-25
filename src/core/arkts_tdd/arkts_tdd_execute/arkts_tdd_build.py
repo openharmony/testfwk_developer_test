@@ -121,14 +121,7 @@ def write_output_to_log(result, log_file, testsuite_summary):
             case_index += 1
 
         if case_name + ' ; consuming ' in line:
-            testcase_result = line[9:13]
-            consuming_list = line.split(case_name + ' ; consuming ')
-            testcase_consuming = '0'
-            if len(consuming_list) > 1:
-                testcase_consuming = consuming_list[1].replace('ms', '')
-            testcase_map['testcaseResult'] = testcase_result
-            testcase_map['testcaseConsuming'] = testcase_consuming
-            LOG.info(f'[{case_index}/{testsuite_case_num.strip()}] {class_name}#{case_name} {testcase_result}')
+            testcase_result = get_testcase_result(case_index, case_name, class_name, line, testcase_map, testsuite_case_num)
 
         if testcase_result == 'fail' and line.startswith('[Hypium][failDetail]'):
             testcase_faildetail = line.replace('[Hypium][failDetail]', '')
@@ -151,6 +144,18 @@ def write_output_to_log(result, log_file, testsuite_summary):
         # 将输出写入文件
         log_file.write(output)
         log_file.flush()  # 确保内容立即写入文件
+
+
+def get_testcase_result(case_index, case_name, class_name, line, testcase_map, testsuite_case_num):
+    testcase_result = line[9:13]
+    consuming_list = line.split(case_name + ' ; consuming ')
+    testcase_consuming = '0'
+    if len(consuming_list) > 1:
+        testcase_consuming = consuming_list[1].replace('ms', '')
+    testcase_map['testcaseResult'] = testcase_result
+    testcase_map['testcaseConsuming'] = testcase_consuming
+    LOG.info(f'[{case_index}/{testsuite_case_num.strip()}] {class_name}#{case_name} {testcase_result}')
+    return testcase_result
 
 
 def run_abc_files(suite_file, log_path, testcases_path, result_path, index, suite_file_list, result_construction):
