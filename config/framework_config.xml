@@ -57,6 +57,9 @@
     <option name="BENCHMARK"
             desc="benchmark"
             timeout="300" />
+    <option name="ARKTSTDD"
+            desc="arktstdd"
+            timeout="900" />
     <option name="ALL"
             desc="ALL" />
   </test_category>
@@ -71,5 +74,6 @@
     <option name="security" />
     <option name="reliability" />
     <option name="benchmark" />
+    <option name="arktstdd" />
   </all_category>
 </framework_config>

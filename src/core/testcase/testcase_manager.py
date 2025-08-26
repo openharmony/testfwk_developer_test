@@ -41,7 +41,8 @@ TESTFILE_TYPE_DATA_DIC = {
     "OHJST": [],
     "JST": [],
     "LTPPosix": [],
-    "OHRust": []
+    "OHRust": [],
+    "ABC": []
 }
 FILTER_SUFFIX_NAME_LIST = [".TOC", ".info", ".pyc"]
 
@@ -291,6 +292,9 @@ class TestCaseManager(object):
                         suite_file_dictionary.get("CXX").append(suite_file)
                 elif suffix_name == ".bin":
                     suite_file_dictionary.get("BIN").append(suite_file)
+                elif (suffix_name == ".abc" and not os.path.dirname(suite_file).endswith("out")
+                    and not os.path.dirname(suite_file).endswith("hypium")):
+                    suite_file_dictionary.get("ABC").append(suite_file)
 
         return suite_file_dictionary
 
