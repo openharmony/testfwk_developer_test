@@ -43,6 +43,9 @@ def get_path_code_directory(after_dir):
 
 
 def run_command(command):
+    """
+    执行编译工具链命令
+    """
     try:
         print(f'{"*" * 35}开始执行命令：{command}{"*" * 35}')
         command_list = command.split(" ")
@@ -71,6 +74,9 @@ def create_soft_link(target_path, link_path):
 
 
 def run_toolchain_build():
+    """
+    调用公共方法执行编译工具链命令
+    """
     static_core_path = get_path_code_directory(STATICCOREPATH)
     os.path.join(static_core_path, "tools")
     current_dir = os.path.join(static_core_path, "tools")
@@ -225,7 +231,7 @@ def build_tools(compile_filelist, hypium_output_dir):
 def collect_abc_files(output_dir):
     abc_files = []
 
-    # 1. 收集out目录下的.abc文件
+    # 收集out目录下的.abc文件
     if os.path.exists(output_dir):
         out_files = [
             os.path.join(output_dir, f)
@@ -319,6 +325,7 @@ def main():
     static_core_path = get_path_code_directory(STATICCOREPATH)
     #清空上次编译结果
     remove_directory_contents(os.path.join(static_core_path, "out"))
+    #执行编译工具链命令
     run_toolchain_build()
     third_party_path = os.path.join(static_core_path, "third_party")
     #删除third_party路径下的bundle.json防止编译出错
