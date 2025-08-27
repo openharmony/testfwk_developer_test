@@ -12,7 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- export enum LogLevel {
+
+export enum LogLevel {
   DEBUG = 3,
   INFO = 4,
   WARN = 5,
