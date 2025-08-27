@@ -292,6 +292,7 @@ class TestCaseManager(object):
                         suite_file_dictionary.get("CXX").append(suite_file)
                 elif suffix_name == ".bin":
                     suite_file_dictionary.get("BIN").append(suite_file)
+                # 将arktstdd的测试文件加入测试文件字典
                 elif (suffix_name == ".abc" and not os.path.dirname(suite_file).endswith("out")
                     and not os.path.dirname(suite_file).endswith("hypium")):
                     suite_file_dictionary.get("ABC").append(suite_file)
