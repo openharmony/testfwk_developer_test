@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { BusinessError } from '@ohos.base';
 
 type AsyncCallback<T, E = void> = (error: BusinessError<E>, data: T) => void;

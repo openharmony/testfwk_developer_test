@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 import { AbilityDelegator as _AbilityDelegator, AbilityDelegatorInner } from 'AbilityDelegator'
 import { AbilityDelegatorArgs as _AbilityDelegatorArgs} from 'AbilityDelegatorArgs'
 import { ShellCmdResult as _ShellCmdResult } from 'ShellCmdResult'
+
 
 export default namespace abilityDelegatorRegistry {
   export type AbilityDelegator = _AbilityDelegator;
