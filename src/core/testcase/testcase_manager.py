@@ -242,7 +242,7 @@ class TestCaseManager(object):
             return suite_file_dictionary
 
         testcase_json_dic = {}
-        if os.part.exists(testcase_json) and testcase_json.endswith(".json"):
+        if os.path.exists(testcase_json) and testcase_json.endswith(".json"):
             testcase_json_dic = json.load(open(testcase_json))
 
         for part_name in os.listdir(test_case_out_path):
@@ -304,6 +304,7 @@ class TestCaseManager(object):
                         testcase_list = module_test_dic.get(prefix_name).get("testcase", [])
                         if not testcase_list:
                             level = module_test_dic.get(prefix_name).get("level", "")
+                            
                     if level in ["0", "1", "2", "3", "4"]:
                         test_level_dict[suite_file] = level
 
