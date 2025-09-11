@@ -323,7 +323,7 @@ class OHJSUnitTestDriver(IDriver):
                         testargs = {"level": level}
                     oh_jsunit_para_parse(self.runner, testargs)
                 else:
-                   oh_jsunit_para_parse(self.runner, self.config.testargs)
+                    oh_jsunit_para_parse(self.runner, self.config.testargs)
                 self._do_test_run(listener=request.listeners)
 
         finally:
