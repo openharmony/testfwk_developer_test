@@ -297,14 +297,14 @@ class TestCaseManager(object):
                     if module_test_dic and prefix_name not in module_test_dic:
                         continue
 
-                    if suffix_name not in [".dex", ".hap", ".py", ".bin", ""]:
+                    if suffix_name not in [".dex", ".hap", ".py", ".bin", None]:
                         continue
 
                     if module_test_dic and module_test_dic.get(prefix_name):
                         testcase_list = module_test_dic.get(prefix_name).get("testcase", [])
                         if not testcase_list:
                             level = module_test_dic.get(prefix_name).get("level", "")
-                            
+
                     if level in ["0", "1", "2", "3", "4"]:
                         test_level_dict[suite_file] = level
 
