@@ -216,6 +216,19 @@ class TestCaseManager(object):
         return suit_file_dictionary
 
     def get_all_test_file(self, test_case_out_path, options):
+        testcase_dict = {
+            "DEX": [],
+            "HAP": [],
+            "PYT": [],
+            "CXX": [],
+            "BIN": [],
+            "OHJST": [],
+            "JST": [],
+            "LTPPosix": [],
+            "OHRust": [],
+            "ABC": []
+        }
+        test_level_dict = {}
         suite_file_dictionary = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
         filter_part_list = FilterConfigManager().get_filtering_list(
             "subsystem_name", options.productform)
@@ -223,13 +236,26 @@ class TestCaseManager(object):
             "testfile_name", options.productform)
         # 遍历测试用例输出目录下面的所有文件夹，每个文件夹对应一个子系统
         command_list = options.current_raw_cmd.split(" ")
+        # testcase_json
+        testcase_json = options.testcasefile
+        if not testcase_json or not os.path.exists(testcase_json):
+            return suite_file_dictionary
+
+        testcase_json_dic = {}
+        if os.part.exists(testcase_json) and testcase_json.endswith(".json"):
+            testcase_json_dic = json.load(open(testcase_json))
+
         for part_name in os.listdir(test_case_out_path):
             if "-ss" in command_list or "-tp" in command_list:
                 if part_name not in options.partname_list:
                     continue
+            if testcase_json_dic and part_name not in testcase_json_dic:
+                continue
+
             part_case_dir = os.path.join(test_case_out_path, part_name)
             if not os.path.isdir(part_case_dir):
                 continue
+
             # 如果子系统在fiter_config.xml配置文件的<subsystem_name>下面配置过，则过滤
             if part_name in filter_part_list:
                 continue
@@ -251,6 +277,36 @@ class TestCaseManager(object):
                 if suffix_name in FILTER_SUFFIX_NAME_LIST:
                     continue
 
+                testcase_list = []
+                level = ""
+                if testcase_json_dic:
+                    part_test_dic = testcase_json_dic.get(part_name, {})
+                    if "level" in part_test_dic.keys():
+                        level = part_test_dic.pop("level", "")
+
+                    module_name = suite_file.replace(part_case_dir, "").replace(
+                        "\\", "/").strip("/").split("/")[0]
+
+                    if part_test_dic and module_name not in part_test_dic:
+                        continue
+
+                    module_test_dic = part_test_dic.get(module_name, {})
+                    if "level" in module_test_dic.keys():
+                        level = module_test_dic.pop("level", "")
+
+                    if module_test_dic and prefix_name not in module_test_dic:
+                        continue
+
+                    if suffix_name not in [".dex", ".hap", ".py", ".bin", ""]:
+                        continue
+
+                    if module_test_dic and module_test_dic.get(prefix_name):
+                        testcase_list = module_test_dic.get(prefix_name).get("testcase", [])
+                        if not testcase_list:
+                            level = module_test_dic.get(prefix_name).get("level", "")
+                    if level in ["0", "1", "2", "3", "4"]:
+                        test_level_dict[suite_file] = level
+
                 if not self.get_valid_suite_file(test_case_out_path,
                                                 suite_file,
                                                 options):
@@ -258,6 +314,8 @@ class TestCaseManager(object):
 
                 if suffix_name == ".dex":
                     suite_file_dictionary.get("DEX").append(suite_file)
+                    if testcase_list
+                        testcase_dict["DEX"][prefix_name] = ":".join(testcase_list)
                 elif suffix_name == ".hap":
                     if self.get_hap_test_driver(suite_file) == "OHJSUnitTest":
                         # 如果stage测试指定了-tp，只有部件名与moduleInfo中part一致的HAP包才会加入最终执行的队列
@@ -276,27 +334,45 @@ class TestCaseManager(object):
                                 continue
                         if not self.check_hap_test_file(suite_file):
                             continue
+
                         suite_file_dictionary.get("OHJST").append(suite_file)
+                        if testcase_list:
+                            testcase_dict["OHJST"][]prefix_name = ":".join(testcase_list)
                     if self.get_hap_test_driver(suite_file) == "JSUnitTest":
                         suite_file_dictionary.get("JST").append(suite_file)
+                        if testcase_list:
+                            testcase_dict["JST"][]prefix_name = ":".join(testcase_list)
                 elif suffix_name == ".py":
                     if not self.check_python_test_file(suite_file):
                         continue
+
                     suite_file_dictionary.get("PYT").append(suite_file)
+                    if testcase_list:
+                            testcase_dict["PYT"][]prefix_name = ":".join(testcase_list)
                 elif suffix_name == "":
                     if file_name.startswith("rust_"):
                         Binder.get_tdd_config().update_test_type_in_source(
                             "OHRust", DeviceTestType.oh_rust_test)
                         suite_file_dictionary.get("OHRust").append(suite_file)
+                        if testcase_list:
+                            testcase_dict["OHRUST"][]prefix_name = ":".join(testcase_list)
                     else:
                         suite_file_dictionary.get("CXX").append(suite_file)
+                        if testcase_list:
+                            testcase_dict["CXX"][]prefix_name = ":".join(testcase_list)
                 elif suffix_name == ".bin":
                     suite_file_dictionary.get("BIN").append(suite_file)
+                    if testcase_list:
+                            testcase_dict["BIN"][]prefix_name = ":".join(testcase_list)
                 # 将arktstdd的测试文件加入测试文件字典
                 elif (suffix_name == ".abc" and not os.path.dirname(suite_file).endswith("out")
                     and not os.path.dirname(suite_file).endswith("hypium")):
                     suite_file_dictionary.get("ABC").append(suite_file)
-
+                    if testcase_list:
+                            testcase_dict["ABC"][]prefix_name = ":".join(testcase_list)
+        
+        options.testcase_dict = testcase_dict
+        options.test_level_dict = test_level_dict
         return suite_file_dictionary
 
     def get_part_deps_files(self, external_deps_path, testpart):

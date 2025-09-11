@@ -59,8 +59,8 @@ def oh_jsunit_para_parse(runner, junit_paras):
     for para_name in junit_paras.keys():
         para_name = para_name.strip()
         para_values = junit_paras.get(para_name, [])
-        if para_name == "class":
-            runner.add_arg(para_name, ",".join(para_values))
+        if para_name == "class" or para_name in ["HAP", "CXX"]:
+            runner.add_arg("class", ",".join(para_values))
         elif para_name == "notClass":
             runner.add_arg(para_name, ",".join(para_values))
         elif para_name == "testType":
@@ -309,7 +309,21 @@ class OHJSUnitTestDriver(IDriver):
                     # execute test case
                 self._do_tf_suite()
                 self._make_exclude_list_file(request)
-                oh_jsunit_para_parse(self.runner, self.config.testargs)
+                if self.config.get("testcasefile"):
+                    suite_file = request.root.source.source_file
+                    prefix_name, _ = os.path.splitext(os.path.basename(suite_file))
+                    testcase = self.config.testcase_dict.get("OHJST", {}).get(prefix_name, [])
+                    level = self.config.test_level_dict.get(suite_file, "")
+                    testargs = {}
+                    if testcase:
+                        testcase = [testcase]
+                        testargs = {"class": testcase}
+
+                    if level and not testcase:
+                        testargs = {"level": level}
+                    oh_jsunit_para_parse(self.runner, testargs)
+                else:
+                   oh_jsunit_para_parse(self.runner, self.config.testargs)
                 self._do_test_run(listener=request.listeners)
 
         finally:

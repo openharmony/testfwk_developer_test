@@ -574,6 +574,7 @@ class CppTestDriver(IDriver):
             self.config = request.config
             self.config.target_test_path = DEFAULT_TEST_PATH
             self.config.device = request.config.environment.devices[0]
+            self.config.test_level_dict = request.config.test_level_dict
 
             suite_file = request.root.source.source_file
             LOG.debug("Testsuite FilePath: %s" % suite_file)
@@ -652,13 +653,19 @@ class CppTestDriver(IDriver):
 
     def _gtest_command(self, suite_file):
         filename = os.path.basename(suite_file)
-        test_para = self._get_test_para(self.config.testcase,
+        if self.config.testcase:
+            testcase = self.config.testcase
+        else:
+            testcase = self.config.tesecase_dict["CXX"].get(filename, "")
+        test_para = self._get_test_para(testcase,
+                                        self.config.testcase,
                                         self.config.testlevel,
                                         self.config.testtype,
                                         self.config.target_test_path,
                                         suite_file,
                                         filename,
-                                        self.config.iteration)
+                                        self.config.iteration,
+                                        self.config.test_level_dict.get(suite_file, ""))
 
         # execute testcase
         if not self.config.coverage:
@@ -808,7 +815,8 @@ class CppTestDriver(IDriver):
                        target_test_path,
                        suite_file,
                        filename,
-                       iteration):
+                       iteration,
+                       case_level=""):
         if "benchmark" == testtype[0]:
             test_para = (" --benchmark_out_format=json"
                          " --benchmark_out=%s%s.json") % (
@@ -817,8 +825,11 @@ class CppTestDriver(IDriver):
 
         if "" != testcase and "" == testlevel:
             test_para = "%s=%s" % (GTestConst.exec_para_filter, testcase)
-        elif "" == testcase and "" != testlevel:
+        elif "" == testcase and "" != testlevel and not case_level:
             level_para = get_level_para_string(testlevel)
+            test_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
+        elif "" == testcase and not testlevel and case_level:
+            level_para = get_level_para_string(case_level)
             test_para = "%s=%s" % (GTestConst.exec_para_level, level_para)
         else:
             test_para = ""
@@ -875,23 +886,23 @@ class JSUnitTestDriver(IDriver):
             self.config.target_test_path = DEFAULT_TEST_PATH
             self.config.device = request.config.environment.devices[0]
 
-            suite_file = request.root.source.source_file
-            result_save_path = get_result_savepath(suite_file, self.config.report_path)
+            self.suite_file = request.root.source.source_file
+            result_save_path = get_result_savepath(self.suite_file, self.config.report_path)
             self.result = os.path.join(result_save_path, "%s.xml" % request.get_module_name())
-            if not suite_file:
+            if not self.suite_file:
                 LOG.error("test source '%s' not exists" %
                           request.root.source.source_string)
                 return
 
             if not self.config.device:
-                result = ResultManager(suite_file, self.config)
+                result = ResultManager(self.suite_file, self.config)
                 result.set_is_coverage(False)
                 result.make_empty_result_file(
                     "No test device is found")
                 return
 
             package_name, ability_name = self._get_package_and_ability_name(
-                suite_file)
+                self.suite_file)
             self.package_name = package_name
             self.ability_name = ability_name
             self.config.test_hap_out_path = \
@@ -912,7 +923,7 @@ class JSUnitTestDriver(IDriver):
                 _, self.hilog_proc = self.config.device.device_log_collector.\
                     start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
                 self._init_jsunit_test()
-                self._run_jsunit(suite_file, self.hilog)
+                self._run_jsunit(self.suite_file, self.hilog)
                 hilog_file_pipe.flush()
                 self.generate_console_output(self.hilog, request)
                 xml_path = os.path.join(
