@@ -214,6 +214,7 @@ class Run(object):
         LOG.info("runhistory   = %s" % options.runhistory)
         LOG.info("partname_list = %s" % str(options.partname_list))
         LOG.info("partdeps = %s" % options.partdeps)
+        LOG.info("testcase_file = %s" % options.testcasefile)
         LOG.info("------------------------------------")
         LOG.info("")
 

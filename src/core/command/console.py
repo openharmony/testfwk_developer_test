@@ -230,6 +230,13 @@ class Console(object):
                                 default="",
                                 help="Specify test suites list file"
                                 )
+            parser.add_argument("-tcf", "--testcasefile",
+                                action="store",
+                                type=str,
+                                dest="testcasefile",
+                                default="",
+                                help="Add the test case to be executed to the JSON config file"
+                                )
             parser.add_argument("-res", "--resource",
                                 action="store",
                                 type=str,
@@ -483,6 +490,7 @@ class ConfigConst(object):
     testlist = "testlist"
     testfile = "testfile"
     testcase = "testcase"
+    testcasefile = "testcasefile"
     testdict = "testdict"
     device_sn = "device_sn"
     report_path = "report_path"
