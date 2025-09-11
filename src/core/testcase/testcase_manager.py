@@ -297,7 +297,7 @@ class TestCaseManager(object):
                     if module_test_dic and prefix_name not in module_test_dic:
                         continue
 
-                    if suffix_name not in [".dex", ".hap", ".py", ".bin", None]:
+                    if suffix_name not in [".dex", ".hap", ".py", ".bin", ""]:
                         continue
 
                     if module_test_dic and module_test_dic.get(prefix_name):
