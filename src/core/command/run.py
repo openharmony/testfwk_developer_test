@@ -214,6 +214,7 @@ class Run(object):
         LOG.info("runhistory   = %s" % options.runhistory)
         LOG.info("partname_list = %s" % str(options.partname_list))
         LOG.info("partdeps = %s" % options.partdeps)
+        LOG.info("testcase_file = %s" % options.testcasefile)
         LOG.info("------------------------------------")
         LOG.info("")
 
@@ -363,14 +364,17 @@ class Run(object):
             options.testdict = test_dict
             options.target_outpath = self.get_target_out_path(
                 options.productform)
+            # 开始执行arktstdd用例
             if "arktstdd" in options.testtype:
                 local_time = time.localtime()
                 create_time = time.strftime('%Y-%m-%d-%H-%M-%S', local_time)
+                # 定义report目录
                 result_rootpath = os.path.join(sys.framework_root_dir, "reports", create_time)
                 log_path = os.path.join(result_rootpath, "log")
                 os.makedirs(log_path, exist_ok=True)
-
+                # report目录
                 options.result_rootpath = result_rootpath
+                # log目录
                 options.log_path = log_path
 
                 test_case_path = self.get_tests_out_path(options.productform)
@@ -379,8 +383,9 @@ class Run(object):
                     return
 
                 Binder.get_runtime_log().start_task_log(log_path)
-
+                # 测试用例路径
                 options.testcases_path = os.path.join(test_case_path, options.testtype[0])
+                # 用例执行及报告生成
                 run_test(options)
                 Binder.get_runtime_log().stop_task_logcat()
             else:
