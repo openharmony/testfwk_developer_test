@@ -217,16 +217,16 @@ class TestCaseManager(object):
 
     def get_all_test_file(self, test_case_out_path, options):
         testcase_dict = {
-            "DEX": [],
-            "HAP": [],
-            "PYT": [],
-            "CXX": [],
-            "BIN": [],
-            "OHJST": [],
-            "JST": [],
-            "LTPPosix": [],
-            "OHRust": [],
-            "ABC": []
+            "DEX": {},
+            "HAP": {},
+            "PYT": {},
+            "CXX": {},
+            "BIN": {},
+            "OHJST": {},
+            "JST": {},
+            "LTPPosix": {},
+            "OHRust": {},
+            "ABC": {}
         }
         test_level_dict = {}
         suite_file_dictionary = copy.deepcopy(TESTFILE_TYPE_DATA_DIC)
@@ -238,7 +238,7 @@ class TestCaseManager(object):
         command_list = options.current_raw_cmd.split(" ")
         # testcase_json
         testcase_json = options.testcasefile
-        if not testcase_json or not os.path.exists(testcase_json):
+        if testcase_json and not os.path.exists(testcase_json):
             return suite_file_dictionary
 
         testcase_json_dic = {}
@@ -307,11 +307,11 @@ class TestCaseManager(object):
 
                     if level in ["0", "1", "2", "3", "4"]:
                         test_level_dict[suite_file] = level
-
-                if not self.get_valid_suite_file(test_case_out_path,
-                                                suite_file,
-                                                options):
-                    continue
+                else:
+                    if not self.get_valid_suite_file(test_case_out_path,
+                                                    suite_file,
+                                                    options):
+                        continue
 
                 if suffix_name == ".dex":
                     suite_file_dictionary.get("DEX").append(suite_file)
@@ -414,6 +414,28 @@ class TestCaseManager(object):
         if not os.path.exists(xts_test_case_path):
             LOG.error("xts %s is not exist." % xts_test_case_path)
             return xts_suit_file_dic
+        
+        testcase_dict = {
+            "DEX": {},
+            "HAP": {},
+            "PYT": {},
+            "CXX": {},
+            "BIN": {},
+            "OHJST": {},
+            "JST": {},
+            "LTPPosix": {},
+            "OHRust": {},
+            "ABC": {}
+        }
+        test_level_dict = {}
+        testcase_json = options.testcasefile
+        if testcase_json and not os.path.exists(testcase_json):
+            return xts_suit_file_dic
+
+        testcase_json_dic = {}
+        if os.path.exists(testcase_json) and testcase_json.endswith(".json"):
+            testcase_json_dic = json.load(open(testcase_json))
+
         # 获取XTS测试用例输出目录下面的所有文件路径列表
         xts_suite_file_list = get_file_list_by_postfix(xts_test_case_path)
         for xts_suite_file in xts_suite_file_list:
@@ -421,14 +443,49 @@ class TestCaseManager(object):
             prefix_name, suffix_name = os.path.splitext(file_name)
             if not self.check_xts_config_match(options, prefix_name, xts_suite_file):
                 continue
+
+            json_config_part = self.get_part_name_test_file(xts_suite_file)
+            level = ""
+            testcase_list = []
+            if testcase_json_dic:
+                if json_config_part not in testcase_json_dic:
+                    continue
+
+                part_test_dic = testcase_json_dic.get(json_config_part)
+                if part_test_dic and "level" in part_test_dic.keys():
+                    level = part_test_dic.pop("level", "")
+
+                if part_test_dic and prefix_name not in part_test_dic:
+                    continue
+
+                suite_dic = part_test_dic.get(prefix_name, {})
+                if suite_dic and "level" in suite_dic.keys():
+                    testcase_list = part_test_dic.get(prefix_name, {}).get("testcase", [])
+                    if not testcase_list:
+                        level = suite_dic.pop("level", "")
+                
+                if level in ["0", "1", "2", "3", "4"]:
+                    test_level_dict[xts_suite_file] = level
+
             if suffix_name == "":
                 if file_name == "HatsOpenPosixTest":
                     xts_suit_file_dic.get("LTPPosix").append(xts_suite_file)
+                    if testcase_list:
+                        testcase_dict["LTPPosix"][prefix_name] = ",".join(testcase_list)
                 else:
                     xts_suit_file_dic.get("CXX").append(xts_suite_file)
+                    if testcase_list:
+                        testcase_dict["CXX"][prefix_name] = ",".join(testcase_list)
             elif suffix_name == ".hap":
                 if self.get_hap_test_driver(xts_suite_file) == "OHJSUnitTest":
                     xts_suit_file_dic.get("OHJST").append(xts_suite_file)
+                    if testcase_list:
+                        testcase_dict["OHJST"][prefix_name] = ",".join(testcase_list)
                 if self.get_hap_test_driver(xts_suite_file) == "JSUnitTest":
                     xts_suit_file_dic.get("JST").append(xts_suite_file)
+                    if testcase_list:
+                        testcase_dict["JST"][prefix_name] = ",".join(testcase_list)
+
+        options.testcase_dict = testcase_dict
+        options.test_level_dict = test_level_dict
         return xts_suit_file_dic

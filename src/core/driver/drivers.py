@@ -656,7 +656,7 @@ class CppTestDriver(IDriver):
         if self.config.testcase:
             testcase = self.config.testcase
         else:
-            testcase = self.config.tesecase_dict.get("CXX", {}).get(filename, "")
+            testcase = self.config.testcase_dict.get("CXX", {}).get(filename, "")
         test_para = self._get_test_para(testcase,
                                         self.config.testcase,
                                         self.config.testlevel,
