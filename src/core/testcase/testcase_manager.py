@@ -338,39 +338,39 @@ class TestCaseManager(object):
 
                         suite_file_dictionary.get("OHJST").append(suite_file)
                         if testcase_list:
-                            testcase_dict["OHJST"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["OHJST"][prefix_name] = ":".join(testcase_list)
                     if self.get_hap_test_driver(suite_file) == "JSUnitTest":
                         suite_file_dictionary.get("JST").append(suite_file)
                         if testcase_list:
-                            testcase_dict["JST"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["JST"][prefix_name] = ":".join(testcase_list)
                 elif suffix_name == ".py":
                     if not self.check_python_test_file(suite_file):
                         continue
 
                     suite_file_dictionary.get("PYT").append(suite_file)
                     if testcase_list:
-                            testcase_dict["PYT"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["PYT"][prefix_name] = ":".join(testcase_list)
                 elif suffix_name == "":
                     if file_name.startswith("rust_"):
                         Binder.get_tdd_config().update_test_type_in_source(
                             "OHRust", DeviceTestType.oh_rust_test)
                         suite_file_dictionary.get("OHRust").append(suite_file)
                         if testcase_list:
-                            testcase_dict["OHRUST"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["OHRUST"][prefix_name] = ":".join(testcase_list)
                     else:
                         suite_file_dictionary.get("CXX").append(suite_file)
                         if testcase_list:
-                            testcase_dict["CXX"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["CXX"][prefix_name] = ":".join(testcase_list)
                 elif suffix_name == ".bin":
                     suite_file_dictionary.get("BIN").append(suite_file)
                     if testcase_list:
-                            testcase_dict["BIN"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["BIN"][prefix_name] = ":".join(testcase_list)
                 # 将arktstdd的测试文件加入测试文件字典
                 elif (suffix_name == ".abc" and not os.path.dirname(suite_file).endswith("out")
                     and not os.path.dirname(suite_file).endswith("hypium")):
                     suite_file_dictionary.get("ABC").append(suite_file)
                     if testcase_list:
-                            testcase_dict["ABC"][]prefix_name = ":".join(testcase_list)
+                            testcase_dict["ABC"][prefix_name] = ":".join(testcase_list)
         
         options.testcase_dict = testcase_dict
         options.test_level_dict = test_level_dict
