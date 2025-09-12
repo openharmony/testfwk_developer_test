@@ -315,7 +315,7 @@ class TestCaseManager(object):
 
                 if suffix_name == ".dex":
                     suite_file_dictionary.get("DEX").append(suite_file)
-                    if testcase_list
+                    if testcase_list:
                         testcase_dict["DEX"][prefix_name] = ":".join(testcase_list)
                 elif suffix_name == ".hap":
                     if self.get_hap_test_driver(suite_file) == "OHJSUnitTest":
