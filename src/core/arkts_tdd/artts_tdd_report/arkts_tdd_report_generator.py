@@ -44,6 +44,7 @@ class ResultConstruction(object):
                 elem_node.tail = "\n" + level * "  "
 
     def set_testsuites_element(self, testsuites):
+        # 构造testsuites的节点信息
         testsuites.set("name", self.suite_file_name)
         testsuites.set("timestamp", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         testsuites.set("time", str(float(self.testsuite_summary['taskconsuming']) / 1000))
@@ -60,6 +61,7 @@ class ResultConstruction(object):
         testsuites.set("test_type", "OHJSUnitTest")
 
     def node_construction(self, suite_result_file):
+        # 构造xml文件的节点信息
         # 创建根元素
         testsuites = ET.Element("testsuites")
         self.set_testsuites_element(testsuites)
@@ -73,7 +75,7 @@ class ResultConstruction(object):
             for detail in case_detail:
                 if detail['testcaseResult'] == 'fail':
                     fail_count += 1
-
+            # 构造testsuite的节点信息
             testsuite.set("name", key)
             testsuite.set("time", str(float(value['testsuite_consuming']) / 1000))
             testsuite.set("errors", "0")
@@ -82,7 +84,7 @@ class ResultConstruction(object):
             testsuite.set("ignored", "0")
             testsuite.set("tests", value['testsuiteCaseNum'])
             testsuite.set("report", "")
-
+            # 构造testcase的节点信息
             case_detail = value['case_detail']
             for detail in case_detail:
                 testcase = ET.SubElement(testsuite, "testcase")
@@ -101,6 +103,7 @@ class ResultConstruction(object):
                     failure.set("message", detail['testcaseFailDetail'])
                     failure.set("type", "")
                     failure.text = detail['testcaseFailDetail']
+        # 美化xml格式
         self.format_xml(testsuites)
 
         # 将 ElementTree 写入 XML 文件
