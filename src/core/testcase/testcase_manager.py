@@ -372,6 +372,10 @@ class TestCaseManager(object):
                     if testcase_list:
                         testcase_dict["ABC"][prefix_name] = ":".join(testcase_list)
         
+        if "testcase_dict" in vars(options) and "test_level_dict" in vars(options):
+            testcase_dict.update(options.testcase_dict)
+            test_level_dict.update(options.test_level_dict)
+
         options.testcase_dict = testcase_dict
         options.test_level_dict = test_level_dict
         return suite_file_dictionary
@@ -459,8 +463,10 @@ class TestCaseManager(object):
                     continue
 
                 suite_dic = part_test_dic.get(prefix_name, {})
-                if suite_dic and "level" in suite_dic.keys():
+                if suite_dic:
                     testcase_list = part_test_dic.get(prefix_name, {}).get("testcase", [])
+                    
+                if suite_dic and "level" in suite_dic.keys():
                     if not testcase_list:
                         level = suite_dic.pop("level", "")
                 
