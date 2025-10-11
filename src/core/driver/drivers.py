@@ -718,10 +718,11 @@ class CppTestDriver(IDriver):
 
         # push testsuite file
         self.config.device.push_file(suite_file, self.config.target_test_path)
-        self.config.device.execute_shell_command(
-            "hilog -d %s" % (os.path.join(self.config.target_test_path,
-                                          os.path.basename(suite_file)))
-        )
+        if self.config.hilogswitch != "0":
+            self.config.device.execute_shell_command(
+                "hilog -d %s" % (os.path.join(self.config.target_test_path,
+                                              os.path.basename(suite_file)))
+            )
         self._push_corpus_if_exist(suite_file)
 
         # push resource files
