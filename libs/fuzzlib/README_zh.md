@@ -36,7 +36,7 @@ Fuzzing测试框架使用了LLVM编译器框架中的[libFuzzer](https://llvm.or
 
 ### 配置启动测试框架<a name="section005187487501"></a>
 
-参考[ 开发者测试组件](https://gitee.com/openharmony/testfwk_developer_test/blob/master/README_zh.md)中的描述完成测试框架安装、设备连接配置，并在linux环境下通过
+参考[ 开发者测试组件](https://gitcode.com/openharmony/testfwk_developer_test/blob/master/README_zh.md)中的描述完成测试框架安装、设备连接配置，并在linux环境下通过
 
 ```
 ./start.sh

@@ -356,8 +356,8 @@ The Python environment is required.
 
 ## Repositories Involved<a name="section6299103515474"></a>
 
-[testing subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/test.md)
+[testing subsystem](https://gitcode.com/openharmony/docs/blob/master/en/readme/test.md)
 
 **test\_developer_test**
 
-[test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice/blob/master/README_zh.md)
+[test\_xdevice](https://gitcode.com/openharmony/testfwk_xdevice/blob/master/README_zh.md)
