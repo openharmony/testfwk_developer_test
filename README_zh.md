@@ -4,8 +4,8 @@ OpenHarmony为开发者提供了一套全面的开发自测试框架OHA-develope
 本文从基础环境构建，用例开发，编译以及执行等方面介绍OpenHarmony开发自测试执行框架如何运行和使用。
 ## 基础环境构建
 开发自测试框架依赖于python运行环境,python版本为3.8.X,在使用测试框架之前可参阅以下方式进行配置。
- - [环境配置](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/device-test/developer_test.md)
- - [源码获取](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/sourcecode-acquire.md)
+ - [环境配置](https://gitcode.com/openharmony/docs/blob/master/zh-cn/device-dev/device-test/developer_test.md)
+ - [源码获取](https://gitcode.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/sourcecode-acquire.md)
 
 开发自测试框架依赖于测试调度框架testfwk_xdevice，在使用时两个框架放在同级目录
 
@@ -527,12 +527,12 @@ subsystem  # 子系统
 
 **Fuzz测试**
 
-[Fuzz用例编写规范](https://gitee.com/openharmony/testfwk_developer_test/blob/master/libs/fuzzlib/README_zh.md)
+[Fuzz用例编写规范](https://gitcode.com/openharmony/testfwk_developer_test/blob/master/libs/fuzzlib/README_zh.md)
 
 
 **Benchmark测试**
 
-[Benchmark用例编写规范](https://gitee.com/openharmony/testfwk_developer_test/blob/master/libs/benchmark/README_zh.md)
+[Benchmark用例编写规范](https://gitcode.com/openharmony/testfwk_developer_test/blob/master/libs/benchmark/README_zh.md)
 
 
 #### 测试用例编译文件编写
@@ -1182,7 +1182,7 @@ reports/platform_log_xxxx_xx_xx_xx_xx_xx.log
        C:   cflags = [ "--coverage" ]
        C++: cflags_cc = [ "--coverage" ]
             
-**推荐：**     也可以参考窗口子系统的方式（推荐这种方式），参考链接：https://gitee.com/openharmony/window_window_manager/pulls/1274/files
+**推荐：**     也可以参考窗口子系统的方式（推荐这种方式），参考链接：https://gitcode.com/openharmony/window_window_manager/pull/1274/diffs
 3. 执行覆盖率需要安装以下依赖包：
    
        1）安装lcov, 安装命令：sudo apt install lcov
@@ -1220,7 +1220,7 @@ reports/platform_log_xxxx_xx_xx_xx_xx_xx.log
    接口覆盖率报告：/test/testfwk/developer_test/localCoverage/interfaceCoverage/results/coverage/interface_kits/html
 ### 涉及仓
 
-[test\_xdevice](https://gitee.com/openharmony/testfwk_xdevice)
+[test\_xdevice](https://gitcode.com/openharmony/testfwk_xdevice)
 
 ## 发布版本说明
 
