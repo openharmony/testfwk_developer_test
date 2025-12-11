@@ -732,7 +732,6 @@ class CppTestDriver(IDriver):
                                                self.config.device)
 
         command = self._gtest_command(suite_file)
-
         result = ResultManager(suite_file, self.config)
         result.set_is_coverage(is_coverage_test)
 
