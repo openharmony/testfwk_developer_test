@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 export interface AbilityDelegatorArgs {
   bundleName: string;
   parameters: Record<string, string>;
