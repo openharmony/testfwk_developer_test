@@ -18,11 +18,13 @@ import os
 import subprocess
 import shutil
 import json
+import re
 
 STATICCOREPATH = "arkcompiler/runtime_core/static_core/"
 ES2PANDAPATH = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
 CONFIGPATH = "arkcompiler/runtime_core/static_core/out/bin/arktsconfig.json"
 HYPIUMPATH = "test/testfwk/arkxtest/jsunit/src_static/"
+DESTHYPIUMPATH = "test/testfwk/developer_test/libs/destHypium"
 TOOLSPATH = "test/testfwk/developer_test/libs/arkts1.2"
 ARKLINKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
 
@@ -58,10 +60,16 @@ def run_command(command):
             print("命令执行失败")
             print("错误:", result.stderr)
         print(f'{"*" * 35}命令：{command}执行结束{"*" * 35}')
+    except subprocess.CalledProcessError as e:
+        print(f"命令执行失败（返回码: {e.returncode}）")
+        print("错误输出:", e.stderr.strip())
+        raise
     except FileNotFoundError:
         print("错误：未找到 sudo 命令。请确保已安装 sudo。")
+        raise
     except Exception as e:
         print(f"发生错误: {e}")
+        raise
 
 
 def create_soft_link(target_path, link_path):
@@ -79,16 +87,19 @@ def run_toolchain_build():
     """
     static_core_path = get_path_code_directory(STATICCOREPATH)
     os.path.join(static_core_path, "tools")
-    current_dir = os.path.join(static_core_path, "tools")
-    os.chdir(current_dir)
-    target_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(current_dir))), 'ets_frontend/ets2panda')
-    link_path = os.path.join(current_dir, 'es2panda')
+    tools_path = os.path.join(static_core_path, "tools")
+    os.chdir(tools_path)
+    # 创建软链接
+    target_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(tools_path))), 'ets_frontend/ets2panda')
+    link_path = os.path.join(tools_path, 'es2panda')
+    # 删除旧链接
     if os.path.exists(link_path):
         try:
             os.remove(link_path)
-            print(f"文件 {link_path} 已成功删除。")
+            print(f"软连接 {link_path} 已成功删除。")
         except OSError as e:
-            print(f"删除文件时出错: {e}")
+            print(f"删除软连接 时出错: {e}")
+            raise
 
     relative_path = os.path.relpath(target_path, os.path.dirname(link_path))
     # 创建软链接ln -s ../../../ets_frontend/ets2panda es2panda
@@ -106,7 +117,13 @@ def run_toolchain_build():
     command_list = [command_1, command_2, command_3, command_4, command_5, command_6, command_7]
 
     for command in command_list:
-        run_command(command)
+        try:
+            run_command(command)
+        except Exception as e:
+            print(f"命令执行失败: {command}")
+            print(f"错误详情: {e}")
+            print("工具链构建失败，将跳过后续的 hypium 编译。")
+            raise
 
 
 # 删除目录下的特定文件
@@ -140,7 +157,7 @@ def remove_directory_contents(dir_path):
             os.rmdir(dir_path)
 
 
-#*************hypium build***************
+# *************hypium build***************
 def write_arktsconfig_file():
     """
     将当前目录下的 .ets文件生成 file_map, 并追加写入 arktsconfig.json
@@ -213,19 +230,33 @@ def build_tools(compile_filelist, hypium_output_dir):
             # 成功编译
             print(f"成功编译'{ets_file}', 输出路径： {output_filepath}")
 
+        except subprocess.CalledProcessError as e:
+            print(f"'{ets_file}' 编译失败（返回码: {e.returncode}）")
+            if e.stderr:
+                print("错误输出:", e.stderr.strip())
+            print(f"编译失败，流程终止。请检查上述文件。")
+            raise
         except Exception as e:
             print(f"'{ets_file}'编译失败:{e}")
             break
-
+    # 所有文件都成功编译，统计 .abc 文件数量
     count = 0
     for root, _, filenames in os.walk(output_dir):
         for filename in filenames:
             if filename.endswith(".abc"):
                 count += 1
 
+    # 判断是否全部编译成功
+    if count != len(compile_filelist):
+        print(f"WARNING: 预期编译 {len(compile_filelist)} 个文件，"
+              f"但只找到 {count} 个 .abc 文件。")
+        print("可能有文件未正确生成，流程终止。")
+        raise RuntimeError("编译结果不完整，部分文件未生成 .abc 输出。")
+
     # 如果hypium和tools所有的文件都编译成功,则把所有abc文件link成一个abc文件
-    if count == len(compile_filelist):
-        link_abc_files(output_dir)
+    link_abc_files(output_dir)
+
+    print(f"工具链编译与链接完成！在{hypium_output_dir}目录下生成hypium_tools.abc")
 
 
 def collect_abc_files(output_dir):
@@ -259,9 +290,12 @@ def build_ets_files(hypium_output_dir):
         print(f'文件夹不存在：{hypium_output_dir}')
 
     abs_hypium_path = get_path_code_directory(HYPIUMPATH)
+    abs_dest_hypium_path = get_path_code_directory(DESTHYPIUMPATH)
+
+    changeHypium(abs_hypium_path, abs_dest_hypium_path)
 
     files_to_compile = []
-    for root, dirs, files in os.walk(abs_hypium_path):
+    for root, dirs, files in os.walk(abs_dest_hypium_path):
         if "testAbility" in dirs:
             dirs.remove("testAbility")
         if "testrunner" in dirs:
@@ -320,20 +354,234 @@ def link_abc_files(output_dir):
         raise  # 可以选择抛出异常或处理错误
 
 
+def copy_hypium2dest(src_path, dest_path):
+    """复制目录中除了testAbility和testrunner以外的文件和目录"""
+    if os.path.exists(dest_path):
+        shutil.rmtree(dest_path)
+
+    os.makedirs(dest_path)
+
+    # 需要排除的目录名
+    exclude_dirs = {'testAbility', 'testrunner'}
+
+    for root, dirs, files in os.walk(src_path):
+        # 过滤掉需要排除的目录
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
+
+        # 计算相对路径
+        rel_path = os.path.relpath(root, src_path)
+        if rel_path == '.':
+            rel_path = ''
+
+        # 创建目标目录
+        if rel_path:
+            dest_dir = os.path.join(dest_path, rel_path)
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+        
+        # 复制文件
+        for file in files:
+            if file not in exclude_dirs:
+                src_file = os.path.join(root, file)
+                dest_file = os.path.join(dest_path, rel_path, file)
+                shutil.copy2(src_file, dest_file)
+
+
+def get_ets_files(dest_path):
+    """获取目标路径中所有.ets后缀的文件名"""
+    ets_files = []
+    for root, dirs, files in os.walk(dest_path):
+        for file in files:
+            if file.endswith('.ets'):
+                # 保存相对路径和文件名
+                ets_files.append(os.path.relpath(os.path.join(root, file), dest_path))
+    return ets_files
+
+
+def modify_filename(filename):
+    """修改文件名，在后缀前加上_hypiumTool"""
+    # index.ets不修改文件名
+    if filename == 'index.ets':
+        return filename
+    name, ext = os.path.splitext(filename)
+    return f"{name}_hypiumTool{ext}"
+
+
+def process_import_lines(line):
+    """处理import语句，修改相对路径"""
+    # 匹配 import ... from 'path' 或 export ... from 'path' 格式
+    pattern = r"(import|export)\s+(.*?from\s+')([^']+)'"
+
+    def replace_path(match):
+        import_type = match.group(1)
+        import_content = match.group(2)  # from '
+        path = match.group(3)
+
+        # 检查是否为相对路径且不是node_modules等系统路径
+        if path.startswith('.') and not path.startswith('./node_modules') and not path.startswith('@ohos'):
+            # 分离目录和文件名
+            if '/' in path:
+                dir_part, file_part = os.path.split(path)
+                name, ext = os.path.splitext(file_part)
+                if name != 'index':  # 不修改index文件
+                    new_path = f"{dir_part}/{name}_hypiumTool{ext}"
+                else:
+                    new_path = path
+            else:
+                name, ext = os.path.splitext(path)
+                if name != 'index':  # 不修改index文件
+                    new_path = f"{name}_hypiumTool{ext}"
+                else:
+                    new_path = path
+            return f"{import_type} {import_content}{new_path}'"
+        return match.group(0)
+
+    # 处理import语句
+    result = re.sub(pattern, replace_path, line)
+    return result
+
+
+def process_special_case_line(line):
+    """处理特殊格式： } from './xxx'; 这种情况"""
+    # 匹配 } from './xxx'; 这种格式
+    pattern = r'}\s+from\s+[\'"]([^\'"]+)[\'"]'
+
+    def replace_path(match):
+        path = match.group(1)
+
+        # 检查是否为相对路径且不是node_modules等系统路径
+        if path.startswith('.') and not path.startswith('./node_modules') and not path.startswith('@ohos'):
+            # 分离目录和文件名
+            if '/' in path:
+                dir_part, file_part = os.path.split(path)
+                name, ext = os.path.splitext(file_part)
+                if name != 'index':  # 不修改index文件
+                    new_path = f"{dir_part}/{name}_hypiumTool{ext}"
+                else:
+                    new_path = path
+            else:
+                name, ext = os.path.splitext(path)
+                if name != 'index':  # 不修改index文件
+                    new_path = f"{name}_hypiumTool{ext}"
+                else:
+                    new_path = path
+            return f"}} from '{new_path}'"
+        return match.group(0)
+
+    # 处理特殊格式
+    result = re.sub(pattern, replace_path, line)
+    return result
+
+
+def process_file_content(file_path, ets_files_list):
+    """处理单个文件的内容"""
+    with open(file_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    modified_lines = []
+    for line in lines:
+        # 先处理特殊格式: } from './xxx';
+        if line.strip().startswith('}') and 'from \'' in line:
+            modified_line = process_special_case_line(line)
+            modified_lines.append(modified_line)
+        # 处理import/export语句
+        elif 'from \'' in line and ('import' in line or 'export' in line):
+            modified_line = process_import_lines(line)
+            modified_lines.append(modified_line)
+        else:
+            modified_lines.append(line)
+
+    # 写回修改后的内容
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.writelines(modified_lines)
+
+
+def changeHypium(src_path, dest_path):
+    # 1. 复制文件
+    print(f"复制文件从 {src_path} 到 {dest_path}")
+    copy_hypium2dest(src_path, dest_path)
+
+    # 2. 读取所有.ets文件名
+    ets_files = get_ets_files(dest_path)
+    print(f"找到 {len(ets_files)} 个.ets文件")
+    
+    # 3. 修改文件名 (index.ets不修改，其他文件修改)
+    print("修改文件名...")
+    renamed_files = []
+    for file_path in ets_files:
+        # 获取文件名
+        filename = os.path.basename(file_path)
+        if filename != 'index.ets':
+            # 获取目录路径
+            dir_path = os.path.dirname(file_path)
+            if dir_path:
+                full_old_path = os.path.join(dest_path, file_path)
+                new_filename = modify_filename(filename)
+                full_new_path = os.path.join(dest_path, dir_path, new_filename)
+            else:
+                full_old_path = os.path.join(dest_path, file_path)
+                new_filename = modify_filename(filename)
+                full_new_path = os.path.join(dest_path, new_filename)
+
+            if os.path.exists(full_old_path):
+                os.rename(full_old_path, full_new_path)
+                renamed_files.append((file_path, os.path.join(dir_path, new_filename) if dir_path else new_filename))
+                print(f"重命名: {file_path} -> {os.path.join(dir_path, new_filename) if dir_path else new_filename}")
+        else:
+            print(f"跳过index.ets文件名修改: {file_path}")
+
+    # 更新文件列表(注意：index.ets保持原名)
+    updated_ets_files = []
+    for file_path in ets_files:
+        filename = os.path.basename(file_path)
+        if filename != 'index.ets':
+            dir_path = os.path.dirname(file_path)
+            new_filename = modify_filename(filename)
+            if dir_path:
+                updated_ets_files.append(os.path.join(dir_path, new_filename))
+            else:
+                updated_ets_files.append(new_filename)
+        else:
+            updated_ets_files.append(file_path)
+
+    # 4.处理文件内容
+    print("处理文件内容...")
+    for file_path in updated_ets_files:
+        if file_path.endswith('.ets'):
+            full_file_path = os.path.join(dest_path, file_path)
+            if os.path.exists(full_file_path):
+                print(f"处理文件: {file_path}")
+                process_file_content(full_file_path, updated_ets_files)
+
+    print("处理完成！")
+
+
 def main():
-    # 工具链编译
-    static_core_path = get_path_code_directory(STATICCOREPATH)
-    #清空上次编译结果
-    remove_directory_contents(os.path.join(static_core_path, "out"))
-    #执行编译工具链命令
-    run_toolchain_build()
+    # 先编译工具链(必须全部成功)
+    try:
+        static_core_path = get_path_code_directory(STATICCOREPATH)
+        remove_directory_contents(os.path.join(static_core_path, "out"))
+        run_toolchain_build() # 会中断失败流程
+    except Exception as e:
+        print(f"工具链构建失败，无法继续后续流程：{e}")
+        return
     third_party_path = os.path.join(static_core_path, "third_party")
-    #删除third_party路径下的bundle.json防止编译出错
+    # 删除third_party路径下的bundle.json防止编译出错
     delete_specific_files(third_party_path, 'bundle.json')
     # hypium编译
     arktstest_output_path = 'out/generic_generic_arm_64only/general_all_phone_standard/tests/arktstdd/hypium'
     hypium_output_dir = get_path_code_directory(arktstest_output_path)
-    build_ets_files(hypium_output_dir)
+    if not os.path.exists(hypium_output_dir):
+        os.makedirs(hypium_output_dir)
+        print(f"目录 {hypium_output_dir} 已创建")
+    else:
+        print(f"目录 {hypium_output_dir} 已存在")
+    # 3. 执行 hypium 编译
+    try:
+        build_ets_files(hypium_output_dir)
+    except Exception as e:
+        print(f"hypium 编译失败：{e}")
+        return
 
 
 if __name__ == '__main__':
