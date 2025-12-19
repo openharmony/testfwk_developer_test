@@ -24,7 +24,11 @@ export interface AbilityDelegator {
   
   finishTest(msg: string, code: number): void;
   
-  executeShellCommand(cmd: String, timeoutSecs: number, callback: AsyncCallback<ShellCmdResult, void>): void;
+  executeShellCommand(cmd: String, timeoutSecs?: number): Promise<ShellCmdResult>;
+  
+  executeShellCommand(cmd: String, callback: AsyncCallback<ShellCmdResult>): void;
+  
+  executeShellCommand(cmd: String, timeoutSecs: number, callback: AsyncCallback<ShellCmdResult>): void;
 }
 
 export class AbilityDelegatorInner implements AbilityDelegator {
@@ -33,5 +37,13 @@ export class AbilityDelegatorInner implements AbilityDelegator {
   
   finishTest(msg: string, code: number): void {};
   
-  executeShellCommand(cmd: String, timeoutSecs: number, callback: AsyncCallback<ShellCmdResult, void>): void {};
+  executeShellCommand(cmd: String, timeoutSecs?: number): Promise<ShellCmdResult>{
+    return new Promise<ShellCmdResult>((resolve, reject) => {
+      resolve({} as ShellCmdResult);
+    });
+  }
+  
+  executeShellCommand(cmd: String, callback: AsyncCallback<ShellCmdResult, void>): void{};
+  
+  executeShellCommand(cmd: String, timeoutSecs: number, callback: AsyncCallback<ShellCmdResult, void>): void{};
 }
