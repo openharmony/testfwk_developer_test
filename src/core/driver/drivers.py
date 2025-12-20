@@ -31,13 +31,18 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from json import JSONDecodeError
 
-from xdevice import DeviceTestType, check_result_report
+from xdevice import DeviceTestType
 from xdevice import DeviceLabelType
 from xdevice import CommonParserType
 from xdevice import ExecuteTerminate
 from xdevice import DeviceError
 from xdevice import ShellHandler
-
+from xdevice import do_module_kit_teardown
+from xdevice import get_config_value
+from xdevice import check_result_report
+from xdevice import JsonParser
+from xdevice import get_kit_instances
+from xdevice import do_module_kit_setup
 from xdevice import IDriver
 from xdevice import platform_logger
 from xdevice import Plugin
@@ -594,8 +599,10 @@ class CppTestDriver(IDriver):
             self.config.device.set_device_report_path(request.config.report_path)
             if request.config.hilogswitch != "0":
                 self.config.device.device_log_collector.start_hilog_task()
+
+            self._init_acts_gtest(request)
             self._init_gtest()
-            self._run_gtest(suite_file)
+            self._run_gtest(suite_file, request)
 
         finally:
             log_path = get_result_savepath(request.root.source.source_file, request.config.report_path)
@@ -650,6 +657,50 @@ class CppTestDriver(IDriver):
             self.config.device.execute_shell_command(
                 "mkdir -p %s" % os.path.join(self.config.target_test_path,
                                              "corpus"))
+
+    def _init_acts_gtest(self, request=None):
+        if not request:
+            return
+
+        config_file = request.root.source.config_file
+        if config_file:
+            json_config = JsonParser(config_file)
+            self.kits = get_kit_instances(json_config,
+                                          self.config.resource_path,
+                                          self.config.testcases_path)
+            self._get_driver_config(json_config)
+            do_module_kit_setup(request, self.kits)
+
+    def _get_driver_config(self, json_config):
+        target_test_path = get_config_value('native-test-device-path',
+                                            json_config.get_driver(),
+                                            False)
+        if target_test_path:
+            if not target_test_path.endswith("/"):
+                self.config.target_test_path = target_test_path + "/"
+            else:
+                self.config.target_test_path = target_test_path
+        else:
+            self.config.target_test_path = DEFAULT_TEST_PATH
+
+        self.config.module_name = get_config_value(
+            'module-name', json_config.get_driver(), False
+        )
+
+        timeout_config = get_config_value('native-test-timeout',
+                                          json_config.get_driver(), False)
+        if timeout_config:
+            self.config.timeout = int(timeout_config)
+        else:
+            self.config.timeout = TIME_OUT
+
+        rerun = get_config_value('rerun', json_config.get_driver(), False)
+        if isinstance(rerun, bool):
+            self.rerun = rerun
+        elif str(rerun).lower == "false":
+            self.rerun = False
+        else:
+            self.rerun = True
 
     def _gtest_command(self, suite_file):
         filename = os.path.basename(suite_file)
@@ -712,7 +763,7 @@ class CppTestDriver(IDriver):
 
         return command
 
-    def _run_gtest(self, suite_file):
+    def _run_gtest(self, suite_file, request=None):
         from xdevice import Variables
         is_coverage_test = True if self.config.coverage else False
 
@@ -761,9 +812,12 @@ class CppTestDriver(IDriver):
         else:
             self.result = result.get_test_results(return_message)
 
-        resource_manager.process_cleaner_data(resource_data_dic,
-                                              resource_dir,
-                                              self.config.device)
+        if request and request.root.source.config_file:
+            do_module_kit_teardown(request)
+        else:
+            resource_manager.process_cleaner_data(resource_data_dic,
+                                                  resource_dir,
+                                                  self.config.device)
 
     def _push_corpus_cov_if_exist(self, suite_file):
         corpus_path = suite_file.split("fuzztest")[-1].strip(os.sep)
