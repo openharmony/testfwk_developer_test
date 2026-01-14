@@ -31,7 +31,7 @@ ARKLINKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
 
 def get_path_code_directory(after_dir):
     """
-    拼接绝对路径工具类
+    拼接绝对路径工具 类
     """
     current_path = os.path.abspath(__file__)
     current_dir = os.path.dirname(current_path)
