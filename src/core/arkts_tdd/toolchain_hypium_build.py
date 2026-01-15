@@ -19,6 +19,7 @@ import subprocess
 import shutil
 import json
 import re
+import sys
 
 STATICCOREPATH = "arkcompiler/runtime_core/static_core/"
 ES2PANDAPATH = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
@@ -27,6 +28,7 @@ HYPIUMPATH = "test/testfwk/arkxtest/jsunit/src_static/"
 DESTHYPIUMPATH = "test/testfwk/developer_test/libs/destHypium"
 TOOLSPATH = "test/testfwk/developer_test/libs/arkts1.2"
 ARKLINKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
+CASEBUILDPATH = "build/ohos/testfwk"
 
 
 def get_path_code_directory(after_dir):
@@ -79,6 +81,7 @@ def create_soft_link(target_path, link_path):
         print(f'{"*" * 35}成功创建软链接：{link_path} -> {target_path}{"*" * 35}')
     except OSError as e:
         print(f'创建软连接失败：{e}')
+        raise
 
 
 def run_toolchain_build():
@@ -112,7 +115,7 @@ def run_toolchain_build():
     command_3 = "pip3 install tqdm"
     command_4 = "pip3 install python-dotenv"
     command_5 = "./scripts/install-third-party --force-clone"
-    command_6 = "cmake -B out -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain/host_clang_default.cmake -GNinja ."
+    command_6 = "cmake -B out -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./cmake/toolchain/host_clang_default.cmake -GNinja ."
     command_7 = "cmake --build out"
     command_list = [command_1, command_2, command_3, command_4, command_5, command_6, command_7]
 
@@ -138,6 +141,7 @@ def delete_specific_files(directory, target_extension):
                 print(f"已删除文件：{file_path}")
             except Exception as e:
                 print(f"删除文件 {file_path} 时出错：{str(e)}")
+                raise
 
 
 # 删除某个目录下所有的文件和文件夹
@@ -184,6 +188,7 @@ def write_arktsconfig_file():
             config = json.load(f)
     except FileNotFoundError:
         config = {"compilerOptions": {"baseUrl": "/code/arkcompiler/runtime_core/static_core", "paths": {}}}
+        raise
 
     # 5. 更新配置中的paths(保留之前的配置项)
     config.setdefault("compilerOptions", {})
@@ -213,6 +218,10 @@ def build_tools(compile_filelist, hypium_output_dir):
             file_name = os.path.basename(ets_file)
             base_name = os.path.splitext(file_name)[0]
             output_filepath = os.path.join(output_dir, f"{base_name}.abc")
+            # 如果hypium和tools的abc文件存在则跳过编译
+            if os.path.exists(output_filepath):
+                print(f".abc文件已存在：'{output_filepath}',跳过编译")
+                continue
 
             # 构造编译命令
             command = [abs_es2panda_path, ets_file, f"--output={output_filepath}"]
@@ -280,14 +289,16 @@ def build_ets_files(hypium_output_dir):
     """
     编译hypium、tools文件
     """
-    if os.path.exists(hypium_output_dir):
+    target_file = os.path.join(hypium_output_dir, "hypium_tools.abc")
+    if os.path.exists(target_file):
         try:
-            shutil.rmtree(hypium_output_dir)
-            print(f'已成功清除文件夹：{hypium_output_dir}')
+            os.remove(target_file)
+            print(f'已成功删除文件：{target_file}')
         except OSError as e:
-            print(f'清空文件夹失败：{e}')
+            print(f'文件删除失败：{e}')
+            raise
     else:
-        print(f'文件夹不存在：{hypium_output_dir}')
+        print(f'文件不存在：{target_file}')
 
     abs_hypium_path = get_path_code_directory(HYPIUMPATH)
     abs_dest_hypium_path = get_path_code_directory(DESTHYPIUMPATH)
@@ -314,6 +325,36 @@ def build_ets_files(hypium_output_dir):
         print("未找到可编译的 .ets 文件，跳过编译。")
         return
     build_tools(files_to_compile, hypium_output_dir)
+
+
+def make_executable(file_path):
+    """
+    为指定路径的文件添加可执行权限 (chmod +x)
+    :rtype: object
+    :param file_path: 文件的完整或相对路径
+    :return: True if success, False otherwise
+    """
+    # 检查文件是否存在
+    if not os.path.exists(file_path):
+        print(f"错误：文件不存在 → '{file_path}'")
+        return False
+
+    # 检查是否为文件（而非目录）
+    if not os.path.isfile(file_path):
+        print(f"错误：路径不是文件 → '{file_path}'")
+        return False
+
+    # 设置可执行权限：rwxr-xr-x -> 0o755
+    try:
+        os.chmod(file_path, 0o755)
+        print(f"成功：已为 '{file_path}' 添加可执行权限。")
+        return True
+    except PermissionError:
+        print(f"权限不足：无法修改文件权限 → '{file_path}'")
+        return False
+    except Exception as e:
+        print(f"操作失败：{e}")
+        return False
 
 
 def link_abc_files(output_dir):
@@ -378,7 +419,7 @@ def copy_hypium2dest(src_path, dest_path):
             dest_dir = os.path.join(dest_path, rel_path)
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
-        
+
         # 复制文件
         for file in files:
             if file not in exclude_dirs:
@@ -504,7 +545,7 @@ def changeHypium(src_path, dest_path):
     # 2. 读取所有.ets文件名
     ets_files = get_ets_files(dest_path)
     print(f"找到 {len(ets_files)} 个.ets文件")
-    
+
     # 3. 修改文件名 (index.ets不修改，其他文件修改)
     print("修改文件名...")
     renamed_files = []
@@ -557,32 +598,41 @@ def changeHypium(src_path, dest_path):
 
 
 def main():
+    print("开始编译", flush=True)
+
     # 先编译工具链(必须全部成功)
-    try:
-        static_core_path = get_path_code_directory(STATICCOREPATH)
-        remove_directory_contents(os.path.join(static_core_path, "out"))
-        run_toolchain_build() # 会中断失败流程
-    except Exception as e:
-        print(f"工具链构建失败，无法继续后续流程：{e}")
-        return
+    static_core_path = get_path_code_directory(STATICCOREPATH)
     third_party_path = os.path.join(static_core_path, "third_party")
-    # 删除third_party路径下的bundle.json防止编译出错
-    delete_specific_files(third_party_path, 'bundle.json')
-    # hypium编译
-    arktstest_output_path = 'out/generic_generic_arm_64only/general_all_phone_standard/tests/arktstdd/hypium'
-    hypium_output_dir = get_path_code_directory(arktstest_output_path)
-    if not os.path.exists(hypium_output_dir):
-        os.makedirs(hypium_output_dir)
-        print(f"目录 {hypium_output_dir} 已创建")
-    else:
-        print(f"目录 {hypium_output_dir} 已存在")
-    # 3. 执行 hypium 编译
     try:
+        remove_directory_contents(os.path.join(static_core_path, "out"))
+        run_toolchain_build()  # 会中断失败流程
+        # 删除third_party路径下的bundle.json防止编译出错
+        delete_specific_files(third_party_path, 'bundle.json')
+        # hypium编译
+        arktstest_output_path = 'out/generic_generic_arm_64only/general_all_phone_standard/tests/arktstdd/hypium'
+        hypium_output_dir = get_path_code_directory(arktstest_output_path)
+        if not os.path.exists(hypium_output_dir):
+            os.makedirs(hypium_output_dir)
+            print(f"目录 {hypium_output_dir} 已创建")
+        else:
+            print(f"目录 {hypium_output_dir} 已存在")
+        # 执行hypium编译
         build_ets_files(hypium_output_dir)
     except Exception as e:
-        print(f"hypium 编译失败：{e}")
-        return
+        print(f"工具链/hypium构建编译失败，无法继续后续流程：{e}")
+        # 删除third_party目录
+        if os.path.exists(third_party_path):
+            shutil.rmtree(third_party_path)  # 递归删除整个目录树
+            print(f"成功删除目录: {third_party_path}")
+        else:
+            print(f"目录不存在: {third_party_path}")
+        sys.exit(1)
+    # 为用例执行脚本赋可执行权限
+    case_build_path = get_path_code_directory(CASEBUILDPATH)
+    make_executable(os.path.join(case_build_path, 'arkts_tdd_cases_build.py'))
+
+    print("编译结束", flush=True)
 
 
 if __name__ == '__main__':
-    main()  
+    main()
