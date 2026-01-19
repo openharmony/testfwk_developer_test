@@ -21,6 +21,8 @@ import os
 import shutil
 import stat
 import time
+from xml.dom import minidom
+from datetime import datetime
 
 from xdevice import ParamError
 from xdevice import get_device_log_file
@@ -39,6 +41,7 @@ from xdevice import ConfigConst
 from xdevice import JsonParser
 from xdevice import TestDescription
 from xdevice import platform_logger
+from xdevice import FilePermission
 
 from ohos.constants import CKit
 from ohos.executor.listener import CollectingPassListener
@@ -273,6 +276,11 @@ class OHJSUnitTestDriver(IDriver):
                 xml_path = os.path.join(
                     request.config.report_path, "result",
                     '.'.join((request.get_module_name(), "xml")))
+                if not os.path.exists(xml_path):
+                    self._no_result_create_suite_xml(xml_path, 
+                    request.get_module_name(), 
+                    self.error_message.__str__())
+
                 shutil.move(xml_path, self.result)
                 self.result = check_result_report(
                     request.config.report_path, self.result, self.error_message)
@@ -328,6 +336,16 @@ class OHJSUnitTestDriver(IDriver):
 
         finally:
             do_module_kit_teardown(request)
+
+    def _no_result_create_suite_xml(self, xml_path, module_name, error_message):
+        times = str(datetime.now()).split(".")[0]
+        xml_content = """<testsuites name="SUITENAME" timestamp="DATETIME" time="0" errors="0" disabled="0" failures="0" tests="0" ignored="0" unavailable="1" message="ERROR_MESSAGE"></testsuites>"""
+        xml_content = xml_content.replace("SUITENAME", module_name).replace(
+            "DATETIME", times).replace("ERROR_MESSAGE", error_message)
+        xml_pretty = minidom.parseString(xml_content).toprettyxml(indent="  ")
+        result_fd = os.open(xml_path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, FilePermission.mode_644)
+        with os.fdopen(result_fd, mode="w", encoding="utf-8") as result_file:
+            result_file.write(xml_pretty)
 
     def _get_driver_config(self, json_config):
         package = get_config_value('package-name',
