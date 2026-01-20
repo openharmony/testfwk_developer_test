@@ -647,10 +647,14 @@ class CppTestDriver(IDriver):
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
-        self.config.device.execute_shell_command(
-            "rm -rf %s" % self.config.target_test_path)
-        self.config.device.execute_shell_command(
+        if self._check_shell_path(self.config.target_test_path,
+                                  self.config.device.device_sn):
+            self.config.device.execute_shell_command(
+                f"rm -rf {os.path.join(self.config.target_test_path, '*')}")
+        else:
+            self.config.device.execute_shell_command(
             "mkdir -p %s" % self.config.target_test_path)
+            
         self.config.device.execute_shell_command(
             "mount -o rw,remount,rw /")
         if "fuzztest" == self.config.testtype[0]:
@@ -670,6 +674,14 @@ class CppTestDriver(IDriver):
                                           self.config.testcases_path)
             self._get_driver_config(json_config)
             do_module_kit_setup(request, self.kits)
+    
+    def _check_shell_path(self, file_path, device_sn):
+        command = f"hdc -t {device_sn} shell ls -l {file_path}"
+        output = subprocess.getoutput(command)
+        if "No such file or directory" in output:
+            return False
+        else:
+            return True
 
     def _get_driver_config(self, json_config):
         target_test_path = get_config_value('native-test-device-path',
