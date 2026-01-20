@@ -648,9 +648,7 @@ class CppTestDriver(IDriver):
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
         self.config.device.execute_shell_command(
-            "rm -rf %s" % self.config.target_test_path)
-        self.config.device.execute_shell_command(
-            "mkdir -p %s" % self.config.target_test_path)
+            f"rm -rf {os.path.join(self.config.target_test_path, '*')}")
         self.config.device.execute_shell_command(
             "mount -o rw,remount,rw /")
         if "fuzztest" == self.config.testtype[0]:
