@@ -676,7 +676,7 @@ class CppTestDriver(IDriver):
             self._get_driver_config(json_config)
             do_module_kit_setup(request, self.kits)
     
-    def _check_shell_path(self, file_path, device_sn):
+    def _check_shell_path(self, file_path):
         command = f"ls -l {file_path}"
         output = self.config.device.execute_shell_command(command)
         if "No such file or directory" in output:
