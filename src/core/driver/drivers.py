@@ -600,8 +600,10 @@ class CppTestDriver(IDriver):
             if request.config.hilogswitch != "0":
                 self.config.device.device_log_collector.start_hilog_task()
 
-            self._init_acts_gtest(request)
-            self._init_gtest()
+            if self.config.testtype[0] in ["acts", "hits"]:
+                self._init_acts_gtest(request)
+            else:
+                self._init_gtest()
             self._run_gtest(suite_file, request)
 
         finally:
@@ -647,8 +649,7 @@ class CppTestDriver(IDriver):
 
     def _init_gtest(self):
         self.config.device.connector_command("target mount")
-        if self._check_shell_path(self.config.target_test_path,
-                                  self.config.device.device_sn):
+        if self._check_shell_path(self.config.target_test_path):
             self.config.device.execute_shell_command(
                 f"rm -rf {os.path.join(self.config.target_test_path, '*')}")
         else:
@@ -675,9 +676,9 @@ class CppTestDriver(IDriver):
             self._get_driver_config(json_config)
             do_module_kit_setup(request, self.kits)
     
-    def _check_shell_path(self, file_path, device_sn):
-        command = f"hdc -t {device_sn} shell ls -l {file_path}"
-        output = subprocess.getoutput(command)
+    def _check_shell_path(self, file_path):
+        command = f"ls -l {file_path}"
+        output = self.config.device.execute_shell_command(command)
         if "No such file or directory" in output:
             return False
         else:
