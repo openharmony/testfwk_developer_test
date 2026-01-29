@@ -250,19 +250,20 @@ class OHJSUnitTestDriver(IDriver):
                                         request.config.device.__get_serial__() + "_" + request.
                                         get_module_name(),
                                         "device_hilog")
-
-            hilog_open = os.open(self.hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
-                                 0o755)
-            self.config.device.device_log_collector.add_log_address(self.device_log, self.hilog)
-            self.config.device.execute_shell_command(command="hilog -r")
-            with os.fdopen(hilog_open, "a") as hilog_file_pipe:
-                if hasattr(self.config, ConfigConst.device_log) \
-                        and self.config.device_log.get(ConfigConst.tag_enable) == ConfigConst.device_log_on \
-                        and hasattr(self.config.device, "clear_crash_log"):
-                    self.config.device.device_log_collector.clear_crash_log()
-                self.log_proc, self.hilog_proc = self.config.device.device_log_collector.\
-                    start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
-                self._run_oh_jsunit(config_file, request)
+            if request.config.hilogswitch != "0":
+                hilog_open = os.open(self.hilog, os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+                                     0o755)
+                self.config.device.device_log_collector.add_log_address(self.device_log, self.hilog)
+                self.config.device.execute_shell_command(command="hilog -r")
+                with os.fdopen(hilog_open, "a") as hilog_file_pipe:
+                    if hasattr(self.config, ConfigConst.device_log) \
+                            and self.config.device_log.get(ConfigConst.tag_enable) == ConfigConst.device_log_on \
+                            and hasattr(self.config.device, "clear_crash_log"):
+                        self.config.device.device_log_collector.clear_crash_log()
+                    self.log_proc, self.hilog_proc = self.config.device.device_log_collector.\
+                        start_catch_device_log(hilog_file_pipe=hilog_file_pipe)
+                        
+            self._run_oh_jsunit(config_file, request)
         except Exception as exception:
             self.error_message = exception
             if not getattr(exception, "error_no", ""):
