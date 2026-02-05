@@ -18,14 +18,12 @@ import os
 import subprocess
 import shutil
 import json
-import re
 import sys
 
 STATICCOREPATH = "arkcompiler/runtime_core/static_core/"
 ES2PANDAPATH = "arkcompiler/runtime_core/static_core/out/bin/es2panda"
 CONFIGPATH = "arkcompiler/runtime_core/static_core/out/bin/arktsconfig.json"
 HYPIUMPATH = "test/testfwk/arkxtest/jsunit/src_static/"
-DESTHYPIUMPATH = "test/testfwk/developer_test/libs/destHypium"
 TOOLSPATH = "test/testfwk/developer_test/libs/arkts1.2"
 ARKLINKPATH = "arkcompiler/runtime_core/static_core/out/bin/ark_link"
 CASEBUILDPATH = "build/ohos/testfwk"
@@ -301,12 +299,8 @@ def build_ets_files(hypium_output_dir):
         print(f'文件不存在：{target_file}')
 
     abs_hypium_path = get_path_code_directory(HYPIUMPATH)
-    abs_dest_hypium_path = get_path_code_directory(DESTHYPIUMPATH)
-
-    changeHypium(abs_hypium_path, abs_dest_hypium_path)
-
     files_to_compile = []
-    for root, dirs, files in os.walk(abs_dest_hypium_path):
+    for root, dirs, files in os.walk(abs_hypium_path):
         if "testAbility" in dirs:
             dirs.remove("testAbility")
         if "testrunner" in dirs:
@@ -393,208 +387,6 @@ def link_abc_files(output_dir):
         print("错误: 链接失败")
         print("错误详情:", e.stderr.strip())
         raise  # 可以选择抛出异常或处理错误
-
-
-def copy_hypium2dest(src_path, dest_path):
-    """复制目录中除了testAbility和testrunner以外的文件和目录"""
-    if os.path.exists(dest_path):
-        shutil.rmtree(dest_path)
-
-    os.makedirs(dest_path)
-
-    # 需要排除的目录名
-    exclude_dirs = {'testAbility', 'testrunner'}
-
-    for root, dirs, files in os.walk(src_path):
-        # 过滤掉需要排除的目录
-        dirs[:] = [d for d in dirs if d not in exclude_dirs]
-
-        # 计算相对路径
-        rel_path = os.path.relpath(root, src_path)
-        if rel_path == '.':
-            rel_path = ''
-
-        # 创建目标目录
-        if rel_path:
-            dest_dir = os.path.join(dest_path, rel_path)
-            if not os.path.exists(dest_dir):
-                os.makedirs(dest_dir)
-
-        # 复制文件
-        for file in files:
-            if file not in exclude_dirs:
-                src_file = os.path.join(root, file)
-                dest_file = os.path.join(dest_path, rel_path, file)
-                shutil.copy2(src_file, dest_file)
-
-
-def get_ets_files(dest_path):
-    """获取目标路径中所有.ets后缀的文件名"""
-    ets_files = []
-    for root, dirs, files in os.walk(dest_path):
-        for file in files:
-            if file.endswith('.ets'):
-                # 保存相对路径和文件名
-                ets_files.append(os.path.relpath(os.path.join(root, file), dest_path))
-    return ets_files
-
-
-def modify_filename(filename):
-    """修改文件名，在后缀前加上_hypiumTool"""
-    # index.ets不修改文件名
-    if filename == 'index.ets':
-        return filename
-    name, ext = os.path.splitext(filename)
-    return f"{name}_hypiumTool{ext}"
-
-
-def process_import_lines(line):
-    """处理import语句，修改相对路径"""
-    # 匹配 import ... from 'path' 或 export ... from 'path' 格式
-    pattern = r"(import|export)\s+(.*?from\s+')([^']+)'"
-
-    def replace_path(match):
-        import_type = match.group(1)
-        import_content = match.group(2)  # from '
-        path = match.group(3)
-
-        # 检查是否为相对路径且不是node_modules等系统路径
-        if path.startswith('.') and not path.startswith('./node_modules') and not path.startswith('@ohos'):
-            # 分离目录和文件名
-            if '/' in path:
-                dir_part, file_part = os.path.split(path)
-                name, ext = os.path.splitext(file_part)
-                if name != 'index':  # 不修改index文件
-                    new_path = f"{dir_part}/{name}_hypiumTool{ext}"
-                else:
-                    new_path = path
-            else:
-                name, ext = os.path.splitext(path)
-                if name != 'index':  # 不修改index文件
-                    new_path = f"{name}_hypiumTool{ext}"
-                else:
-                    new_path = path
-            return f"{import_type} {import_content}{new_path}'"
-        return match.group(0)
-
-    # 处理import语句
-    result = re.sub(pattern, replace_path, line)
-    return result
-
-
-def process_special_case_line(line):
-    """处理特殊格式： } from './xxx'; 这种情况"""
-    # 匹配 } from './xxx'; 这种格式
-    pattern = r'}\s+from\s+[\'"]([^\'"]+)[\'"]'
-
-    def replace_path(match):
-        path = match.group(1)
-
-        # 检查是否为相对路径且不是node_modules等系统路径
-        if path.startswith('.') and not path.startswith('./node_modules') and not path.startswith('@ohos'):
-            # 分离目录和文件名
-            if '/' in path:
-                dir_part, file_part = os.path.split(path)
-                name, ext = os.path.splitext(file_part)
-                if name != 'index':  # 不修改index文件
-                    new_path = f"{dir_part}/{name}_hypiumTool{ext}"
-                else:
-                    new_path = path
-            else:
-                name, ext = os.path.splitext(path)
-                if name != 'index':  # 不修改index文件
-                    new_path = f"{name}_hypiumTool{ext}"
-                else:
-                    new_path = path
-            return f"}} from '{new_path}'"
-        return match.group(0)
-
-    # 处理特殊格式
-    result = re.sub(pattern, replace_path, line)
-    return result
-
-
-def process_file_content(file_path, ets_files_list):
-    """处理单个文件的内容"""
-    with open(file_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-
-    modified_lines = []
-    for line in lines:
-        # 先处理特殊格式: } from './xxx';
-        if line.strip().startswith('}') and 'from \'' in line:
-            modified_line = process_special_case_line(line)
-            modified_lines.append(modified_line)
-        # 处理import/export语句
-        elif 'from \'' in line and ('import' in line or 'export' in line):
-            modified_line = process_import_lines(line)
-            modified_lines.append(modified_line)
-        else:
-            modified_lines.append(line)
-
-    # 写回修改后的内容
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.writelines(modified_lines)
-
-
-def changeHypium(src_path, dest_path):
-    # 1. 复制文件
-    print(f"复制文件从 {src_path} 到 {dest_path}")
-    copy_hypium2dest(src_path, dest_path)
-
-    # 2. 读取所有.ets文件名
-    ets_files = get_ets_files(dest_path)
-    print(f"找到 {len(ets_files)} 个.ets文件")
-
-    # 3. 修改文件名 (index.ets不修改，其他文件修改)
-    print("修改文件名...")
-    renamed_files = []
-    for file_path in ets_files:
-        # 获取文件名
-        filename = os.path.basename(file_path)
-        if filename != 'index.ets':
-            # 获取目录路径
-            dir_path = os.path.dirname(file_path)
-            if dir_path:
-                full_old_path = os.path.join(dest_path, file_path)
-                new_filename = modify_filename(filename)
-                full_new_path = os.path.join(dest_path, dir_path, new_filename)
-            else:
-                full_old_path = os.path.join(dest_path, file_path)
-                new_filename = modify_filename(filename)
-                full_new_path = os.path.join(dest_path, new_filename)
-
-            if os.path.exists(full_old_path):
-                os.rename(full_old_path, full_new_path)
-                renamed_files.append((file_path, os.path.join(dir_path, new_filename) if dir_path else new_filename))
-                print(f"重命名: {file_path} -> {os.path.join(dir_path, new_filename) if dir_path else new_filename}")
-        else:
-            print(f"跳过index.ets文件名修改: {file_path}")
-
-    # 更新文件列表(注意：index.ets保持原名)
-    updated_ets_files = []
-    for file_path in ets_files:
-        filename = os.path.basename(file_path)
-        if filename != 'index.ets':
-            dir_path = os.path.dirname(file_path)
-            new_filename = modify_filename(filename)
-            if dir_path:
-                updated_ets_files.append(os.path.join(dir_path, new_filename))
-            else:
-                updated_ets_files.append(new_filename)
-        else:
-            updated_ets_files.append(file_path)
-
-    # 4.处理文件内容
-    print("处理文件内容...")
-    for file_path in updated_ets_files:
-        if file_path.endswith('.ets'):
-            full_file_path = os.path.join(dest_path, file_path)
-            if os.path.exists(full_file_path):
-                print(f"处理文件: {file_path}")
-                process_file_content(full_file_path, updated_ets_files)
-
-    print("处理完成！")
 
 
 def main():
